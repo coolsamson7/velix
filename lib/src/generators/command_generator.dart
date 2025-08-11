@@ -5,6 +5,34 @@ import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 class CommandGenerator extends Generator {
+  // internal
+
+  String getExtends(ClassElement classElement) {
+    // Get the superclass element
+
+    final superClassElement = classElement.supertype;
+
+    if (superClassElement == null) {
+      print('No superclass for ${classElement.name}');
+      return "";
+    }
+
+    // Get the type arguments applied to the superclass
+    final typeArguments = superClassElement.typeArguments;
+
+    if (typeArguments.isEmpty) {
+      print('Superclass has no generic arguments for ${classElement.name}');
+      return "";
+    }
+
+    final firstArg = typeArguments.first;
+    //print('First generic argument: ${firstArg.getDisplayString(withNullability: false)}');
+
+    return firstArg.getDisplayString();
+  }
+
+  // override
+
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
     final output = StringBuffer();
@@ -29,10 +57,12 @@ class CommandGenerator extends Generator {
       final className = clazz.name;
       final mixinName = '_\$${className}Commands';
 
-      output.writeln('mixin $mixinName on CommandController {');
+      final type = getExtends(clazz);
+      output.writeln('mixin $mixinName on CommandController<${type}> {');
 
       // Generate initCommands
 
+      output.writeln('  @override()');
       output.writeln('  void initCommands() {');
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');

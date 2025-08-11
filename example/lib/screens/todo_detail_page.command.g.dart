@@ -7,7 +7,8 @@
 
 part of 'todo_detail_page.dart';
 
-mixin _$_TodoDetailPageStateCommands on CommandController {
+mixin _$_TodoDetailPageStateCommands on CommandController<TodoDetailPage> {
+  @override
   void initCommands() {
     addCommand("save", _save);
     addCommand("cancel", _cancel);

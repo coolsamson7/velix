@@ -16,7 +16,7 @@ class TodoHomePage extends StatefulWidget {
   State<TodoHomePage> createState() => _TodoHomePageState();
 }
 
-class _TodoHomePageState extends State<TodoHomePage> with CommandController, _$_TodoHomePageStateCommands {
+class _TodoHomePageState extends State<TodoHomePage> with CommandController<TodoHomePage>, _$_TodoHomePageStateCommands {
   final TextEditingController _controller = TextEditingController();
 
   // override
@@ -25,7 +25,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController, _$_
   void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
     super.addCommand(name, function, i18n: i18n, label: label, icon: icon);
     
-    CommandDescriptor command = getCommand(name);
+    //CommandDescriptor command = getCommand(name);
     
     //command.prependInterceptor(_SpinnerInterceptor())
   }
@@ -76,8 +76,6 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController, _$_
   @override
   void initState() {
     super.initState();
-
-    initCommands();
 
     _controller.addListener(updateCommandState);
 

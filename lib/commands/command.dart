@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 
@@ -150,7 +150,7 @@ class CommandManager {
 }
 
 
-mixin CommandController {
+mixin CommandController<T extends StatefulWidget> on State<T> {
   // instance data
 
   final Map<String, CommandDescriptor> _commands = {};
@@ -158,16 +158,12 @@ mixin CommandController {
 
   // public
 
-  void setCommandManager(CommandManager commandManager) {
-    this.commandManager = commandManager;
-  }
-
   List<CommandDescriptor> getCommands() {
     return _commands.values.toList();
   }
   
   void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
-    // TODO _commands[name] = getIt<CommandManager>().createCommand(name, function, i18n: i18n, label: label, icon: icon);
+    _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon);
   }
 
   CommandDescriptor getCommand(String name) {
@@ -187,5 +183,18 @@ mixin CommandController {
 
   Future<dynamic> execute(String name, List<dynamic> args) {
     return getCommand(name).execute(args);
+  }
+
+  void initCommands() {}
+
+  // override
+
+  @override
+  void initState() {
+    super.initState();
+
+    commandManager = context.read<CommandManager>();
+
+    initCommands();
   }
 }

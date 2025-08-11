@@ -1,4 +1,3 @@
-//import 'package:flutter/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -18,9 +17,7 @@ class TodoDetailPage extends StatefulWidget {
   State<TodoDetailPage> createState() => _TodoDetailPageState();
 }
 
-// TODO: add commands!
-
-class _TodoDetailPageState extends State<TodoDetailPage> {
+class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<TodoDetailPage>, _$_TodoDetailPageStateCommands {
   // instance data
 
   late FormMapper mapper;
@@ -38,6 +35,12 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
   }
 
   // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+  }
 
   @override
   void initState() {

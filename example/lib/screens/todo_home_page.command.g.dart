@@ -7,7 +7,8 @@
 
 part of 'todo_home_page.dart';
 
-mixin _$_TodoHomePageStateCommands on CommandController {
+mixin _$_TodoHomePageStateCommands on CommandController<TodoHomePage> {
+  @override
   void initCommands() {
     addCommand("addTodo", _addTodo);
     addCommand("removeTodo", _removeTodo);

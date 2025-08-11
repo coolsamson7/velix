@@ -35,3 +35,8 @@ export './validation/validation.dart';
 // util
 
 export './util/collections.dart';
+
+// widgets
+
+
+export './velix.widget_registry.g.dart';

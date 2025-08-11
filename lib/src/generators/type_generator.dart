@@ -176,6 +176,8 @@ class AggregateBuilder implements Builder {
       final name = field.name;
       final type = field.type.getDisplayString();
 
+      //print('${field.name} → ${field.type} → ${field.type.nullabilitySuffix}');
+
       final isFinal = field.isFinal;
       final isNullable = isTypeNullable(field.type);
 

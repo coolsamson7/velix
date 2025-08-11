@@ -10,8 +10,3 @@ targets:
         generate_for:
           include:
             - lib/main.dart
-
-      velix|widget_builder:
-        generate_for:
-          include:
-            - lib/main.dart

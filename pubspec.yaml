@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   path_provider: ^2.0.0
+  path: ^1.9.0
   flutter:
     sdk: flutter
   provider: ^6.0.0

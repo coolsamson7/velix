@@ -1,5 +1,5 @@
-import 'package:flutter_application/mapper/operation_builder.dart';
-import 'package:flutter_application/validation/validation.dart';
+import '../mapper/operation_builder.dart';
+import '../validation/validation.dart';
 
 class Dataclass {
   const Dataclass();

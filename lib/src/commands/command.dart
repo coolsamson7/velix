@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:flutter_application/service_locator.dart';
-//import 'package:easy_localization/easy_localization.dart';
-
 class Command {
   final String? name;
   final String? i18n;

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
-import 'package:flutter_application/commands/command.dart';
-import 'command_button.dart';
+import '../commands/command.dart';
+import './command_button.dart';
 
 class CommandToolbar extends StatelessWidget {
   // instance data

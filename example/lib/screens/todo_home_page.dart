@@ -1,0 +1,173 @@
+import 'dart:async';
+
+//import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
+import '../screens/todo_detail_page.dart';
+import 'package:provider/provider.dart';
+import 'package:velix/velix.dart';
+import '../providers/todo_provider.dart';
+
+part 'todo_home_page.command.g.dart';
+
+class TodoHomePage extends StatefulWidget {
+  const TodoHomePage({super.key});
+
+  @override
+  State<TodoHomePage> createState() => _TodoHomePageState();
+}
+
+class _TodoHomePageState extends State<TodoHomePage> with CommandController, _$_TodoHomePageStateCommands {
+  final TextEditingController _controller = TextEditingController();
+
+  // override
+
+  @override
+  void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
+    super.addCommand(name, function, i18n: i18n, label: label, icon: icon);
+    
+    CommandDescriptor command = getCommand(name);
+    
+    //command.prependInterceptor(_SpinnerInterceptor())
+  }
+
+  // commands
+
+  @override
+  @Command(i18n: "main.addTodo") // icon: CupertinoIcons.add
+  void _addTodo() async{
+      context.read<TodoProvider>().addTodo(_controller.text);
+      _controller.clear();
+
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      updateCommandState();
+  }
+
+  @override
+  @Command(i18n: "main.removeTodo") // icon: CupertinoIcons.delete
+  void _removeTodo(String id) {
+    context.read<TodoProvider>().removeTodo(id);
+  }
+
+  @override
+  @Command(i18n: "main.toggleTodo")
+  void _toggleTodo(String id) {
+    context.read<TodoProvider>().toggleTodo(id);
+  }
+
+  // internal
+
+  void updateCommandState() {
+    setCommandEnabled("addTodo",  _controller.text.isNotEmpty);
+
+    // TODO: more
+  }
+
+  // override
+
+  @override
+  void dispose() {
+    _controller.removeListener(updateCommandState);
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    initCommands();
+
+    _controller.addListener(updateCommandState);
+
+    updateCommandState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CommandView(
+      commands: getCommands(), // <-- Pass the commands TODO
+      child: Consumer<TodoProvider>(
+        builder: (context, todoProvider, _) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoTextField(
+                        controller: _controller,
+                        placeholder: 'hello',
+                      ),
+                    ),
+                    CommandButton(
+                      command: getCommand('addTodo'),
+                      icon: CupertinoIcons.add,
+                      iconOnly: true
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: todoProvider.todos.length,
+                  itemBuilder: (context, index) {
+                    final todo = todoProvider.todos[index];
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      //decoration: BoxDecoration(
+                      //  border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey4)),
+                      //),
+                      child:GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (_) => TodoDetailPage(todo: todo),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey4)),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  todo.title,
+                                  style: TextStyle(
+                                    decoration: todo.completed
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none,
+                                  ),
+                                ),
+                              ),
+                              CupertinoSwitch(
+                                value: todo.completed,
+                                onChanged: (_) => toggleTodo(todo.id),
+                              ),
+                              CommandButton(
+                                command: getCommand('removeTodo'),
+                                icon: CupertinoIcons.delete,
+                                iconOnly: true,
+                                args: [todo.id],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

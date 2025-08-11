@@ -1,13 +1,12 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_application/databinding/text_adapter.dart';
+import 'text_adapter.dart';
+import 'valued_widget.dart';
 
-
-import 'package:flutter_application/databinding/valued_widget.dart';
-import 'package:flutter_application/reflectable/reflectable.dart';
-import 'package:flutter_application/mapper/transformer.dart';
-import 'package:flutter_application/validation/validation.dart';
+import '../reflectable/reflectable.dart';
+import '../mapper/transformer.dart';
+import '../validation/validation.dart';
 
 
 class TypeProperty extends Property<ValuedWidgetContext> {

@@ -1,8 +1,9 @@
-import 'package:flutter_application/main.type_registry.g.dart';
-import 'package:flutter_application/main.widget_registry.g.dart';
-import 'package:flutter_application/mapper/mapper.dart';
-import 'package:flutter_application/models/todo.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/velix.dart';
+
+import 'package:flutter_application/main.widget_registry.g.dart';
+import 'package:flutter_application/models/todo.dart';
+
 
 void main() {
   group('mapper', () {

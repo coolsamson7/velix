@@ -1,5 +1,4 @@
-import 'package:flutter_application/reflectable/reflectable.dart';
-//import 'package:easy_localization/easy_localization.dart';
+import '../reflectable/reflectable.dart';
 
 typedef Check<T> = bool Function(T);
 

@@ -27,7 +27,7 @@ class CommandGenerator extends Generator {
 
       output.writeln("part of '$fileName';\n");
 
-      //output.writeln('import \'package:flutter_application/commands/command.dart\';')
+      //output.writeln('import \'package:velix/velix.dart\';')
 
       final className = clazz.name;
       final mixinName = '_\$${className}Commands';

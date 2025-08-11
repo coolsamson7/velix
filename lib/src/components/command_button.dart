@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/commands/command.dart';
+import '../commands/command.dart';
 
 class CommandButton extends StatefulWidget {
   // instance data

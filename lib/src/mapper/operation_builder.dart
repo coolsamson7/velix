@@ -1,7 +1,8 @@
 
-import 'package:flutter_application/mapper/mapper.dart';
-import 'package:flutter_application/mapper/transformer.dart';
-import 'package:flutter_application/reflectable/reflectable.dart';
+import 'mapper.dart';
+import 'transformer.dart';
+
+import '../reflectable/reflectable.dart';
 
 T? findElement<T>(List<T> list, bool test(T element) ) {
   for ( var element in list) {

@@ -1,8 +1,9 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_application/databinding/form_mapper.dart';
-import 'package:flutter_application/databinding/text_adapter.dart';
-import 'package:flutter_application/mapper/transformer.dart';
+
+import 'form_mapper.dart';
+import 'text_adapter.dart';
+import '../mapper/transformer.dart';
 
 class WidgetAdapter {
   const WidgetAdapter();

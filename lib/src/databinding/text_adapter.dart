@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-import 'package:flutter_application/databinding/valued_widget.dart';
-import 'package:flutter_application/databinding/form_mapper.dart';
+import 'valued_widget.dart';
+import 'form_mapper.dart';
 
 //import 'package:easy_localization/easy_localization.dart';
 

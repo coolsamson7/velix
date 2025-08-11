@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:flutter_application/validation/validation.dart';
+
+import 'package:velix/velix.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:flutter_application/reflectable/reflectable.dart';
+import 'package:velix/velix.dart';
 
 
 bool isTypeNullable(DartType type) {
@@ -41,7 +42,7 @@ class AggregateBuilder implements Builder {
     final className = element.name;
     final buffer = StringBuffer();
 
-    final uri = element.source.uri.toString(); // e.g., package:flutter_application/models/todo.dart
+    final uri = element.source.uri.toString(); // e.g., package:example/models/todo.dart
     final index = uri.lastIndexOf('/');
     String name = uri.substring(index + 1);
 
@@ -302,8 +303,7 @@ class AggregateBuilder implements Builder {
 
     final buffer = StringBuffer();
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
-    buffer.writeln("import 'package:flutter_application/reflectable/reflectable.dart';");
-    buffer.writeln("import 'package:flutter_application/validation/validation.dart';");
+    buffer.writeln("import 'package:velix/velix.dart';");
 
     final seenImports = <String>{};
     for (final clazz in classes) {

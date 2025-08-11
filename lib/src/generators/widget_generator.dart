@@ -4,8 +4,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
-
-
 Builder widgetBuilder(BuilderOptions options) => WidgetBuilder();
 
 bool hasAnnotationByName(Element element, String annotationName) {
@@ -47,7 +45,7 @@ class WidgetBuilder implements Builder {
 
     final buffer = StringBuffer();
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
-    buffer.writeln("import 'package:flutter_application/databinding/valued_widget.dart';");
+    buffer.writeln("import 'package:velix/velix.dart';");
 
     final seenImports = <String>{};
     for (final clazz in classes) {

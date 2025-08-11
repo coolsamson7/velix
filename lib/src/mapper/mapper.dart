@@ -1,11 +1,8 @@
-
-
-
 import 'dart:collection';
 
-import 'package:flutter_application/mapper/operation_builder.dart';
-import 'package:flutter_application/mapper/transformer.dart';
-import 'package:flutter_application/reflectable/reflectable.dart';
+import 'operation_builder.dart';
+import 'transformer.dart';
+import '../reflectable/reflectable.dart';
 
 typedef Converter<S,T> = T Function(S);
 

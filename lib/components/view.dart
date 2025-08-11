@@ -60,7 +60,6 @@ class _CommandViewState extends State<CommandView> {
 
   void _setBusy(bool busy) {
     setState(() {
-      print("swt busy $busy");
       _busy = busy;
     });
   }

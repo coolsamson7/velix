@@ -81,7 +81,6 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
         mapper.notifyChange(path: path, value: newValue);
 
         if (error != errorText) {
-          print("error changed from $errorText to $error");
           errorText = error;
           //(context as Element).markNeedsBuild();
 

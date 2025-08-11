@@ -51,6 +51,8 @@ enum ArgType {
 
 /// @internal
 class MethodSpec {
+  // instance data
+
   final int argCount;
   final List<ArgType> argTypes;
   final MethodApplier<dynamic> apply;
@@ -335,10 +337,16 @@ class IntType extends AbstractType<int> {
   static final Map<String, MethodSpec> methods = {
     'min': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).min(a[0])),
     'max': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).max(a[0])),
+
     'lessThan': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThan(a[0])),
     'lessThanEquals': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
     'greaterThan': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThan(a[0])),
-    'greaterThanEquals': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
+    'greaterThanEquals': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThanEquals(a[0])),
+
+    '<': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThan(a[0])),
+    '<=': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
+    '>': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThan(a[0])),
+    '>=': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
   };
 
   // static methods
@@ -467,10 +475,16 @@ class DoubleType extends AbstractType<double> {
   static final Map<String, MethodSpec> methods = {
     'min': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).min(a[0])),
     'max': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).max(a[0])),
+
     'lessThan': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThan(a[0])),
     'lessThanEquals': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
     'greaterThan': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThan(a[0])),
-    'greaterThanEquals': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
+    'greaterThanEquals': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThanEquals(a[0])),
+
+    '<': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThan(a[0])),
+    '<=': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
+    '>': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThan(a[0])),
+    '>=': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThanEquals(a[0])),
   };
 
   // static methods
@@ -599,6 +613,8 @@ class StringType extends AbstractType<String> {
   static final Map<String, MethodSpec> methods = {
     'minLength': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).minLength(a[0])),
     'maxLength': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).maxLength(a[0])),
+    'min-length': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).minLength(a[0])),
+    'max-length': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).maxLength(a[0])),
     'length': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic)
         .minLength(a[0])
         .maxLength(a[0])),
@@ -609,6 +625,7 @@ class StringType extends AbstractType<String> {
       check: (s) => RegExp(a[0]).hasMatch(s),
     )),
     'notEmpty': MethodSpec(0, [], (t, a) => (t as dynamic).notEmpty()),
+    'not-empty': MethodSpec(0, [], (t, a) => (t as dynamic).notEmpty()),
   };
 
   // static methods

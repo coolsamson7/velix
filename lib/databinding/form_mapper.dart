@@ -57,7 +57,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
   dynamic newInstance() {
     Map<Symbol, dynamic> args = {};
 
-    // TODO. not all attributes mapped!
+    // TODO: check if not all attributes are mapped!
 
     for (var constructorParameter in (field.type as ObjectType).typeDescriptor.constructorParameters) {
       var name = constructorParameter.name;

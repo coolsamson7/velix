@@ -189,7 +189,6 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
   }
 
   void setCommandEnabled(String command, bool enabled) {
-    print("$command.enabled = $enabled");
     getCommand(command).enabled = enabled;
   }
 

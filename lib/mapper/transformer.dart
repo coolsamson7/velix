@@ -1,3 +1,6 @@
+/// A [Property] is able to read and write property values given an instance
+///
+/// [CONTEXT] any context information that could be needed during a transformation
 abstract class Property<CONTEXT> {
   /// Read a property value given an instance
   ///
@@ -19,10 +22,16 @@ abstract class Property<CONTEXT> {
 ///
 /// [CONTEXT] any context information that could be needed during a transformation
 class Operation<CONTEXT> {
+  // instance data
+
   Property<CONTEXT> source;
   Property<CONTEXT> target;
 
+  // constructor
+
   Operation(this.source, this.target);
+
+  // public
 
   /// Set a target property by reading the appropriate value from the source
   ///
@@ -45,14 +54,15 @@ class Operation<CONTEXT> {
 
 /// [Transformer] is a generic class that transforms a source into a target object given a list of [Operation]s.
 class Transformer<CONTEXT> {
+  // instance data
+
   final List<Operation<CONTEXT>> operations;
+
+  // constructor
 
   Transformer(this.operations);
 
-  /// A [Property] is able to read and write property values given an instance
-  ///
-  /// [CONTEXT] any context information that could be needed during a transformation
-
+  // public
 
   /// Modify a target instance by applying all specified operations.
   ///

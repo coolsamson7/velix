@@ -248,7 +248,6 @@ class AggregateBuilder implements Builder {
         typeName = typeName.substring(0, typeName.length - 1);
 
       if ( typeName.startsWith("List<")) {
-        print(typeName);
         return "ListType($typeName)";
       }
       else

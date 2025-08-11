@@ -6,7 +6,7 @@ void main() {
   group('StringParser', () {
 
     test('parse', () {
-      var type = IntType.fromString("lessThan 7 greaterThan 0");
+      var type = IntType.fromString("< 7 > 0");
 
       var code = type.code();
 

@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:velix/velix.dart';
 
 import 'package:provider/provider.dart';
+import 'main.type_registry.g.dart';
+import 'main.widget_registry.g.dart';
 import 'service_locator.dart';
 import 'providers/todo_provider.dart';
 import 'screens/main_screen.dart';

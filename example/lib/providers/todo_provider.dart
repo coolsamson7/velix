@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:velix/velix.dart';
 import '../models/todo.dart';
 import 'package:injectable/injectable.dart';
 
@@ -14,9 +13,6 @@ class TodoProvider with ChangeNotifier {
 
   void addTodo(String title) async {
     Todo todo = Todo(id: DateTime.now().toString(), details: Details(author: "", priority: 1), title: title);
-
-    //String id = TypeDescriptor.forType(Todo).get(todo, "id");
-    //Map json = serializeToJson(todo);
 
     _todos.add(todo);
 

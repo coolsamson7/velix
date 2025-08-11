@@ -115,9 +115,6 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
                     final todo = todoProvider.todos[index];
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      //decoration: BoxDecoration(
-                      //  border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey4)),
-                      //),
                       child:GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(

@@ -1,0 +1,34 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome, {{name}}!",
+
+  "main": {
+    "todos": "TODOs",
+    "settings": "Settings",
+
+    "addTodo": "Add",
+    "removeTodo": "Delete",
+    "toggleTodo": "Toggle"
+  },
+
+  "validation": {
+    "string": {
+      "minLength": "must have a minimum of {minLength} characters",
+      "maxLength": "must have a maximum of {maxLength} characters"
+    },
+    "int": {
+      "greaterThan": "must have greater than {greaterThan}",
+      "greaterThanEquals": "must have greater or equal to {greaterThan}",
+      "lessThan": "must have less than {lessThan}",
+      "lessThanEquals": "must have less or equal to {lessThanEquals}"
+    },
+    "double": {
+      "greaterThan": "must have greater than {greaterThan}",
+      "greaterThanEquals": "must have greater or equal to {greaterThan}",
+      "lessThan": "must have less than {lessThan}",
+      "lessThanEquals": "must have less or equal to {lessThanEquals}"
+    },
+    "bool": {
+    }
+  }
+}

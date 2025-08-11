@@ -29,10 +29,10 @@ void registerAllDescriptors() {
      params: [
          param<String>('id', isNamed: true, isRequired: true),
          param<String>('title', isNamed: true, isRequired: true),
-         param<Details>('details', isNamed: true, isNullable: true, defaultValue: null),
+         param<Details?>('details', isNamed: true, isNullable: true, defaultValue: null),
          param<bool>('completed', isNamed: true, isNullable: true, defaultValue: false),
        ],
-     constructor: ({String id = '', String title = '', required Details details, bool completed = false}) => Todo(id: id, title: title, details: details, completed: completed),
+     constructor: ({String id = '', String title = '', Details? details, bool completed = false}) => Todo(id: id, title: title, details: details, completed: completed),
      fields: [
          field<Todo,String>('id',
            type: StringType().maxLength(7),
@@ -48,7 +48,7 @@ void registerAllDescriptors() {
            getter: (obj) => (obj as Todo).completed,
            setter: (obj, value) => (obj as Todo).completed = value,
          ),
-         field<Todo,Details>('details',
+         field<Todo,Details?>('details',
            getter: (obj) => (obj as Todo).details,
            setter: (obj, value) => (obj as Todo).details = value,
            isNullable: true

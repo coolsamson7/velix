@@ -62,7 +62,7 @@ class CommandGenerator extends Generator {
 
       // Generate initCommands
 
-      output.writeln('  @override()');
+      output.writeln('  @override');
       output.writeln('  void initCommands() {');
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');

@@ -135,9 +135,9 @@ class AggregateBuilder implements Builder {
           paramsBuffer.write("required $paramType $paramName, ");
         else {
           if ( defaultValue == "null")
-            paramType = "$paramType?";
-
-          paramsBuffer.write("$paramType $paramName = $defaultValue, ");
+            paramsBuffer.write("$paramType $paramName, ");
+          else
+            paramsBuffer.write("$paramType $paramName = $defaultValue, ");
         }
       }
 

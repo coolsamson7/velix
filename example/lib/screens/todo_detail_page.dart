@@ -41,7 +41,6 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
   }
 
   @override

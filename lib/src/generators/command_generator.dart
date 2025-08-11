@@ -4,7 +4,6 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 
-
 class CommandGenerator extends Generator {
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
@@ -27,8 +26,6 @@ class CommandGenerator extends Generator {
 
       output.writeln("part of '$fileName';\n");
 
-      //output.writeln('import \'package:velix/velix.dart\';')
-
       final className = clazz.name;
       final mixinName = '_\$${className}Commands';
 
@@ -39,15 +36,6 @@ class CommandGenerator extends Generator {
       output.writeln('  void initCommands() {');
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
-        final paramDeclarations = method.parameters.asMap().entries.map((entry) {
-          final i = entry.key;
-          final param = entry.value;
-          final typeStr = param.type.getDisplayString(withNullability: false);
-          return '$typeStr ${param.name} = args[$i] as $typeStr;';
-        }).join('\n        ');
-
-        final paramCall = method.parameters.map((p) => p.name).join(', ');
-
         final name = _getCommandAnnotation(method)!.peek('name')?.stringValue ?? publicName;
         final label = _getCommandAnnotation(method)!.peek('label')?.stringValue ?? '';
 
@@ -58,15 +46,11 @@ class CommandGenerator extends Generator {
         }
 
         output.writeln(');');
-        //output.writeln('      execute: (args) {');
-        //i//f (method.parameters.isNotEmpty) output.writeln('        $paramDeclarations');
-        // output.writeln('        return ${method.name}($paramCall);');
-        //output.writeln('      },');
-        //output.writeln('    ));');
       }
       output.writeln('  }');
 
       // Generate public forwarding methods
+
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
         final signature = method.parameters.map((param) {
@@ -102,10 +86,11 @@ class CommandGenerator extends Generator {
         return ConstantReader(constantValue);
       }
     }
+
     return null;
   }
 }
 
 // function for build.yaml
-Builder commandBuilder(BuilderOptions options) =>
-    LibraryBuilder(CommandGenerator(), generatedExtension: '.command.g.dart');
+
+Builder commandBuilder(BuilderOptions options) => LibraryBuilder(CommandGenerator(), generatedExtension: '.command.g.dart');

@@ -2,7 +2,6 @@ library velix;
 
 // commands
 
-
 export 'src/commands/command.dart';
 
 // components
@@ -32,17 +31,3 @@ export 'src/reflectable/reflectable.dart';
 // validation
 
 export 'src/validation/validation.dart';
-
-
-
-export 'src/core.dart';
-
-// Widget adapters and registry
-export 'src/valued_widget.dart' show ValuedWidget;
-
-// Any annotations needed for code generation
-export 'src/annotations.dart';
-
-// (Optional) utility functions or constants
-
-export 'src/utils.dart';

@@ -167,7 +167,7 @@ mixin CommandController {
   }
   
   void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
-    _commands[name] = getIt<CommandManager>().createCommand(name, function, i18n: i18n, label: label, icon: icon);
+    // TODO _commands[name] = getIt<CommandManager>().createCommand(name, function, i18n: i18n, label: label, icon: icon);
   }
 
   CommandDescriptor getCommand(String name) {

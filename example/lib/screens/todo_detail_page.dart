@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:velix/velix.dart';
 import 'package:provider/provider.dart';
+
+import 'package:velix/velix.dart';
+
 import '../models/todo.dart';
-import ../providers/todo_provider.dart';
+import '../providers/todo_provider.dart';
 
 part "todo_detail_page.command.g.dart";
 

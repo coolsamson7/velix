@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:velix/velix.dart';
-import 'todo.dart';
+import '../models/todo.dart';
 import 'package:injectable/injectable.dart';
 
 part 'todo_provider.command.g.dart';

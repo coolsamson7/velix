@@ -17,6 +17,9 @@ description: "flutter foundation."
 # of the product and file versions while build-number is used as the build suffix.
 version: 1.0.0+1
 
+homepage: https://github.com/coolsamson7/velix
+repository: https://github.com/coolsamson7/velix
+
 environment:
   sdk: ^3.8.1
   flutter: ">=3.32.8"

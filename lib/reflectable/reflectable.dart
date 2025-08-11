@@ -276,7 +276,7 @@ class ObjectMapper {
     for (var field in descriptor._fields.values) {
       final value = json[field.name];
 
-      if (value is Map<String, dynamic> && TypeDescriptor.forType(field.type.type) != null) {
+      if (value is Map<String, dynamic>) {
         field.setter!(instance, fromJson(field.type.type, value, seen: seen));
       }
       else if (value is List &&

@@ -85,7 +85,7 @@ class MapDeep extends MapperProperty {
   }
 }
 
-class Convert extends MapperProperty {
+class ConvertProperty extends MapperProperty {
   // instance data
 
   MapperProperty property;
@@ -93,7 +93,7 @@ class Convert extends MapperProperty {
 
   // constructor
 
-  Convert({required this.property, required this.conversion});
+  ConvertProperty({required this.property, required this.conversion});
 
   // implement Property
 
@@ -571,7 +571,7 @@ class TargetNode {
     if (conversion == null)
       return property;
     else {
-      return Convert(property: property, conversion: conversion);
+      return ConvertProperty(property: property, conversion: conversion);
     }
   }
 

@@ -286,8 +286,8 @@ class Mapping<S,T> extends Transformer<MappingContext> {
 
   // public
 
-  State setupContext(MappingContext context)  {
-    var state = State(context: context);
+  MappingState setupContext(MappingContext context)  {
+    var state = MappingState(context: context);
 
     context.setup(intermediateResultDefinitions, stackSize);
 
@@ -553,7 +553,7 @@ class MappingDefinition<S,T> {
         fromAccessors.add(PropertyAccessor(name: from));
 
       else if (from is List<String>)
-        fromAccessors = (from as List<String>).map((element) => PropertyAccessor(name: element)).toList(growable: false);
+        fromAccessors = (from).map((element) => PropertyAccessor(name: element)).toList(growable: false);
 
       if ( constant != null)
         fromAccessors.add(ConstantAccessor(value: constant));
@@ -562,7 +562,7 @@ class MappingDefinition<S,T> {
         toAccessors.add(PropertyAccessor(name: to));
 
       if (to is List<String>)
-        toAccessors = (to as List<String>).map((element) => PropertyAccessor(name: element)).toList(growable: false);
+        toAccessors = (to).map((element) => PropertyAccessor(name: element)).toList(growable: false);
 
       // done
 
@@ -588,18 +588,18 @@ MappingDefinition<S,T> mapping<S,T>() {
   return MappingDefinition<S,T>();
 }
 
-class State {
+class MappingState {
   // instance data
 
   MappingContext context;
   late List<Buffer> resultBuffers;
   late List<dynamic> stack;
   dynamic result;
-  late State? nextState;
+  late MappingState? nextState;
 
   // constructor
 
-  State({required this.context}) {
+  MappingState({required this.context}) {
     nextState = context.currentState;
 
     context.currentState = this;
@@ -625,7 +625,7 @@ class MappingContext {
   Map<dynamic, dynamic>  mappedObjects = Map.identity();
   List<Buffer> resultBuffers = [];
   List<dynamic> stack = [];
-  State? currentState;
+  MappingState? currentState;
 
   // constructor
 

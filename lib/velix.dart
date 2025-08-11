@@ -2,32 +2,32 @@ library velix;
 
 // commands
 
-export 'src/commands/command.dart';
+export './commands/command.dart';
 
 // components
 
-export 'src/components/command_button.dart';
-export 'src/components/command_toolbar.dart';
-export 'src/components/overlay.dart';
-export 'src/components/view.dart';
+export './components/command_button.dart';
+export './components/command_toolbar.dart';
+export './components/overlay.dart';
+export './components/view.dart';
 
 // databinding
 
-export 'src/databinding/form_mapper.dart';
-export 'src/databinding/switch_adapter.dart';
-export 'src/databinding/text_adapter.dart';
-export 'src/databinding/valued_widget.dart';
+export './databinding/form_mapper.dart';
+export './databinding/switch_adapter.dart';
+export './databinding/text_adapter.dart';
+export './databinding/valued_widget.dart';
 
 // mapper
 
-export 'src/mapper/mapper.dart';
-export 'src/mapper/transformer.dart';
-export 'src/mapper/operation_builder.dart';
+export './mapper/mapper.dart';
+export './mapper/transformer.dart';
+export './mapper/operation_builder.dart';
 
 // reflectable
 
-export 'src/reflectable/reflectable.dart';
+export './reflectable/reflectable.dart';
 
 // validation
 
-export 'src/validation/validation.dart';
+export './validation/validation.dart';

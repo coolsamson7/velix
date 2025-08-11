@@ -1,9 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
 
-import 'package:flutter_application/models/todo.dart';
-
-
 @Dataclass()
 class Collections {
   // instance data
@@ -74,7 +71,7 @@ class Immutable {
 void main() {
   group('mapper', () {
 
-    registerAllDescriptors();
+    //TODO registerAllDescriptors();
 
     test('map collections', () {
       print("collections");

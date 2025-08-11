@@ -3,13 +3,13 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 
-import 'package:velix/velix.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:velix/velix.dart';
+import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/validation/validation.dart';
 
 
 bool isTypeNullable(DartType type) {

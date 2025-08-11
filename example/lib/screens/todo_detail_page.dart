@@ -1,3 +1,4 @@
+//import 'package:flutter/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class TodoDetailPage extends StatefulWidget {
   State<TodoDetailPage> createState() => _TodoDetailPageState();
 }
 
-// TODO: add comamnds!
+// TODO: add commands!
 
 class _TodoDetailPageState extends State<TodoDetailPage> {
   // instance data

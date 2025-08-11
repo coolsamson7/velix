@@ -1,0 +1,40 @@
+builders:
+  command_builder:
+    import: "package:velix/src/generators/command_generator.dart"
+    builder_factories: ["commandBuilder"]
+    build_extensions: {".dart": [".command.g.dart"]}
+    auto_apply: dependents
+    build_to: source
+    applies_builders: ["source_gen|combining_builder"]
+
+  type_builder:
+    import: "package:velix/src/generators/type_generator.dart"
+    builder_factories: [ "typeBuilder" ]
+    build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
+    auto_apply: root_package
+    build_to: source
+
+  widget_builder:
+    import: "package:velix/src/generators/widget_generator.dart"
+    builder_factories: [ "widgetBuilder" ]
+    build_extensions: { "$lib$": [ ".widget_registry.g.dart" ] }
+    auto_apply: root_package
+    build_to: source
+
+targets:
+  $default:
+    builders:
+      velix|command_builder:
+        generate_for:
+          include:
+            - lib/**/*.dart
+
+      velix|type_builder:
+        generate_for:
+          include:
+            - lib/main.dart
+
+      velix|widget_builder:
+        generate_for:
+          include:
+            - lib/main.dart

@@ -291,8 +291,11 @@ class AggregateBuilder implements Builder {
     final resolver = buildStep.resolver;
     final classes = <ClassElement>[];
 
+    final isTestFile = buildStep.inputId.toString().contains('|test/');
+    var dir = isTestFile ? "test" : "lib";
+
     // Find all Dart files in lib/
-    await for (final input in buildStep.findAssets(Glob('lib/**.dart'))) {
+    await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
       for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
         if (element.element is ClassElement) {
@@ -327,7 +330,7 @@ class AggregateBuilder implements Builder {
 
     // Write to type_registry.g.dart
 
-    final assetId = AssetId(buildStep.inputId.package, 'lib/${fileName}.type_registry.g.dart');
+    final assetId = AssetId(buildStep.inputId.package, '$dir/${fileName}.type_registry.g.dart');
     await buildStep.writeAsString(assetId, buffer.toString());
   }
 }

@@ -69,7 +69,10 @@ class WidgetBuilder implements Builder {
 
     final fileName = p.basenameWithoutExtension(buildStep.inputId.path);
 
-    final assetId = AssetId(buildStep.inputId.package, 'lib/${fileName}.widget_registry.g.dart');
+    final isTestFile = buildStep.inputId.toString().contains('|test/');
+    var dir = isTestFile ? "test" : "lib";
+
+    final assetId = AssetId(buildStep.inputId.package, '$dir/${fileName}.widget_registry.g.dart');
     await buildStep.writeAsString(assetId, buffer.toString());
   }
 }

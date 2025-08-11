@@ -9,7 +9,7 @@ Builder widgetBuilder(BuilderOptions options) => WidgetBuilder();
 
 bool hasAnnotationByName(Element element, String annotationName) {
   return element.metadata.any((annotation) {
-    final name = annotation.element?.enclosingElement?.name;
+    final name = annotation.element?.enclosingElement3?.name;
     // For a simple annotation like @Foo, name is 'Foo'.
     // If unresolved it can be null, so check safe.
     return name == annotationName;
@@ -72,7 +72,7 @@ class WidgetBuilder implements Builder {
     final isTestFile = buildStep.inputId.toString().contains('|test/');
     var dir = isTestFile ? "test" : "lib";
 
-    final assetId = AssetId(buildStep.inputId.package, '$dir/${fileName}.widget_registry.g.dart');
+    final assetId = AssetId(buildStep.inputId.package, '$dir/$fileName.widget_registry.g.dart');
     await buildStep.writeAsString(assetId, buffer.toString());
   }
 }

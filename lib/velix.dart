@@ -1,4 +1,4 @@
-library velix;
+//library velix;
 
 // commands
 

@@ -36,7 +36,7 @@ class FieldDescriptor<T, V> {
     required this.getter,
     this.elementType,
     this.factoryConstructor,
-    this.setter = null,
+    this.setter,
     this.isFinal = false,
     this.isNullable = false
   });
@@ -99,12 +99,12 @@ class TypeDescriptor<T> {
   // class methods
 
   static void register<T>(TypeDescriptor<T> typeDescriptor) {
-    _by_type[typeDescriptor.type] = typeDescriptor;
-    _by_name[typeDescriptor.name] = typeDescriptor;
+    _byType[typeDescriptor.type] = typeDescriptor;
+    _byName[typeDescriptor.name] = typeDescriptor;
   }
 
   static TypeDescriptor forType<T>(T type) {
-    final descriptor = _by_type[type];
+    final descriptor = _byType[type];
     if (descriptor == null) {
       throw StateError("No TypeDescriptor registered for type: $type");
     }
@@ -113,7 +113,7 @@ class TypeDescriptor<T> {
   }
 
   static TypeDescriptor forName(String type) {
-    final descriptor = _by_name[type];
+    final descriptor = _byName[type];
     if (descriptor == null) {
       throw StateError("No TypeDescriptor registered for type: $type");
     }
@@ -123,8 +123,8 @@ class TypeDescriptor<T> {
 
   // class properties
 
-  static final Map<Type,TypeDescriptor> _by_type = {};
-  static final Map<String,TypeDescriptor> _by_name = {};
+  static final Map<Type,TypeDescriptor> _byType = {};
+  static final Map<String,TypeDescriptor> _byName = {};
 
   // instance data
 
@@ -281,7 +281,7 @@ class ObjectMapper {
       }
       else if (value is List &&
           field.type.toString().startsWith('List<')) {
-        final elementType = field.type.toString();// TODO.substring(5, field.type.toString().length - 1);
+        final elementType = field.type.toString();
         final resolvedType = TypeDescriptor.forName(elementType);
 
         final items = value

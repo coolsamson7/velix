@@ -80,7 +80,7 @@ void main() {
             .map(constant: 2, to: "value")
       ]);
 
-      var target = mapper.map(Money(currency: "EU", value: 1));
+      mapper.map(Money(currency: "EU", value: 1));
 
       // benchmark
 
@@ -88,15 +88,13 @@ void main() {
       final stopwatch = Stopwatch()..start();
 
       // 👇 Code to benchmark
+
       for (int i = 0; i < loops; i++) {
         mapper.map(Money(currency: "EU", value: 1));
       }
 
       stopwatch.stop();
       print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
-
-
-      //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
 
     test('map deep', () {
@@ -113,7 +111,7 @@ void main() {
 
       var source = Immutable(id: '1', price: Money(currency: "EU", value: 1));
 
-      var target = mapper.map(source);
+      mapper.map(source);
 
       // benchmark
 
@@ -121,6 +119,7 @@ void main() {
       final stopwatch = Stopwatch()..start();
 
       // 👇 Code to benchmark
+
       for (int i = 0; i < loops; i++) {
         mapper.map(source);
       }
@@ -143,7 +142,7 @@ void main() {
 
       var source = Immutable(id: '1', price: Money(currency: "EU", value: 1));
 
-      var target = mapper.map(source);
+      mapper.map(source);
 
       // benchmark
 

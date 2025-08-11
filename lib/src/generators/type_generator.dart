@@ -43,8 +43,6 @@ class AggregateBuilder implements Builder {
     final buffer = StringBuffer();
 
     final uri = element.source.uri.toString(); // e.g., package:example/models/todo.dart
-    final index = uri.lastIndexOf('/');
-    String name = uri.substring(index + 1);
 
     final qualifiedName = '$uri.${element.name}';
 
@@ -109,31 +107,6 @@ class AggregateBuilder implements Builder {
          var paramType = param.type.getDisplayString(withNullability: false);
         final paramName = param.name;
 
-        bool isRequired = false;
-
-        //
-
-        if (param.isNamed && param.isRequiredNamed) {
-          //print('Named required param: ${param.name}');
-
-          if (param.isInitializingFormal) {
-            // Get the field it initializes
-            final field = element.getField(param.name);
-            if (field != null) {
-              final DartType type = field.type;
-              final nullable = type.nullabilitySuffix ==
-                  NullabilitySuffix.question;
-
-              //print('  → Field type: ${type.getDisplayString(withNullability: true)}');
-              //print('  → Nullable: $nullable');
-
-              isRequired = !nullable;
-            }
-          }
-        }
-
-        //
-
         // Use param.defaultValueCode or default literal for some common types if null
 
         String? defaultValue = param.defaultValueCode;
@@ -163,7 +136,7 @@ class AggregateBuilder implements Builder {
           paramsBuffer.write("required $paramType $paramName, ");
         else {
           if ( defaultValue == "null")
-            paramType = paramType + "?";
+            paramType = "$paramType?";
 
           paramsBuffer.write("$paramType $paramName = $defaultValue, ");
         }
@@ -181,6 +154,7 @@ class AggregateBuilder implements Builder {
       buffer.write("}) => $className(");
 
       // Pass parameters to actual constructor, named if necessary
+
       final args = <String>[];
       for (final param in firstCtor.parameters) {
         if (param.isNamed) {
@@ -218,7 +192,7 @@ class AggregateBuilder implements Builder {
       if (elementType != null) {
         final elementTypeName = elementType.getDisplayString(withNullability: false);
         buffer.writeln("           elementType: $elementTypeName,");
-        buffer.writeln("           factoryConstructor: () => <${elementTypeName}>[],");
+        buffer.writeln("           factoryConstructor: () => <$elementTypeName>[],");
       }
 
       buffer.writeln("           getter: (obj) => (obj as $className).$name,");
@@ -227,7 +201,6 @@ class AggregateBuilder implements Builder {
         buffer.writeln("           setter: (obj, value) => (obj as $className).$name = value,");
       }
       else {
-        //buffer.writeln("        setter: null,");
         buffer.writeln("           isFinal: $isFinal,");
       }
 
@@ -295,6 +268,7 @@ class AggregateBuilder implements Builder {
     var dir = isTestFile ? "test" : "lib";
 
     // Find all Dart files in lib/
+
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
       for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
@@ -330,7 +304,7 @@ class AggregateBuilder implements Builder {
 
     // Write to type_registry.g.dart
 
-    final assetId = AssetId(buildStep.inputId.package, '$dir/${fileName}.type_registry.g.dart');
+    final assetId = AssetId(buildStep.inputId.package, '$dir/$fileName.type_registry.g.dart');
     await buildStep.writeAsString(assetId, buffer.toString());
   }
 }

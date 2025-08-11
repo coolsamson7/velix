@@ -6,8 +6,7 @@ import 'package:injectable/injectable.dart';
 class TodoProvider with ChangeNotifier {
   final List<Todo> _todos = [];
 
-  TodoProvider() {
-  }
+  TodoProvider();
 
   List<Todo> get todos => _todos;
 

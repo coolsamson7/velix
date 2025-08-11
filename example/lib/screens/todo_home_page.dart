@@ -19,17 +19,6 @@ class TodoHomePage extends StatefulWidget {
 class _TodoHomePageState extends State<TodoHomePage> with CommandController<TodoHomePage>, _$_TodoHomePageStateCommands {
   final TextEditingController _controller = TextEditingController();
 
-  // override
-
-  @override
-  void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
-    super.addCommand(name, function, i18n: i18n, label: label, icon: icon);
-    
-    //CommandDescriptor command = getCommand(name);
-    
-    //command.prependInterceptor(_SpinnerInterceptor())
-  }
-
   // commands
 
   @override
@@ -60,7 +49,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   void updateCommandState() {
     setCommandEnabled("addTodo",  _controller.text.isNotEmpty);
 
-    // TODO: more
+    // more...
   }
 
   // override

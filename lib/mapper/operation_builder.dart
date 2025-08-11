@@ -4,7 +4,7 @@ import 'transformer.dart';
 
 import '../reflectable/reflectable.dart';
 
-T? findElement<T>(List<T> list, bool test(T element) ) {
+T? findElement<T>(List<T> list, bool Function(T element) test ) {
   for ( var element in list) {
     if ( test(element)) {
       return element;
@@ -37,7 +37,7 @@ class MapList2List extends  MapperProperty {
   void set(dynamic instance, dynamic value, MappingContext context) {
     if (value != null) {
       var list = value as List;
-      var result = this.factory();
+      var result = factory();
 
       for (var element in list) {
         result.add(context.mapper.map(element, context: context));
@@ -192,7 +192,7 @@ class PushValueProperty extends MapperProperty {
 
   // constructor
 
-  PushValueProperty({required this.index}) {}
+  PushValueProperty({required this.index});
 
   // implement Property
 
@@ -328,16 +328,16 @@ class SourceNode {
   }
 
   void insertMatch(SourceTree tree, Match match, int index) {
-    SourceNode? root = findElement(children, (child) => child.accessor == match.paths[SOURCE][index]);
+    SourceNode? root = findElement(children, (child) => child.accessor == match.paths[0][index]);
 
     if (root == null) {
       children.add(root = tree.makeNode(
         this,
-          match.paths[SOURCE][index],  // step
-        match.paths[SOURCE].length - 1 == index ? match : null));
+          match.paths[0][index],  // step
+        match.paths[0].length - 1 == index ? match : null));
     }
 
-    if (match.paths[SOURCE].length > index + 1) {
+    if (match.paths[0].length > index + 1) {
       root.insertMatch(tree, match, index + 1);
     }
   }
@@ -345,9 +345,9 @@ class SourceNode {
   // pre: this node matches index - 1
 
   SourceNode? findMatchingNode(Match match, int index) {
-    if (index < match.paths[SOURCE].length) {
+    if (index < match.paths[0].length) {
       for (var child in children) {
-        if (child.accessor == match.paths[SOURCE][index]) {
+        if (child.accessor == match.paths[0][index]) {
           return child.findMatchingNode(match, index + 1);
         }
       } // for
@@ -356,9 +356,6 @@ class SourceNode {
     return this;
   }
 }
-
-int SOURCE = 0;
-int TARGET = 1;
 
 class SourceTree {
   // instance data
@@ -369,9 +366,7 @@ class SourceTree {
 
   // constructor
 
-  SourceTree(Type type, List<Match> matches) {
-    this.type = type;
-
+  SourceTree(this.type, List<Match> matches) {
     for ( var match in matches) {
       insertMatch(match);
     }
@@ -384,13 +379,13 @@ class SourceTree {
 
     if (root == null) {
       root = makeNode(null, // parent
-          match.paths[SOURCE][0], // step
-          match.paths[SOURCE].length == 1 ? match : null);
+          match.paths[0][0], // step
+          match.paths[0].length == 1 ? match : null);
 
       roots.add(root);
     }
 
-    if (match.paths[SOURCE].length > 1) {
+    if (match.paths[0].length > 1) {
       root.insertMatch(this, match, 1);
     }
   }
@@ -400,7 +395,7 @@ class SourceTree {
       if (node.match == match) {
         return node;
       }
-      else if (node.accessor == match.paths[SOURCE][0])
+      else if (node.accessor == match.paths[0][0])
         return node.findMatchingNode(match, 1);
     }
 
@@ -472,7 +467,7 @@ class IntermediateResultDefinition {
 
   // constructor
 
-  IntermediateResultDefinition({required clazz, required this.constructor, required this.index, required this.nArgs, required this.valueReceiver}) {
+  IntermediateResultDefinition({required Type clazz, required this.constructor, required this.index, required this.nArgs, required this.valueReceiver}) {
     typeDescriptor = TypeDescriptor.forType(clazz);
     constructorArgs = typeDescriptor.constructorParameters.length;
   }
@@ -532,7 +527,7 @@ class TargetNode {
     if ( conversion != null)
       return conversion;
     else
-      throw MapperException("cannot convert ${sourceType} to ${targetType}");
+      throw MapperException("cannot convert $sourceType to $targetType");
   }
 
 
@@ -554,10 +549,10 @@ class TargetNode {
       var to = conversion.targetType;
 
       if ( from != sourceType)
-        throw MapperException("conversion source type ${from} does not match ${sourceType}");
+        throw MapperException("conversion source type $from does not match $sourceType");
 
       if ( to != targetType)
-        throw MapperException("conversion target type ${to} does not match ${targetType}");
+        throw MapperException("conversion target type $to does not match $targetType");
 
       result = conversion.get();
     }
@@ -667,17 +662,17 @@ class TargetNode {
   }
 
   void insertMatch(TargetTree tree, Match match, int index) {
-    TargetNode? root = findElement(children, (child) => child.accessor == match.paths[SOURCE][index]);
+    TargetNode? root = findElement(children, (child) => child.accessor == match.paths[0][index]);
 
     if (root == null) {
       children.add(root = tree.makeNode(
           this,
-          match.paths[TARGET][index],  // step
-          match.paths[TARGET].length - 1 == index ? match : null
+          match.paths[1][index],  // step
+          match.paths[1].length - 1 == index ? match : null
       ));
     }
 
-    if (match.paths[TARGET].length > index + 1) {
+    if (match.paths[1].length > index + 1) {
       root.insertMatch(tree, match, index + 1);
     }
   }
@@ -685,9 +680,9 @@ class TargetNode {
   // pre: this node matches index - 1
 
   TargetNode? findMatchingNode(Match match, int index) {
-    if (index < match.paths[SOURCE].length) {
+    if (index < match.paths[0].length) {
       for (var child in children) {
-        if (child.accessor == match.paths[SOURCE][index]) {
+        if (child.accessor == match.paths[0][index]) {
           return child.findMatchingNode(match, index + 1);
       }
         }
@@ -734,8 +729,7 @@ class TargetTree {
 
   // constructor
 
-  TargetTree(Type type, List<Match> matches) {
-    this.type = type;
+  TargetTree(this.type, List<Match> matches) {
     root = TargetNode(accessor: RootAccessor(type), parent: null, match: null);
 
     for ( var match in matches) {

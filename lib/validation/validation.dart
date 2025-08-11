@@ -27,17 +27,17 @@ class Test<T> {
 typedef MethodApplier<T> = void Function(AbstractType<T>, List<dynamic> args);
 
 enum ArgType {
-  string_type,
-  int_type,
-  double_type;
+  stringType,
+  intType,
+  doubleType;
 
   dynamic parse(String value) {
     switch (this) {
-      case ArgType.string_type:
+      case ArgType.stringType:
         return value;
-      case ArgType.int_type:
+      case ArgType.intType:
         return int.parse(value);
-      case ArgType.double_type:
+      case ArgType.doubleType:
         return double.parse(value);
     }
   }
@@ -135,8 +135,6 @@ class AbstractType<T> {
     return '$value';
   }
 
-
-
   void check(dynamic object, ValidationContext context) {
     for ( Test test in tests) {
       if (!test.run(object)) {
@@ -172,7 +170,7 @@ class AbstractType<T> {
 
   // fluent
 
-  void baseType<T>(Type type) {
+  void baseType<V>(Type type) {
     this.type = type;
 
     this.test<dynamic>(
@@ -181,7 +179,7 @@ class AbstractType<T> {
         params: {
           "type": type
         },
-        check: (dynamic object) => object is T,
+        check: (dynamic object) => object is V,
         stop: true
     );
   }
@@ -259,9 +257,9 @@ class TypeViolation {
    String toString() {
      var buffer = StringBuffer();
 
-     Map<String, String> stringMap = params.map(
-           (key, value) => MapEntry(key, value.toString()),
-     );
+     //Map<String, String> stringMap = params.map(
+     //      (key, value) => MapEntry(key, value.toString()),
+     //);
 
      var translation = "validation.${type.toString().toLowerCase()}.$name";//TODO .tr(namedArgs: stringMap);
 
@@ -304,12 +302,12 @@ class IntType extends AbstractType<int> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
-    'min': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).min(a[0])),
-    'max': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).max(a[0])),
-    'lessThan': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).lessThan(a[0])),
-    'lessThanEquals': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).lessThanEquals(a[0])),
-    'greaterThan': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).greaterThan(a[0])),
-    'greaterThanEquals': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
+    'min': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).min(a[0])),
+    'max': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).max(a[0])),
+    'lessThan': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThan(a[0])),
+    'lessThanEquals': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
+    'greaterThan': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThan(a[0])),
+    'greaterThanEquals': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
   };
 
   // static methods
@@ -330,12 +328,14 @@ class IntType extends AbstractType<int> {
 
   // fluent
 
+  @override
   IntType required() {
     super.required();
 
     return this;
   }
 
+  @override
   IntType optional() {
     super.optional();
 
@@ -434,12 +434,12 @@ class DoubleType extends AbstractType<double> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
-    'min': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).min(a[0])),
-    'max': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).max(a[0])),
-    'lessThan': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).lessThan(a[0])),
-    'lessThanEquals': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).lessThanEquals(a[0])),
-    'greaterThan': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).greaterThan(a[0])),
-    'greaterThanEquals': MethodSpec(1, [ArgType.double_type], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
+    'min': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).min(a[0])),
+    'max': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).max(a[0])),
+    'lessThan': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThan(a[0])),
+    'lessThanEquals': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).lessThanEquals(a[0])),
+    'greaterThan': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThan(a[0])),
+    'greaterThanEquals': MethodSpec(1, [ArgType.doubleType], (t, a) => (t as dynamic).greaterThanEquals(a[0]))
   };
 
   // static methods
@@ -460,12 +460,14 @@ class DoubleType extends AbstractType<double> {
 
   // fluent
 
+  @override
   DoubleType required() {
     super.required();
 
     return this;
   }
 
+  @override
   DoubleType optional() {
     super.optional();
 
@@ -564,12 +566,12 @@ class StringType extends AbstractType<String> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
-    'minLength': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).minLength(a[0])),
-    'maxLength': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).maxLength(a[0])),
-    'length': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic)
+    'minLength': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).minLength(a[0])),
+    'maxLength': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).maxLength(a[0])),
+    'length': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic)
         .minLength(a[0])
         .maxLength(a[0])),
-    're': MethodSpec(1, [ArgType.string_type], (t, a) => (t as dynamic).test<String>(
+    're': MethodSpec(1, [ArgType.stringType], (t, a) => (t as dynamic).test<String>(
       type: String,
       name: "re",
       params: {"pattern": a[0]},
@@ -596,12 +598,14 @@ class StringType extends AbstractType<String> {
 
   // fluent
 
+  @override
   StringType required() {
     super.required();
 
     return this;
   }
 
+  @override
   StringType optional() {
     super.optional();
 
@@ -676,12 +680,14 @@ class BoolType extends AbstractType<bool> {
 
   // override
 
+  @override
   BoolType required() {
     super.required();
 
     return this;
   }
 
+  @override
   BoolType optional() {
     super.optional();
 
@@ -743,8 +749,8 @@ class ListType<T> extends AbstractType<T> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
-    'min': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).min(a[0])),
-    'max': MethodSpec(1, [ArgType.int_type], (t, a) => (t as dynamic).max(a[0])),
+    'min': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).min(a[0])),
+    'max': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).max(a[0])),
   };
 
   // constructor
@@ -778,7 +784,7 @@ class ListType<T> extends AbstractType<T> {
     return this;
   }
 
-  ListType  max(int length) {
+  ListType max(int length) {
     test<List> (
       type: List,
       name: "max",

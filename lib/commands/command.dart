@@ -47,9 +47,7 @@ class CommandDescriptor extends ChangeNotifier {
     if ( i18n != null) {
       label = i18n; //TODO !.tr();
     }
-    else if ( label == null) {
-      label ??= name;
-    }
+    else label ??= name;
   }
 
   // administrative

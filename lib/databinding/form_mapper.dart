@@ -88,6 +88,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
 
   // implement
 
+  @override
   dynamic get(dynamic instance, ValuedWidgetContext context) {
     if (!isInitialized()) {
       if (parent != null) {
@@ -100,6 +101,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     return value;
   }
 
+  @override
   void set(dynamic instance, dynamic value, ValuedWidgetContext context) {
     if (this.value != value) {
       var wasDirty = isDirty();

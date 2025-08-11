@@ -1,5 +1,5 @@
 name: velix
-description: "flutter foundation."
+description: "flutter foundation library including validation, a reflection based mapper and automatic two-way form binding ."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 
@@ -31,22 +31,22 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  path_provider: ^2.0.0
-  path: ^1.9.0
+  path_provider: ^2.1.5
+  path: ^1.9.1
   flutter:
     sdk: flutter
   provider: ^6.0.0
-  get_it: ^8.0.3
+  get_it: ^8.2.0
   injectable: ^2.3.2
   source_gen: ^2.0.0
   analyzer: ^6.4.1
   build: ^2.4.1
-  easy_localization: ^3.0.3
+  easy_localization: ^3.0.8
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  glob: ^2.0.2
+  glob: ^2.1.3
 
 dev_dependencies:
   flutter_test:
@@ -54,7 +54,6 @@ dev_dependencies:
   injectable_generator: ^2.4.0
   build_runner: ^2.4.7
   flutter_lints: ^6.0.0
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

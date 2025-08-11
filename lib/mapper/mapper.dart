@@ -714,8 +714,7 @@ class Mapper {
 
     Mapping<S,T> mapping = getMapping<S,T>(source.runtimeType);
 
-    if ( context == null)
-       context = MappingContext(mapper: this);
+    context ??= MappingContext(mapper: this);
 
     dynamic target = context.mappedObject(source);
 

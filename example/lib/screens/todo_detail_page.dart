@@ -25,11 +25,13 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   // commands
 
   @Command()
+  @override
   void _save() {
 
   }
 
   @Command()
+  @override
   void _cancel() {
 
   }
@@ -114,7 +116,6 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
               Row(
                 children: [
                   CupertinoButton(
-                    child: const Text('Speichern'),
                     onPressed: mapper.isDirty.value ?  () {
                       if (mapper.validate()) {
                         mapper.commit();
@@ -126,6 +127,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
                         Navigator.pop(context);
                       }
                     } : null,
+                    child: const Text('Speichern')
                   ),
                   const SizedBox(width: 16),
                   CupertinoButton.filled(

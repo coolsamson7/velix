@@ -54,7 +54,7 @@ class CommandGenerator extends Generator {
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
         final signature = method.parameters.map((param) {
-          final typeStr = param.type.getDisplayString(withNullability: false);
+          final typeStr = param.type.getDisplayString();
           return '$typeStr ${param.name}';
         }).join(', ');
         final argList = method.parameters.map((param) => param.name).join(', ');
@@ -75,14 +75,14 @@ class CommandGenerator extends Generator {
 
   bool _isCommandMethod(MethodElement method) {
     return method.metadata.any((m) =>
-    m.computeConstantValue()?.type?.getDisplayString(withNullability: false) == 'Command');
+    m.computeConstantValue()?.type?.getDisplayString() == 'Command');
   }
 
   ConstantReader? _getCommandAnnotation(MethodElement method) {
     for (final meta in method.metadata) {
       final constantValue = meta.computeConstantValue();
       if (constantValue == null) continue;
-      if (constantValue.type?.getDisplayString(withNullability: false) == 'Command') {
+      if (constantValue.type?.getDisplayString() == 'Command') {
         return ConstantReader(constantValue);
       }
     }

@@ -1,4 +1,4 @@
-import '../mapper/operation_builder.dart';
+import '../util/collections.dart';
 import '../validation/validation.dart';
 
 class Dataclass {

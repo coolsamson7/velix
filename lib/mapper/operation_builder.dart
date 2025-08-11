@@ -1,18 +1,10 @@
 
+import 'package:velix/util/collections.dart';
+
 import 'mapper.dart';
 import 'transformer.dart';
 
 import '../reflectable/reflectable.dart';
-
-T? findElement<T>(List<T> list, bool Function(T element) test ) {
-  for ( var element in list) {
-    if ( test(element)) {
-      return element;
-    }
-  }
-
-  return null;
-}
 
 
 abstract class MapperProperty extends Property<MappingContext> {

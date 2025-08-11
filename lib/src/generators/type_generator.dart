@@ -11,6 +11,8 @@ import 'package:path/path.dart' as p;
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
 
+import '../../util/collections.dart';
+
 
 bool isTypeNullable(DartType type) {
   return type.nullabilitySuffix == NullabilitySuffix.question;
@@ -59,7 +61,7 @@ class AggregateBuilder implements Builder {
 
         for (final param in ctor.parameters) {
           final name = param.name;
-          final typeStr = param.type.getDisplayString(withNullability: false);
+          final typeStr = param.type.getDisplayString();
           final isNamed = param.isNamed;
           final isRequired = param.isRequiredNamed || param.isRequiredPositional;
           final isNullable = param.isOptional || param.isOptionalNamed;
@@ -88,10 +90,7 @@ class AggregateBuilder implements Builder {
 
     // For constructor function: keep generating for the first public constructor (or you can customize)
 
-    final firstCtor = element.constructors.firstWhere(
-          (c) => !c.isFactory && c.isPublic,
-      //orElse: () => thr
-    );
+    final firstCtor = findElement(element.constructors, (c) => !c.isFactory && c.isPublic);
 
     // write constructor function
 
@@ -104,7 +103,7 @@ class AggregateBuilder implements Builder {
       final paramsBuffer = StringBuffer();
 
       for (final param in firstCtor.parameters) {
-         var paramType = param.type.getDisplayString(withNullability: false);
+         var paramType = param.type.getDisplayString();
         final paramName = param.name;
 
         // Use param.defaultValueCode or default literal for some common types if null
@@ -175,7 +174,7 @@ class AggregateBuilder implements Builder {
       if (field.isStatic || field.isPrivate) continue;
 
       final name = field.name;
-      final type = field.type.getDisplayString(withNullability: false);
+      final type = field.type.getDisplayString();
 
       final isFinal = field.isFinal;
       final isNullable = isTypeNullable(field.type);
@@ -190,7 +189,7 @@ class AggregateBuilder implements Builder {
         buffer.writeln("           type: $typeCode,");
 
       if (elementType != null) {
-        final elementTypeName = elementType.getDisplayString(withNullability: false);
+        final elementTypeName = elementType.getDisplayString();
         buffer.writeln("           elementType: $elementTypeName,");
         buffer.writeln("           factoryConstructor: () => <$elementTypeName>[],");
       }
@@ -234,7 +233,7 @@ class AggregateBuilder implements Builder {
 
         final type = constant.type;
         if (type != null &&
-            type.getDisplayString(withNullability: false) == 'Attribute') {
+            type.getDisplayString() == 'Attribute') {
           final typeValue = constant.getField('type');
           if (typeValue != null && typeValue.toStringValue() != "") {
             constraint.constraint(typeValue.toStringValue()!);

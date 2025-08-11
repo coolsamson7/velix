@@ -1,7 +1,9 @@
 import '../reflectable/reflectable.dart';
 
+/// @internal
 typedef Check<T> = bool Function(T);
 
+/// @internal
 class Test<T> {
   final Type type;
   final String name;
@@ -24,8 +26,10 @@ class Test<T> {
   }
 }
 
+/// @internal
 typedef MethodApplier<T> = void Function(AbstractType<T>, List<dynamic> args);
 
+/// @internal
 enum ArgType {
   stringType,
   intType,
@@ -45,6 +49,7 @@ enum ArgType {
   String get name => toString().split('.').last;
 }
 
+/// @internal
 class MethodSpec {
   final int argCount;
   final List<ArgType> argTypes;
@@ -53,13 +58,18 @@ class MethodSpec {
   const MethodSpec(this.argCount, this.argTypes, this.apply);
 }
 
-
+/// Base class for type constraints based on a literal type.
+/// [T] the literal type
 class AbstractType<T> {
+  // instance data
+
   late Type type;
   List<Test<dynamic>> tests = [];
 
   // constructor
 
+  /// Create a new [AbstractType]
+  /// [type] the literal type
   AbstractType({required this.type});
 
   // internal
@@ -202,6 +212,8 @@ class AbstractType<T> {
 
   // public
 
+  /// validate the passed object. In case of a type violation,  a [ValidationException] will be thrown
+  /// [object] the to be validated object.
   void validate(dynamic object) {
     ValidationContext context = ValidationContext();
 
@@ -212,6 +224,8 @@ class AbstractType<T> {
     }
   }
 
+  /// return [true], if the specified object is valid, else [false]
+  /// [object] the to be validated object.
   bool isValid(dynamic object) {
     ValidationContext context = ValidationContext();
 
@@ -221,10 +235,19 @@ class AbstractType<T> {
   }
 }
 
+/// Exception thrown in case of validation violations.
 class ValidationException {
+  // instance data
+
   List<TypeViolation> violations;
 
+  // constructor
+
+  /// Create a new [ValidationException]
+  /// [violations] the list of violations
   ValidationException({required this.violations});
+
+  // override
 
   @override
   String toString() {
@@ -237,13 +260,18 @@ class ValidationException {
   }
 }
 
+/// This class describes a single violation.
 class TypeViolation {
+  // instance data
+
   final Type type;
   final String name;
   final Map<String, dynamic> params;
   final dynamic value;
   final String path;
   final String message;
+
+  // constructor
 
    const TypeViolation({
      required this.type,
@@ -252,6 +280,8 @@ class TypeViolation {
      required this.value,
      required this.path,
      required this.message});
+
+   // override
 
    @override
    String toString() {
@@ -269,6 +299,7 @@ class TypeViolation {
    }
 }
 
+/// @internal
 class ValidationContext {
   // instance data
 

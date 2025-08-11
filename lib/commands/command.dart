@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 
+/// @internal
 class Command {
   final String? name;
   final String? i18n;
@@ -21,6 +22,7 @@ class CommandException implements Exception {
   String toString() => 'CommandException: $message';
 }
 
+/// @internal
 class CommandDescriptor extends ChangeNotifier {
   // instance data
 
@@ -75,17 +77,25 @@ class CommandDescriptor extends ChangeNotifier {
   }
 }
 
+/// Covers the parameters of a command invocation:
+/// - the command name
+/// - the args
 class Invocation {
   final CommandDescriptor command;
   List<dynamic> args;
 
+  /// Create a new [Invocation]
+  /// [command] the command name
+  /// [args] the supplied args
   Invocation({required this.command, required this.args});
 }
 
+/// Base class for command interceptors.
 abstract class CommandInterceptor {
   Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next);
 }
 
+/// A simple [CommandInterceptor] that traces command invocations on stdout
 class TracingCommandInterceptor implements CommandInterceptor {
   @override
   Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) {
@@ -99,6 +109,7 @@ class TracingCommandInterceptor implements CommandInterceptor {
   }
 }
 
+/// A [CommandInterceptor] that disables a command while being executed.
 class LockCommandInterceptor implements CommandInterceptor {
   @override
   Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) {
@@ -114,6 +125,7 @@ class LockCommandInterceptor implements CommandInterceptor {
   }
 }
 
+/// @internal
 class MethodCommandInterceptor implements CommandInterceptor {
   @override
   Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) {
@@ -121,7 +133,8 @@ class MethodCommandInterceptor implements CommandInterceptor {
   }
 }
 
-@injectable
+/// Central class that controls teh creation of [CommandInterceptor]s for commands
+/// @internal
 class CommandManager {
   // instance data
 
@@ -148,6 +161,7 @@ class CommandManager {
 }
 
 
+/// Mixin class that adds the ability to handle commands
 mixin CommandController<T extends StatefulWidget> on State<T> {
   // instance data
 

@@ -1,13 +1,16 @@
 import '../util/collections.dart';
 import '../validation/validation.dart';
 
+/// decorator used to mark classes that should emit meta-data
 class Dataclass {
   const Dataclass();
 }
 
+/// decorator used to add meta-data to properties
 class Attribute {
   final String type;
 
+  /// [type] a type constraint
   const Attribute({this.type = ""});
 }
 
@@ -95,6 +98,9 @@ class ConstructorDescriptor {
 
 typedef Constructor<T> = Function;// T Function(Map<String, dynamic> args);//
 
+/// Class covering the meta-data of a type.
+/// [T] the reflected type
+///
 class TypeDescriptor<T> {
   // class methods
 
@@ -103,6 +109,8 @@ class TypeDescriptor<T> {
     _byName[typeDescriptor.name] = typeDescriptor;
   }
 
+  /// Return a new or cached 'TypeDescriptor' given a type.
+  /// [T] the reflected type
   static TypeDescriptor forType<T>(T type) {
     final descriptor = _byType[type];
     if (descriptor == null) {
@@ -319,6 +327,7 @@ ConstructorParameter param<T>(String name, {
   return ConstructorParameter(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue);
 }
 
+/// @internal
 AbstractType inferType<T>() {
   final type = T;
 

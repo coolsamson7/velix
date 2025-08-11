@@ -21,6 +21,7 @@ class Convert<S, T> {
 
 typedef Finalizer<S, T> = void Function(S,T);
 
+/// @internal
 class TypeKey {
   // instance data
 
@@ -44,6 +45,7 @@ class TypeKey {
   String toString() => '$from -> $to';
 }
 
+/// @internal
 class TypeConversionTable {
   static final Map<TypeKey, Converter> _converters = {
     TypeKey(String, int):    (v) => int.tryParse(v),
@@ -93,6 +95,7 @@ List<String> path(String a, [String? b, String? c, String? d, String? e, String?
   return [a, b, c, d, e, f, g, h].whereType<String>().toList();
 }
 
+/// @internal
 class PropertyProperty extends MapperProperty {
   // instance data
 
@@ -122,6 +125,7 @@ class PropertyProperty extends MapperProperty {
   }
 }
 
+/// @internal
 abstract class Accessor {
   // instance data
 
@@ -151,6 +155,7 @@ class MapperException implements Exception  {
 
 }
 
+/// @internal
 class ConstantValue extends MapperProperty {
   // instance data
 
@@ -177,6 +182,7 @@ class ConstantValue extends MapperProperty {
   }
 }
 
+/// @internal
 class ConstantAccessor extends Accessor {
   // instance data
 
@@ -215,6 +221,7 @@ class ConstantAccessor extends Accessor {
   int get hashCode => value != null ? value.hashCode : 0;
 }
 
+/// @internal
 class PropertyAccessor extends Accessor {
   // instance data
 
@@ -268,6 +275,7 @@ class PropertyAccessor extends Accessor {
   int get hashCode => name.hashCode;
 }
 
+/// @internal
 class Mapping<S,T> extends Transformer<MappingContext> {
   // instance data
 
@@ -299,6 +307,7 @@ class Mapping<S,T> extends Transformer<MappingContext> {
   }
 }
 
+/// @internal
 abstract class MapOperation {
   // instance data
 
@@ -318,6 +327,7 @@ abstract class MapOperation {
   List<String> computeProperties(Type sourceClass, Type targetClass);
  }
 
+/// @internal
 class Properties extends PropertyQualifier {
   // instance data
 
@@ -335,6 +345,7 @@ class Properties extends PropertyQualifier {
   }
 }
 
+/// @internal
 class AllProperties extends PropertyQualifier {
   // instance data
 
@@ -384,6 +395,7 @@ AllProperties matchingProperties() {
   return AllProperties();
 }
 
+/// @internal
 class Match {
   // instance data
 
@@ -403,6 +415,7 @@ class Match {
   }
 }
 
+/// @internal
 class MapProperties extends MapOperation {
   // instance data
 
@@ -431,6 +444,7 @@ class MapProperties extends MapOperation {
   }
 }
 
+/// @internal
 class MapAccessor extends MapOperation {
   // instance data
 
@@ -449,7 +463,7 @@ class MapAccessor extends MapOperation {
   }
 }
 
-
+/// @internal
 class MappingDefinition<S,T> {
   // instance data
 
@@ -588,6 +602,7 @@ MappingDefinition<S,T> mapping<S,T>() {
   return MappingDefinition<S,T>();
 }
 
+/// @internal
 class MappingState {
   // instance data
 
@@ -616,6 +631,7 @@ class MappingState {
   }
 }
 
+/// @internal
 class MappingContext {
   // instance data
 

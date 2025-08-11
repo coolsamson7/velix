@@ -6,11 +6,12 @@ import 'transformer.dart';
 
 import '../reflectable/reflectable.dart';
 
-
+/// @internal
 abstract class MapperProperty extends Property<MappingContext> {
   Type getType();
 }
 
+/// @internal
 class MapList2List extends  MapperProperty {
   // instance data
 
@@ -50,6 +51,7 @@ class MapList2List extends  MapperProperty {
   }
 }
 
+/// @internal
 class MapDeep extends MapperProperty {
   // instance data
 
@@ -77,6 +79,7 @@ class MapDeep extends MapperProperty {
   }
 }
 
+/// @internal
 class ConvertProperty extends MapperProperty {
   // instance data
 
@@ -109,6 +112,7 @@ class ConvertProperty extends MapperProperty {
   }
 }
 
+/// @internal
 class SetResultArgument extends MapperProperty {
   // instance data
 
@@ -142,6 +146,7 @@ class SetResultArgument extends MapperProperty {
   }
 }
 
+/// @internal
 class PeekValueProperty extends MapperProperty {
   // instance data
 
@@ -177,6 +182,7 @@ class PeekValueProperty extends MapperProperty {
   }
 }
 
+/// @internal
 class PushValueProperty extends MapperProperty {
   // instance data
 
@@ -206,11 +212,12 @@ class PushValueProperty extends MapperProperty {
   }
 }
 
-
+/// @internal
 abstract class ValueReceiver {
   void receive(MappingContext context, dynamic instance, dynamic value);
 }
 
+/// @internal
 class SetPropertyValueReceiver extends ValueReceiver {
   // instance data
 
@@ -228,6 +235,7 @@ class SetPropertyValueReceiver extends ValueReceiver {
   }
 }
 
+/// @internal
 class SetResultPropertyValueReceiver extends ValueReceiver {
   // instance data
 
@@ -257,6 +265,7 @@ class MappingResultValueReceiver extends ValueReceiver {
   }
 }
 
+/// @internal
 class SourceNode {
   // instance data
 
@@ -349,6 +358,7 @@ class SourceNode {
   }
 }
 
+/// @internal
 class SourceTree {
   // instance data
 
@@ -402,6 +412,7 @@ class SourceTree {
   }
 }
 
+/// @internal
 class Buffer {
   // instance data
 
@@ -447,6 +458,7 @@ class Buffer {
   }
 }
 
+/// @internal
 class IntermediateResultDefinition {
   // instance data
 
@@ -471,6 +483,7 @@ class IntermediateResultDefinition {
   }
 }
 
+/// @internal
 class TargetNode {
   // instance data
 
@@ -521,7 +534,6 @@ class TargetNode {
     else
       throw MapperException("cannot convert $sourceType to $targetType");
   }
-
 
   Converter? calculateConversion(SourceNode sourceNode) {
     var conversion = match!.converter;
@@ -684,6 +696,7 @@ class TargetNode {
   }
 }
 
+/// @internal
 class RootAccessor extends Accessor {
   // constructor
 
@@ -712,6 +725,7 @@ class RootAccessor extends Accessor {
   int get hashCode => 1;
 }
 
+/// @internal
 class TargetTree {
   // instance data
 
@@ -748,6 +762,7 @@ class TargetTree {
   }
 }
 
+/// @internal
 class OperationResult {
   // instance data
 
@@ -760,6 +775,7 @@ class OperationResult {
   OperationResult({required this.operations, required this.constructor, required this.stackSize});
 }
 
+/// @internal
 class OperationBuilder {
   // instance data
 

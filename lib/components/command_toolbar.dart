@@ -20,10 +20,9 @@ class CommandToolbar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: commands
           .map((command) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: CommandButton(command: command),
-      ))
-          .toList(),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: CommandButton(command: command))
+          ).toList(),
     );
   }
 }

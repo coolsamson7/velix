@@ -146,8 +146,8 @@ class FormMapper {
   // constructor
 
   /// Create a new [FormMapper]
-  ///  [instance] the source instance whose fields will be bound
-  ///  [twoWay] if [true], modifications will immediately modify the instance
+  /// [instance] the source instance whose fields will be bound
+  /// [twoWay] if [true], modifications will immediately modify the instance
   FormMapper({required this.instance, this.twoWay=false}) {
     transformer = Transformer(operations);
     type = TypeDescriptor.forType(instance.runtimeType);

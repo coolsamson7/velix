@@ -1,4 +1,5 @@
 import 'dart:async';
+//TODO I18N import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -46,7 +47,7 @@ class CommandDescriptor extends ChangeNotifier {
 
   CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon}) {
     if ( i18n != null) {
-      label = i18n; //TODO !.tr();
+      label = i18n;//TODO I18N !.tr();
     }
     else label ??= name;
   }

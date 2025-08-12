@@ -6,7 +6,7 @@ class CommandButton extends StatefulWidget {
 
   final CommandDescriptor command;
   final String? label;
-  final IconData? icon;          // optional icon
+  final IconData? icon;
   final List<dynamic>? args;
   final bool iconOnly;
 

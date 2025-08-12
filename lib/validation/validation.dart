@@ -1,3 +1,5 @@
+//TODO I18N import 'package:easy_localization/easy_localization.dart';
+
 import '../reflectable/reflectable.dart';
 
 /// @internal
@@ -296,11 +298,11 @@ class TypeViolation {
    String toString() {
      var buffer = StringBuffer();
 
-     //Map<String, String> stringMap = params.map(
-     //      (key, value) => MapEntry(key, value.toString()),
-     //);
+     Map<String, String> stringMap = params.map(
+           (key, value) => MapEntry(key, value.toString()),
+     );
 
-     var translation = "validation.${type.toString().toLowerCase()}.$name";//TODO .tr(namedArgs: stringMap);
+     var translation = "validation.${type.toString().toLowerCase()}.$name";//TODO I18N .tr(namedArgs: stringMap);
 
      buffer.write(translation);
 

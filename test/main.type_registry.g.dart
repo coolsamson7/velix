@@ -1,6 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:velix/velix.dart';
-
 import 'main.dart';
 
 void registerAllDescriptors() {

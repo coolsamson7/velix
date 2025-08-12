@@ -25,6 +25,7 @@ DartType? extractElementDartType(FieldElement field) {
       return type.typeArguments.first;
     }
   }
+
   return null;
 }
 
@@ -44,7 +45,7 @@ class AggregateBuilder implements Builder {
     final className = element.name;
     final buffer = StringBuffer();
 
-    final uri = element.source.uri.toString(); // e.g., package:example/models/todo.dart
+    final uri = element.source.uri.toString(); // e.g., package:example/models/foo.dart
 
     final qualifiedName = '$uri.${element.name}';
 

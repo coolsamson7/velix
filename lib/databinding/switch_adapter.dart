@@ -3,11 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'valued_widget.dart';
 import 'form_mapper.dart';
 
+///  A [ValuedWidgetAdapter] for a [CupertinoSwitch]
 @WidgetAdapter()
 class CupertinoSwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
   // constructor
 
-  CupertinoSwitchAdapter() : super(type: CupertinoSwitch);
+  CupertinoSwitchAdapter();
 
   // override
 

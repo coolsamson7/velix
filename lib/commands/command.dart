@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:injectable/injectable.dart';
 
 /// @internal
 class Command {

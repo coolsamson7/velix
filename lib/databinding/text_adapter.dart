@@ -9,11 +9,12 @@ import 'form_mapper.dart';
 typedef DisplayValue<S,T> = T Function(S);
 typedef ParseValue<S,T> = S Function(T text);
 
+///  A [ValuedWidgetAdapter] for a [CupertinoTextFormFieldRow]
 @WidgetAdapter()
 class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFieldRow> {
   // constructor
 
-  TextFieldAdapter() : super(type: CupertinoTextFormFieldRow);
+  TextFieldAdapter();
 
   // override
 

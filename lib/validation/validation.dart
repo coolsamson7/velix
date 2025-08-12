@@ -275,7 +275,14 @@ class TypeViolation {
 
   // constructor
 
-   const TypeViolation({
+  /// Create a new [TypeViolation]
+  /// [type] the corresponding type
+  /// [name] the name of the test that failed
+  /// [params] the parameters of the failed test
+  /// [value] the tested value
+  /// [path] the path of the current property referencing the value
+  /// [message] oprional message of the violation
+  const TypeViolation({
      required this.type,
      required this.name,
      required this.params,
@@ -331,6 +338,7 @@ class ValidationContext {
 
 // number
 
+/// The type specification of int types
 class IntType extends AbstractType<int> {
   // static data
 
@@ -361,6 +369,7 @@ class IntType extends AbstractType<int> {
 
   // constructor
 
+  /// Create a new [IntType]
   IntType() : super(type: int) {
     baseType<int>(int);
   }
@@ -388,71 +397,83 @@ class IntType extends AbstractType<int> {
     return this;
   }
 
-  IntType min(int length) {
+  /// allow only values >= value
+  /// [value] the minimum value
+  IntType min(int value) {
     test<int>(
       type: int,
       name: "min",
       params: {
-        "min": length
+        "min": value
       },
-      check: (obj) => obj >= length,
+      check: (obj) => obj >= value,
     );
 
     return this;
   }
 
-  IntType max(int length) {
+  /// allow only values <= value
+  /// [value] the maximum value
+  IntType max(int value) {
     test<int>(
       type: int,
       name: "max",
       params: {
-        "max": length
+        "max": value
       },
-      check: (obj) => obj <= length,
+      check: (obj) => obj <= value,
     );
 
     return this;
   }
 
-  IntType lessThan(int length) {
+  /// allow only values < value
+  /// [value] the upper limit
+  IntType lessThan(int value) {
     test<int>(
       type: int,
       name: "lessThan",
       params: {
-        "lessThan": length
+        "lessThan": value
       },
-      check: (obj) => obj < length,
+      check: (obj) => obj < value,
     );
 
     return this;
   }
 
-  IntType lessThanEquals(int length) {
+  /// allow only values <= value
+  /// [value] the upper limit
+  IntType lessThanEquals(int value) {
     test<int>(
       type: int,
       name: "lessThanEquals",
       params: {
-        "lessThanEquals": length
+        "lessThanEquals": value
       },
-      check: (obj) => obj <= length,
+      check: (obj) => obj <= value,
     );
 
     return this;
   }
 
-  IntType greaterThan(int length) {
+  /// allow only values > value
+  /// [value] the lower limit
+  IntType greaterThan(int value) {
     test<int>(
       type: int,
       name: "greaterThan",
       params: {
-        "greaterThan": length
+        "greaterThan": value
       },
-      check: (obj) => obj > length,
+      check: (obj) => obj > value,
     );
 
     return this;
   }
 
+  /// allow only values <= value
+  /// [value] the upper limit
   IntType greaterThanEquals(int length) {
     test<int>(
       type: int,
@@ -469,6 +490,7 @@ class IntType extends AbstractType<int> {
 
 // double
 
+/// type constraint for double values
 class DoubleType extends AbstractType<double> {
   // static data
 
@@ -499,6 +521,7 @@ class DoubleType extends AbstractType<double> {
 
   // constructor
 
+  /// Create a new [DoubleType]
   DoubleType() : super(type: double) {
     baseType<double>(double);
   }
@@ -526,79 +549,91 @@ class DoubleType extends AbstractType<double> {
     return this;
   }
 
-  DoubleType min(double length) {
+  /// allow only values >= value
+  /// [value] the minimum value
+  DoubleType min(double value) {
     test<double>(
       type: double,
       name: "min",
       params: {
-        "min": length
+        "min": value
       },
-      check: (obj) => obj >= length,
+      check: (obj) => obj >= value,
     );
 
     return this;
   }
 
-  DoubleType max(double length) {
+  /// allow only values <= value
+  /// [value] the maximum value
+  DoubleType max(double value) {
     test<double>(
       type: double,
       name: "max",
       params: {
-        "max": length
+        "max": value
       },
-      check: (obj) => obj <= length,
+      check: (obj) => obj <= value,
     );
 
     return this;
   }
 
-  DoubleType lessThan(double length) {
+  /// allow only values < value
+  /// [value] the upper limit
+  DoubleType lessThan(double value) {
     test<double>(
       type: double,
       name: "lessThan",
       params: {
-        "lessThan": length
+        "lessThan": value
       },
-      check: (obj) => obj < length,
+      check: (obj) => obj < value,
     );
 
     return this;
   }
 
-  DoubleType lessThanEquals(double length) {
+  /// allow only values <= value
+  /// [value] the upper limit
+  DoubleType lessThanEquals(double value) {
     test<double>(
       type: double,
       name: "lessThanEquals",
       params: {
-        "lessThanEquals": length
+        "lessThanEquals": value
       },
-      check: (obj) => obj <= length,
+      check: (obj) => obj <= value,
     );
 
     return this;
   }
 
-  DoubleType greaterThan(double length) {
+  /// allow only values > value
+  /// [value] the lower limit
+  DoubleType greaterThan(double value) {
     test<double>(
       type: double,
       name: "greaterThan",
       params: {
-        "greaterThan": length
+        "greaterThan": value
       },
-      check: (obj) => obj > length,
+      check: (obj) => obj > value,
     );
 
     return this;
   }
 
-  DoubleType greaterThanEquals(double length) {
+  /// allow only values <= value
+  /// [value] the upper limit
+  DoubleType greaterThanEquals(double value) {
     test<double>(
       type: double,
       name: "greaterThanEquals",
       params: {
-        "greaterThanEquals": length
+        "greaterThanEquals": value
       },
-      check: (obj) => obj >= length,
+      check: (obj) => obj >= value,
     );
 
     return this;
@@ -607,6 +642,7 @@ class DoubleType extends AbstractType<double> {
 
 // string
 
+/// The type specification of String types
 class StringType extends AbstractType<String> {
   // static data
 
@@ -640,6 +676,7 @@ class StringType extends AbstractType<String> {
 
   // constructor
 
+  /// Create a new [StringType]
   StringType() : super(type: String) {
     baseType<String>(String);
   }
@@ -667,6 +704,7 @@ class StringType extends AbstractType<String> {
     return this;
   }
 
+  /// requires the value to be non empty
   StringType notEmpty() {
     test<String>(
       type: String,
@@ -677,6 +715,7 @@ class StringType extends AbstractType<String> {
     return this;
   }
 
+  /// requires the value to hava minimum length
   StringType  minLength(int length) {
     test<String> (
       type: String,
@@ -690,6 +729,7 @@ class StringType extends AbstractType<String> {
     return this;
   }
 
+  /// requires the value to have maximum length
   StringType  maxLength(int length) {
     test<String> (
       type: String,
@@ -704,6 +744,7 @@ class StringType extends AbstractType<String> {
   }
 }
 
+/// type specification for  [bool] values
 class BoolType extends AbstractType<bool> {
   // static data
 
@@ -722,6 +763,7 @@ class BoolType extends AbstractType<bool> {
 
   // constructor
 
+  /// Create a new [BoolType]
   BoolType() : super(type: bool) {
     baseType<bool>(bool);
   }
@@ -749,7 +791,8 @@ class BoolType extends AbstractType<bool> {
     return this;
   }
 }
-
+/// Type specification for class values of a certain type.
+/// [T] the corresponding type
 class ObjectType<T> extends AbstractType<T> {
   // static data
 
@@ -793,6 +836,7 @@ class ObjectType<T> extends AbstractType<T> {
   }
 }
 
+/// Type specification for List types
 class ListType<T> extends AbstractType<T> {
   // static data
 
@@ -803,6 +847,8 @@ class ListType<T> extends AbstractType<T> {
 
   // constructor
 
+  /// Create a new [ListType]
+  /// [type] the element type
   ListType(Type type) : super(type: type) {
     this.type = type;
 
@@ -819,6 +865,7 @@ class ListType<T> extends AbstractType<T> {
 
   // fluent
 
+  /// requires that the list should have a minimum length
   ListType min(int length) {
     test<List> (
       type: List,
@@ -826,12 +873,13 @@ class ListType<T> extends AbstractType<T> {
       params: {
         "min": length
       },
-      check: (s) => s.length <= length,
+      check: (s) => s.length >= length,
     );
 
     return this;
   }
 
+  /// requires that the list should have a maximum length
   ListType max(int length) {
     test<List> (
       type: List,
@@ -844,7 +892,6 @@ class ListType<T> extends AbstractType<T> {
 
     return this;
   }
-
 
   @override
   AbstractType constraint(String input) {

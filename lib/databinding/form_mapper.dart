@@ -8,7 +8,7 @@ import '../reflectable/reflectable.dart';
 import '../mapper/transformer.dart';
 import '../validation/validation.dart';
 
-
+/// @internal
 class TypeProperty extends Property<ValuedWidgetContext> {
   // instance data
 
@@ -125,7 +125,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
   }
 }
 
-
+/// A [FormMapper] is used to bind field values to form elements
 class FormMapper {
   // instance data
 
@@ -145,6 +145,9 @@ class FormMapper {
 
   // constructor
 
+  /// Create a new [FormMapper]
+  ///  [instance] the source instance whose fields will be bound
+  ///  [twoWay] if [true], modifications will immediately modify the instance
   FormMapper({required this.instance, this.twoWay=false}) {
     transformer = Transformer(operations);
     type = TypeDescriptor.forType(instance.runtimeType);
@@ -152,14 +155,21 @@ class FormMapper {
 
   // public
 
+  /// bind a field to a form element
+  /// [type] the element type
+  /// [path] a field path
+  /// [context] the [BuildContext]
+  /// [args] any parameters that will be passed to the newly created element
   Widget bind(Type type, {required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
     return ValuedWidget.build(type, context: context, mapper: this, path: path, args: args);
   }
 
+  /// return [True] if the form is valid.
   bool validate() {
     return _formKey.currentState?.validate() ?? false;
   }
 
+  /// return the [GlobalKey] of the form.
   GlobalKey<FormState> getKey() {
     return _formKey;
   }
@@ -192,6 +202,7 @@ class FormMapper {
     return result;
   }
 
+  /// commit all pending changes to the instance
   void commit() {
     ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
     for ( Operation operation in operations)
@@ -208,7 +219,6 @@ class FormMapper {
     if ( wasDirty != isDirty)
       markDirty(dirtyWidgets > 0);
   }
-
 
   void markDirty(bool dirty) {
     _dirtyController.value = dirty;
@@ -258,6 +268,8 @@ class FormMapper {
     property.set(instance, value, ValuedWidgetContext(mapper: this));
   }
 
+  /// set the instance that will provide values
+  /// [value] an instance
   void setValue(dynamic object) {
     ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
 

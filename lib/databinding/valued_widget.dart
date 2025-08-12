@@ -5,6 +5,7 @@ import 'form_mapper.dart';
 import 'text_adapter.dart';
 import '../mapper/transformer.dart';
 
+/// decorates widget adapters
 class WidgetAdapter {
   const WidgetAdapter();
 }
@@ -47,19 +48,47 @@ class WidgetProperty extends Property<ValuedWidgetContext> {
   }
 }
 
+/// base class for widget adapters
+/// [T] the widget type
 abstract class ValuedWidgetAdapter<T> {
+  /// return the element type
   Type getType();
+
+  /// return the current value given a widget
+  /// [widget] the widget
   dynamic getValue(T widget);
+
+  /// set a current value
+  /// [widget] the widget
+  /// [value] the value
+  /// [context] the [ValuedWidgetContext]
   void setValue(T widget, dynamic value, ValuedWidgetContext context);
+
+  /// dispose any resources
   void dispose(WidgetProperty property);
 
+  /// build and bind the corresponding widget
+  /// [context] a [FormMapper]
+  /// [mapper] the [FormMapper]
+  /// [path] a field path
+  /// [args] and parameters that will be handled by the adapter
   T build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}});
 }
 
+/// base class for widget adapters
+/// [T] the widget type
 abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
-  Type type;
+  // instance data
 
-  AbstractValuedWidgetAdapter({required this.type});
+  late Type type;
+
+  // constructor
+
+  AbstractValuedWidgetAdapter() {
+    type = T;
+  }
+
+  // override
 
   @override
   Type getType() {
@@ -70,13 +99,13 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   void dispose(WidgetProperty property) {}
 }
 
-
 class ValuedWidgetContext {
   FormMapper? mapper;
 
   ValuedWidgetContext({required this.mapper});
 }
 
+/// A registry for [ValuedWidgetAdapter]s
 class ValuedWidget {
   // properties
 

@@ -24,7 +24,6 @@ class _SpinnerInterceptor implements CommandInterceptor {
   }
 }
 
-
 class CommandView extends StatefulWidget {
   // instance data
 

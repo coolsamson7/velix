@@ -178,40 +178,56 @@ class TypeDescriptor<T> {
     return true;
   }
 
+  /// return [true], if the type has at least one final field
   bool isImmutable() {
     return findElement(_fields.values.toList(), (field) => field.isFinal)!= null;
   }
 
+  /// return the field names
   List<String> getFieldNames() {
     return _fields.keys.toList();
   }
 
+  /// return [true], if the type has a named field
+  /// [field] the field name
   bool hasField(String field) {
     return _fields[field] != null;
   }
 
+  /// return a named field.
+  /// [field] the field name
   FieldDescriptor getField(String field) {
     return _fields[field]!;
   }
 
+  /// return all fields
   Iterable<FieldDescriptor> getFields() {
     return _fields.values;
   }
 
-  Getter getter(String propertyName) {
-    return _getField(propertyName).getter;
+  /// return the getter function of a specific field
+  Getter getter(String field) {
+    return _getField(field).getter;
   }
 
-  Setter setter(String propertyName) {
-    return _getField(propertyName).setter!;
+  /// return the setter function of a specific field
+  Setter setter(String field) {
+    return _getField(field).setter!;
   }
 
-  dynamic get(Object instance, String propertyName) {
-    return _getField(propertyName).getter(instance);
+  /// get the field value of a specific instance
+  /// [instance] the instance
+  /// [field] the field name
+  dynamic get(Object instance, String field) {
+    return _getField(field).getter(instance);
   }
 
-  void set(Object instance, String propertyName, dynamic value) {
-    _getField(propertyName).setter!(instance, value);
+  /// set a field value
+  /// [instance] the instance
+  /// [field] the field name
+  /// [value] a value
+  void set(Object instance, String field, dynamic value) {
+    _getField(field).setter!(instance, value);
   }
 }
 

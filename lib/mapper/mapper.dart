@@ -4,13 +4,24 @@ import 'operation_builder.dart';
 import 'transformer.dart';
 import '../reflectable/reflectable.dart';
 
+/// A [Converter] converts a source type in a target type
+/// [S] the source type
+/// [T] the target type
 typedef Converter<S,T> = T Function(S);
 
+/// Wrapper class for a [Converter] that preserves the type information.
 class Convert<S, T> {
+  // instance data
+
   final Converter<S, T> convert;
 
+  // constructor
+
+  /// Create a new [Convert] instance
+  /// [convert] the [Converter]
   Convert(this.convert);
 
+  /// return the wrapped [Converter]
   Converter<dynamic, dynamic> get() {
     return (dynamic s) => convert(s);
   }
@@ -19,6 +30,9 @@ class Convert<S, T> {
   Type get targetType => T;
 }
 
+/// A [Finalizer] is executed given the mapped source and target and is used to perform any logic not expressible with the mapper.
+/// [S] the source type
+/// [T] the target type
 typedef Finalizer<S, T> = void Function(S,T);
 
 /// @internal
@@ -323,11 +337,12 @@ abstract class MapOperation {
   void findMatches(MappingDefinition definition,List<Match> matches);
 }
 
- abstract class PropertyQualifier {
+/// base class for wildcard expressions matching source and target fields
+abstract class PropertyQualifier {
   List<String> computeProperties(Type sourceClass, Type targetClass);
- }
+}
 
-/// @internal
+/// wildcard that matches an explicit list of field names
 class Properties extends PropertyQualifier {
   // instance data
 
@@ -345,7 +360,7 @@ class Properties extends PropertyQualifier {
   }
 }
 
-/// @internal
+/// wildcard that matches field values given a source and target type.
 class AllProperties extends PropertyQualifier {
   // instance data
 
@@ -357,6 +372,7 @@ class AllProperties extends PropertyQualifier {
 
   // public
 
+  /// remove the field names from the matching process.
   AllProperties except(List<String> properties) {
     for ( var property in properties)
       exceptions.add(property);
@@ -391,6 +407,7 @@ Properties properties(List<String> properties) {
   return Properties(properties: properties);
 }
 
+/// return a new [AllProperties] wildcard
 AllProperties matchingProperties() {
   return AllProperties();
 }
@@ -463,7 +480,9 @@ class MapAccessor extends MapOperation {
   }
 }
 
-/// @internal
+/// Covers the to be executed operations that transform a source in a a target type.
+/// [S] the source type
+/// [T] the target type
 class MappingDefinition<S,T> {
   // instance data
 
@@ -549,13 +568,22 @@ class MappingDefinition<S,T> {
 
   // fluent
 
+  /// inherit all operations as specified in a parent mapping. This makes sense for inherited classes, where mappers inherit each other as well.
+  /// [mappingDefinition] an inherited mapping
   MappingDefinition<S,T>  derives(MappingDefinition<S,T> mappingDefinition) {
     baseMapping = mappingDefinition;
 
     return this;
   }
 
-  MappingDefinition<S,T>  map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, Convert? convert}) {
+  /// specifies a single operation, that will be executed while mapping.
+  /// [constant] maps a constant value as a source
+  /// [from] either a single source field or a field path
+  /// [to] either a single target field or a field path
+  /// [all] a [PropertyQualifier] wild card, that is used instead of from and to
+  /// [deep] if [true], a different supplied mapping is expected to transform the retrieved source value recursively
+  /// [convert] optional [Convert] instance
+  MappingDefinition<S,T> map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, Convert? convert}) {
     if ( all != null) {
       operations.add(MapProperties(qualifier: all, converter: convert, deep: deep));
     }
@@ -591,6 +619,8 @@ class MappingDefinition<S,T> {
     return this;
   }
 
+  /// add a [Finalizer]
+  /// [finalizer] a finalizer
   MappingDefinition<S,T> finalize(Finalizer<S,T> finalizer)  {
     this.finalizer = (dynamic source, dynamic target) => finalizer(source, target);
 
@@ -598,6 +628,9 @@ class MappingDefinition<S,T> {
   }
 }
 
+/// create a new [MappingDefinition]
+/// [S] the source type
+/// [T] the target type
 MappingDefinition<S,T> mapping<S,T>() {
   return MappingDefinition<S,T>();
 }
@@ -724,6 +757,11 @@ class Mapper {
 
   // public
 
+  /// map a source object adn return the resulting target.
+  /// [S] the source type
+  /// [T] the target type
+  /// [source] the source object
+  /// [context] optional [MappingContext] in case of recursive maps.
   T? map<S,T>(S source, {MappingContext? context}) {
     if ( source == null)
       return null;

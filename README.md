@@ -1,4 +1,10 @@
 
+![License](https://img.shields.io/github/license/coolsamson7/velix)
+![Dart](https://img.shields.io/badge/Dart-3.0-blue)
+[![Docs](https://img.shields.io/badge/docs-online-blue?logo=github)](https://coolsamson7.github.io/velix/)
+[![Flutter CI](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg)](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml)
+
+
  
  <img width="1536" height="1024" alt="Futuristische Flutter App Arbeitsumgebung" src="https://github.com/user-attachments/assets/e746b067-5fc1-464b-a16c-c9c9251698a4" />
  

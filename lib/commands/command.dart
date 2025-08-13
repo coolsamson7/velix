@@ -144,7 +144,7 @@ class CommandManager {
   // public
 
   CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon}) {
-    if ( label != null) {
+    if ( label == null) {
       if (i18n != null) {
         label = translator.translate(i18n);
       }

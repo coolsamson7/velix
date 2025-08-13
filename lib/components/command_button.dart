@@ -59,7 +59,7 @@ class _CommandButtonState extends State<CommandButton> {
   Widget build(BuildContext context) {
     final bool isEnabled = widget.command.enabled;
 
-    String label = widget.label ?? widget.command.label ?? "WTF";
+    String label = widget.label ?? widget.command.label!;
     IconData? icon = widget.icon ?? widget.command.icon;
 
     return IgnorePointer(

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="reflectable library API docs, for the Dart programming language.">
+  <title>reflectable library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">velix</a></li>
+    <li class="self-crumb">reflectable/reflectable.dart</li>
+  </ol>
+  <div class="self-name">reflectable</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar=""
+    data-below-sidebar="reflectable_reflectable&#47;reflectable_reflectable-library-sidebar.html">
+  
+    <div>
+      
+
+      <h1>
+        <span class="kind-library">reflectable/reflectable</span>
+        library 
+ 
+
+      </h1>
+    </div>
+
+    
+
+
+    <section class="summary offset-anchor" id="classes">
+      <h2>Classes</h2>
+      <dl>
+          <dt id="Attribute">
+  <span class="name "><a href="../reflectable_reflectable/Attribute-class.html">Attribute</a></span> 
+
+</dt>
+<dd>
+  decorator used to add meta-data to properties
+</dd>
+
+          <dt id="ConstructorDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/ConstructorDescriptor-class.html">ConstructorDescriptor</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="ConstructorParameter">
+  <span class="name "><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="Dataclass">
+  <span class="name "><a href="../reflectable_reflectable/Dataclass-class.html">Dataclass</a></span> 
+
+</dt>
+<dd>
+  decorator used to mark classes that should emit meta-data
+</dd>
+
+          <dt id="FieldDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="ObjectMapper">
+  <span class="name "><a href="../reflectable_reflectable/ObjectMapper-class.html">ObjectMapper</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="TypeDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  Class covering the meta-data of a type.
+<code>T</code> the reflected type
+</dd>
+
+      </dl>
+    </section>
+
+
+
+
+
+
+
+    <section class="summary offset-anchor" id="functions">
+      <h2>Functions</h2>
+      <dl class="callables">
+          <dt id="deserializeFromJson" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/deserializeFromJson.html">deserializeFromJson</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="deserializeFromJson-param-json"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span>, </span><span class="parameter" id="deserializeFromJson-param-creator"><span class="type-annotation">T</span> <span class="parameter-name">creator</span>()</span>)
+    <span class="returntype parameter">&#8594; T</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+          <dt id="field" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/field.html">field</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="field-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="field-param-type"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">V</span>&gt;</span>?</span> <span class="parameter-name">type</span>, </span><span class="parameter" id="field-param-getter"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Getter.html">Getter</a></span> <span class="parameter-name">getter</span>, </span><span class="parameter" id="field-param-setter"><span class="type-annotation"><a href="../reflectable_reflectable/Setter.html">Setter</a>?</span> <span class="parameter-name">setter</span>, </span><span class="parameter" id="field-param-elementType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">elementType</span>, </span><span class="parameter" id="field-param-factoryConstructor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a>?</span> <span class="parameter-name">factoryConstructor</span>, </span><span class="parameter" id="field-param-isFinal"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isFinal</span> = <span class="default-value">false</span>, </span><span class="parameter" id="field-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+          <dt id="inferType" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/inferType.html">inferType</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  @internal
+  
+
+</dd>
+
+          <dt id="nonNullableOf" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/nonNullableOf.html">nonNullableOf</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+          <dt id="param" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/param.html">param</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="param-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="param-param-isNamed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNamed</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-isRequired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isRequired</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-defaultValue"><span class="type-annotation">dynamic</span> <span class="parameter-name">defaultValue</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+          <dt id="serializeToJson" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/serializeToJson.html">serializeToJson</a></span><span class="signature">(<wbr><span class="parameter" id="serializeToJson-param-obj"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">obj</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+          <dt id="type" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span></span>})
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="typedefs">
+      <h2>Typedefs</h2>
+      <dl>
+          
+  <dt id="Constructor" class="">
+  <span class="name"><a href="../reflectable_reflectable/Constructor.html">Constructor</a></span>&lt;<wbr><span class="type-parameter">T</span>&gt;
+    = <a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+
+          
+  <dt id="Getter" class="callable">
+    <span class="name"><a href="../reflectable_reflectable/Getter.html">Getter</a></span>&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;<span class="signature">
+      <span class="returntype parameter">= V Function<span class="signature">(<span class="parameter" id="param-instance"><span class="type-annotation">T</span> <span class="parameter-name">instance</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
+  <dt id="Setter" class="callable">
+    <span class="name"><a href="../reflectable_reflectable/Setter.html">Setter</a></span>&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;<span class="signature">
+      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-instance"><span class="type-annotation">T</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="param-value"><span class="type-annotation">V</span> <span class="parameter-name">value</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+      </dl>
+    </section>
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">velix</a></li>
+    <li class="self-crumb">reflectable/reflectable.dart</li>
+</ol>
+
+    <h5><span class="package-name">velix</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="../commands_command/">commands/command</a></li>
+      <li><a href="../components_command_button/">components/command_button</a></li>
+      <li><a href="../components_command_toolbar/">components/command_toolbar</a></li>
+      <li><a href="../components_overlay/">components/overlay</a></li>
+      <li><a href="../components_view/">components/view</a></li>
+      <li><a href="../databinding_form_mapper/">databinding/form_mapper</a></li>
+      <li><a href="../databinding_registry/">databinding/registry</a></li>
+      <li><a href="../databinding_switch_adapter/">databinding/switch_adapter</a></li>
+      <li><a href="../databinding_text_adapter/">databinding/text_adapter</a></li>
+      <li><a href="../databinding_valued_widget/">databinding/valued_widget</a></li>
+      <li><a href="../i18n_i18n/">i18n/i18n</a></li>
+      <li><a href="../mapper_mapper/">mapper/mapper</a></li>
+      <li><a href="../mapper_operation_builder/">mapper/operation_builder</a></li>
+      <li><a href="../mapper_transformer/">mapper/transformer</a></li>
+      <li><a href="../reflectable_reflectable/">reflectable/reflectable</a></li>
+      <li><a href="../util_collections/">util/collections</a></li>
+      <li><a href="../validation_validation/">validation/validation</a></li>
+      <li><a href="../velix/">velix</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+    <h5>reflectable library</h5>
+  </div><!--/sidebar-offcanvas-right-->
+</main>
+<footer>
+  <span class="no-break">
+    velix
+      0.12.0
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="velix API docs, for the Dart programming language.">
+  <title>velix - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://github.com/coolsamson7/velix">velix package</a></li>
+  </ol>
+  <div class="self-name">velix</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <img width="1536" height="1024" alt="Futuristische Flutter App Arbeitsumgebung" src="https://github.com/user-attachments/assets/e746b067-5fc1-464b-a16c-c9c9251698a4">
+<h1 id="model-driven-forms-for-flutter">Model-driven forms for Flutter</h1>
+<p>Velix is a dart / flutter based library that vastly simplifies data binding and validation in forms.</p>
+<h1 id="motivation">Motivation</h1>
+<p>Looking at the effort required in Flutter to handle even simple forms i was shocked and started looking for
+alternatives that gave my about the same level of verbosity or productivity as i have known for example in Angular.</p>
+<p>While there are some form related libraries, they all skip the problem of binding widgets to values automatically, so i started my own
+library reusing ideas, that i have known for at least 20 years :-)
+Starting with the form binding quickly other solutions where integrated as well, that simplify development.</p>
+<h1 id="solution-idea">Solution idea</h1>
+<p>The idea is a model based declarative approach, that utilizes</p>
+<ul>
+<li>reflection information with respect to the bound classes and fields</li>
+<li>including type constraints on field level</li>
+<li>in combination with technical adapters that handle specific widgets and do the internal dirty work.</li>
+</ul>
+<p>As a result, all the typical boilerplate code is completely gone, resulting in a fraction of necessary code.</p>
+<h1 id="example">Example</h1>
+<p>Let's look at a simple form example first.</p>
+<p>Both the reflection and validation information is covered by specific decorators:</p>
+<pre class="language-dart"><code class="language-dart">@Dataclass()
+class Address {
+  // instance data
+
+  @Attribute(type: "length 100")
+  final String city;
+  @Attribute(type: "length 100")
+  final String street;
+  
+  // constructor
+
+  Address({required this.city, required this.street});
+}
+
+@Dataclass()
+class Person {
+  // instance data
+
+  @Attribute(type: "length 100")
+  String firstName;
+  @Attribute(type: "length 100")
+  String lastName;
+  @Attribute(type: "&gt;= 0")
+  int age;
+  @Attribute()
+  Address address;
+}
+</code></pre>
+<p>Inside the state of the form page, we can bind values easily</p>
+<pre class="language-dart"><code class="language-dart">class PersonFormPageState extends State&lt;PersonFormPage&gt; {
+  // instance data
+
+  late FormMapper mapper;
+  
+  // override
+
+  @override
+  void initState() {
+    super.initState();
+
+    mapper = FormMapper(instance: widget.person, twoWay: true);
+
+    mapper.isDirty.addListener(() {
+      setState(() {
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    mapper.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    Widget result = Form(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      key: mapper.getKey(),
+      ...
+      mapper.bind(CupertinoTextFormFieldRow, path: "firstName", context: context, args: {"placeholder": 'First Name'}), 
+      mapper.bind(CupertinoTextFormFieldRow, path: "lastName", context: context, args: {"placeholder": 'Last Name'}),
+      mapper.bind(CupertinoTextFormFieldRow, path: "age", context: context, args: {"placeholder": 'Age'}),
+      mapper.bind(CupertinoTextFormFieldRow, path: "address.city", context: context, args: {"placeholder": 'City'}),
+      mapper.bind(CupertinoTextFormFieldRow, path: "address.street", context: context, args: {"placeholder": 'Street'}),
+    );
+
+    // set initial value
+
+    mapper.setValue(widget.person);
+
+    // done
+
+    return result;
+  }
+} 
+</code></pre>
+<p>You can already see some highlights:</p>
+<ul>
+<li>automatic handling of type validation ( e.g. length constraints ) and generation of error messages</li>
+<li>automatic coercion of types ( e.g. "age" bound to a test field )</li>
+<li>handling of paths ( "address.city" ) including the necessary reconstruction of immutable classes ( with final fields )</li>
+<li>two-way data-binding, if requested</li>
+</ul>
+<p>Two-way databinding will modify the underlying model immediately after every change in a associated widget.
+If disabled, you would have to explicitly call <code>form.getValue()</code> to retrieve the updated model. The additional benefit you
+would gain here is that the form mapper remembers the initial values and will change its <code>dirty</code> state accordingly, which means that
+a reverted change will bring the form back to a non-dirty state!</p>
+<h1 id="benefits">Benefits</h1>
+<p>Velix drastically reduces the manual wiring and repetitive boilerplate that normally comes with Flutter forms.
+With it, you get:</p>
+<ul>
+<li>
+<p>No manual controllers – Forget TextEditingController, FocusNode, and onChanged spaghetti for every single field.</p>
+</li>
+<li>
+<p>Type-aware validation out of the box – Your @Attribute metadata drives validation rules automatically, without repeating them in the UI layer.</p>
+</li>
+<li>
+<p>Immutable model support – Handles reconstruction of immutable (final) classes automatically when updating nested fields.</p>
+</li>
+<li>
+<p>Two-way binding – Keep your widgets and model in sync without extra glue code; or opt for one-way binding with explicit getValue() retrieval.</p>
+</li>
+<li>
+<p>Path-based binding – Easily bind deeply nested fields (address.city) without manually drilling down in your widget code.</p>
+</li>
+<li>
+<p>Automatic dirty-state tracking – Know instantly if a form has unsaved changes and when it has been reverted to its original state.</p>
+</li>
+<li>
+<p>Minimal code footprint – Complex forms can be expressed in a fraction of the lines you’d normally need.</p>
+</li>
+</ul>
+<h1 id="comparison-to-existing-flutter-solutions">Comparison to Existing Flutter Solutions</h1>
+<p>While Flutter has some established form libraries like
+flutter_form_builder and reactive_forms, they still expect you to:</p>
+<ul>
+<li>
+<p>Define FormControl or TextEditingController instances manually</p>
+</li>
+<li>
+<p>Wire each widget to its controller or form control</p>
+</li>
+<li>
+<p>Duplicate validation rules across model and UI layers</p>
+</li>
+<li>
+<p>Write boilerplate for converting between text and typed fields</p>
+</li>
+</ul>
+<p>Velix takes a different route:</p>
+<ul>
+<li>
+<p>Model-driven – The form is generated from your annotated model, not from widget-level configuration.</p>
+</li>
+<li>
+<p>Automatic widget adapters – You don’t manually connect a controller; you just tell Velix which property to bind.</p>
+</li>
+<li>
+<p>Unified validation &amp; transformation – Rules live once, in the model, and apply everywhere.</p>
+</li>
+<li>
+<p>Nested object awareness – Works with object graphs, not just flat maps of fields.</p>
+</li>
+</ul>
+<p>The result is a WPF/Angular-style binding experience in Flutter — something currently missing from the ecosystem.</p>
+<h1 id="installation">Installation</h1>
+<p>The library is hosted on Github ( <a href="https://github.com/coolsamson7/velix">https://github.com/coolsamson7/velix</a> )</p>
+<p>and published on pub.dev (<a href="https://pub.dev/packages/velix">https://pub.dev/packages/velix</a> )</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="command">
+  <span class="name"><a href="commands_command/">commands/command</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="command_button">
+  <span class="name"><a href="components_command_button/">components/command_button</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="command_toolbar">
+  <span class="name"><a href="components_command_toolbar/">components/command_toolbar</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="overlay">
+  <span class="name"><a href="components_overlay/">components/overlay</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="view">
+  <span class="name"><a href="components_view/">components/view</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="form_mapper">
+  <span class="name"><a href="databinding_form_mapper/">databinding/form_mapper</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="registry">
+  <span class="name"><a href="databinding_registry/">databinding/registry</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="switch_adapter">
+  <span class="name"><a href="databinding_switch_adapter/">databinding/switch_adapter</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="text_adapter">
+  <span class="name"><a href="databinding_text_adapter/">databinding/text_adapter</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="valued_widget">
+  <span class="name"><a href="databinding_valued_widget/">databinding/valued_widget</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="i18n">
+  <span class="name"><a href="i18n_i18n/">i18n/i18n</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="mapper">
+  <span class="name"><a href="mapper_mapper/">mapper/mapper</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="operation_builder">
+  <span class="name"><a href="mapper_operation_builder/">mapper/operation_builder</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="transformer">
+  <span class="name"><a href="mapper_transformer/">mapper/transformer</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="reflectable">
+  <span class="name"><a href="reflectable_reflectable/">reflectable/reflectable</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="collections">
+  <span class="name"><a href="util_collections/">util/collections</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="validation">
+  <span class="name"><a href="validation_validation/">validation/validation</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="velix">
+  <span class="name"><a href="velix/">velix</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="https://github.com/coolsamson7/velix">velix package</a></li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">velix</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="commands_command/">commands/command</a></li>
+      <li><a href="components_command_button/">components/command_button</a></li>
+      <li><a href="components_command_toolbar/">components/command_toolbar</a></li>
+      <li><a href="components_overlay/">components/overlay</a></li>
+      <li><a href="components_view/">components/view</a></li>
+      <li><a href="databinding_form_mapper/">databinding/form_mapper</a></li>
+      <li><a href="databinding_registry/">databinding/registry</a></li>
+      <li><a href="databinding_switch_adapter/">databinding/switch_adapter</a></li>
+      <li><a href="databinding_text_adapter/">databinding/text_adapter</a></li>
+      <li><a href="databinding_valued_widget/">databinding/valued_widget</a></li>
+      <li><a href="i18n_i18n/">i18n/i18n</a></li>
+      <li><a href="mapper_mapper/">mapper/mapper</a></li>
+      <li><a href="mapper_operation_builder/">mapper/operation_builder</a></li>
+      <li><a href="mapper_transformer/">mapper/transformer</a></li>
+      <li><a href="reflectable_reflectable/">reflectable/reflectable</a></li>
+      <li><a href="util_collections/">util/collections</a></li>
+      <li><a href="validation_validation/">validation/validation</a></li>
+      <li><a href="velix/">velix</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    velix
+      0.12.0
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

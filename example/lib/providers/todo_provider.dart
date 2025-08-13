@@ -10,12 +10,16 @@ class TodoProvider with ChangeNotifier {
 
   List<Todo> get todos => _todos;
 
-  void addTodo(String title) async {
+  Future<Todo> addTodo(String title) async {
     Todo todo = Todo(id: DateTime.now().toString(), details: Details(author: "", priority: 1), title: title);
 
     _todos.add(todo);
 
-    notifyListeners(); 
+    await Future.delayed(const Duration(milliseconds: 1000)); // just a test
+
+    notifyListeners();
+
+    return todo;
   }
 
   void updateTodo(Todo todo) {

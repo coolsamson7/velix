@@ -19,14 +19,14 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
 
   // command declarations
 
-  void _addTodo();
+  Future<Todo> _addTodo();
   void _removeTodo(String id);
   void _toggleTodo(String id);
 
   // command bodies
 
-  void addTodo() {
-    execute("addTodo", []);
+  Future<Todo> addTodo() async {
+    return await execute("addTodo", []);
   }
 
   void removeTodo(String id) {

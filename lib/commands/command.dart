@@ -75,16 +75,16 @@ class CommandDescriptor extends ChangeNotifier {
 
   // public
 
-  Future<dynamic> execute(List<dynamic> args) {
-    Invocation invocation = Invocation(command: this, args: args);
-
-    // local function
+  /// Always returns a Future, regardless of whether the function is sync or async
+  Future<dynamic> execute(List<dynamic> args) async {
+    final invocation = Invocation(command: this, args: args);
 
     FutureOr<dynamic> callNext(int index) {
       return _interceptors[index](invocation, () => callNext(index + 1));
     }
 
-    return Future.sync(() => callNext(0));
+    // Ensure the return type is a Future
+    return await Future.sync(() => callNext(0));
   }
 }
 

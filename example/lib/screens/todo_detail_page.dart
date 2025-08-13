@@ -9,7 +9,7 @@ import '../providers/todo_provider.dart';
 part "todo_detail_page.command.g.dart";
 
 class TodoDetailPage extends StatefulWidget {
-  final Todo todo; // replace with your concrete model
+  final Todo todo;
 
   const TodoDetailPage({super.key, required this.todo});
 

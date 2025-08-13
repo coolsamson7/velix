@@ -69,20 +69,23 @@ class CommandGenerator extends Generator {
       output.writeln('  void initCommands() {');
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
-        final name = _getCommandAnnotation(method)!.peek('name')?.stringValue ?? publicName;
+        final name = _getCommandAnnotation(method)!.peek('name')?.stringValue ??
+            publicName;
 
         output.write('    addCommand("$name", _$publicName');
 
         // label
 
-        final label = _getCommandAnnotation(method)!.peek('label')?.stringValue ?? '';
-        if ( label.isNotEmpty)
+        final label = _getCommandAnnotation(method)!.peek('label')
+            ?.stringValue ?? '';
+        if (label.isNotEmpty)
           output.write(', label: \'$label\'');
 
         // i18n
 
-        final i18n = _getCommandAnnotation(method)!.peek('i18n')?.stringValue ?? '';
-        if ( i18n.isNotEmpty) {
+        final i18n = _getCommandAnnotation(method)!.peek('i18n')?.stringValue ??
+            '';
+        if (i18n.isNotEmpty) {
           output.write(', i18n: \'$i18n\'');
         }
 
@@ -92,19 +95,20 @@ class CommandGenerator extends Generator {
         if (lock != null && !lock.isNull) {
           final revived = lock.revive(); // from source_gen
           //final typeName = revived.source?.fragment;   // e.g. 'LockType'
-          final accessor = revived.accessor;           // e.g. 'LockType.command'
+          final accessor = revived.accessor; // e.g. 'LockType.command'
 
           int dot = accessor.indexOf(".");
-          var value = accessor.substring(dot +1 );
+          var value = accessor.substring(dot + 1);
 
-          if ( value != "command")
+          if (value != "command")
             output.write(', lock: LockType.$value');
         }
 
         // done
 
         output.writeln(');');
-      }
+      } // for
+
       output.writeln('  }');
 
       //  _<command>()...
@@ -116,11 +120,15 @@ class CommandGenerator extends Generator {
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
         final signature = method.parameters.map((param) {
-          final typeStr = param.type.getDisplayString();
+          final typeStr = param.type.getDisplayString(withNullability: false);
           return '$typeStr ${param.name}';
         }).join(', ');
 
-        output.writeln('  void _$publicName($signature);');
+        // Use the method's own declared return type
+        final returnType = method.returnType.getDisplayString(
+            withNullability: false);
+
+        output.writeln('  $returnType _$publicName($signature);');
       } // for
 
       // <command>(...)
@@ -132,19 +140,34 @@ class CommandGenerator extends Generator {
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
         final signature = method.parameters.map((param) {
-          final typeStr = param.type.getDisplayString();
+          final typeStr = param.type.getDisplayString(withNullability: false);
           return '$typeStr ${param.name}';
         }).join(', ');
         final argList = method.parameters.map((param) => param.name).join(', ');
 
-        output.writeln('  void $publicName($signature) {');
-        output.writeln('    execute("$publicName", [$argList]);');
+        final returnType = method.returnType.getDisplayString(
+            withNullability: false);
+        final isFuture = returnType.startsWith('Future');
+
+        // If method returns Future<T>, make wrapper async and await execution
+        final asyncKeyword = isFuture ? 'async ' : '';
+        final awaitPrefix = isFuture ? 'await ' : '';
+
+        // Add return if method actually returns something
+        final needsReturn = returnType != 'void' &&
+            returnType != 'Future<void>';
+        final returnKeyword = needsReturn ? 'return ' : '';
+
+        output.writeln('  $returnType $publicName($signature) $asyncKeyword{');
+        output.writeln(
+            '    ${returnKeyword}${awaitPrefix}execute("$publicName", [$argList]);');
         output.writeln('  }');
       } // for
 
       output.writeln('}');
-      output.writeln();
-    } // for
+    }
+
+
 
     return output.toString();
   }

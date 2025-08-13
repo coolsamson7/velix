@@ -2,6 +2,7 @@ import 'dart:async';
 
 //import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:sample/models/todo.dart';
 import '../screens/todo_detail_page.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/velix.dart';
@@ -25,13 +26,14 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
 
   @override
   @Command(i18n: "main.addTodo", lock: LockType.view) // icon: CupertinoIcons.add
-  void _addTodo() async {
-      context.read<TodoProvider>().addTodo(_controller.text);
+  Future<Todo> _addTodo() async {
+      var todo = await context.read<TodoProvider>().addTodo(_controller.text);
+
       _controller.clear();
 
-      await Future.delayed(const Duration(milliseconds: 1000));
-
       updateCommandState();
+
+      return todo;
   }
 
   @override
@@ -77,7 +79,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   @override
   Widget build(BuildContext context) {
     return CommandView(
-      commands: getCommands(), // <-- Pass the commands TODO
+      commands: getCommands(),
       child: Consumer<TodoProvider>(
         builder: (context, todoProvider, _) {
           return Column(

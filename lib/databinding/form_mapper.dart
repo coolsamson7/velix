@@ -202,11 +202,13 @@ class FormMapper {
     return result;
   }
 
-  /// commit all pending changes to the instance
-  void commit() {
+  /// commit all pending changes to the instance and return it
+  dynamic commit() {
     ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
     for ( Operation operation in operations)
       (operation.source as TypeProperty).commit(context);
+
+    return instance;
   }
 
   void addDirty(int delta) {
@@ -259,7 +261,7 @@ class FormMapper {
       if ( (operation.source as TypeProperty).path == path)
         return operation.source as TypeProperty;
 
-    throw Exception("ouch");
+    throw Exception("unknown property $path");
   }
 
   void notifyChange({required String path, required dynamic value}) {

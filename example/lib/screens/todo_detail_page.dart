@@ -27,13 +27,33 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   @Command()
   @override
   void _save() {
+    if (mapper.validate()) {
+      Todo todo = mapper.commit();
 
+      final todoProvider = Provider.of<TodoProvider>(context, listen: false);
+
+      // it could be a different object in case of immutable classes!
+
+      todoProvider.updateTodo(todo);
+
+      // close screen
+
+      Navigator.pop(context);
+    }
   }
 
   @Command()
   @override
   void _cancel() {
 
+  }
+
+  // override
+
+  @override
+  void updateCommandState() {
+    setCommandEnabled("save", mapper.isDirty.value);
+    setCommandEnabled("cancel", mapper.isDirty.value);
   }
 
   // override
@@ -53,8 +73,11 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
     mapper.isDirty.addListener(() {
       setState(() {
+        updateCommandState();
       });
     });
+
+    updateCommandState();
   }
 
   @override
@@ -115,17 +138,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
               Row(
                 children: [
                   CupertinoButton(
-                    onPressed: mapper.isDirty.value ?  () {
-                      if (mapper.validate()) {
-                        mapper.commit();
-
-                        //TODO Provider.updateTodo(
-                        //  widget.todo.id,
-                        //  _titleCtrl.text,
-                        //);
-                        Navigator.pop(context);
-                      }
-                    } : null,
+                    onPressed: isCommandEnabled("save") ?  save : null,
                     child: const Text('Speichern')
                   ),
                   const SizedBox(width: 16),
@@ -144,7 +157,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
       ),
     );
 
-    // set initial value
+    // set value
 
     mapper.setValue(widget.todo);
 

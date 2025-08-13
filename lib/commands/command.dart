@@ -205,6 +205,12 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
     getCommand(command).enabled = enabled;
   }
 
+  /// return [true],  if the named command is enabled
+  /// [command] the command name
+  bool isCommandEnabled(String command) {
+    return getCommand(command).enabled ;
+  }
+
   Future<dynamic> execute(String name, List<dynamic> args) {
     return getCommand(name).execute(args);
   }

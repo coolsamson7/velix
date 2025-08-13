@@ -18,6 +18,12 @@ class TodoProvider with ChangeNotifier {
     notifyListeners(); 
   }
 
+  void updateTodo(Todo todo) {
+    // we know the object is not immutable
+
+    notifyListeners();
+  }
+
   void toggleTodo(String id) {
     final todo = _todos.firstWhere((t) => t.id == id);
     todo.completed = !todo.completed;

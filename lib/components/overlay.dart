@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// on overlay, that shows a spinner while active
 class OverlaySpinner extends StatelessWidget {
   // instance data
 

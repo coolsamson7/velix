@@ -24,7 +24,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   // commands
 
   @override
-  @Command(i18n: "main.addTodo") // icon: CupertinoIcons.add
+  @Command(i18n: "main.addTodo", lock: LockType.view) // icon: CupertinoIcons.add
   void _addTodo() async {
       context.read<TodoProvider>().addTodo(_controller.text);
       _controller.clear();

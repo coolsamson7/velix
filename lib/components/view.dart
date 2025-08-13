@@ -52,8 +52,10 @@ class _CommandViewState extends State<CommandView> {
     super.initState();
 
     // Add spinner interceptor to each command
-    for (var cmd in widget.commands) {
-      cmd.prependInterceptor(_SpinnerInterceptor(onChange: _setBusy));
+
+    for (var command in widget.commands) {
+      if (command.lock == LockType.view)
+        command.prependInterceptor(_SpinnerInterceptor(onChange: _setBusy));
     }
   }
 

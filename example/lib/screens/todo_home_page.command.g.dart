@@ -12,7 +12,7 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
 
   @override
   void initCommands() {
-    addCommand("addTodo", _addTodo);
+    addCommand("addTodo", _addTodo, lock: LockType.view);
     addCommand("removeTodo", _removeTodo);
     addCommand("toggleTodo", _toggleTodo);
   }

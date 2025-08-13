@@ -3,14 +3,29 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:velix/i18n/i18n.dart';
 
-/// @internal
+/// enum specifying how execution of a command will influence the ui state
+enum LockType {
+  /// the command is disabled while executing
+  command,
+  /// the associated [CommandView] is disabled while executing
+  view,
+  /// ...
+  group;
+}
+
+/// decorates methods that should be exposed as commands.
 class Command {
+  // instance data
+
   final String? name;
   final String? i18n;
   final String? label;
+  final LockType lock;
   //IconData? icon;
 
-  const Command({this.name, this.label, this.i18n});
+  // constructor
+
+  const Command({this.name, this.label, this.i18n, this.lock = LockType.command});
 }
 
 class CommandException implements Exception {
@@ -22,7 +37,7 @@ class CommandException implements Exception {
   String toString() => 'CommandException: $message';
 }
 
-/// @internal
+/// Internal representation of a command, including all interceptors
 class CommandDescriptor extends ChangeNotifier {
   // instance data
 
@@ -30,6 +45,7 @@ class CommandDescriptor extends ChangeNotifier {
   final String? i18n;
   late String? label;
   late IconData? icon;
+  final LockType lock;
   final List<CommandInterceptor> _interceptors = [];
   late Function function;
   bool _enabled = true;
@@ -45,7 +61,7 @@ class CommandDescriptor extends ChangeNotifier {
 
   // constructor
 
-  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon});
+  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.lock = LockType.command});
 
   // administrative
 
@@ -76,8 +92,12 @@ class CommandDescriptor extends ChangeNotifier {
 /// - the command name
 /// - the args
 class Invocation {
+  // instance data
+
   final CommandDescriptor command;
   List<dynamic> args;
+
+  // constructor
 
   /// Create a new [Invocation]
   /// [command] the command name
@@ -143,7 +163,7 @@ class CommandManager {
 
   // public
 
-  CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon}) {
+  CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType? lock = LockType.command}) {
     if ( label == null) {
       if (i18n != null) {
         label = translator.translate(i18n);
@@ -153,7 +173,7 @@ class CommandManager {
       }
     }
 
-    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon);
+    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon, lock: lock);
 
     // add standard interceptors
 
@@ -183,8 +203,8 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
   }
 
   /// @internal
-  void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
-    _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon);
+  void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon, LockType? lock}) {
+    _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon, lock: lock);
   }
 
   /// @internal

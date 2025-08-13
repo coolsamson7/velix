@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../commands/command.dart';
 
+/// A button that is attached to a command
+
 class CommandButton extends StatefulWidget {
   // instance data
 
@@ -25,6 +27,7 @@ class CommandButton extends StatefulWidget {
   State<CommandButton> createState() => _CommandButtonState();
 }
 
+/// @internal
 class _CommandButtonState extends State<CommandButton> {
   // instance data
 

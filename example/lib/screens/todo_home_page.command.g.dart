@@ -7,7 +7,9 @@
 
 part of 'todo_home_page.dart';
 
-mixin _$_TodoHomePageStateCommands on CommandController<TodoHomePage> {
+mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
+  // override
+
   @override
   void initCommands() {
     addCommand("addTodo", _addTodo);
@@ -15,19 +17,23 @@ mixin _$_TodoHomePageStateCommands on CommandController<TodoHomePage> {
     addCommand("toggleTodo", _toggleTodo);
   }
 
+  // command declarations
+
+  void _addTodo();
+  void _removeTodo(String id);
+  void _toggleTodo(String id);
+
+  // command bodies
+
   void addTodo() {
     execute("addTodo", []);
   }
 
-  void _addTodo();
   void removeTodo(String id) {
     execute("removeTodo", [id]);
   }
 
-  void _removeTodo(String id);
   void toggleTodo(String id) {
     execute("toggleTodo", [id]);
   }
-
-  void _toggleTodo(String id);
 }

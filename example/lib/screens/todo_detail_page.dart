@@ -17,7 +17,7 @@ class TodoDetailPage extends StatefulWidget {
   State<TodoDetailPage> createState() => _TodoDetailPageState();
 }
 
-class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<TodoDetailPage>, _$_TodoDetailPageStateCommands {
+class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<TodoDetailPage>, _TodoDetailPageStateCommands {
   // instance data
 
   late FormMapper mapper;

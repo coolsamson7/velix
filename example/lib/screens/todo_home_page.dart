@@ -16,14 +16,16 @@ class TodoHomePage extends StatefulWidget {
   State<TodoHomePage> createState() => _TodoHomePageState();
 }
 
-class _TodoHomePageState extends State<TodoHomePage> with CommandController<TodoHomePage>, _$_TodoHomePageStateCommands {
+class _TodoHomePageState extends State<TodoHomePage> with CommandController<TodoHomePage>, _TodoHomePageStateCommands {
+  // instance data
+
   final TextEditingController _controller = TextEditingController();
 
   // commands
 
   @override
   @Command(i18n: "main.addTodo") // icon: CupertinoIcons.add
-  void _addTodo() async{
+  void _addTodo() async {
       context.read<TodoProvider>().addTodo(_controller.text);
       _controller.clear();
 
@@ -46,6 +48,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
 
   // internal
 
+  @override
   void updateCommandState() {
     setCommandEnabled("addTodo",  _controller.text.isNotEmpty);
 

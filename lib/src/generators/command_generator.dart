@@ -55,12 +55,15 @@ class CommandGenerator extends Generator {
       output.writeln("part of '$fileName';\n");
 
       final className = clazz.name;
-      final mixinName = '_\$${className}Commands';
+      final mixinName = '${className}Commands';
 
       final type = getExtends(clazz);
-      output.writeln('mixin $mixinName on CommandController<${type}> {');
+      output.writeln('mixin $mixinName on CommandController<$type> {');
 
       // Generate initCommands
+
+      output.writeln('  // override');
+      output.writeln();
 
       output.writeln('  @override');
       output.writeln('  void initCommands() {');
@@ -79,7 +82,27 @@ class CommandGenerator extends Generator {
       }
       output.writeln('  }');
 
-      // Generate public forwarding methods
+      //  _<command>()...
+
+      output.writeln();
+      output.writeln('  // command declarations');
+      output.writeln();
+
+      for (final method in commands) {
+        final publicName = method.name.replaceFirst('_', '');
+        final signature = method.parameters.map((param) {
+          final typeStr = param.type.getDisplayString();
+          return '$typeStr ${param.name}';
+        }).join(', ');
+
+        output.writeln('  void _$publicName($signature);');
+      } // for
+
+      // <command>(...)
+
+      output.writeln();
+      output.writeln('  // command bodies');
+      output.writeln();
 
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
@@ -92,13 +115,11 @@ class CommandGenerator extends Generator {
         output.writeln('  void $publicName($signature) {');
         output.writeln('    execute("$publicName", [$argList]);');
         output.writeln('  }');
-
-        output.writeln('  void _$publicName($signature);');
-      }
+      } // for
 
       output.writeln('}');
       output.writeln();
-    }
+    } // for
 
     return output.toString();
   }

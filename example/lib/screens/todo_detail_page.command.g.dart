@@ -7,21 +7,27 @@
 
 part of 'todo_detail_page.dart';
 
-mixin _$_TodoDetailPageStateCommands on CommandController<TodoDetailPage> {
+mixin _TodoDetailPageStateCommands on CommandController<TodoDetailPage> {
+  // override
+
   @override
   void initCommands() {
     addCommand("save", _save);
     addCommand("cancel", _cancel);
   }
 
+  // command declarations
+
+  void _save();
+  void _cancel();
+
+  // command bodies
+
   void save() {
     execute("save", []);
   }
 
-  void _save();
   void cancel() {
     execute("cancel", []);
   }
-
-  void _cancel();
 }

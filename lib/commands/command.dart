@@ -128,7 +128,7 @@ class MethodCommandInterceptor implements CommandInterceptor {
   }
 }
 
-/// Central class that controls teh creation of [CommandInterceptor]s for commands
+/// Central class that controls the creation of [CommandInterceptor]s for commands
 /// @internal
 class CommandManager {
   // instance data
@@ -155,15 +155,18 @@ class CommandManager {
 
     CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon);
 
+    // add standard interceptors
+
     for ( CommandInterceptor interceptor in interceptors)
       command.addInterceptor(interceptor);
+
+    // the method itself
 
     command.addInterceptor(methodInterceptor);
 
     return command;
   }
 }
-
 
 /// Mixin class that adds the ability to handle commands
 mixin CommandController<T extends StatefulWidget> on State<T> {
@@ -174,14 +177,17 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
 
   // public
 
+  /// @internal
   List<CommandDescriptor> getCommands() {
     return _commands.values.toList();
   }
-  
+
+  /// @internal
   void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon}) {
     _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon);
   }
 
+  /// @internal
   CommandDescriptor getCommand(String name) {
     CommandDescriptor? command = _commands[name];
     if (command != null) {
@@ -192,6 +198,9 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
     }
   }
 
+  /// enable or disable a named command
+  /// [command] the command name
+  /// [enabled] the enabled status
   void setCommandEnabled(String command, bool enabled) {
     getCommand(command).enabled = enabled;
   }
@@ -200,7 +209,11 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
     return getCommand(name).execute(args);
   }
 
+  /// @internal
   void initCommands() {}
+
+  /// update the command states
+  void updateCommandState() {}
 
   // override
 

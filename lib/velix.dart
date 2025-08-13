@@ -34,6 +34,10 @@ export './reflectable/reflectable.dart';
 
 export './validation/validation.dart';
 
+// i18n
+
+export './i18n/i18n.dart';
+
 // util
 
 export './util/collections.dart';

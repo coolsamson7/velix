@@ -1,6 +1,8 @@
 import '../util/collections.dart';
 import '../validation/validation.dart';
 
+Type nonNullableOf<T>() => T;
+
 /// decorator used to mark classes that should emit meta-data
 class Dataclass {
   const Dataclass();
@@ -150,8 +152,9 @@ class TypeDescriptor<T> {
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
   }) {
-    type = T;
-      for (var field in fields) {
+    type = nonNullableOf<T>();
+
+    for (var field in fields) {
         field.typeDescriptor = this;
         _fields[field.name] = field;
       }
@@ -344,8 +347,11 @@ ConstructorParameter param<T>(String name, {
 }
 
 /// @internal
-AbstractType inferType<T>() {
-  final type = T;
+AbstractType inferType<T>(AbstractType? t) {
+  if ( t != null)
+    return t;
+
+  final type = nonNullableOf<T>();
 
   final Map<Type, AbstractType> types = {
     String: StringType(),    // default unconstrained
@@ -374,5 +380,5 @@ FieldDescriptor field<T,V>(String name, {
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType<V>(), elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
+  return FieldDescriptor(name: name, type: inferType<V>(type), elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
 }

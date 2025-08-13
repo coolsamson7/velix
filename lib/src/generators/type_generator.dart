@@ -175,7 +175,7 @@ class AggregateBuilder implements Builder {
       if (field.isStatic || field.isPrivate) continue;
 
       final name = field.name;
-      final type = field.type.getDisplayString();
+      final type = field.type.getDisplayString(withNullability: false);
 
       //print('${field.name} → ${field.type} → ${field.type.nullabilitySuffix}');
 

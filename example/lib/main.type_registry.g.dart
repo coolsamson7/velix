@@ -48,7 +48,7 @@ void registerAllDescriptors() {
            getter: (obj) => (obj as Todo).completed,
            setter: (obj, value) => (obj as Todo).completed = value,
          ),
-         field<Todo,Details?>('details',
+         field<Todo,Details>('details',
            getter: (obj) => (obj as Todo).details,
            setter: (obj, value) => (obj as Todo).details = value,
            isNullable: true

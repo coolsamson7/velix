@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:velix/velix.dart';
 
 import 'package:provider/provider.dart';
@@ -8,29 +8,41 @@ import 'service_locator.dart';
 import 'providers/todo_provider.dart';
 import 'screens/main_screen.dart';
 
+class EasyLocalizationTranslator extends Translator {
+  // constructor
+
+  EasyLocalizationTranslator() {
+    Translator.instance = this;
+  }
+
+  // implement
+
+  @override
+  String translate(String key, {Map<String, String>  args = const {}}) {
+    return key.tr(namedArgs: args);
+  }
+}
+
 void main() async {
   configureDependencies();
+
+  TypeViolationTranslationProvider();
 
   registerAllDescriptors();
   registerWidgets();
 
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  //await EasyLocalization.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
-  getIt.registerSingleton<CommandManager>(
-      CommandManager(interceptors: [LockCommandInterceptor(), TracingCommandInterceptor()])
-  );
-
-  runApp(const MyApp());
-  /*runApp(
+  runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('de')],
       path: 'assets/translations', // folder path
       fallbackLocale: const Locale('en'),
       child: const MyApp(),
     ),
-  );*/
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -40,12 +52,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => getIt<TodoProvider>()),
+        ChangeNotifierProvider(create: (_) => TodoProvider()),
         Provider<CommandManager>(create: (_) => CommandManager(
           interceptors: [
             LockCommandInterceptor(),
             TracingCommandInterceptor()
-          ]
+          ],
+          translator: EasyLocalizationTranslator()
         )),
       ],
       child: CupertinoApp(
@@ -53,9 +66,9 @@ class MyApp extends StatelessWidget {
         theme: const CupertinoThemeData(
           primaryColor: CupertinoColors.activeBlue,
         ),
-        //localizationsDelegates: context.localizationDelegates,
-        //supportedLocales: context.supportedLocales,
-        //locale: context.locale,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
         home: const MainScreen(),
       ),
     );

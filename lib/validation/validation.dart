@@ -1,5 +1,6 @@
 //TODO I18N import 'package:easy_localization/easy_localization.dart';
 
+import '../i18n/i18n.dart';
 import '../reflectable/reflectable.dart';
 
 /// @internal
@@ -283,7 +284,7 @@ class TypeViolation {
   /// [params] the parameters of the failed test
   /// [value] the tested value
   /// [path] the path of the current property referencing the value
-  /// [message] oprional message of the violation
+  /// [message] optional message of the violation
   const TypeViolation({
      required this.type,
      required this.name,
@@ -291,23 +292,6 @@ class TypeViolation {
      required this.value,
      required this.path,
      required this.message});
-
-   // override
-
-   @override
-   String toString() {
-     var buffer = StringBuffer();
-
-     Map<String, String> stringMap = params.map(
-           (key, value) => MapEntry(key, value.toString()),
-     );
-
-     var translation = "validation.${type.toString().toLowerCase()}.$name";//TODO I18N .tr(namedArgs: stringMap);
-
-     buffer.write(translation);
-
-     return buffer.toString();
-   }
 }
 
 /// @internal
@@ -900,5 +884,16 @@ class ListType<T> extends AbstractType<T> {
     super.parse(methods, input);
 
     return this;
+  }
+}
+
+class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation> {
+  // override
+
+  @override
+  String translate(instance) {
+    return Translator.tr("validation.${instance.type.toString().toLowerCase()}.${instance.name}", args: instance.params.map(
+          (key, value) => MapEntry(key, value.toString()),
+    ));
   }
 }

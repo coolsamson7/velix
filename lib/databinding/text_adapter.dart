@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:velix/i18n/i18n.dart';
 
+import '../validation/validation.dart';
 import 'valued_widget.dart';
 import 'form_mapper.dart';
 
@@ -49,8 +51,11 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
 
         return null;
       }
+      on ValidationException catch(e) {
+        return TranslationManager.translate(e.violations.first);
+      }
       catch(e) {
-        return e.toString(); // TODO
+        return e.toString();
       }
     }
 
@@ -83,11 +88,6 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
 
         if (error != errorText) {
           errorText = error;
-          //(context as Element).markNeedsBuild();
-
-          //final formState = Form.of(context);
-
-          //formState.validate();
         }
       });
 

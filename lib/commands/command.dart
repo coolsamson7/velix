@@ -1,7 +1,7 @@
 import 'dart:async';
-//TODO I18N import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:velix/i18n/i18n.dart';
 
 /// @internal
 class Command {
@@ -45,12 +45,7 @@ class CommandDescriptor extends ChangeNotifier {
 
   // constructor
 
-  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon}) {
-    if ( i18n != null) {
-      label = i18n;//TODO I18N !.tr();
-    }
-    else label ??= name;
-  }
+  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon});
 
   // administrative
 
@@ -140,15 +135,24 @@ class CommandManager {
 
   MethodCommandInterceptor methodInterceptor = MethodCommandInterceptor();
   List<CommandInterceptor> interceptors = [];
-
+  Translator translator;
 
   // constructor
 
-  CommandManager({this.interceptors = const []});
+  CommandManager({this.interceptors = const [], this.translator = NO_TRANSLATOR});
 
   // public
 
   CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon}) {
+    if ( label != null) {
+      if (i18n != null) {
+        label = translator.translate(i18n);
+      }
+      else {
+        label = name;
+      }
+    }
+
     CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon);
 
     for ( CommandInterceptor interceptor in interceptors)

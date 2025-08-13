@@ -55,6 +55,7 @@ class CommandDescriptor extends ChangeNotifier {
   set enabled(bool value) {
     if (_enabled != value) {
       _enabled = value;
+
       notifyListeners();
     }
   }
@@ -113,10 +114,10 @@ abstract class CommandInterceptor {
 /// A simple [CommandInterceptor] that traces command invocations on stdout
 class TracingCommandInterceptor implements CommandInterceptor {
   @override
-  Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) {
+  Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) async {
     print("> ${invocation.command.name}");
     try {
-      return Future.value(next!());
+      return await Future.value(next!());
     }
     finally {
       print("< ${invocation.command.name}");
@@ -127,12 +128,12 @@ class TracingCommandInterceptor implements CommandInterceptor {
 /// A [CommandInterceptor] that disables a command while being executed.
 class LockCommandInterceptor implements CommandInterceptor {
   @override
-  Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) {
+  Future<dynamic> call(Invocation invocation, FutureOr<dynamic> Function()? next) async {
     bool enabled = invocation.command.enabled;
     try {
       invocation.command.enabled = false;
 
-      return Future.value(next!());
+      return await Future.value(next!());
     }
     finally {
       invocation.command.enabled = enabled;

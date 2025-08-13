@@ -19,7 +19,12 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
       icon: CupertinoIcons.add,
       lock: LockType.view,
     );
-    addCommand("removeTodo", _removeTodo, i18n: 'main.removeTodo');
+    addCommand(
+      "removeTodo",
+      _removeTodo,
+      i18n: 'main.removeTodo',
+      icon: CupertinoIcons.delete,
+    );
     addCommand("toggleTodo", _toggleTodo, i18n: 'main.toggleTodo');
   }
 

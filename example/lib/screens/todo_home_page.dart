@@ -36,7 +36,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   }
 
   @override
-  @Command(i18n: "main.removeTodo") // icon: CupertinoIcons.delete
+  @Command(i18n: "main.removeTodo",  icon: CupertinoIcons.delete)
   void _removeTodo(String id) {
     context.read<TodoProvider>().removeTodo(id);
   }
@@ -93,11 +93,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
                         placeholder: 'hello',
                       ),
                     ),
-                    CommandButton(
-                      command: getCommand('addTodo'),
-                      icon: CupertinoIcons.add,
-                      iconOnly: true
-                    ),
+                    CommandButton(command: getCommand('addTodo'), iconOnly: true),
                   ],
                 ),
               ),

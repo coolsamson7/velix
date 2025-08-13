@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import '../commands/command.dart';
 
 /// A button that is attached to a command
-
 class CommandButton extends StatefulWidget {
   // instance data
 
   final CommandDescriptor command;
-  final String? label;
-  final IconData? icon;
+  late final String? label;
+  late final IconData? icon;
   final List<dynamic>? args;
   final bool iconOnly;
 
   // constructor
 
-  const CommandButton({
+  CommandButton({
     super.key,
     required this.command,
-    this.label,
-    this.icon,
+    String? label,
+    IconData? icon,
     this.args,
-    this.iconOnly=false
-  });
+    this.iconOnly=true
+  }) {
+    this.label = label ?? command.label;
+    this.icon = icon ?? command.icon;
+  }
 
   @override
   State<CommandButton> createState() => _CommandButtonState();

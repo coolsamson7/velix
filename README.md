@@ -2,7 +2,7 @@
 ![License](https://img.shields.io/github/license/coolsamson7/velix)
 ![Dart](https://img.shields.io/badge/Dart-3.0-blue)
 [![Docs](https://img.shields.io/badge/docs-online-blue?logo=github)](https://coolsamson7.github.io/velix/)
-[![Dart CI](https://github.com/coolsamson7/velix/.github/workflows/dart.yml/badge.svg)](https://github.com/coolsamson7/velix/.github/workflows/flutter.yml)
+[![Flutter CI](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg)](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml)
 
 
  

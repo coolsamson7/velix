@@ -20,13 +20,14 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   // instance data
 
   final TextEditingController _controller = TextEditingController();
+  late TodoProvider todoProvider;
 
   // commands
 
   @override
-  @Command(i18n: "main.addTodo1",  icon: CupertinoIcons.add, lock: LockType.view)
+  @Command(i18n: "main.addTodo",  icon: CupertinoIcons.add, lock: LockType.view)
   Future<Todo> _addTodo() async {
-      var todo = await context.read<TodoProvider>().addTodo(_controller.text);
+      var todo = await todoProvider.addTodo(_controller.text);
 
       _controller.clear();
 
@@ -70,6 +71,8 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   void initState() {
     super.initState();
 
+    todoProvider = context.read<TodoProvider>();
+
     _controller.addListener(updateCommandState);
 
     updateCommandState();
@@ -79,6 +82,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   Widget build(BuildContext context) {
     return CommandView(
       commands: getCommands(),
+      toolbarCommands: [getCommand("addTodo")],
       child: Consumer<TodoProvider>(
         builder: (context, todoProvider, _) {
           return Column(

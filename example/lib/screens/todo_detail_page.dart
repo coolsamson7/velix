@@ -21,6 +21,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   // instance data
 
   late FormMapper mapper;
+  late TodoProvider todoProvider;
 
   // commands
 
@@ -29,8 +30,6 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   void _save() {
     if (mapper.validate()) {
       Todo todo = mapper.commit();
-
-      final todoProvider = Provider.of<TodoProvider>(context, listen: false);
 
       // it could be a different object in case of immutable classes!
 
@@ -67,9 +66,9 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   void initState() {
     super.initState();
 
-    var twoWay = false;
+    todoProvider = Provider.of<TodoProvider>(context, listen: false);
 
-    mapper = FormMapper(instance: widget.todo, twoWay: twoWay);
+    mapper = FormMapper(instance: widget.todo, twoWay: false);
 
     mapper.isDirty.addListener(() {
       setState(() {

@@ -7,6 +7,7 @@ import '../commands/command.dart';
 import 'command_button.dart';
 import 'overlay.dart';
 
+/// @internal [CommandInterceptor] that is used to change the cursor after <n> ms
 class _CursorInterceptor implements CommandInterceptor {
   final void Function(bool) onChange;
   final Duration delay;
@@ -37,6 +38,7 @@ class _CursorInterceptor implements CommandInterceptor {
   }
 }
 
+/// @internal [CommandInterceptor] that is used to show a spinner overlay while executing a command
 class _SpinnerInterceptor implements CommandInterceptor {
   final void Function(bool) onChange;
 
@@ -54,18 +56,25 @@ class _SpinnerInterceptor implements CommandInterceptor {
   }
 }
 
+const List<CommandDescriptor> NO_COMMANDS = [];
+
+/// a widget that is associated with commands and will change the cursor or show a spinner while executing commands.
 class CommandView extends StatefulWidget {
   // instance data
 
   final Widget child;
   final List<CommandDescriptor> commands;
+  final List<CommandDescriptor> toolbarCommands;
 
   // constructor
 
+  /// Create a new [CommandView]
+  /// [commands] list of commands
   const CommandView({
     super.key,
     required this.child,
     required this.commands,
+    this.toolbarCommands = NO_COMMANDS,
   });
 
   // override
@@ -74,10 +83,14 @@ class CommandView extends StatefulWidget {
   State<CommandView> createState() => _CommandViewState();
 }
 
+/// @internal
 class _CommandViewState extends State<CommandView> {
-  bool _busy = false;
+  // instance data
 
+  bool _busy = false;
   bool _cursorBusy = false;
+
+  // internal
 
   void _setCursorBusy(bool busy) {
     setState(() {
@@ -86,6 +99,14 @@ class _CommandViewState extends State<CommandView> {
     });
   }
 
+  void _setBusy(bool busy) {
+    setState(() {
+
+      _busy = busy;
+    });
+  }
+
+  // override
 
   @override
   void initState() {
@@ -105,20 +126,13 @@ class _CommandViewState extends State<CommandView> {
     }
   }
 
-  void _setBusy(bool busy) {
-    setState(() {
-
-      _busy = busy;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Column(
           children: [
-            _buildToolbar(),
+            if ( widget.toolbarCommands.isNotEmpty ) _buildToolbar(),
             Expanded(
               child: OverlaySpinner(
                 show: _busy,
@@ -142,7 +156,7 @@ class _CommandViewState extends State<CommandView> {
 
   Widget _buildToolbar() {
     return Row(
-      children: widget.commands
+      children: widget.toolbarCommands
           .map((command) => CommandButton(command: command))
           .toList(growable: false),
     );

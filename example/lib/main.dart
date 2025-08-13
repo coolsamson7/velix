@@ -40,13 +40,13 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('de')],
       path: 'assets/translations', // folder path
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      child: const TODOApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TODOApp extends StatelessWidget {
+  const TODOApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
         )),
       ],
       child: CupertinoApp(
-        title: 'TODO App',
+        title: 'TODO',
         theme: const CupertinoThemeData(
           primaryColor: CupertinoColors.activeBlue,
         ),

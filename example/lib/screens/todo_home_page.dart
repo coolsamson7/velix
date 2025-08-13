@@ -94,7 +94,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
                     Expanded(
                       child: CupertinoTextField(
                         controller: _controller,
-                        placeholder: 'hello',
+                        placeholder: 'Todo',
                       ),
                     ),
                     CommandButton(command: getCommand('addTodo'), iconOnly: true),

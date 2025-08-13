@@ -7,7 +7,7 @@
 ## 0.9.0
 
 - Fixed lint errors
-- 
+
 ## 0.10.0
 
 - added documentation
@@ -19,3 +19,7 @@
 - commands fully support sync and async
 - commands support icons
 - busy cursor after 200ms
+
+## 0.12.0
+
+- more docs

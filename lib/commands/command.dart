@@ -163,7 +163,7 @@ class CommandManager {
 
   // public
 
-  CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType? lock = LockType.command}) {
+  CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType lock = LockType.command}) {
     if ( label == null) {
       if (i18n != null) {
         label = translator.translate(i18n);
@@ -204,7 +204,7 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
 
   /// @internal
   void addCommand(String name, Function function, {String? label, String? i18n, IconData? icon, LockType? lock}) {
-    _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon, lock: lock);
+    _commands[name] = commandManager.createCommand(name, function, i18n: i18n, label: label, icon: icon, lock: lock ?? LockType.command);
   }
 
   /// @internal

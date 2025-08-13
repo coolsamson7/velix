@@ -70,13 +70,38 @@ class CommandGenerator extends Generator {
       for (final method in commands) {
         final publicName = method.name.replaceFirst('_', '');
         final name = _getCommandAnnotation(method)!.peek('name')?.stringValue ?? publicName;
-        final label = _getCommandAnnotation(method)!.peek('label')?.stringValue ?? '';
 
         output.write('    addCommand("$name", _$publicName');
 
-        if ( label.isNotEmpty) {
+        // label
+
+        final label = _getCommandAnnotation(method)!.peek('label')?.stringValue ?? '';
+        if ( label.isNotEmpty)
           output.write(', label: \'$label\'');
+
+        // i18n
+
+        final i18n = _getCommandAnnotation(method)!.peek('i18n')?.stringValue ?? '';
+        if ( i18n.isNotEmpty) {
+          output.write(', i18n: \'$i18n\'');
         }
+
+        // lock
+
+        final lock = _getCommandAnnotation(method)!.peek('lock');
+        if (lock != null && !lock.isNull) {
+          final revived = lock.revive(); // from source_gen
+          //final typeName = revived.source?.fragment;   // e.g. 'LockType'
+          final accessor = revived.accessor;           // e.g. 'LockType.command'
+
+          int dot = accessor.indexOf(".");
+          var value = accessor.substring(dot +1 );
+
+          if ( value != "command")
+            output.write(', lock: LockType.$value');
+        }
+
+        // done
 
         output.writeln(');');
       }

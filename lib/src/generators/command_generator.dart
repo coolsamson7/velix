@@ -89,6 +89,27 @@ class CommandGenerator extends Generator {
           output.write(', i18n: \'$i18n\'');
         }
 
+        // icon
+
+        final iconObj = _getCommandAnnotation(method)!.peek('icon');
+        if (iconObj != null && !iconObj.isNull) {
+          final  dartObj = iconObj.objectValue;
+
+          if (dartObj.variable != null) {
+            // This works only if using analyzer >= 6.0.0 — otherwise need a cast
+            final variable = dartObj.variable!;
+            final iconName = variable.name; // add
+            final iconType = variable.enclosingElement?.name; // CupertinoIcons
+            output.write(', icon: $iconType.$iconName');
+          } else if (dartObj.toFunctionValue() is PropertyAccessorElement) {
+            final accessor = dartObj.toFunctionValue() as PropertyAccessorElement;
+            final variable = accessor.variable;
+            final iconName = variable.name;
+            final iconType = variable.enclosingElement?.name;
+            output.write(', icon: $iconType.$iconName');
+          }
+        }
+
         // lock
 
         final lock = _getCommandAnnotation(method)!.peek('lock');

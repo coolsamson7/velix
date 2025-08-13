@@ -12,7 +12,13 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
 
   @override
   void initCommands() {
-    addCommand("addTodo", _addTodo, i18n: 'main.addTodo', lock: LockType.view);
+    addCommand(
+      "addTodo",
+      _addTodo,
+      i18n: 'main.addTodo1',
+      icon: CupertinoIcons.add,
+      lock: LockType.view,
+    );
     addCommand("removeTodo", _removeTodo, i18n: 'main.removeTodo');
     addCommand("toggleTodo", _toggleTodo, i18n: 'main.toggleTodo');
   }

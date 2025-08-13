@@ -1,6 +1,5 @@
 import 'dart:async';
 
-//import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sample/models/todo.dart';
 import '../screens/todo_detail_page.dart';
@@ -25,7 +24,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   // commands
 
   @override
-  @Command(i18n: "main.addTodo", lock: LockType.view) // icon: CupertinoIcons.add
+  @Command(i18n: "main.addTodo1",  icon: CupertinoIcons.add, lock: LockType.view) // icon: CupertinoIcons.add
   Future<Todo> _addTodo() async {
       var todo = await context.read<TodoProvider>().addTodo(_controller.text);
 

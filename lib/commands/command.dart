@@ -21,11 +21,11 @@ class Command {
   final String? i18n;
   final String? label;
   final LockType lock;
-  //IconData? icon;
+  final IconData? icon;
 
   // constructor
 
-  const Command({this.name, this.label, this.i18n, this.lock = LockType.command});
+  const Command({this.name, this.label, this.i18n, this.icon, this.lock = LockType.command});
 }
 
 class CommandException implements Exception {

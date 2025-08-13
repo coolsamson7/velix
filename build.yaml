@@ -14,13 +14,6 @@ builders:
     auto_apply: root_package
     build_to: source
 
-  widget_builder:
-    import: "package:velix/src/generators/widget_generator.dart"
-    builder_factories: [ "widgetBuilder" ]
-    build_extensions: { "$lib$": [ ".widget_registry.g.dart" ] }
-    auto_apply: root_package
-    build_to: source
-
 targets:
   $default:
     builders:

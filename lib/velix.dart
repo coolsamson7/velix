@@ -18,6 +18,8 @@ export './databinding/switch_adapter.dart';
 export './databinding/text_adapter.dart';
 export './databinding/valued_widget.dart';
 
+export './databinding/registry.dart';
+
 // mapper
 
 export './mapper/mapper.dart';
@@ -35,8 +37,3 @@ export './validation/validation.dart';
 // util
 
 export './util/collections.dart';
-
-// widgets
-
-
-export './velix.widget_registry.g.dart';

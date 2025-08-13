@@ -283,12 +283,16 @@ class AggregateBuilder implements Builder {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln("import 'package:velix/velix.dart';");
 
-    final seenImports = <String>{};
+    final seenImports = <Uri>{};
     for (final clazz in classes) {
-      final sourceUri = clazz.source.uri.toString();
+      final sourceUri = clazz.source.uri;
+
       if (seenImports.add(sourceUri)) {
-        buffer.writeln("import '$sourceUri';");
-      }
+          if (sourceUri.scheme == 'asset')
+            buffer.writeln("import '${sourceUri.pathSegments.last}';");
+          else
+            buffer.writeln("import '$sourceUri';");
+      } // if
     }
 
     buffer.writeln();

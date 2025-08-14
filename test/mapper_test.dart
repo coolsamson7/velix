@@ -36,8 +36,8 @@ void main() {
 
       var jsonMapper = JSONMapper<Money>();
 
-      var json = jsonMapper.serialize(money);
-      var m = jsonMapper.deserialize<Money>(json);
+      var json = JSON.serialize(money);
+      var m = JSON.deserialize<Money>(json);
 
       print(json);
 
@@ -45,25 +45,55 @@ void main() {
 
       var mutableMapper = JSONMapper<Mutable>();
 
-      var result1 = mutableMapper.serialize(mutable);
-
-      var r3 = mutableMapper.deserialize<Mutable>(result1);
+      var result1 = JSON.serialize(mutable);
 
       print(result1);
+
+
+      var r3 = JSON.deserialize<Mutable>(result1);
+
+      print(r3);
     });
 
 
     test('map json collections', () {
       var money = Money(currency: "EU", value: 1);
-      var collections = Collections(prices: [money]);
+      var collections = Collections(prices: [money, money, money]);
 
       var collectionsMapper = JSONMapper<Collections>();
 
-      var result2 = collectionsMapper.serialize(collections);
+      // warm up
 
-      var r4 = collectionsMapper.deserialize<Collections>(result2);
+      JSON.deserialize<Collections>(JSON.serialize(collections));
 
-      print(r4);
+      print("serialize");
+
+      var loops = 100000;
+      var stopwatch = Stopwatch()..start();
+
+      for (int i = 0; i < loops; i++) {
+        JSON.serialize(collections);
+      }
+
+      stopwatch.stop();
+      print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
+
+
+      print("deserialize");
+
+      stopwatch = Stopwatch()..start();
+
+      var json = JSON.serialize(collections);
+
+      print(json);
+
+      for (int i = 0; i < loops; i++) {
+        JSON.deserialize<Collections>(json);
+      }
+
+      stopwatch.stop();
+      print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
+
     });
 
     test('map collections', () {

@@ -9,10 +9,6 @@ import '../reflectable/reflectable.dart';
 /// @internal
 abstract class MapperProperty extends Property<MappingContext> {
   Type getType();
-
-  Function? getContainerConstructor() {
-    return null;
-  }
 }
 
 /// @internal
@@ -74,7 +70,7 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    targetProperty.set(instance, context.mapper.map(value, context: context), context); // recursive call! TODO key pair!
+    targetProperty.set(instance, context.mapper.map(value, context: context), context); // recursive call!
   }
 
   @override
@@ -578,7 +574,7 @@ class TargetNode {
     }
   }
 
-  MapperProperty mapDeep(Accessor source, Accessor target, MapperProperty targetProperty) {
+  MapperProperty mapDeep(Mapper mapper, Accessor source, Accessor target, MapperProperty targetProperty) {
     var sourceType = source.type;
     var targetType = target.type;
 
@@ -592,10 +588,11 @@ class TargetNode {
       return MapList2List(sourceType: sourceType,
           targetType: targetType,
           property: targetProperty,
-          factory: target.getContainerConstructor()!); // TODO : reinreichen!
+          factory: target.getContainerConstructor()!);
     }
-    else
+    else {
       return MapDeep(targetProperty: targetProperty);
+    }
   }
 
   Operation<MappingContext> makeOperation(SourceNode sourceNode, Mapper mapper) {
@@ -620,7 +617,7 @@ class TargetNode {
     }
 
     if ( deep )
-      writeProperty = mapDeep(sourceNode.accessor, accessor, writeProperty);
+      writeProperty = mapDeep(mapper, sourceNode.accessor, accessor, writeProperty);
     else
       writeProperty = maybeConvert(writeProperty, conversion);
 

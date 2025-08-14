@@ -122,11 +122,6 @@ class PropertyProperty extends MapperProperty {
   // override
 
   @override
-  Function? getContainerConstructor() {
-    return field.factoryConstructor!;
-  }
-
-  @override
   dynamic get(dynamic instance, MappingContext context) {
     return field.getter(instance);
   }
@@ -809,6 +804,16 @@ class Mapper {
 
   void registerMapping(Mapping mapping) {
     mappings[MappingKey(source: mapping.definition.sourceClass, target: mapping.definition.targetClass)] = mapping;
+  }
+
+  Mapping<S,T> getMappingX<S,T>(Type source, Type target) {
+    var key = MappingKey(source: source, target: target);
+    var mapping = mappings[key];
+    if (mapping == null) {
+      throw MapperException('No mapping found for <$S, $T>');
+    }
+
+    return mapping as Mapping<S,T>;
   }
 
   Mapping<S,T> getMapping<S,T>() {

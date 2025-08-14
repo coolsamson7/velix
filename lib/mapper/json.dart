@@ -45,11 +45,6 @@ class JSONProperty extends MapperProperty {
   // override
 
   @override
-  Function? getContainerConstructor() {
-    return containerConstructor;
-  }
-
-  @override
   dynamic get(dynamic instance, MappingContext context) {
     return (instance as Map)[name];
   }
@@ -66,8 +61,6 @@ class JSONProperty extends MapperProperty {
     return Object; // TODO?
   }
 }
-
-
 
 
 class JSONMapper<T> {
@@ -213,99 +206,29 @@ class JSONMapper<T> {
   }
 }
 
+class JSON {
+  // static data
 
+  static Map<Type,JSONMapper> mappers = {};
 
-// OLD
+  // internal
 
-Map<String, dynamic> serializeToJson(Object obj) {
-  final type = obj.runtimeType;
-  final descriptor = TypeDescriptor.forType(type);
-
-
-  final Map<String, dynamic> json = {};
-  for (final field in descriptor.getFields()) {
-    json[field.name] = field.getter(obj);
-  }
-  return json;
-}
-
-T deserializeFromJson<T>(Map<String, dynamic> json, T Function() creator) {
-  final descriptor = TypeDescriptor.forType(T);
-
-  final obj = creator();
-
-  for (final field in descriptor.getFields()) {
-    if (json.containsKey(field.name)) {
-      field.setter!(obj as Object, json[field.name]);
+  static JSONMapper getMapper<T>() {
+    var mapper = mappers[T];
+    if ( mapper == null) {
+      mappers[T] = mapper = JSONMapper<T>();
     }
+
+    return mapper;
   }
 
-  return obj;
-}
+  // static methods
 
-class ObjectMapper {
-  static Map<String, dynamic> toJson(Object obj,
-      {Set<Object>? visited}) {
-    visited ??= {};
-
-    if (visited.contains(obj)) {
-      return {'__ref': obj.hashCode.toString()};
-    }
-
-    visited.add(obj);
-
-    final descriptor = TypeDescriptor.forType(obj.runtimeType);
-
-    final map = <String, dynamic>{};
-    for (var field in descriptor.getFields()) {
-      final value = field.getter(obj);
-
-      if (value == null || value is num || value is bool || value is String) {
-        map[field.name] = value;
-      }
-      else if (value is List) {
-        map[field.name] =
-            value.map((e) => toJson(e, visited: visited)).toList();
-      }
-      else {
-        map[field.name] = toJson(value, visited: visited);
-      }
-    }
-
-    return map;
+  static Map serialize<T>(T instance) {
+    return getMapper<T>().serialize(instance);
   }
 
-  static Object fromJson(Type type, Map<String, dynamic> json,
-      {Map<String, Object>? seen}) {
-    seen ??= {};
-
-    final descriptor = TypeDescriptor.forType(type);
-
-    final instance = descriptor.constructor();
-
-    for (var field in descriptor.getFields()) {
-      final value = json[field.name];
-
-      if (value is Map<String, dynamic>) {
-        field.setter!(instance, fromJson(field.type.type, value, seen: seen));
-      }
-      else if (value is List &&
-          field.type.toString().startsWith('List<')) {
-        final elementType = field.type.toString();
-        final resolvedType = TypeDescriptor.forName(elementType);
-
-        final items = value
-            .map((item) => item is Map<String, dynamic>
-            ? fromJson(resolvedType.type, item, seen: seen)
-            : item)
-            .toList();
-        field.setter!(instance, items);
-      }
-      else {
-        field.setter!(instance, value);
-      }
-    }
-
-    return instance;
+  static dynamic deserialize<T>(Map json) {
+    return getMapper<T>().deserialize<T>(json);
   }
 }

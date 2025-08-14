@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
 
@@ -9,6 +11,45 @@ void main() {
   group('mapper', () {
 
     registerAllDescriptors();
+
+    test('map json', () {
+      var money = Money(currency: "EU", value: 1);
+      var mutable = Mutable(
+        id: "id",
+        price: money
+      );
+
+
+      var d = TypeDescriptor<Map<String, dynamic>>(name: "json" , constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
+      TypeDescriptor.register(d);
+
+      /*var mapper = Mapper([
+        mapping<Money, Map<String, dynamic>>()
+            .map(from: "currency", to: JSONAccessor(name: "currency", type: String, index: 0))
+            .map(from: "value", to: JSONAccessor(name: "value", type: int, index: 0)),
+      ]);
+
+      var result = mapper.map<Money, Map<dynamic, dynamic>>(money);
+
+      print(result);*/
+
+      var jsonMapper = JSONMapper<Money>();
+
+      var json = jsonMapper.serialize(money);
+      var m = jsonMapper.deserialize<Money>(json);
+
+      print(json);
+
+      // as
+
+      var mutableMapper = JSONMapper<Mutable>();
+
+      var result1 = mutableMapper.serialize(mutable);
+
+      var r3 = mutableMapper.deserialize<Mutable>(result1);
+
+      print(result1);
+    });
 
     test('map collections', () {
       print("collections");

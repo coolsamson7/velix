@@ -70,7 +70,7 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    targetProperty.set(instance, context.mapper.map(value, context: context), context);
+    targetProperty.set(instance, context.mapper.map(value, context: context), context); // recursive call! TODO key pair!
   }
 
   @override
@@ -584,16 +584,18 @@ class TargetNode {
     if (isSourceMultiValued != isTargetMultiValued)
       throw MapperException("relations must have the same cardinality");
 
-    PropertyAccessor propertyAccessor = target as PropertyAccessor;
-
-
-    if (isSourceMultiValued)
-      return MapList2List(sourceType: sourceType, targetType: targetType, property: targetProperty, factory:  propertyAccessor.field.factoryConstructor!);
+    if (isSourceMultiValued) {
+      PropertyAccessor propertyAccessor = target as PropertyAccessor; // TODO
+      return MapList2List(sourceType: sourceType,
+          targetType: targetType,
+          property: targetProperty,
+          factory: propertyAccessor.field.factoryConstructor!);
+    }
     else
       return MapDeep(targetProperty: targetProperty);
   }
 
-  Operation<MappingContext>  makeOperation(SourceNode sourceNode, Mapper mapper) {
+  Operation<MappingContext> makeOperation(SourceNode sourceNode, Mapper mapper) {
     var sourceProperty = sourceNode.fetchProperty!;
 
     var deep = match!.deep;

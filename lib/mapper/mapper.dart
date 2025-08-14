@@ -496,9 +496,9 @@ class MappingDefinition<S,T> {
 
   // constructor
 
-  MappingDefinition() {
-    this.sourceClass = S;
-    this.targetClass = T;
+  MappingDefinition({Type? sourceClass, Type? targetClass}) {
+    this.sourceClass = sourceClass ?? S;
+    this.targetClass = targetClass ?? T;
   }
 
   // internal
@@ -591,6 +591,10 @@ class MappingDefinition<S,T> {
       List<Accessor> fromAccessors = [];
       List<Accessor> toAccessors = [];
 
+      // NEW
+      if ( from is Accessor)
+        fromAccessors.add(from);
+
       if ( from is String)
         fromAccessors.add(PropertyAccessor(name: from));
 
@@ -599,6 +603,10 @@ class MappingDefinition<S,T> {
 
       if ( constant != null)
         fromAccessors.add(ConstantAccessor(value: constant));
+
+      // NEW
+      if ( to is Accessor)
+        toAccessors.add(to);
 
       if ( to is String)
         toAccessors.add(PropertyAccessor(name: to));
@@ -725,11 +733,45 @@ class MappingContext {
   }
 }
 
+class MappingKey {
+  // instance data
+
+  final Type source;
+  final Type target;
+
+  // constructor
+
+  MappingKey({required this.source, required this.target});
+
+  // internal
+
+  bool _typeMatches(Type a, Type b) {
+    // "dynamic" is represented by the literal type `dynamic`
+    return a == b || a == dynamic || b == dynamic;
+  }
+
+  // override
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MappingKey &&
+        _typeMatches(source, other.source) &&
+        _typeMatches(target, other.target);
+  }
+
+  @override
+  int get hashCode {
+    int hashType(Type t) => t == dynamic ? 0 : t.hashCode;
+    return 0;//Object.hash(hashType(source), hashType(target));
+  }
+}
+
 class Mapper {
   // instance data
 
   late List<MappingDefinition> mappingDefinitions;
-  Map<Type, Mapping> mappings = HashMap<Type,Mapping>();
+  Map<MappingKey, Mapping> mappings = HashMap<MappingKey,Mapping>();
 
   // constructor
 
@@ -748,11 +790,17 @@ class Mapper {
   }
 
   void registerMapping(Mapping mapping) {
-    mappings[mapping.definition.sourceClass] = mapping;
+    mappings[MappingKey(source: mapping.definition.sourceClass, target: mapping.definition.targetClass)] = mapping;
   }
 
-  Mapping<S,T> getMapping<S,T>(Type sourceClass) {
-    return mappings[sourceClass] as Mapping<S,T>;
+  Mapping<S,T> getMapping<S,T>() {
+    var key = MappingKey(source: S, target: T);
+    var mapping = mappings[key];
+    if (mapping == null) {
+      throw MapperException('No mapping found for <$S, $T>');
+    }
+
+    return mapping as Mapping<S,T>;
   }
 
   // public
@@ -762,11 +810,11 @@ class Mapper {
   /// [T] the target type
   /// [source] the source object
   /// [context] optional [MappingContext] in case of recursive maps.
-  T? map<S,T>(S source, {MappingContext? context}) {
+  T? map<S,T>(S source, {MappingContext? context, Mapping<S,T>? mapping}) {
     if ( source == null)
       return null;
 
-    Mapping<S,T> mapping = getMapping<S,T>(source.runtimeType);
+    mapping = mapping ?? getMapping<S,T>();
 
     context ??= MappingContext(mapper: this);
 

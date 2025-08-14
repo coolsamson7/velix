@@ -25,6 +25,7 @@ export './databinding/registry.dart';
 export './mapper/mapper.dart';
 export './mapper/transformer.dart';
 export './mapper/operation_builder.dart';
+export './mapper/json.dart';
 
 // reflectable
 

@@ -122,6 +122,11 @@ class PropertyProperty extends MapperProperty {
   // override
 
   @override
+  Function? getContainerConstructor() {
+    return field.factoryConstructor!;
+  }
+
+  @override
   dynamic get(dynamic instance, MappingContext context) {
     return field.getter(instance);
   }
@@ -157,6 +162,14 @@ abstract class Accessor {
   void resolve(Type type, bool write);
 
   MapperProperty makeTransformerProperty(bool write);
+
+  bool isContainer() {
+    return getContainerConstructor() != null;
+  }
+
+  Function? getContainerConstructor() {
+    return null;
+  }
 }
 
 class MapperException implements Exception  {
@@ -261,6 +274,11 @@ class PropertyAccessor extends Accessor {
     else {
       return PropertyProperty(field: field);
     }
+  }
+
+  @override
+  Function? getContainerConstructor() {
+    return field.factoryConstructor;
   }
 
   @override

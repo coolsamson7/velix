@@ -12,6 +12,10 @@ void main() {
 
     registerAllDescriptors();
 
+    // TODO
+    // TODO register weg!
+    TypeDescriptor.register(TypeDescriptor<Map<String, dynamic>>(name: "json" , constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []));
+
     test('map json', () {
       var money = Money(currency: "EU", value: 1);
       var mutable = Mutable(
@@ -19,9 +23,6 @@ void main() {
         price: money
       );
 
-
-      var d = TypeDescriptor<Map<String, dynamic>>(name: "json" , constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
-      TypeDescriptor.register(d);
 
       /*var mapper = Mapper([
         mapping<Money, Map<String, dynamic>>()
@@ -49,6 +50,20 @@ void main() {
       var r3 = mutableMapper.deserialize<Mutable>(result1);
 
       print(result1);
+    });
+
+
+    test('map json collections', () {
+      var money = Money(currency: "EU", value: 1);
+      var collections = Collections(prices: [money]);
+
+      var collectionsMapper = JSONMapper<Collections>();
+
+      var result2 = collectionsMapper.serialize(collections);
+
+      var r4 = collectionsMapper.deserialize<Collections>(result2);
+
+      print(r4);
     });
 
     test('map collections', () {

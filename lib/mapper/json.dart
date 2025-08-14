@@ -7,15 +7,24 @@ import 'mapper.dart';
 import 'operation_builder.dart';
 
 class JSONAccessor extends Accessor {
+  // instance data
+
+  Function? containerConstructor;
+
   // constructor
 
-  JSONAccessor({required super.name, required super.type, required super.index});
+  JSONAccessor({required super.name, required super.type, required super.index, this.containerConstructor});
 
   // override
 
   @override
   MapperProperty makeTransformerProperty(bool write) {
-    return JSONProperty(name: name);
+    return JSONProperty(name: name); // TODO?
+  }
+
+  @override
+  Function? getContainerConstructor() {
+    return containerConstructor;
   }
 
   @override
@@ -27,12 +36,18 @@ class JSONProperty extends MapperProperty {
   // instance data
 
   final String name;
+  Function? containerConstructor;
 
   // constructor
 
-  JSONProperty({required this.name});
+  JSONProperty({required this.name, this.containerConstructor});
 
   // override
+
+  @override
+  Function? getContainerConstructor() {
+    return containerConstructor;
+  }
 
   @override
   dynamic get(dynamic instance, MappingContext context) {
@@ -76,6 +91,11 @@ class JSONMapper<T> {
 
     // local function
 
+    void check(Type type) {
+      if (!mappings.containsKey(type))
+        queue.add(type);
+    }
+
     MappingDefinition process(Type type) {
       var typeMapping = MappingDefinition<T,Map<String, dynamic>>(sourceClass: type, targetClass: Map<String, dynamic>);
       var typeDescriptor = TypeDescriptor.forType(type);
@@ -85,11 +105,20 @@ class JSONMapper<T> {
       // process fields
 
       for ( var field in typeDescriptor.getFields()) {
-        if ( field.type is ObjectType) {
+        if (field.type is ListType) {
+          var elementType = field.elementType;
+
+          check(elementType!);
+
+          typeMapping.map(from: field.name,
+              to: JSONAccessor(
+                  name: field.name, type: Map<String, dynamic>, index: 0, containerConstructor: () => []),
+              deep: true); // index?
+        }
+        else if ( field.type is ObjectType) {
           var target = (field.type as ObjectType).type;
 
-          if (!mappings.containsKey(target))
-            queue.add(target);
+          check(target);
 
           typeMapping.map(from: field.name,
               to: JSONAccessor(
@@ -126,20 +155,34 @@ class JSONMapper<T> {
 
       mappings[type] = typeMapping;
 
+      void check(Type type) {
+        if (!mappings.containsKey(type))
+          queue.add(type);
+      }
+
       // process fields
 
       for ( var field in typeDescriptor.getFields()) {
-        if ( field.type is ObjectType) {
+        if (field.type is ListType) {
+          var elementType = field.elementType;
+
+          check(elementType!);
+
+          typeMapping.map(
+              from: JSONAccessor(name: field.name, type: List<dynamic>, index: 0, containerConstructor: () => []),
+              to: field.name,
+              deep: true);
+        }
+        else if ( field.type is ObjectType) {
           var target = (field.type as ObjectType).type;
 
-          if (!mappings.containsKey(target))
-            queue.add(target);
+          check(target);
 
           typeMapping.map(
               from: JSONAccessor(
                   name: field.name, type: Map<String, dynamic>, index: 0),
               to: field.name,
-              deep: true); // index?
+              deep: true);
         } // if
         else
           typeMapping.map(from: JSONAccessor(name: field.name, type: field.type.type, index: 0), to: field.name); // index?

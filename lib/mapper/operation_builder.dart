@@ -9,6 +9,10 @@ import '../reflectable/reflectable.dart';
 /// @internal
 abstract class MapperProperty extends Property<MappingContext> {
   Type getType();
+
+  Function? getContainerConstructor() {
+    return null;
+  }
 }
 
 /// @internal
@@ -578,18 +582,17 @@ class TargetNode {
     var sourceType = source.type;
     var targetType = target.type;
 
-    var isSourceMultiValued = sourceType.toString().startsWith("List<");
-    var isTargetMultiValued = targetType.toString().startsWith("List<");
+    var isSourceMultiValued = source.isContainer();
+    var isTargetMultiValued = target.isContainer();
 
     if (isSourceMultiValued != isTargetMultiValued)
       throw MapperException("relations must have the same cardinality");
 
     if (isSourceMultiValued) {
-      PropertyAccessor propertyAccessor = target as PropertyAccessor; // TODO
       return MapList2List(sourceType: sourceType,
           targetType: targetType,
           property: targetProperty,
-          factory: propertyAccessor.field.factoryConstructor!);
+          factory: target.getContainerConstructor()!); // TODO : reinreichen!
     }
     else
       return MapDeep(targetProperty: targetProperty);

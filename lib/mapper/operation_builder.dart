@@ -404,9 +404,8 @@ class SourceTree {
     return null; // make the compiler happy
   }
 
-  //step.resolve(parent?.accessor?.type ?: clazz, true)
   SourceNode makeNode(SourceNode? parent, Accessor step, Match? match) {
-    step.resolve(parent?.accessor.type ??  type, false);
+    step.resolve(parent?.accessor.type ?? type, false);
 
     return SourceNode(accessor: step, parent: parent, match: match);
   }
@@ -527,7 +526,7 @@ class TargetNode {
   }
 
   Converter tryConvert(Type sourceType, Type targetType) {
-    var conversion = TypeConversionTable.getConverter(sourceType, targetType);
+    var conversion = Mapper.typeConversions.getConverter(sourceType, targetType);
 
     if ( conversion != null)
       return conversion;

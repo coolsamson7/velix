@@ -26,7 +26,8 @@ void main() {
     test('map mutable json', () {
       var input = Mutable(
           id: "id",
-          price: Money(currency: "EU", value: 1)
+          price: Money(currency: "EU", value: 1),
+          dateTime: DateTime.now()
       );
 
       var json = JSON.serialize(input);

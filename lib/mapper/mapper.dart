@@ -13,17 +13,23 @@ typedef Converter<S,T> = T Function(S);
 class Convert<S, T> {
   // instance data
 
-  final Converter<S, T> convert;
+  final Converter<S, T> converter;
 
   // constructor
 
   /// Create a new [Convert] instance
   /// [convert] the [Converter]
-  Convert(this.convert);
+  Convert(this.converter);
+
+  // public
+
+  T convert(S source) {
+    return converter(source);
+  }
 
   /// return the wrapped [Converter]
   Converter<dynamic, dynamic> get() {
-    return (dynamic s) => convert(s);
+    return (dynamic s) => converter(s);
   }
 
   Type get sourceType => S;
@@ -60,8 +66,13 @@ class TypeKey {
 }
 
 /// @internal
-class TypeConversionTable {
-  static final Map<TypeKey, Converter> _converters = {
+class TypeConversions {
+  // static data
+
+
+  // instance data
+
+  final Map<TypeKey, Converter> _converters = {
     TypeKey(String, int):    (v) => int.tryParse(v),
     TypeKey(String, double): (v) => double.tryParse(v),
     TypeKey(String, bool):   (v) => v.toLowerCase() == 'true',
@@ -80,13 +91,21 @@ class TypeConversionTable {
     TypeKey(double, bool):    (v) => v == 1.0 ? true : false,
   };
 
-  static Converter? getConverter(Type fromType, Type toType) {
+  // internal
+
+  void register(Convert converter) {
+    _converters[TypeKey(converter.sourceType, converter.targetType)] = converter.get();
+  }
+
+  // public
+
+  Converter? getConverter(Type fromType, Type toType) {
     final key = TypeKey(fromType, toType);
 
     return _converters[key];
   }
 
-  static dynamic convert(dynamic value, Type fromType, Type toType) {
+  dynamic convert(dynamic value, Type fromType, Type toType) {
     if (value == null || fromType == toType) return value;
 
     final key = TypeKey(fromType, toType);
@@ -95,13 +114,10 @@ class TypeConversionTable {
     if (converter != null) return converter(value);
 
     // fallback if exact runtime types match
-    if (value.runtimeType == toType) return value;
+    if (value.runtimeType == toType)
+      return value;
 
     throw UnsupportedError('No converter registered for $fromType -> $toType');
-  }
-
-  static void register<S, T>(Converter converter) {
-    _converters[TypeKey(S, T)] = converter;
   }
 }
 
@@ -810,6 +826,12 @@ class MappingKey {
 }
 
 class Mapper {
+  // static data
+
+  static TypeConversions typeConversions = TypeConversions();
+
+  // static methods
+
   // instance data
 
   late List<MappingDefinition> mappingDefinitions;

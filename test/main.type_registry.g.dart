@@ -41,7 +41,7 @@ void registerAllDescriptors() {
          field<Money,int>('value',
            type: IntType().greaterThan(0),
            annotations: [
-            Json(name: "value", includeNull: true, required: true, defaultValue: 1, ignore: false),
+            Json(includeNull: true, required: true, defaultValue: 1, ignore: false),
            ],
            getter: (obj) => (obj as Money).value,
            isFinal: true,
@@ -51,11 +51,15 @@ void registerAllDescriptors() {
 
    type<Mutable>(
      name: 'asset:velix/test/main.dart.Mutable',
+     annotations: [
+       JsonSerializable(includeNull: true),
+     ],
      params: [
          param<String>('id', isNamed: true, isRequired: true),
          param<Money>('price', isNamed: true, isRequired: true),
+         param<DateTime?>('dateTime', isNamed: true, isRequired: true),
      ],
-     constructor: ({String id = '', required Money price}) => Mutable(id: id, price: price),
+     constructor: ({String id = '', required Money price, DateTime? dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
      fields: [
          field<Mutable,String>('id',
            type: StringType().maxLength(7),
@@ -65,6 +69,14 @@ void registerAllDescriptors() {
          field<Mutable,Money>('price',
            getter: (obj) => (obj as Mutable).price,
            setter: (obj, value) => (obj as Mutable).price = value,
+         ),
+         field<Mutable,DateTime>('dateTime',
+           annotations: [
+            Json(name: "date-time"),
+           ],
+           getter: (obj) => (obj as Mutable).dateTime,
+           setter: (obj, value) => (obj as Mutable).dateTime = value,
+           isNullable: true
          ),
        ]
      );

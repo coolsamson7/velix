@@ -150,8 +150,10 @@ class TypeDescriptor<T> {
       final valueA = field.getter(a);
       final valueB = field.getter(b);
 
-      if ( false )
-        ;
+      if ( field.type.runtimeType == ObjectType ) {
+        if (!deepEquals(valueA, valueB))
+          return false;
+      }
       /* TODO if (valueA is List && valueB is List) {
         if (!equality.equals(valueA, valueB)) return false;
       }
@@ -314,7 +316,8 @@ AbstractType inferType<T>(AbstractType? t) {
     String: StringType(),    // default unconstrained
     int: IntType(),
     double: DoubleType(),
-    bool: BoolType()
+    bool: BoolType(),
+    DateTime: DateTimeType()
   };
 
   var result = types[type];

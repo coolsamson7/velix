@@ -777,6 +777,55 @@ class BoolType extends AbstractType<bool> {
     return this;
   }
 }
+
+/// type specification for  [bool] values
+class DateTimeType extends AbstractType<DateTime> {
+  // static data
+
+  static final Map<String, MethodSpec> methods = {
+  };
+
+  // static methods
+
+  static DateTimeType fromString(String input) {
+    var result = DateTimeType();
+
+    result.parse(methods, input);
+
+    return result;
+  }
+
+  // constructor
+
+  /// Create a new [BoolType]
+  DateTimeType() : super(type: DateTime) {
+    baseType<DateTime>(DateTime);
+  }
+
+  // override
+
+  @override
+  DateTimeType required() {
+    super.required();
+
+    return this;
+  }
+
+  @override
+  DateTimeType optional() {
+    super.optional();
+
+    return this;
+  }
+
+  @override
+  AbstractType constraint(String input) {
+    super.parse(methods, input);
+
+    return this;
+  }
+}
+
 /// Type specification for class values of a certain type.
 /// [T] the corresponding type
 class ObjectType<T> extends AbstractType<T> {

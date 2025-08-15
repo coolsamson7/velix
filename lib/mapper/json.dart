@@ -40,19 +40,29 @@ class JSONAccessor extends Accessor {
   Function? containerConstructor;
   bool includeNull;
   Object? defaultValue;
+  Converter? convert;
 
   // constructor
 
-  JSONAccessor({required super.name, required super.type, super.index=0, this.containerConstructor, this.includeNull = true, this.defaultValue = JSONAccessor});
+  JSONAccessor({required super.name, required super.type, super.index=0, this.containerConstructor, this.includeNull = true, this.defaultValue = JSONAccessor, this.convert});
 
   // override
 
   @override
   MapperProperty makeTransformerProperty(bool write) {
-    if ( defaultValue != JSONAccessor)
-      return JSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue);
-    else
-      return JSONProperty(name: name, includeNull: includeNull, );
+    if ( defaultValue != JSONAccessor) {
+      if ( convert != null)
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue, convert: convert!);
+      else
+        return JSONProperty(
+          name: name, includeNull: includeNull, defaultValue: defaultValue);
+    }
+    else {
+      if ( convert != null)
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!);
+      else
+        return JSONProperty(name: name, includeNull: includeNull,);
+    }
   }
 
   @override
@@ -62,6 +72,41 @@ class JSONAccessor extends Accessor {
 
   @override
   void resolve(Type type, bool write) {
+  }
+}
+
+class ConvertingJSONProperty extends JSONProperty {
+  // instance data
+
+  Converter convert;
+
+  // constructor
+
+  ConvertingJSONProperty({required this.convert, required super.name, required super.includeNull, super.containerConstructor, super.defaultValue=JSONProperty});
+
+  // override
+
+  @override
+  dynamic get(dynamic instance, MappingContext context) {
+    dynamic value =  (instance as Map)[name];
+
+    if ( value == null) {
+      if ( defaultValue != JSONProperty)
+        return defaultValue;
+      else
+        throw MapperException("expected a value for $name");
+    }
+
+    return convert(value);
+  }
+
+  @override
+  void set(dynamic instance, dynamic value, MappingContext context) {
+    if ( value == null ) {
+      if (includeNull)
+        (instance as Map)[name] = value;
+    }
+    else (instance as Map)[name] = convert(value);
   }
 }
 
@@ -177,8 +222,19 @@ class JSONMapper<T> {
               to: JSONAccessor(name: json.name, type: Map<String, dynamic>, includeNull: includeNull),
               deep: true); // index?
         } // if
-        else
-          typeMapping.map(from: field.name, to: JSONAccessor(name: json.name, type: field.type.type, includeNull: includeNull));
+        else {
+          Converter? convertSource;
+
+          if ( field.type.type == DateTime) {
+            convertSource = JSON.instance.typeConversions.getConverter(DateTime, String);
+          }
+
+          typeMapping.map(from: field.name,
+              to: JSONAccessor(name: json.name,
+                  type: field.type.type,
+                  convert: convertSource,
+                  includeNull: includeNull));
+        }
       }
 
       return typeMapping;
@@ -254,8 +310,19 @@ class JSONMapper<T> {
               to: field.name,
               deep: true);
         } // if
-        else
-          typeMapping.map(from: JSONAccessor(name: json.name, type: field.type.type, includeNull: includeNull, defaultValue: defaultValue), to: field.name); // index?
+        else {
+          Converter? convertSource;
+
+          if ( field.type.type == DateTime) {
+            convertSource = JSON.instance.typeConversions.getConverter(String, DateTime);
+          }
+
+          typeMapping.map(from: JSONAccessor(name: json.name,
+              type: field.type.type,
+              convert: convertSource,
+              includeNull: includeNull,
+              defaultValue: defaultValue), to: field.name); // index?
+        }
       }
 
       return typeMapping;
@@ -293,11 +360,26 @@ class JSON {
 
   final bool validate;
   Map<Type,JSONMapper> mappers = {};
+  TypeConversions typeConversions = TypeConversions();
 
   // constructor
 
-  JSON({required this.validate}) {
+  JSON({required this.validate, List<Convert>? converters}) {
     instance = this;
+    
+    if ( converters != null)
+      for ( var converter in converters)
+        typeConversions.register(converter);
+    
+    // add some defaults
+    
+    if (typeConversions.getConverter(String, DateTime) == null)
+      typeConversions.register(Convert<String,DateTime>((value) => DateTime.parse(value)));
+
+    if (typeConversions.getConverter(DateTime,String) == null)
+      typeConversions.register(Convert<DateTime,String>((value) => value.toIso8601String()));
+    
+    // ugly... we need a type descriptor
 
     TypeDescriptor<Map<String, dynamic>>(name: "json" , annotations: [], constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
   }

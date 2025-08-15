@@ -1,4 +1,5 @@
 
+import 'package:velix/mapper/json.dart';
 import 'package:velix/util/collections.dart';
 
 import 'mapper.dart';
@@ -10,21 +11,25 @@ import '../reflectable/reflectable.dart';
 abstract class MapperProperty extends Property<MappingContext> {
   Type getType();
 
- void validate(dynamic value){}
+  void validate(dynamic value){}
 }
 
 /// @internal
-class MapList2List extends  MapperProperty {
+class MapList2List extends MapperProperty {
   // instance data
 
-  Type sourceType;
-  Type targetType;
-  MapperProperty property;
-  Function factory;
+  final Type sourceType;
+  final Type targetType;
+  final MapperProperty property;
+  final Function factory;
+  final Mapper mapper;
+  Mapping? mapping;
 
   // constructor
 
-  MapList2List({required this.sourceType, required this.targetType, required this.property, required this.factory});
+  MapList2List({required this.mapper, required this.sourceType, required this.targetType, required this.property, required this.factory}) {
+    //mapping = mapper.getMappingX(sourceType, targetType);
+  }
 
   // override
 
@@ -32,10 +37,13 @@ class MapList2List extends  MapperProperty {
   void set(dynamic instance, dynamic value, MappingContext context) {
     if (value != null) {
       var list = value as List;
+      var len = list.length;
       var result = factory();
 
-      for (var element in list) {
-        result.add(context.mapper.map(element, context: context));
+      var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetType)); // TODO...
+
+      for (var i = 0; i < len; i++) {
+        result.add(mapper.map(list[i], context: context, mapping: m));
       }
 
       property.set(instance, result, context);
@@ -57,11 +65,17 @@ class MapList2List extends  MapperProperty {
 class MapDeep extends MapperProperty {
   // instance data
 
-  MapperProperty targetProperty;
+  final Type sourceType;
+  final MapperProperty targetProperty;
+  final Mapper mapper;
+  Mapping? mapping;
 
   // constructor
 
-  MapDeep({required this.targetProperty});
+  MapDeep({required this.mapper, required this.sourceType, required this.targetProperty}) {
+    //mapping = mapper.getMappingX(sourceType, targetProperty.getType());
+  }
+
 
   // override AccessorValue
 
@@ -72,7 +86,8 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    targetProperty.set(instance, context.mapper.map(value, context: context), context); // recursive call!
+    var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetProperty.getType())); // TODO
+    targetProperty.set(instance, mapper.map(value, context: context, mapping: m), context); // recursive call!
   }
 
   @override
@@ -85,8 +100,8 @@ class MapDeep extends MapperProperty {
 class ConvertProperty extends MapperProperty {
   // instance data
 
-  MapperProperty property;
-  Converter conversion;
+  final MapperProperty property;
+  final Converter conversion;
 
   // constructor
 
@@ -118,10 +133,10 @@ class ConvertProperty extends MapperProperty {
 class SetResultArgument extends MapperProperty {
   // instance data
 
-  IntermediateResultDefinition  resultDefinition;
-  int index;
-  Symbol param;
-  MapperProperty property;
+  final IntermediateResultDefinition  resultDefinition;
+  final int index;
+  final Symbol param;
+  final MapperProperty property;
 
   // constructor
 
@@ -137,6 +152,7 @@ class SetResultArgument extends MapperProperty {
   @override
   void set(dynamic instance, dynamic value, MappingContext context) {
     property.validate(value); // hmm...maybe we can optimize that
+
     context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, context);
   }
 
@@ -153,8 +169,8 @@ class SetResultArgument extends MapperProperty {
 class PeekValueProperty extends MapperProperty {
   // instance data
 
-   int index;
-   MapperProperty property;
+  final int index;
+  final MapperProperty property;
 
   // constructor
 
@@ -189,7 +205,7 @@ class PeekValueProperty extends MapperProperty {
 class PushValueProperty extends MapperProperty {
   // instance data
 
-  int index;
+  final int index;
 
   // constructor
 
@@ -224,7 +240,7 @@ abstract class ValueReceiver {
 class SetPropertyValueReceiver extends ValueReceiver {
   // instance data
 
-  Property<MappingContext> property;
+  final Property<MappingContext> property;
 
   // constructor
 
@@ -242,10 +258,10 @@ class SetPropertyValueReceiver extends ValueReceiver {
 class SetResultPropertyValueReceiver extends ValueReceiver {
   // instance data
 
-  int resultIndex;
-  int index;
-  Symbol prop;
-  Property<MappingContext>? property;
+  final int resultIndex;
+  final int index;
+  final Symbol prop;
+  final Property<MappingContext>? property;
 
   // constructor
 
@@ -279,9 +295,7 @@ class SourceNode {
   int stackIndex = -1; // this will hold the index in the stack of intermediate results
 
   Property<MappingContext>? fetchProperty; // the transformer property needed to fetch the value
-  late Type type;
-
-  //
+  Type type;
 
   bool get isRoot { return parent == null; }
 
@@ -289,10 +303,7 @@ class SourceNode {
 
   // constructor
 
-  SourceNode({required this.accessor, required this.match, this.parent}) {
-    type = accessor.type;
-  }
-
+  SourceNode({required this.accessor, required this.match, this.parent}) :  type = accessor.type;
   // public
 
   void fetchValue(SourceTree sourceTree, Type expectedType, List<Operation<MappingContext>> operations) {
@@ -418,22 +429,23 @@ class SourceTree {
 class Buffer {
   // instance data
 
-  IntermediateResultDefinition definition;
+  final IntermediateResultDefinition definition;
   int nArgs;
   int constructorArgs;
 
- int nSuppliedArgs = 0;
- late Map<Symbol,dynamic> arguments;
- dynamic result;
+  final Function constructor;
+  final ValueReceiver valueReceiver;
+
+  int nSuppliedArgs = 0;
+  final Map<Symbol,dynamic> arguments = {};
+  dynamic result;
 
  // constructor
 
-  Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) {
+  Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) : constructor = definition.constructor, valueReceiver = definition.valueReceiver {
     if ( constructorArgs == 0) {
-      result = definition.constructor();
+      result = constructor();
     }
-
-    arguments = {};
   }
 
   // public
@@ -447,7 +459,7 @@ class Buffer {
       arguments[param] = value;
 
       if ( nSuppliedArgs == constructorArgs - 1) {
-        result = Function.apply(definition.constructor, [], arguments);
+        result = Function.apply(constructor, [], arguments);
       }
     } // if
     else {
@@ -455,7 +467,7 @@ class Buffer {
     }
 
     if ( ++nSuppliedArgs == nArgs) {
-      definition.valueReceiver.receive(mappingContext, instance, result!!);
+      valueReceiver.receive(mappingContext, instance, result!);
     }
   }
 }
@@ -464,19 +476,17 @@ class Buffer {
 class IntermediateResultDefinition {
   // instance data
 
-  late TypeDescriptor typeDescriptor;
-  Function constructor;
+  final TypeDescriptor typeDescriptor;
+  final Function constructor;
   int index;
   int nArgs;
-  ValueReceiver valueReceiver;
-  late int constructorArgs;
+  final ValueReceiver valueReceiver;
+  final int constructorArgs;
 
   // constructor
 
-  IntermediateResultDefinition({required Type clazz, required this.constructor, required this.index, required this.nArgs, required this.valueReceiver}) {
-    typeDescriptor = TypeDescriptor.forType(clazz);
-    constructorArgs = typeDescriptor.constructorParameters.length;
-  }
+  IntermediateResultDefinition({required this.typeDescriptor, required this.constructor, required this.index, required this.nArgs, required this.valueReceiver})
+  : constructorArgs = typeDescriptor.constructorParameters.length;
 
   // public
 
@@ -587,13 +597,36 @@ class TargetNode {
       throw MapperException("relations must have the same cardinality");
 
     if (isSourceMultiValued) {
-      return MapList2List(sourceType: sourceType,
+      Type sourceType = dynamic;
+      Type targetType = dynamic;
+
+      if (source is PropertyAccessor)
+        sourceType = (source as PropertyAccessor).field.elementType!;
+      else if (source is JSONAccessor) {
+        sourceType = Map<String,dynamic>;
+      }
+      else {
+        print("m");
+      }
+
+      if (target is PropertyAccessor)
+        targetType = (target as PropertyAccessor).field.elementType!;
+      else if (target is JSONAccessor) {
+        targetType = Map<String,dynamic>;
+      }
+      else {
+        print("m");
+      }
+
+      return MapList2List(
+          mapper: mapper,
+          sourceType: sourceType,
           targetType: targetType,
           property: targetProperty,
           factory: target.getContainerConstructor()!);
     }
     else {
-      return MapDeep(targetProperty: targetProperty);
+      return MapDeep(mapper: mapper, sourceType: sourceType, targetProperty: targetProperty);
     }
   }
 
@@ -633,7 +666,7 @@ class TargetNode {
       var descriptor = TypeDescriptor.forType(targetTree.type);
 
       if (descriptor.isImmutable() || !descriptor.hasDefaultConstructor()) {
-        resultDefinition = definition.addIntermediateResultDefinition(type, descriptor.constructor, children.length, MappingResultValueReceiver());
+        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.constructor, children.length, MappingResultValueReceiver());
       }
 
       // recursion
@@ -651,7 +684,7 @@ class TargetNode {
 
       // done
 
-      resultDefinition = definition.addIntermediateResultDefinition(type, constructor, children.length, valueReceiver);
+      resultDefinition = definition.addIntermediateResultDefinition(descriptor, constructor, children.length, valueReceiver);
 
       // recursion
 

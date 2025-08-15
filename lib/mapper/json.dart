@@ -52,16 +52,16 @@ class JSONAccessor extends Accessor {
   MapperProperty makeTransformerProperty(bool write) {
     if ( defaultValue != JSONAccessor) {
       if ( convert != null)
-        return ConvertingJSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue, convert: convert!);
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue, convert: convert!, type: this.type); // TODO
       else
         return JSONProperty(
-          name: name, includeNull: includeNull, defaultValue: defaultValue);
+          name: name, includeNull: includeNull, defaultValue: defaultValue, type: this.type);
     }
     else {
       if ( convert != null)
-        return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!);
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!, type: this.type); // TODO
       else
-        return JSONProperty(name: name, includeNull: includeNull,);
+        return JSONProperty(name: name, includeNull: includeNull,type: this.type);
     }
   }
 
@@ -82,7 +82,7 @@ class ConvertingJSONProperty extends JSONProperty {
 
   // constructor
 
-  ConvertingJSONProperty({required this.convert, required super.name, required super.includeNull, super.containerConstructor, super.defaultValue=JSONProperty});
+  ConvertingJSONProperty({required this.convert, required super.name, required super.type, required super.includeNull, super.containerConstructor, super.defaultValue=JSONProperty});
 
   // override
 
@@ -118,16 +118,17 @@ class JSONProperty extends MapperProperty {
   final bool includeNull;
   Function? containerConstructor;
   Object? defaultValue;
+  final Type type;
 
   // constructor
 
-  JSONProperty({required this.name, this.containerConstructor, required this.includeNull, this.defaultValue = JSONProperty});
+  JSONProperty({required this.name, required this.type, this.containerConstructor, required this.includeNull, this.defaultValue = JSONProperty});
 
   // override
 
   @override
   dynamic get(dynamic instance, MappingContext context) {
-    dynamic value =  (instance as Map)[name];
+    dynamic value = (instance as Map)[name];
 
     if ( value == null) {
       if ( defaultValue != JSONProperty)
@@ -152,7 +153,7 @@ class JSONProperty extends MapperProperty {
 
   @override
   Type getType() {
-    return Object; // TODO?
+    return type;
   }
 }
 
@@ -163,6 +164,8 @@ class JSONMapper<T> {
 
   late Mapper serializer;
   late Mapper deserializer;
+  late Mapping? serializerMapping;
+  late Mapping? deserializerMapping;
   bool validate;
 
   // constructor
@@ -248,7 +251,11 @@ class JSONMapper<T> {
 
     // done
 
-    return Mapper(mappings.values.toList());
+    var mapper = Mapper(mappings.values.toList());
+
+    serializerMapping = mapper.getMappingX(T, Map<String,dynamic>);
+
+    return mapper;
   }
 
   Mapper createDeserializer() {
@@ -259,6 +266,10 @@ class JSONMapper<T> {
 
     MappingDefinition process(Type type) {
       var typeMapping = MappingDefinition<Map<String, dynamic>, dynamic>(sourceClass: Map<String, dynamic>, targetClass: type);
+
+      //if ( mapping == null)
+      //  mapping = typeMapping;
+
       var typeDescriptor = TypeDescriptor.forType(type);
 
       var jsonSerializable = typeDescriptor.find_annotation<JsonSerializable>() ?? JsonSerializable();
@@ -338,17 +349,21 @@ class JSONMapper<T> {
 
     // done
 
-    return Mapper(mappings.values.toList());
+    var mapper = Mapper(mappings.values.toList());
+
+    deserializerMapping = mapper.mappings.values.firstWhere((mapping) => mapping.typeDescriptor.type == T);
+
+    return mapper;
   }
 
   // public
 
   Map serialize(T instance) {
-    return serializer.map<T,Map<String,dynamic>>(instance)!;
+    return serializer.map(instance, mapping: serializerMapping);
   }
 
-  dynamic deserialize<T>(Map json) {
-    return deserializer.map(json, mapping: deserializer.mappings.values.firstWhere((mapping) => mapping.typeDescriptor.type == T)) as T;
+  V deserialize<V>(Map json) {
+    return deserializer.map(json, mapping: deserializerMapping);
   }
 }
 

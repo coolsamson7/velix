@@ -130,21 +130,23 @@ class PropertyProperty extends MapperProperty {
   // instance data
 
   final FieldDescriptor field;
+  final Getter getter;
+  final Setter? setter;
 
   // constructor
 
-  PropertyProperty({required this.field});
+  PropertyProperty({required this.field}) : getter = field.getter,  setter = field.setter;
 
   // override
 
   @override
   dynamic get(dynamic instance, MappingContext context) {
-    return field.getter(instance);
+    return getter(instance);
   }
 
   @override
   void set(dynamic instance, dynamic value, MappingContext context) {
-    field.setter!(instance, value);
+    setter!(instance, value);
   }
 
   // override
@@ -155,38 +157,31 @@ class PropertyProperty extends MapperProperty {
   }
 }
 
-class ValidatingPropertyProperty extends MapperProperty {
-  // instance data
-
-  final FieldDescriptor field;
-
+class ValidatingPropertyProperty extends PropertyProperty {
   // constructor
 
-  ValidatingPropertyProperty({required this.field});
+  ValidatingPropertyProperty({required super.field});
 
   // override
 
-  @override
-  dynamic get(dynamic instance, MappingContext context) {
-    return field.getter(instance);
-  }
 
   @override
   void set(dynamic instance, dynamic value, MappingContext context) {
-    field.type.validate(value);
-    field.setter!(instance, value);
+    this.field.type.validate(value);
+
+    setter!(instance, value);
   }
 
   // override
 
   @override
   Type getType() {
-    return field.type.type;
+    return this.field.type.type;
   }
 
   @override
   void validate(dynamic value) {
-    field.type.validate(value);
+    this.field.type.validate(value);
   }
 }
 
@@ -365,11 +360,14 @@ class Mapping<S,T> extends Transformer<MappingContext> {
   int stackSize;
   List<IntermediateResultDefinition>  intermediateResultDefinitions;
   List<Finalizer<dynamic,dynamic>> finalizer;
+  bool lazy = false;
 
   // constructor
 
   Mapping({required this.mapper, required this.typeDescriptor, required this.constructor, required this.stackSize, required this.intermediateResultDefinitions, required this.definition, required List<Operation<MappingContext>> operations, required this.finalizer})
-      :super(operations);
+      :super(operations) {
+    lazy = typeDescriptor.isImmutable() || !typeDescriptor.hasDefaultConstructor();
+  }
 
   // public
 
@@ -551,8 +549,8 @@ class MapAccessor extends MapOperation {
 class MappingDefinition<S,T> {
   // instance data
 
-  late Type sourceClass;
-  late Type targetClass;
+  final Type sourceClass;
+  final Type targetClass;
 
   List<MapOperation> operations = [];
   List<IntermediateResultDefinition> intermediateResultDefinitions = [];
@@ -561,15 +559,12 @@ class MappingDefinition<S,T> {
 
   // constructor
 
-  MappingDefinition({Type? sourceClass, Type? targetClass}) {
-    this.sourceClass = sourceClass ?? S;
-    this.targetClass = targetClass ?? T;
-  }
+  MappingDefinition({Type? sourceClass, Type? targetClass}) : sourceClass = sourceClass ?? S,targetClass = targetClass ?? T;
 
   // internal
 
-  IntermediateResultDefinition addIntermediateResultDefinition(Type clazz, Function ctr, int nargs, ValueReceiver valueReceiver) {
-    intermediateResultDefinitions.add(IntermediateResultDefinition (clazz: clazz, constructor:  ctr, index: intermediateResultDefinitions.length, nArgs: nargs, valueReceiver: valueReceiver));
+  IntermediateResultDefinition addIntermediateResultDefinition(TypeDescriptor typeDescriptor, Function ctr, int nargs, ValueReceiver valueReceiver) {
+    intermediateResultDefinitions.add(IntermediateResultDefinition (typeDescriptor: typeDescriptor, constructor:  ctr, index: intermediateResultDefinitions.length, nArgs: nargs, valueReceiver: valueReceiver));
 
     return intermediateResultDefinitions.last;
   }
@@ -710,20 +705,16 @@ MappingDefinition<S,T> mapping<S,T>() {
 class MappingState {
   // instance data
 
-  MappingContext context;
-  late List<Buffer> resultBuffers;
-  late List<dynamic> stack;
+  final MappingContext context;
+  final List<Buffer> resultBuffers;
+  final List<dynamic> stack;
   dynamic result;
-  late MappingState? nextState;
+  final MappingState? nextState;
 
   // constructor
 
-  MappingState({required this.context}) {
-    nextState = context.currentState;
-
+  MappingState({required this.context}) : resultBuffers = context.resultBuffers, stack = context.stack, nextState = context.currentState {
     context.currentState = this;
-    resultBuffers = context.resultBuffers;
-    stack = context.stack;
   }
 
   // public
@@ -739,22 +730,26 @@ class MappingState {
 class MappingContext {
   // instance data
 
-  Mapper mapper;
+  final Mapper mapper;
   dynamic currentSource;
   dynamic currentTarget;
-  Map<dynamic, dynamic>  mappedObjects = Map.identity();
+  Map<dynamic, dynamic>?  mappedObjects;
   List<Buffer> resultBuffers = [];
   List<dynamic> stack = [];
   MappingState? currentState;
 
   // constructor
 
-  MappingContext({required this.mapper});
+  MappingContext({required this.mapper}) {
+    if ( mapper.checkCycles )
+      mappedObjects = Map.identity();
+  }
 
   // public
 
   MappingContext remember(dynamic source, dynamic target) {
-    mappedObjects[source] = target;
+    if ( mappedObjects != null)
+      mappedObjects![source] = target;
 
     currentSource = source;
     currentTarget = target;
@@ -763,7 +758,7 @@ class MappingContext {
   }
 
   dynamic mappedObject(dynamic source) {
-    return mappedObjects[source];
+    return mappedObjects != null ? mappedObjects![source] : null;
   }
 
   List<Buffer> setupResultBuffers(List<Buffer> buffers) {
@@ -830,25 +825,31 @@ class MappingKey {
   }
 }
 
+typedef MapperConfig = ({
+  bool checkCycles,
+});
+
+
 class Mapper {
   // static data
 
   static TypeConversions typeConversions = TypeConversions();
 
-  // static methods
-
   // instance data
 
-  late List<MappingDefinition> mappingDefinitions;
+  List<MappingDefinition> mappingDefinitions;
   Map<MappingKey, Mapping> mappings = HashMap<MappingKey,Mapping>();
+  bool checkCycles = false;
 
   // constructor
 
-  Mapper(List<MappingDefinition> definitions) {
-    mappingDefinitions = definitions;
-
+  Mapper(List<MappingDefinition> definitions, {MapperConfig? config}) :mappingDefinitions = definitions {
     for (var definition in mappingDefinitions) {
       registerMapping(definition.createMapping(this));
+    }
+
+    if ( config != null) {
+      checkCycles = config.checkCycles;
     }
   }
 
@@ -862,14 +863,14 @@ class Mapper {
     mappings[MappingKey(source: mapping.definition.sourceClass, target: mapping.definition.targetClass)] = mapping;
   }
 
-  Mapping<S,T> getMappingX<S,T>(Type source, Type target) {
+  Mapping getMappingX(Type source, Type target) {
     var key = MappingKey(source: source, target: target);
     var mapping = mappings[key];
     if (mapping == null) {
-      throw MapperException('No mapping found for <$S, $T>');
+      throw MapperException('No mapping found for <$source, $target>');
     }
 
-    return mapping as Mapping<S,T>;
+    return mapping;
   }
 
   Mapping<S,T> getMapping<S,T>() {
@@ -901,7 +902,7 @@ class Mapper {
 
     var lazyCreate = false;
     if ( target == null) {
-      lazyCreate = mapping.typeDescriptor.isImmutable() || !mapping.typeDescriptor.hasDefaultConstructor();
+      lazyCreate = mapping.lazy;
       if (lazyCreate)
         target = context; // we need to set something....
       else {
@@ -918,16 +919,20 @@ class Mapper {
       if ( lazyCreate ) {
         target =  context.currentState!.result;
 
-        context.remember(source, target!!);
+        context.remember(source, target);
       }
     }
     finally {
       state.restore(context);
     }
 
+    // run finalizer
+
     for (Function finalizer in mapping.finalizer)
       finalizer(source, target);
 
-    return target as T;
+    // done
+
+    return target;
   }
 }

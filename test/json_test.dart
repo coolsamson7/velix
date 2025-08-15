@@ -63,15 +63,29 @@ void main() {
       JSON(validate: false);
     });
 
-    test('benchmark list', () {
-      var money = Money(currency: "EU", value: 1);
-      var collections = Collections(prices: [money, money, money]);
+    test('benchmark', () {
+      JSON(validate: false);
+
+      var input = Invoice(
+          date: DateTime.now(),
+          products: [
+            Product(name: "p1", price: Money(currency: "EU", value: 1)),
+            Product(name: "p2", price: Money(currency: "EU", value: 1)),
+            Product(name: "p3", price: Money(currency: "EU", value: 1)),
+            Product(name: "p4", price: Money(currency: "EU", value: 1)),
+            Product(name: "p5", price: Money(currency: "EU", value: 1)),
+            Product(name: "p6", price: Money(currency: "EU", value: 1)),
+            Product(name: "p7", price: Money(currency: "EU", value: 1)),
+            Product(name: "p8", price: Money(currency: "EU", value: 1)),
+            Product(name: "p9", price: Money(currency: "EU", value: 1)),
+          ]
+      );
 
       // warm up
 
-      var json = JSON.serialize(collections);
+      var json = JSON.serialize(input);
 
-      JSON.deserialize<Collections>(json);
+      JSON.deserialize<Invoice>(json);
 
       // serialize
 
@@ -79,7 +93,7 @@ void main() {
       var stopwatch = Stopwatch()..start();
 
       for (int i = 0; i < loops; i++) {
-        JSON.serialize(collections);
+        JSON.serialize(input);
       }
 
       stopwatch.stop();
@@ -90,7 +104,7 @@ void main() {
       stopwatch = Stopwatch()..start();
 
       for (int i = 0; i < loops; i++) {
-        JSON.deserialize<Collections>(json);
+        JSON.deserialize<Invoice>(json);
       }
 
       stopwatch.stop();

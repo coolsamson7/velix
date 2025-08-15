@@ -81,6 +81,46 @@ void registerAllDescriptors() {
        ]
      );
 
+   type<Product>(
+     name: 'asset:velix/test/main.dart.Product',
+     params: [
+         param<String>('name', isNamed: true, isRequired: true),
+         param<Money>('price', isNamed: true, isRequired: true),
+     ],
+     constructor: ({String name = '', required Money price}) => Product(name: name, price: price),
+     fields: [
+         field<Product,String>('name',
+           getter: (obj) => (obj as Product).name,
+           isFinal: true,
+         ),
+         field<Product,Money>('price',
+           getter: (obj) => (obj as Product).price,
+           isFinal: true,
+         ),
+       ]
+     );
+
+   type<Invoice>(
+     name: 'asset:velix/test/main.dart.Invoice',
+     params: [
+         param<List<Product>>('products', isNamed: true, isRequired: true),
+         param<DateTime>('date', isNamed: true, isRequired: true),
+     ],
+     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
+     fields: [
+         field<Invoice,DateTime>('date',
+           getter: (obj) => (obj as Invoice).date,
+           isFinal: true,
+         ),
+         field<Invoice,List<Product>>('products',
+           elementType: Product,
+           factoryConstructor: () => <Product>[],
+           getter: (obj) => (obj as Invoice).products,
+           isFinal: true,
+         ),
+       ]
+     );
+
    type<Flat>(
      name: 'asset:velix/test/main.dart.Flat',
      params: [

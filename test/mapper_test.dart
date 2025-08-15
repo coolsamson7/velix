@@ -133,11 +133,59 @@ void main() {
     });
 
     test('map immutable root', () {
+      var mapper = Mapper([
+        mapping<Money, Money>()
+            .map(all: matchingProperties()),
+
+        mapping<Product, Product>()
+            .map(from: "name", to: "name")
+            .map(from: "price", to: "price", deep: true),
+
+        mapping<Invoice, Invoice>()
+            .map(from: "date", to: "date")
+            .map(from: "products", to: "products", deep: true)
+      ]);
+
+      var input = Invoice(
+          date: DateTime.now(),
+          products: [
+            Product(name: "p1", price: Money(currency: "EU", value: 1)),
+            Product(name: "p2", price: Money(currency: "EU", value: 1)),
+            Product(name: "p3", price: Money(currency: "EU", value: 1)),
+            Product(name: "p4", price: Money(currency: "EU", value: 1)),
+            Product(name: "p5", price: Money(currency: "EU", value: 1)),
+            Product(name: "p6", price: Money(currency: "EU", value: 1)),
+            Product(name: "p7", price: Money(currency: "EU", value: 1)),
+            Product(name: "p8", price: Money(currency: "EU", value: 1)),
+            Product(name: "p9", price: Money(currency: "EU", value: 1)),
+          ]
+      );
+
+      var result = mapper.map(input);
+
+      // benchmark
+
+      var loops = 100000;
+      final stopwatch = Stopwatch()..start();
+
+      // 👇 Code to benchmark
+      for (int i = 0; i < loops; i++) {
+        mapper.map(input);
+      }
+
+      stopwatch.stop();
+      print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
+
+
+      print(result);
+    });
+
+    test('map immutable root', () {
       print("immutable root");
       var mapper = Mapper([
         mapping<Immutable, Immutable>()
             .map(from: "id", to: "id")
-            .map(from: path("price", "currency"), to:  path("price", "currency"))
+            .map(from: path("price", "currency"), to: path("price", "currency"))
             .map(from: path("price", "value"), to: path("price", "value"))
       ]);
 

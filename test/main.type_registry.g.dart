@@ -41,7 +41,7 @@ void registerAllDescriptors() {
          field<Money,int>('value',
            type: IntType().greaterThan(0),
            annotations: [
-            Json(name: "currency", includeNull: true, required: true, defaultValue: 1, ignore: false),
+            Json(name: "value", includeNull: true, required: true, defaultValue: 1, ignore: false),
            ],
            getter: (obj) => (obj as Money).value,
            isFinal: true,

@@ -50,6 +50,10 @@ class FieldDescriptor<T, V> {
 
   // public
 
+  T? find_annotation<T>() {
+    return findElement(annotations, (annotation) => annotation is T) as T?;
+  }
+
   bool isWriteable() {
     return setter != null;
   }
@@ -212,6 +216,10 @@ class TypeDescriptor<T> {
   }
 
   // public
+
+  T? find_annotation<T>() {
+    return findElement(annotations, (annotation) => annotation is T) as T?;
+  }
 
   // true, if all parameters have defaults ( either literal types or nullable object types )
   bool hasDefaultConstructor() {

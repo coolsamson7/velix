@@ -9,6 +9,7 @@ import 'main.type_registry.g.dart';
 
 void main() {
   group('json', () {
+    // register types
 
     registerAllDescriptors();
 
@@ -35,7 +36,7 @@ void main() {
       expect(isEqual, isTrue);
     });
 
-    test('map json collections', () {
+    test('map list', () {
       var money = Money(currency: "EU", value: 1);
       var input = Collections(prices: [money]);
 
@@ -46,7 +47,7 @@ void main() {
       expect(isEqual, isTrue);
     });
 
-    test('benchmark json collections', () {
+    test('benchmark list', () {
       var money = Money(currency: "EU", value: 1);
       var collections = Collections(prices: [money, money, money]);
 
@@ -58,8 +59,6 @@ void main() {
 
       // serialize
 
-      print("serialize json");
-
       var loops = 100000;
       var stopwatch = Stopwatch()..start();
 
@@ -68,11 +67,9 @@ void main() {
       }
 
       stopwatch.stop();
-      print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
+      print('Serialized $loops, time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
 
       // deserialize
-
-      print("deserialize json");
 
       stopwatch = Stopwatch()..start();
 
@@ -81,8 +78,7 @@ void main() {
       }
 
       stopwatch.stop();
-      print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
-
+      print('Deserialized $loops, time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
     });
   });
 }

@@ -139,6 +139,36 @@ class PropertyProperty extends MapperProperty {
   }
 }
 
+class ValidatingPropertyProperty extends MapperProperty {
+  // instance data
+
+  final FieldDescriptor field;
+
+  // constructor
+
+  ValidatingPropertyProperty({required this.field});
+
+  // override
+
+  @override
+  dynamic get(dynamic instance, MappingContext context) {
+    return field.getter(instance);
+  }
+
+  @override
+  void set(dynamic instance, dynamic value, MappingContext context) {
+    field.type.validate(value);
+    field.setter!(instance, value);
+  }
+
+  // override
+
+  @override
+  Type getType() {
+    return field.type.type;
+  }
+}
+
 /// @internal
 abstract class Accessor {
   // instance data
@@ -248,10 +278,11 @@ class PropertyAccessor extends Accessor {
   // instance data
 
   late FieldDescriptor field;
+  bool validate;
 
   // constructor
 
-  PropertyAccessor({required String name })
+  PropertyAccessor({required String name, this.validate = false})
       : super(name: name, type: Object, index: -1, readOnly: false);
 
   // override
@@ -260,14 +291,14 @@ class PropertyAccessor extends Accessor {
   MapperProperty makeTransformerProperty(bool write) {
     if ( write ) {
       if ( field.isWriteable()) {
-        return PropertyProperty(field: field);
+        return validate ? ValidatingPropertyProperty(field: field) : PropertyProperty(field: field);
       }
       else {
         throw MapperException("${field.typeDescriptor.type}.$name is final");
       }
     }
     else {
-      return PropertyProperty(field: field);
+      return validate ? ValidatingPropertyProperty(field: field) : PropertyProperty(field: field);
     }
   }
 
@@ -596,7 +627,7 @@ class MappingDefinition<S,T> {
   /// [all] a [PropertyQualifier] wild card, that is used instead of from and to
   /// [deep] if [true], a different supplied mapping is expected to transform the retrieved source value recursively
   /// [convert] optional [Convert] instance
-  MappingDefinition<S,T> map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, Convert? convert}) {
+  MappingDefinition<S,T> map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, bool validate = false, Convert? convert}) {
     if ( all != null) {
       operations.add(MapProperties(qualifier: all, converter: convert, deep: deep));
     }
@@ -604,7 +635,6 @@ class MappingDefinition<S,T> {
       List<Accessor> fromAccessors = [];
       List<Accessor> toAccessors = [];
 
-      // NEW
       if ( from is Accessor)
         fromAccessors.add(from);
 
@@ -617,12 +647,11 @@ class MappingDefinition<S,T> {
       if ( constant != null)
         fromAccessors.add(ConstantAccessor(value: constant));
 
-      // NEW
       if ( to is Accessor)
         toAccessors.add(to);
 
       if ( to is String)
-        toAccessors.add(PropertyAccessor(name: to));
+        toAccessors.add(PropertyAccessor(name: to, validate: validate));
 
       if (to is List<String>)
         toAccessors = (to).map((element) => PropertyAccessor(name: element)).toList(growable: false);

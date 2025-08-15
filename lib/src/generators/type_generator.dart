@@ -41,6 +41,26 @@ class AggregateBuilder implements Builder {
 
   // internal
 
+  /// Reads raw annotation source and collects import URIs for annotation libraries.
+  List<String> readAnnotations(List<ElementAnnotation> metadata) {
+    final result = <String>[];
+    for (final annotation in metadata) {
+      var source = annotation.toSource();
+      if (!source.startsWith("@Dataclass") && ! source.startsWith("@Attribute"))
+        result.add(source); // exact source text
+    }
+    return result;
+  }
+
+  void collectAnnotationImports(List<ElementAnnotation> metadata, Set<Uri> seenImports) {
+    for (final annotation in metadata) {
+      final libUri = annotation.element?.library?.source.uri;
+      if (libUri != null) {
+        seenImports.add(libUri);
+      }
+    }
+  }
+
   String generateClass(ClassElement element) {
     final className = element.name;
     final buffer = StringBuffer();
@@ -49,8 +69,20 @@ class AggregateBuilder implements Builder {
 
     final qualifiedName = '$uri.${element.name}';
 
+    final classAnnotations = readAnnotations(element.metadata);
+
     buffer.writeln("   type<$className>(");
     buffer.writeln("     name: '$qualifiedName',");
+    if ( classAnnotations.isNotEmpty ) {
+      buffer.writeln("     annotations: [");
+      for (final annotation in classAnnotations) {
+        buffer.write("       ");
+        buffer.write(annotation.substring(1));
+        buffer.writeln(",");
+      }
+
+      buffer.writeln("     ],");
+    }
 
     buffer.write("     params: ");
 
@@ -85,7 +117,7 @@ class AggregateBuilder implements Builder {
           buffer.writeln("),");
         }
 
-        buffer.writeln("       ],");
+        buffer.writeln("     ],");
       }
     }
 
@@ -177,6 +209,9 @@ class AggregateBuilder implements Builder {
       final name = field.name;
       final type = field.type.getDisplayString(withNullability: false);
 
+      // Emit field annotations exactly as source
+      final fieldAnnotations = readAnnotations(field.metadata);
+
       //print('${field.name} → ${field.type} → ${field.type.nullabilitySuffix}');
 
       final isFinal = field.isFinal;
@@ -190,6 +225,17 @@ class AggregateBuilder implements Builder {
 
       if ( typeCode.contains("."))
         buffer.writeln("           type: $typeCode,");
+
+      if ( fieldAnnotations.isNotEmpty ) {
+        buffer.writeln("           annotations: [");
+        for (final annotation in fieldAnnotations) {
+          buffer.write("            ");
+          buffer.write(annotation.substring(1));
+          buffer.writeln(",");
+        }
+
+        buffer.writeln("           ],");
+      }
 
       if (elementType != null) {
         final elementTypeName = elementType.getDisplayString();
@@ -258,6 +304,19 @@ class AggregateBuilder implements Builder {
     }
   }
 
+
+  void collectImports(ClassElement element, Set<Uri> seenImports) {
+    // class annotations
+    
+    collectAnnotationImports(element.metadata, seenImports);
+
+    // field annotations
+
+    for (final field in element.fields) {
+      collectAnnotationImports(field.metadata, seenImports);
+    }
+  }
+
   // override
 
   @override
@@ -268,6 +327,8 @@ class AggregateBuilder implements Builder {
     final isTestFile = buildStep.inputId.toString().contains('|test/');
     var dir = isTestFile ? "test" : "lib";
 
+    final seenImports = <Uri>{};
+
     // Find all Dart files in lib/
 
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
@@ -275,6 +336,8 @@ class AggregateBuilder implements Builder {
       for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
         if (element.element is ClassElement) {
           classes.add(element.element as ClassElement);
+
+          collectImports(element.element as ClassElement, seenImports);
         }
       }
     }
@@ -283,7 +346,6 @@ class AggregateBuilder implements Builder {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln("import 'package:velix/velix.dart';");
 
-    final seenImports = <Uri>{};
     for (final clazz in classes) {
       final sourceUri = clazz.source.uri;
 

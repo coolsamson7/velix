@@ -6,6 +6,34 @@ import '../reflectable/reflectable.dart';
 import 'mapper.dart';
 import 'operation_builder.dart';
 
+
+/// decorator used to influence the json serialization
+class JsonSerializable {
+  final bool includeNull;
+
+  /// Create a JsonSerializable
+  /// [includeNull] if true, nulls will be serialized.
+  const JsonSerializable({this.includeNull = true});
+}
+
+/// decorator used to influence json serialization for fields
+class Json {
+  final String name;
+  final bool ignore;
+  final bool includeNull;
+  final bool required;
+  final Object? defaultValue;
+
+  /// Create a Json
+  /// [name] name override
+  /// [ignore] if true, this field will not be serialized
+  /// [includeNull]  if true, nulls will be serialized.
+  /// [required] if true, the JSON is expected to have a value
+  /// [defaultValue] default in case of a not supplied json value
+  const Json({this.name = "", this.ignore = false, this.includeNull = true, this.required = true, this.defaultValue});
+}
+
+/// @internal
 class JSONAccessor extends Accessor {
   // instance data
 
@@ -19,7 +47,7 @@ class JSONAccessor extends Accessor {
 
   @override
   MapperProperty makeTransformerProperty(bool write) {
-    return JSONProperty(name: name); // TODO?
+    return JSONProperty(name: name);
   }
 
   @override
@@ -32,6 +60,7 @@ class JSONAccessor extends Accessor {
   }
 }
 
+/// @internal
 class JSONProperty extends MapperProperty {
   // instance data
 
@@ -63,6 +92,7 @@ class JSONProperty extends MapperProperty {
 }
 
 
+/// @internal
 class JSONMapper<T> {
   // instance data
 
@@ -206,14 +236,29 @@ class JSONMapper<T> {
   }
 }
 
+/// Main class that offers serialize and deserialize methods
+///
 class JSON {
   // static data
 
-  static Map<Type,JSONMapper> mappers = {};
+  static JSON instance = JSON(validate: false);
+
+  // instance data
+
+  final bool validate;
+  Map<Type,JSONMapper> mappers = {};
+
+  // constructor
+
+  JSON({required this.validate}) {
+    instance = this;
+
+    TypeDescriptor<Map<String, dynamic>>(name: "json" , annotations: [], constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
+  }
 
   // internal
 
-  static JSONMapper getMapper<T>() {
+  JSONMapper getMapper<T>() {
     var mapper = mappers[T];
     if ( mapper == null) {
       mappers[T] = mapper = JSONMapper<T>();
@@ -224,11 +269,16 @@ class JSON {
 
   // static methods
 
+  /// serialize an instance to a 'JSON' map
+  /// [instance] an instance
   static Map serialize<T>(T instance) {
-    return getMapper<T>().serialize(instance);
+    return JSON.instance.getMapper<T>().serialize(instance);
   }
 
+  /// deserialize an 'JSON' to the specified class
+  /// [T] the expected type
+  /// [json] a 'JSON' map
   static dynamic deserialize<T>(Map json) {
-    return getMapper<T>().deserialize<T>(json);
+    return JSON.instance.getMapper<T>().deserialize<T>(json);
   }
 }

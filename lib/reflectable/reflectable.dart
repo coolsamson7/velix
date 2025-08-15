@@ -23,6 +23,7 @@ class FieldDescriptor<T, V> {
   // instance data
 
   final String name;
+  final List<Object> annotations;
   final Type? elementType;
   final Function? factoryConstructor;
 
@@ -39,11 +40,12 @@ class FieldDescriptor<T, V> {
     required this.name,
     required this.type,
     required this.getter,
+    required this.annotations,
     this.elementType,
     this.factoryConstructor,
     this.setter,
     this.isFinal = false,
-    this.isNullable = false
+    this.isNullable = false,
   });
 
   // public
@@ -143,6 +145,7 @@ class TypeDescriptor<T> {
   final Map<String, FieldDescriptor> _fields = {};
   final Constructor<T> constructor;
   final List<ConstructorParameter> constructorParameters;
+  final List<Object> annotations;
 
   // constructor
 
@@ -151,14 +154,19 @@ class TypeDescriptor<T> {
     required this.constructor,
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
+    required this.annotations,
   }) {
     type = nonNullableOf<T>();
 
     for (var field in fields) {
         field.typeDescriptor = this;
         _fields[field.name] = field;
-      }
-    }
+      } // for
+
+    // automatically register
+
+    TypeDescriptor.register(this);
+  }
 
   // internal
 
@@ -240,9 +248,10 @@ void type<T>({
   required String name,
   required Constructor<T> constructor,
   required List<ConstructorParameter> params,
-  required List<FieldDescriptor> fields
+  required List<FieldDescriptor> fields,
+  List<Object>? annotations,
 }) {
-  TypeDescriptor.register(TypeDescriptor<T>(name: name, constructor: constructor, constructorParameters: params, fields: fields));
+  TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields);
 }
 
 ConstructorParameter param<T>(String name, {
@@ -280,6 +289,7 @@ AbstractType inferType<T>(AbstractType? t) {
 
 FieldDescriptor field<T,V>(String name, {
   AbstractType<V>? type,
+  List<Object>? annotations,
   required Getter getter,
   Setter? setter,
   Type? elementType,
@@ -287,5 +297,5 @@ FieldDescriptor field<T,V>(String name, {
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType<V>(type), elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
+  return FieldDescriptor(name: name, type: inferType<V>(type), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
 }

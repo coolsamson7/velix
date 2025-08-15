@@ -7,7 +7,7 @@ void registerAllDescriptors() {
      name: 'asset:velix/test/main.dart.Collections',
      params: [
          param<List<Money>>('prices', isNamed: true, isRequired: true),
-       ],
+     ],
      constructor: ({required List<Money> prices}) => Collections(prices: prices),
      fields: [
          field<Collections,List<Money>>('prices',
@@ -21,19 +21,28 @@ void registerAllDescriptors() {
 
    type<Money>(
      name: 'asset:velix/test/main.dart.Money',
+     annotations: [
+       JsonSerializable(includeNull: true),
+     ],
      params: [
          param<String>('currency', isNamed: true, isRequired: true),
          param<int>('value', isNamed: true, isRequired: true),
-       ],
+     ],
      constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
      fields: [
          field<Money,String>('currency',
            type: StringType().maxLength(7),
+           annotations: [
+            Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false),
+           ],
            getter: (obj) => (obj as Money).currency,
            isFinal: true,
          ),
          field<Money,int>('value',
            type: IntType().greaterThan(0),
+           annotations: [
+            Json(name: "currency", includeNull: true, required: true, defaultValue: 1, ignore: false),
+           ],
            getter: (obj) => (obj as Money).value,
            isFinal: true,
          ),
@@ -45,7 +54,7 @@ void registerAllDescriptors() {
      params: [
          param<String>('id', isNamed: true, isRequired: true),
          param<Money>('price', isNamed: true, isRequired: true),
-       ],
+     ],
      constructor: ({String id = '', required Money price}) => Mutable(id: id, price: price),
      fields: [
          field<Mutable,String>('id',
@@ -66,7 +75,7 @@ void registerAllDescriptors() {
          param<String>('id', isNamed: true, isRequired: true),
          param<String>('priceCurrency', isNamed: true, isRequired: true),
          param<int>('priceValue', isNamed: true, isRequired: true),
-       ],
+     ],
      constructor: ({String id = '', String priceCurrency = '', int priceValue = 0}) => Flat(id: id, priceCurrency: priceCurrency, priceValue: priceValue),
      fields: [
          field<Flat,String>('id',
@@ -90,7 +99,7 @@ void registerAllDescriptors() {
      params: [
          param<String>('id', isNamed: true, isRequired: true),
          param<Money>('price', isNamed: true, isRequired: true),
-       ],
+     ],
      constructor: ({String id = '', required Money price}) => Immutable(id: id, price: price),
      fields: [
          field<Immutable,String>('id',

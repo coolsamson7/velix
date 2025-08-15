@@ -11,11 +11,14 @@ class Collections {
 }
 
 @Dataclass()
+@JsonSerializable(includeNull: true)
 class Money {
   // instance data
 
   @Attribute(type: "maxLength 7")
+  @Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
   final String currency;
+  @Json(name: "currency", includeNull: true, required: true, defaultValue: 1, ignore: false)
   @Attribute(type: "greaterThan 0")
   final int value;
 

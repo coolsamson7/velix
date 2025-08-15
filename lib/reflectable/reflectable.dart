@@ -133,6 +133,39 @@ class TypeDescriptor<T> {
     return descriptor;
   }
 
+  static bool deepEquals(Object a, Object? b) {
+    if (identical(a, b))
+      return true;
+
+    if (b == null || b.runtimeType != a.runtimeType)
+      return false;
+
+    final typeDescriptor = TypeDescriptor.forType(a.runtimeType);
+
+    for (final field in typeDescriptor.getFields()) {
+      final valueA = field.getter(a);
+      final valueB = field.getter(b);
+
+      if ( false )
+        ;
+      /* TODO if (valueA is List && valueB is List) {
+        if (!equality.equals(valueA, valueB)) return false;
+      }
+      else if (valueA is Map && valueB is Map) {
+        if (!equality.equals(valueA, valueB)) return false;
+      }
+      else if (valueA is Set && valueB is Set) {
+        if (!equality.equals(valueA, valueB)) return false;
+      } */
+      else {
+        if (valueA != valueB)
+          return false;
+      }
+    }
+
+    return true;
+  }
+
   // class properties
 
   static final Map<Type,TypeDescriptor> _byType = {};

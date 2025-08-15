@@ -11,7 +11,6 @@ void main() {
   group('mapper', () {
     registerAllDescriptors();
 
-
     test('map collections', () {
       print("collections");
 
@@ -53,7 +52,7 @@ void main() {
             .finalize((s, t) => t.id = s.id)
       ]);
 
-      var source = Mutable(id: '1', price: Money(currency: "EU", value: 1));
+      var source = Mutable(id: '1', price: Money(currency: "EU", value: 1), dateTime: DateTime.now());
 
       Mutable target = mapper.map(source);
 

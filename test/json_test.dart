@@ -48,6 +48,21 @@ void main() {
       expect(isEqual, isTrue);
     });
 
+    test('validate object', () {
+      JSON(validate: true);
+
+      var input = Money(currency: "1234567890", value: 1);
+
+      var json = JSON.serialize(input);
+
+      expect(
+            () => JSON.deserialize<Money>(json),
+        throwsA(isA<ValidationException>()), // or use any matcher: throwsException, etc.
+      );
+
+      JSON(validate: false);
+    });
+
     test('benchmark list', () {
       var money = Money(currency: "EU", value: 1);
       var collections = Collections(prices: [money, money, money]);

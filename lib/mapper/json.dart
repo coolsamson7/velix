@@ -297,7 +297,7 @@ class JSONMapper<T> {
               from: JSONAccessor(name: json.name, type: List<dynamic>, includeNull: includeNull, defaultValue: defaultValue, containerConstructor: () => []),
               to: field.name,
               deep: true,
-            validate: validate
+              validate: validate
           );
         }
         else if ( field.type is ObjectType) {
@@ -321,7 +321,9 @@ class JSONMapper<T> {
               type: field.type.type,
               convert: convertSource,
               includeNull: includeNull,
-              defaultValue: defaultValue), to: field.name); // index?
+              defaultValue: defaultValue),
+              to: field.name,
+            validate: validate);
         }
       }
 

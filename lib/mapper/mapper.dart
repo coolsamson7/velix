@@ -183,6 +183,11 @@ class ValidatingPropertyProperty extends MapperProperty {
   Type getType() {
     return field.type.type;
   }
+
+  @override
+  void validate(dynamic value) {
+    field.type.validate(value);
+  }
 }
 
 /// @internal

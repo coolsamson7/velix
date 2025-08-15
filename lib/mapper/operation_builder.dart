@@ -9,6 +9,8 @@ import '../reflectable/reflectable.dart';
 /// @internal
 abstract class MapperProperty extends Property<MappingContext> {
   Type getType();
+
+ void validate(dynamic value){}
 }
 
 /// @internal
@@ -134,6 +136,7 @@ class SetResultArgument extends MapperProperty {
 
   @override
   void set(dynamic instance, dynamic value, MappingContext context) {
+    property.validate(value); // hmm...maybe we can optimize that
     context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, context);
   }
 

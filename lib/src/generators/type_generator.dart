@@ -448,15 +448,23 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
       // Pass parameters to actual constructor, named if necessary
 
-      final args = <String>[];
+      final positionalArgs = <String>[];
+      final namedArgs = <String>[];
+
       for (final param in firstCtor.parameters) {
         if (param.isNamed) {
-          args.add("${param.name}: ${param.name}");
+          namedArgs.add("${param.name}: ${param.name}");
         }
         else {
-          args.add(param.name);
+          positionalArgs.add(param.name);
         }
       }
+
+    // Combine positional first (no names), then named (with names)
+
+      final args = <String>[]
+        ..addAll(positionalArgs)
+        ..addAll(namedArgs);
 
       write(args.join(", ")).writeln("),");
     }

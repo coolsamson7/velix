@@ -29,9 +29,20 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   GeneratorElement({required this.element, required TypeBuilder builder}) {
     collectImports(builder);
+    collectDependencies(builder);
   }
 
   // internal
+
+  bool isDataclass(Element element) {
+    return element.metadata.any((annotation) {
+      final value = annotation.computeConstantValue();
+      if (value == null) 
+        return false;
+      
+      return value.type?.getDisplayString() == 'Dataclass';
+    });
+  }
 
   void collectAnnotationImports(List<ElementAnnotation> metadata, TypeBuilder builder) {
     for (final annotation in metadata) {
@@ -45,6 +56,8 @@ abstract class GeneratorElement<T extends InterfaceElement> {
   // abstract
 
   generateCode(StringBuffer buffer);
+
+  collectDependencies(TypeBuilder builder){}
 
   // public
 
@@ -82,6 +95,32 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   ClassGeneratorElement({required super.element, required super.builder});
 
   // override
+
+  @override
+  void  collectDependencies(TypeBuilder builder) {
+    // super class
+
+    final superType = element.supertype;
+    if (superType != null && !superType.isDartCoreObject) {
+      final superElement = superType.element;
+
+      if (superElement != null && isDataclass(superElement)) {
+        addDependency(builder.checkElement(superElement));
+      }
+    }
+
+    // fields
+
+    for (final field in element.fields) {
+      if (field.isStatic)
+        continue;
+
+      final fieldTypeElem = field.type.element;
+      if (fieldTypeElem != null && fieldTypeElem is InterfaceElement && fieldTypeElem != element && isDataclass(fieldTypeElem)) {
+        addDependency(builder.checkElement(fieldTypeElem));
+      }
+    } // for
+  }
 
   @override
   collectImports(TypeBuilder builder) {
@@ -294,6 +333,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final elementType = getElementType(field);
     if (elementType != null) {
       final elementTypeName = elementType.getDisplayString();
+
       tab().writeln("elementType: $elementTypeName,");
       tab().writeln("factoryConstructor: () => <$elementTypeName>[],");
     }
@@ -452,6 +492,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
 class TypeBuilder implements Builder {
   // instance data
 
+  Map<InterfaceElement,GeneratorElement> visited = {};
   List<GeneratorElement> elements = [];
   Set<Uri> imports = <Uri>{};
 
@@ -469,12 +510,19 @@ class TypeBuilder implements Builder {
     imports.add(value);
   }
 
-  void addElement(InterfaceElement element) {
-    print("add");
-    if ( element is ClassElement)
-      elements.add(ClassGeneratorElement(element: element, builder: this));
-    else if ( element is EnumElement)
-      elements.add(EnumGeneratorElement(element: element, builder: this));
+  GeneratorElement checkElement(InterfaceElement element) {
+    var result = visited[element];
+
+    if ( result == null) {
+      if (element is ClassElement)
+        elements.add(result = ClassGeneratorElement(element: element, builder: this));
+      else if (element is EnumElement)
+        elements.add(result = EnumGeneratorElement(element: element, builder: this));
+
+      visited[element] = result!;
+    } // if
+
+    return result!;
   }
 
   // header
@@ -523,7 +571,7 @@ class TypeBuilder implements Builder {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
       for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
         if ( element.element is InterfaceElement)
-          addElement(element.element as InterfaceElement);
+          checkElement(element.element as InterfaceElement);
       } // for
     }
 

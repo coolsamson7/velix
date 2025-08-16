@@ -18,6 +18,16 @@ bool isTypeNullable(DartType type) {
   return type.nullabilitySuffix == NullabilitySuffix.question;
 }
 
+bool isDataclass(Element element) {
+  return element.metadata.any((annotation) {
+    final value = annotation.computeConstantValue();
+    if (value == null)
+      return false;
+
+    return value.type?.getDisplayString() == 'Dataclass';
+  });
+}
+
 abstract class GeneratorElement<T extends InterfaceElement> {
   // instance data
 
@@ -33,16 +43,6 @@ abstract class GeneratorElement<T extends InterfaceElement> {
   }
 
   // internal
-
-  bool isDataclass(Element element) {
-    return element.metadata.any((annotation) {
-      final value = annotation.computeConstantValue();
-      if (value == null) 
-        return false;
-      
-      return value.type?.getDisplayString() == 'Dataclass';
-    });
-  }
 
   void collectAnnotationImports(List<ElementAnnotation> metadata, TypeBuilder builder) {
     for (final annotation in metadata) {
@@ -90,6 +90,8 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   static ClassCodeGenerator generator = ClassCodeGenerator();
 
+  // instance data
+
   // constructor
 
   ClassGeneratorElement({required super.element, required super.builder});
@@ -97,7 +99,7 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   // override
 
   @override
-  void  collectDependencies(TypeBuilder builder) {
+  void collectDependencies(TypeBuilder builder) {
     // super class
 
     final superType = element.supertype;
@@ -229,6 +231,21 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if (type is ParameterizedType) {
       if (type.element?.name == 'List' && type.typeArguments.isNotEmpty) {
         return type.typeArguments.first;
+      }
+    }
+
+    return null;
+  }
+
+  String? getSuperclass(ClassElement element) {
+    // super class
+
+    final superType = element.supertype;
+    if (superType != null && !superType.isDartCoreObject) {
+      final superElement = superType.element;
+
+      if (superElement != null && isDataclass(superElement)) {
+        return superElement.name;
       }
     }
 
@@ -455,8 +472,13 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final uri = element.source.uri.toString(); // e.g., package:example/models/foo.dart
     final qualifiedName = '$uri.${element.name}';
 
-    tab().writeln("type<$className>(").indent(1);
+    tab().write("var ${className}Descriptor = ").writeln("type<$className>(").indent(1);
     tab().writeln("name: '$qualifiedName',");
+
+    var superClass = getSuperclass(element);
+    if ( superClass != null) {
+      tab().writeln("superClass: '${superClass}Descriptor',");
+    }
 
     generateAnnotations(element);
     generateConstructorParams(element);
@@ -549,8 +571,14 @@ class TypeBuilder implements Builder {
     buffer.writeln();
     buffer.writeln('void registerAllDescriptors() {');
 
+    bool first = true;
     for ( var element in elements) {
+      if (!first)
+        buffer.writeln();
+
       element.generate(this, buffer);
+
+      first = false;
     }
 
     buffer.writeln('}');

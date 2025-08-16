@@ -187,6 +187,8 @@ class TypeDescriptor<T> {
   final List<Object> annotations;
   final List<T>? enumValues;
 
+  TypeDescriptor? superClass;
+
   // constructor
 
   TypeDescriptor({
@@ -195,6 +197,7 @@ class TypeDescriptor<T> {
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
     required this.annotations,
+    this.superClass,
     this.enumValues
   }) {
     type = nonNullableOf<T>();
@@ -298,9 +301,10 @@ void type<T>({
   required Constructor<T> constructor,
   required List<ConstructorParameter> params,
   required List<FieldDescriptor> fields,
+  TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields);
+  TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }
 
 void enumeration<T extends Enum>({

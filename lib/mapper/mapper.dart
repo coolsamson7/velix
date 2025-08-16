@@ -14,27 +14,36 @@ typedef Converter<S,T> = T Function(S);
 class Convert<S, T> {
   // instance data
 
-  final Converter<S, T> converter;
+  final Converter<S, T> convertSource;
+  final Converter<T, S>? convertTarget;
+
+  Type sourceType;
+  Type targetType;
 
   // constructor
 
   /// Create a new [Convert] instance
   /// [convert] the [Converter]
-  Convert(this.converter);
+  Convert(this.convertSource, {this.convertTarget, Type? sourceType, Type? targetType}) : this.sourceType = sourceType ?? S,  this.targetType = targetType ?? T;
 
   // public
 
   T convert(S source) {
-    return converter(source);
+    return convertSource(source);
   }
 
   /// return the wrapped [Converter]
   Converter<dynamic, dynamic> get() {
-    return (dynamic s) => converter(s);
+    return (dynamic s) => convertSource(s);
   }
 
-  Type get sourceType => S;
-  Type get targetType => T;
+  Converter<dynamic, dynamic> sourceConverter() {
+    return (dynamic s) => convertSource(s);
+  }
+
+  Converter<dynamic, dynamic> targetConverter() {
+    return (dynamic s) => convertTarget!(s);
+  }
 }
 
 /// A [Finalizer] is executed given the mapped source and target and is used to perform any logic not expressible with the mapper.

@@ -1,17 +1,19 @@
-import 'dart:collection';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
 
 import 'main.dart';
 import 'main.type_registry.g.dart';
 
-
 void main() {
   group('json', () {
     // register types
 
     registerAllDescriptors();
+
+    JSON(
+        validate: false,
+        converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+        factories: [Enum2StringFactory()]);
 
     test('map immutable json', () {
       var input = Money(currency: "EU", value: 1);
@@ -64,20 +66,20 @@ void main() {
     });
 
     test('benchmark', () {
-      JSON(validate: false);
+      //JSON(validate: false);
 
       var input = Invoice(
           date: DateTime.now(),
           products: [
-            Product(name: "p1", price: Money(currency: "EU", value: 1)),
-            Product(name: "p2", price: Money(currency: "EU", value: 1)),
-            Product(name: "p3", price: Money(currency: "EU", value: 1)),
-            Product(name: "p4", price: Money(currency: "EU", value: 1)),
-            Product(name: "p5", price: Money(currency: "EU", value: 1)),
-            Product(name: "p6", price: Money(currency: "EU", value: 1)),
-            Product(name: "p7", price: Money(currency: "EU", value: 1)),
-            Product(name: "p8", price: Money(currency: "EU", value: 1)),
-            Product(name: "p9", price: Money(currency: "EU", value: 1)),
+            Product(name: "p1", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p2", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p3", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p4", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p5", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p6", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p7", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p8", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p9", price: Money(currency: "EU", value: 1), status: Status.available),
           ]
       );
 
@@ -85,7 +87,7 @@ void main() {
 
       var json = JSON.serialize(input);
 
-      JSON.deserialize<Invoice>(json);
+      var reverse = JSON.deserialize<Invoice>(json);
 
       // serialize
 

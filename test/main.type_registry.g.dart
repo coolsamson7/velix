@@ -3,6 +3,11 @@ import 'package:velix/velix.dart';
 import 'main.dart';
 
 void registerAllDescriptors() {
+  enumeration<Status>(
+      name: 'asset:velix/test/main.dart.Status',
+      values: Status.values
+  );
+
    type<Collections>(
      name: 'asset:velix/test/main.dart.Collections',
      params: [
@@ -86,8 +91,9 @@ void registerAllDescriptors() {
      params: [
          param<String>('name', isNamed: true, isRequired: true),
          param<Money>('price', isNamed: true, isRequired: true),
+         param<Status>('status', isNamed: true, isRequired: true),
      ],
-     constructor: ({String name = '', required Money price}) => Product(name: name, price: price),
+     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
      fields: [
          field<Product,String>('name',
            getter: (obj) => (obj as Product).name,
@@ -95,6 +101,10 @@ void registerAllDescriptors() {
          ),
          field<Product,Money>('price',
            getter: (obj) => (obj as Product).price,
+           isFinal: true,
+         ),
+         field<Product,Status>('status',
+           getter: (obj) => (obj as Product).status,
            isFinal: true,
          ),
        ]
@@ -165,5 +175,4 @@ void registerAllDescriptors() {
          ),
        ]
      );
-
 }

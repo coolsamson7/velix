@@ -185,6 +185,7 @@ class TypeDescriptor<T> {
   final Constructor<T> constructor;
   final List<ConstructorParameter> constructorParameters;
   final List<Object> annotations;
+  final List<T>? enumValues;
 
   // constructor
 
@@ -194,6 +195,7 @@ class TypeDescriptor<T> {
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
     required this.annotations,
+    this.enumValues
   }) {
     type = nonNullableOf<T>();
 
@@ -218,6 +220,10 @@ class TypeDescriptor<T> {
   }
 
   // public
+
+  bool isEnum() {
+    return this.enumValues != null;
+  }
 
   T? find_annotation<T>() {
     return findElement(annotations, (annotation) => annotation is T) as T?;
@@ -295,6 +301,14 @@ void type<T>({
   List<Object>? annotations,
 }) {
   TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields);
+}
+
+void enumeration<T extends Enum>({
+  required String name,
+  required List<T> values,
+  List<Object>? annotations,
+}) {
+  TypeDescriptor<T>(name: name, constructor: () => null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
 ConstructorParameter param<T>(String name, {

@@ -61,6 +61,40 @@ class AggregateBuilder implements Builder {
     }
   }
 
+  bool isEnumType(DartType type) {
+    return type.element is EnumElement;
+  }
+
+  String generateEnum(EnumElement element) {
+    final className = element.name;
+    final buffer = StringBuffer();
+
+    final uri = element.source.uri.toString(); // e.g., package:example/models/foo.dart
+
+    final qualifiedName = '$uri.${element.name}';
+
+    final classAnnotations = readAnnotations(element.metadata);
+
+    buffer.writeln("   enumeration<$className>(");
+    buffer.writeln("     name: '$qualifiedName',");
+    if ( classAnnotations.isNotEmpty ) {
+      buffer.writeln("     annotations: [");
+      for (final annotation in classAnnotations) {
+        buffer.write("       ");
+        buffer.write(annotation.substring(1));
+        buffer.writeln(",");
+      }
+
+      buffer.writeln("     ],");
+    }
+
+    buffer.write("     ");
+    buffer.writeln("values: $className.values");
+    buffer.writeln("   );");
+
+    return buffer.toString();
+  }
+
   String generateClass(ClassElement element) {
     final className = element.name;
     final buffer = StringBuffer();
@@ -83,6 +117,16 @@ class AggregateBuilder implements Builder {
 
       buffer.writeln("     ],");
     }
+
+    // NEW
+
+    if (element is EnumElement) {
+      buffer.write("       ");
+      buffer.write("enumValues: $className.values");
+      buffer.writeln(",");
+    }
+
+    // NEW
 
     buffer.write("     params: ");
 
@@ -305,7 +349,7 @@ class AggregateBuilder implements Builder {
   }
 
 
-  void collectImports(ClassElement element, Set<Uri> seenImports) {
+  void collectImports(InterfaceElement element, Set<Uri> seenImports) {
     // class annotations
     
     collectAnnotationImports(element.metadata, seenImports);
@@ -323,6 +367,7 @@ class AggregateBuilder implements Builder {
   Future<void> build(BuildStep buildStep) async {
     final resolver = buildStep.resolver;
     final classes = <ClassElement>[];
+    final enums = <EnumElement>[];
 
     final isTestFile = buildStep.inputId.toString().contains('|test/');
     var dir = isTestFile ? "test" : "lib";
@@ -338,6 +383,11 @@ class AggregateBuilder implements Builder {
           classes.add(element.element as ClassElement);
 
           collectImports(element.element as ClassElement, seenImports);
+        }
+        else if (element.element is EnumElement) {
+          enums.add(element.element as EnumElement);
+
+          collectImports(element.element as EnumElement, seenImports);
         }
       }
     }
@@ -363,6 +413,10 @@ class AggregateBuilder implements Builder {
 
     for (final clazz in classes) {
       buffer.writeln(generateClass(clazz));
+    }
+
+    for (final enumerationClass in enums) {
+      buffer.writeln(generateEnum(enumerationClass));
     }
 
     buffer.writeln('}');

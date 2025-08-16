@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
 
@@ -139,6 +137,7 @@ void main() {
             .map(all: matchingProperties()),
 
         mapping<Product, Product>()
+            .map(from: "status", to: "status")
             .map(from: "name", to: "name")
             .map(from: "price", to: "price", deep: true),
 
@@ -150,15 +149,15 @@ void main() {
       var input = Invoice(
           date: DateTime.now(),
           products: [
-            Product(name: "p1", price: Money(currency: "EU", value: 1)),
-            Product(name: "p2", price: Money(currency: "EU", value: 1)),
-            Product(name: "p3", price: Money(currency: "EU", value: 1)),
-            Product(name: "p4", price: Money(currency: "EU", value: 1)),
-            Product(name: "p5", price: Money(currency: "EU", value: 1)),
-            Product(name: "p6", price: Money(currency: "EU", value: 1)),
-            Product(name: "p7", price: Money(currency: "EU", value: 1)),
-            Product(name: "p8", price: Money(currency: "EU", value: 1)),
-            Product(name: "p9", price: Money(currency: "EU", value: 1)),
+            Product(name: "p1", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p2", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p3", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p4", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p5", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p6", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p7", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p8", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(name: "p9", price: Money(currency: "EU", value: 1), status: Status.available),
           ]
       );
 

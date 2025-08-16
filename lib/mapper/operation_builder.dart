@@ -1,5 +1,4 @@
 
-import 'package:velix/mapper/json.dart';
 import 'package:velix/util/collections.dart';
 
 import 'mapper.dart';

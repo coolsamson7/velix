@@ -587,9 +587,6 @@ class TargetNode {
   }
 
   MapperProperty mapDeep(Mapper mapper, Accessor source, Accessor target, MapperProperty targetProperty) {
-    var sourceType = source.type;
-    var targetType = target.type;
-
     var isSourceMultiValued = source.isContainer();
     var isTargetMultiValued = target.isContainer();
 
@@ -597,36 +594,15 @@ class TargetNode {
       throw MapperException("relations must have the same cardinality");
 
     if (isSourceMultiValued) {
-      Type sourceType = dynamic;
-      Type targetType = dynamic;
-
-      if (source is PropertyAccessor)
-        sourceType = (source as PropertyAccessor).field.elementType!;
-      else if (source is JSONAccessor) {
-        sourceType = Map<String,dynamic>;
-      }
-      else {
-        print("m");
-      }
-
-      if (target is PropertyAccessor)
-        targetType = (target as PropertyAccessor).field.elementType!;
-      else if (target is JSONAccessor) {
-        targetType = Map<String,dynamic>;
-      }
-      else {
-        print("m");
-      }
-
       return MapList2List(
           mapper: mapper,
-          sourceType: sourceType,
-          targetType: targetType,
+          sourceType: source.getElementType(),
+          targetType:  target.getElementType(),
           property: targetProperty,
           factory: target.getContainerConstructor()!);
     }
     else {
-      return MapDeep(mapper: mapper, sourceType: sourceType, targetProperty: targetProperty);
+      return MapDeep(mapper: mapper, sourceType: source.type, targetProperty: targetProperty);
     }
   }
 

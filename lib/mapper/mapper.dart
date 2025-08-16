@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import '../validation/validation.dart';
 import 'operation_builder.dart';
 import 'transformer.dart';
 import '../reflectable/reflectable.dart';
@@ -158,16 +159,19 @@ class PropertyProperty extends MapperProperty {
 }
 
 class ValidatingPropertyProperty extends PropertyProperty {
+  // instance data
+
+  final AbstractType type;
+
   // constructor
 
-  ValidatingPropertyProperty({required super.field});
+  ValidatingPropertyProperty({required super.field}) : type = field.type;
 
   // override
 
-
   @override
   void set(dynamic instance, dynamic value, MappingContext context) {
-    this.field.type.validate(value);
+    type.validate(value);
 
     setter!(instance, value);
   }
@@ -176,12 +180,12 @@ class ValidatingPropertyProperty extends PropertyProperty {
 
   @override
   Type getType() {
-    return this.field.type.type;
+    return type.type;
   }
 
   @override
   void validate(dynamic value) {
-    this.field.type.validate(value);
+    type.validate(value);
   }
 }
 
@@ -206,6 +210,10 @@ abstract class Accessor {
 
   bool isContainer() {
     return getContainerConstructor() != null;
+  }
+
+  Type getElementType() {
+    return type; // ?
   }
 
   Function? getContainerConstructor() {
@@ -321,6 +329,11 @@ class PropertyAccessor extends Accessor {
   @override
   Function? getContainerConstructor() {
     return field.factoryConstructor;
+  }
+
+  @override
+  Type getElementType() {
+    return field.elementType!;
   }
 
   @override
@@ -917,7 +930,7 @@ class Mapper {
       mapping.transformTarget(source, target, context);
 
       if ( lazyCreate ) {
-        target =  context.currentState!.result;
+        target = context.currentState!.result;
 
         context.remember(source, target);
       }

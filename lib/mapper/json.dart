@@ -71,6 +71,11 @@ class JSONAccessor extends Accessor {
   }
 
   @override
+  Type getElementType() {
+    return  Map<String,dynamic>;
+  }
+
+  @override
   void resolve(Type type, bool write) {
   }
 }
@@ -127,7 +132,7 @@ class JSONProperty extends MapperProperty {
   // override
 
   @override
-  dynamic get(dynamic instance, MappingContext context) {
+  dynamic get(instance, MappingContext context) {
     dynamic value = (instance as Map)[name];
 
     if ( value == null) {

@@ -18,7 +18,7 @@ class Money {
   @Attribute(type: "maxLength 7")
   @Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
   final String currency;
-  @Json(name: "currency", includeNull: true, required: true, defaultValue: 1, ignore: false)
+  @Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
   @Attribute(type: "greaterThan 0")
   final int value;
 
@@ -26,6 +26,7 @@ class Money {
 }
 
 @Dataclass()
+@JsonSerializable(includeNull: true)
 class Mutable {
   // instance data
 
@@ -33,10 +34,29 @@ class Mutable {
   String id;
   @Attribute()
   Money price;
+  @Attribute()
+  @Json(name: "date-time")
+  DateTime? dateTime;
 
   // constructor
 
-  Mutable({required this.id, required this.price});
+  Mutable({required this.id, required this.price, required this.dateTime});
+}
+
+@Dataclass()
+class Product {
+  final String name;
+  final Money price;
+
+  Product({required this.name, required this.price});
+}
+
+@Dataclass()
+class Invoice {
+  final DateTime date;
+  final List<Product> products;
+
+  Invoice({required this.products, required this.date});
 }
 
 @Dataclass()

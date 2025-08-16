@@ -47,6 +47,7 @@ void main() {
       var mapper = Mapper([
         mapping<Mutable,Mutable>()
             .map(from: "id", to: "id")
+            .map(from: "dateTime", to: "dateTime")
             .map(from: path("price", "currency"), to: path("price", "currency"))
             .map(from: path("price", "value"), to: path("price", "value"))
             .finalize((s, t) => t.id = s.id)

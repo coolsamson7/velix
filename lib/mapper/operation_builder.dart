@@ -626,6 +626,8 @@ class TargetNode {
     var writeProperty = accessor.makeTransformerProperty(requiresWrite) ;// property, constant or synchronizer
 
     if (parent!.resultDefinition != null) {
+      parent!.resultDefinition!.missing -= 1;
+
       writeProperty = SetResultArgument(
         resultDefinition: parent!.resultDefinition!,
         index: accessor.index,
@@ -686,7 +688,7 @@ class TargetNode {
   }
 
   void insertMatch(TargetTree tree, Match match, int index) {
-    TargetNode? root = findElement(children, (child) => child.accessor == match.paths[0][index]);
+    TargetNode? root = findElement(children, (child) => child.accessor == match.paths[1][index]);
 
     if (root == null) {
       children.add(root = tree.makeNode(

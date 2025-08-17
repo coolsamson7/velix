@@ -70,8 +70,6 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   void addDependency(GeneratorElement element) {
     dependencies.add(element);
-
-    element.generateVariable = true;
   }
 
   void generate(TypeBuilder builder, StringBuffer buffer) {
@@ -110,7 +108,11 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
       final superElement = superType.element;
 
       if (superElement != null && isDataclass(superElement)) {
-        addDependency(builder.checkElement(superElement));
+        var element = builder.checkElement(superElement);
+
+        element.generateVariable = true;
+
+        addDependency(element);
       }
     }
 
@@ -213,8 +215,12 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     if ( annotations.isNotEmpty ) {
       tab().writeln("annotations: [").indent(1);
 
+      int len = annotations.length;
+      int i = 0;
       for (final annotation in annotations) {
-        tab().write(annotation.substring(1)).writeln(",");
+        tab().write(annotation.substring(1)).writeln(i < len-1 ? "," : "");
+
+        i++;
       }
 
       indent(-1).tab().writeln("],");
@@ -304,9 +310,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       if (!ctor.isFactory && ctor.isPublic) {
         writeln("[").indent(1);
 
+        int len = ctor.parameters.length;
+        int i = 0;
         for (final param in ctor.parameters) {
           final name = param.name;
-          final typeStr = param.type.getDisplayString();
+          final typeStr = param.type.getDisplayString(withNullability: false);
           final isNamed = param.isNamed;
           final isRequired = param.isRequiredNamed || param.isRequiredPositional;
           final isNullable = param.isOptional || param.isOptionalNamed;
@@ -326,7 +334,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           if ( !isRequired)
             write(", defaultValue: $defaultValue");
 
-          writeln("),");
+          write(")").writeln(i < len-1 ? ", " : "");
+
+          i++;
         }
 
         indent(-1).tab().writeln("],");
@@ -334,7 +344,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
-  void generateField(String className, FieldElement field) {
+  void generateField(String className, FieldElement field, bool last) {
     final name = field.name;
     final type = field.type.getDisplayString(withNullability: false);
 
@@ -352,7 +362,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     final elementType = getElementType(field);
     if (elementType != null) {
-      final elementTypeName = elementType.getDisplayString();
+      final elementTypeName = elementType.getDisplayString(withNullability: false);
 
       tab().writeln("elementType: $elementTypeName,");
       tab().writeln("factoryConstructor: () => <$elementTypeName>[],");
@@ -370,17 +380,19 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if ( isNullable )
       tab().writeln("isNullable: true");
 
-    indent(-1).tab().writeln('),');
+    indent(-1).tab().write(')').writeln(last ? "" : ", ");
   }
 
   void generateFields(ClassElement element) {
     tab().writeln("fields: [").indent(1);
 
+    int len = element.fields.length;
+    int i = 0;
     for (final field in element.fields) {
-      if (field.isStatic || field.isPrivate)
-        continue;
+      if (!field.isStatic && !field.isPrivate)
+        generateField(element.name, field, i == len - 1);
 
-      generateField(element.name, field);
+      i++;
     } // for
 
     indent(-1).tab().writeln("]");
@@ -402,7 +414,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       final paramsBuffer = StringBuffer();
 
       for (final param in firstCtor.parameters) {
-        var paramType = param.type.getDisplayString();
+        var paramType = param.type.getDisplayString(withNullability: false);
         final paramName = param.name;
 
         // Use param.defaultValueCode or default literal for some common types if null
@@ -492,7 +504,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     var superClass = getSuperclass(element);
     if ( superClass != null) {
-      tab().writeln("superClass: '${superClass}Descriptor',");
+      tab().writeln("superClass: ${superClass}Descriptor,");
     }
 
     generateAnnotations(element);

@@ -314,7 +314,7 @@ class TypeDescriptor<T> {
 
 // some convenience functions for the generator
 
-void type<T>({
+TypeDescriptor<T> type<T>({
   required String name,
   required Constructor<T> constructor,
   required List<ConstructorParameter> params,
@@ -322,15 +322,15 @@ void type<T>({
   TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
+  return TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }
 
-void enumeration<T extends Enum>({
+TypeDescriptor<T> enumeration<T extends Enum>({
   required String name,
   required List<T> values,
   List<Object>? annotations,
 }) {
-  TypeDescriptor<T>(name: name, constructor: () => null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  return TypeDescriptor<T>(name: name, constructor: () => null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
 ConstructorParameter param<T>(String name, {

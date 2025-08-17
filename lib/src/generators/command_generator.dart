@@ -96,7 +96,7 @@ class CommandGenerator extends Generator {
         if (iconObj != null && !iconObj.isNull) {
           final  dartObj = iconObj.objectValue;
 
-          if (dartObj.variable != null) {
+          if (dartObj.variable2 != null) {
             // This works only if using analyzer >= 6.0.0 — otherwise need a cast
             final variable = dartObj.variable2!;
             final iconName = variable.name3; // add

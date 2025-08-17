@@ -24,7 +24,7 @@ Uri? getSourceUri(ClassElement2 element) {
 
 bool hasAnnotationByName(ClassElement2 element, String annotationName) {
   return element.metadata2.annotations.any((annotation) {
-    final name = annotation.element?.enclosingElement3?.name;
+    final name = annotation.element?.enclosingElement?.name;
     // For a simple annotation like @Foo, name is 'Foo'.
     // If unresolved it can be null, so check safe.
     return name == annotationName;

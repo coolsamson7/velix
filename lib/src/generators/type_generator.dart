@@ -48,7 +48,7 @@ abstract class GeneratorElement<T extends InterfaceElement2> {
 
   void collectAnnotationImports(List<ElementAnnotation> metadata, TypeBuilder builder) {
     for (final annotation in metadata) {
-      final libUri = annotation.element?.library?.source.uri;
+      final libUri = annotation.element?.library?.uri;
       if (libUri != null) {
         builder.addImport(libUri);
       }

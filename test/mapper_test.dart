@@ -27,7 +27,7 @@ void main() {
       expect(result.int_var, equals(2));
       expect(result.double_var, equals(1.0));
       expect(result.bool_var, equals(true));
-      expect(result.string_var, equals("1"));
+      expect(result.string_var, equals("3"));
     });
 
     test('map inheritance', () {

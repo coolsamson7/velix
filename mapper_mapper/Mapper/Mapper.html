@@ -54,8 +54,9 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">Mapper</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="-param-definitions"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mapper_mapper/MappingDefinition-class.html">MappingDefinition</a></span>&gt;</span></span> <span class="parameter-name">definitions</span></span></li>
-</ol>)
+      <span class="name ">Mapper</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="-param-definitions"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mapper_mapper/MappingDefinition-class.html">MappingDefinition</a></span>&gt;</span></span> <span class="parameter-name">definitions</span>, {</span></li>
+<li><span class="parameter" id="-param-config"><span class="type-annotation"><a href="../../mapper_mapper/MapperConfig.html">MapperConfig</a>?</span> <span class="parameter-name">config</span>, </span></li>
+</ol>})
     </section>
     
 
@@ -63,11 +64,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Mapper(List&lt;MappingDefinition&gt; definitions) {
-  mappingDefinitions = definitions;
-
+  <pre class="language-dart"><code class="language-dart">Mapper(List&lt;MappingDefinition&gt; definitions, {MapperConfig? config}) :mappingDefinitions = definitions {
   for (var definition in mappingDefinitions) {
     registerMapping(definition.createMapping(this));
+  }
+
+  if ( config != null) {
+    checkCycles = config.checkCycles;
   }
 }</code></pre>
 </section>
@@ -97,7 +100,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

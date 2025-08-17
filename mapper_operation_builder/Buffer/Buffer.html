@@ -65,12 +65,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) {
+  <pre class="language-dart"><code class="language-dart">Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) : constructor = definition.constructor, valueReceiver = definition.valueReceiver {
   if ( constructorArgs == 0) {
-    result = definition.constructor();
+    result = constructor();
   }
-
-  arguments = {};
 }</code></pre>
 </section>
 
@@ -99,7 +97,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

@@ -69,7 +69,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Converter tryConvert(Type sourceType, Type targetType) {
-  var conversion = TypeConversionTable.getConverter(sourceType, targetType);
+  var conversion = Mapper.typeConversions.getConverter(sourceType, targetType);
 
   if ( conversion != null)
     return conversion;
@@ -103,7 +103,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

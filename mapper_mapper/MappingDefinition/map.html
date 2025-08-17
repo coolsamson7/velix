@@ -60,6 +60,7 @@
 <li><span class="parameter" id="map-param-all"><span class="type-annotation"><a href="../../mapper_mapper/PropertyQualifier-class.html">PropertyQualifier</a>?</span> <span class="parameter-name">all</span>, </span></li>
 <li><span class="parameter" id="map-param-to"><span class="type-annotation">dynamic</span> <span class="parameter-name">to</span>, </span></li>
 <li><span class="parameter" id="map-param-deep"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deep</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="map-param-validate"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">validate</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="map-param-convert"><span class="type-annotation"><a href="../../mapper_mapper/Convert-class.html">Convert</a>?</span> <span class="parameter-name">convert</span>, </span></li>
 </ol>})
 
@@ -81,13 +82,16 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MappingDefinition&lt;S,T&gt; map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, Convert? convert}) {
+  <pre class="language-dart"><code class="language-dart">MappingDefinition&lt;S,T&gt; map({dynamic constant, dynamic from, PropertyQualifier? all, dynamic to,  bool deep = false, bool validate = false, Convert? convert}) {
   if ( all != null) {
     operations.add(MapProperties(qualifier: all, converter: convert, deep: deep));
   }
   else {
     List&lt;Accessor&gt; fromAccessors = [];
     List&lt;Accessor&gt; toAccessors = [];
+
+    if ( from is Accessor)
+      fromAccessors.add(from);
 
     if ( from is String)
       fromAccessors.add(PropertyAccessor(name: from));
@@ -98,8 +102,11 @@
     if ( constant != null)
       fromAccessors.add(ConstantAccessor(value: constant));
 
+    if ( to is Accessor)
+      toAccessors.add(to);
+
     if ( to is String)
-      toAccessors.add(PropertyAccessor(name: to));
+      toAccessors.add(PropertyAccessor(name: to, validate: validate));
 
     if (to is List&lt;String&gt;)
       toAccessors = (to).map((element) =&gt; PropertyAccessor(name: element)).toList(growable: false);
@@ -143,7 +150,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

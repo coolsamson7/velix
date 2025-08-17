@@ -68,6 +68,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">ValueReceiver computeValueReceiver() {
   if (parent?.resultDefinition != null) {
+    parent?.resultDefinition!.missing -= 1;
+
     return SetResultPropertyValueReceiver(
         resultIndex: parent!.resultDefinition!.index,
         prop: Symbol(accessor.name),
@@ -107,7 +109,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

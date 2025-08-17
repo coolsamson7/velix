@@ -70,6 +70,13 @@
   <pre class="language-dart"><code class="language-dart">Mapping&lt;S,T&gt; createMapping(Mapper mapper) {
   var result = createOperations(mapper);
 
+  &#47;&#47; validate
+
+  for ( var intermediateResult in intermediateResultDefinitions)
+    if ( intermediateResult.missing &gt; 0) {
+      throw MapperException(&quot;${ intermediateResult.typeDescriptor.type} misses ${intermediateResult.missing} arguments&quot;);
+    }
+
   return Mapping&lt;S,T&gt;(
       mapper: mapper,
       definition: this,
@@ -107,7 +114,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

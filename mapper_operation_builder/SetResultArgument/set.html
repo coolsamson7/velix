@@ -82,6 +82,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void set(dynamic instance, dynamic value, MappingContext context) {
+  property.validate(value); &#47;&#47; hmm...maybe we can optimize that
+
   context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, context);
 }</code></pre>
 </section>
@@ -111,7 +113,7 @@ void set(dynamic instance, dynamic value, MappingContext context) {
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

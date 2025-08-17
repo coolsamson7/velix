@@ -68,7 +68,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Operation&lt;MappingContext&gt;  makeOperation(SourceNode sourceNode, Mapper mapper) {
+  <pre class="language-dart"><code class="language-dart">Operation&lt;MappingContext&gt; makeOperation(SourceNode sourceNode, Mapper mapper) {
   var sourceProperty = sourceNode.fetchProperty!;
 
   var deep = match!.deep;
@@ -81,6 +81,8 @@
   var writeProperty = accessor.makeTransformerProperty(requiresWrite) ;&#47;&#47; property, constant or synchronizer
 
   if (parent!.resultDefinition != null) {
+    parent!.resultDefinition!.missing -= 1;
+
     writeProperty = SetResultArgument(
       resultDefinition: parent!.resultDefinition!,
       index: accessor.index,
@@ -90,7 +92,7 @@
   }
 
   if ( deep )
-    writeProperty = mapDeep(sourceNode.accessor, accessor, writeProperty);
+    writeProperty = mapDeep(mapper, sourceNode.accessor, accessor, writeProperty);
   else
     writeProperty = maybeConvert(writeProperty, conversion);
 
@@ -123,7 +125,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

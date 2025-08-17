@@ -87,7 +87,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="MapDeep.new" class="callable">
-          <span class="name"><a href="../mapper_operation_builder/MapDeep/MapDeep.html">MapDeep.new</a></span><span class="signature">({<span class="parameter" id="-param-targetProperty"><span>required</span> <span class="type-annotation"><a href="../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span> <span class="parameter-name">targetProperty</span></span>})</span>
+          <span class="name"><a href="../mapper_operation_builder/MapDeep/MapDeep.html">MapDeep.new</a></span><span class="signature">({<span class="parameter" id="-param-mapper"><span>required</span> <span class="type-annotation"><a href="../mapper_mapper/Mapper-class.html">Mapper</a></span> <span class="parameter-name">mapper</span>, </span><span class="parameter" id="-param-sourceType"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceType</span>, </span><span class="parameter" id="-param-targetProperty"><span>required</span> <span class="type-annotation"><a href="../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span> <span class="parameter-name">targetProperty</span></span>})</span>
         </dt>
         <dd>
           
@@ -112,6 +112,30 @@
 
 </dd>
 
+        <dt id="mapper" class="property">
+  <span class="name"><a href="../mapper_operation_builder/MapDeep/mapper.html">mapper</a></span>
+  <span class="signature">&#8594; <a href="../mapper_mapper/Mapper-class.html">Mapper</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="mapping" class="property">
+  <span class="name"><a href="../mapper_operation_builder/MapDeep/mapping.html">mapping</a></span>
+  <span class="signature">&#8596; <a href="../mapper_mapper/Mapping-class.html">Mapping</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="runtimeType" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
@@ -124,15 +148,27 @@
 
 </dd>
 
-        <dt id="targetProperty" class="property">
-  <span class="name"><a href="../mapper_operation_builder/MapDeep/targetProperty.html">targetProperty</a></span>
-  <span class="signature">&#8596; <a href="../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span>
+        <dt id="sourceType" class="property">
+  <span class="name"><a href="../mapper_operation_builder/MapDeep/sourceType.html">sourceType</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
   
 
 </dt>
 <dd>
   
-  <div class="features"><span class="feature">getter/setter pair</span></div>
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="targetProperty" class="property">
+  <span class="name"><a href="../mapper_operation_builder/MapDeep/targetProperty.html">targetProperty</a></span>
+  <span class="signature">&#8594; <a href="../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 
@@ -210,6 +246,19 @@
 
 </dd>
 
+        <dt id="validate" class="callable inherited">
+  <span class="name"><a href="../mapper_operation_builder/MapperProperty/validate.html">validate</a></span><span class="signature">(<wbr><span class="parameter" id="validate-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
     </dl>
   </section>
     
@@ -260,7 +309,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

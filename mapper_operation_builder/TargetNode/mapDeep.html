@@ -55,9 +55,10 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span>
-<span class="name ">mapDeep</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="mapDeep-param-source"><span class="type-annotation"><a href="../../mapper_mapper/Accessor-class.html">Accessor</a></span> <span class="parameter-name">source</span>, </span></li>
+<span class="name ">mapDeep</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="mapDeep-param-mapper"><span class="type-annotation"><a href="../../mapper_mapper/Mapper-class.html">Mapper</a></span> <span class="parameter-name">mapper</span>, </span></li>
+<li><span class="parameter" id="mapDeep-param-source"><span class="type-annotation"><a href="../../mapper_mapper/Accessor-class.html">Accessor</a></span> <span class="parameter-name">source</span>, </span></li>
 <li><span class="parameter" id="mapDeep-param-target"><span class="type-annotation"><a href="../../mapper_mapper/Accessor-class.html">Accessor</a></span> <span class="parameter-name">target</span>, </span></li>
-<li><span class="parameter" id="mapDeep-param-targetProperty"><span class="type-annotation"><a href="../../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span> <span class="parameter-name">targetProperty</span></span></li>
+<li><span class="parameter" id="mapDeep-param-targetProperty"><span class="type-annotation"><a href="../../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span> <span class="parameter-name">targetProperty</span>, </span></li>
 </ol>)
 
       
@@ -69,23 +70,24 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MapperProperty mapDeep(Accessor source, Accessor target, MapperProperty targetProperty) {
-  var sourceType = source.type;
-  var targetType = target.type;
-
-  var isSourceMultiValued = sourceType.toString().startsWith(&quot;List&lt;&quot;);
-  var isTargetMultiValued = targetType.toString().startsWith(&quot;List&lt;&quot;);
+  <pre class="language-dart"><code class="language-dart">MapperProperty mapDeep(Mapper mapper, Accessor source, Accessor target, MapperProperty targetProperty) {
+  var isSourceMultiValued = source.isContainer();
+  var isTargetMultiValued = target.isContainer();
 
   if (isSourceMultiValued != isTargetMultiValued)
     throw MapperException(&quot;relations must have the same cardinality&quot;);
 
-  PropertyAccessor propertyAccessor = target as PropertyAccessor;
-
-
-  if (isSourceMultiValued)
-    return MapList2List(sourceType: sourceType, targetType: targetType, property: targetProperty, factory:  propertyAccessor.field.factoryConstructor!);
-  else
-    return MapDeep(targetProperty: targetProperty);
+  if (isSourceMultiValued) {
+    return MapList2List(
+        mapper: mapper,
+        sourceType: source.getElementType(),
+        targetType:  target.getElementType(),
+        property: targetProperty,
+        factory: target.getContainerConstructor()!);
+  }
+  else {
+    return MapDeep(mapper: mapper, sourceType: source.type, targetProperty: targetProperty);
+  }
 }</code></pre>
 </section>
 
@@ -114,7 +116,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

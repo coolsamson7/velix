@@ -40,20 +40,31 @@
   </button>
 </header>
 <main>
-  <div id="dartdoc-main-content" class="main-content">
-    <h1>404: Something's gone wrong :-(</h1>
-    <section class="desc">
-      <p>You've tried to visit a page that doesn't exist.  Luckily this site
-         has other <a href="index.html">pages</a>.</p>
-      <p>If you were looking for something specific, try searching:
+<div id="dartdoc-main-content" class="main-content">
+  <h1>404: Something's gone wrong :-(</h1>
+  <section class="desc">
+    <p>
+      You've tried to visit a page that doesn't exist. Luckily this site has
+      other <a href="index.html">pages</a>.
+    </p>
+    <div>
+      If you were looking for something specific, try searching:
       <form class="search-body" role="search">
-        <input type="text" id="search-body" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+        <input
+          type="text"
+          id="search-body"
+          autocomplete="off"
+          disabled
+          class="form-control typeahead"
+          placeholder="Loading search..."
+        />
       </form>
-      </p>
-    </section>
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+    </div>
+  </section>
+</div>
+<!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -63,8 +74,11 @@
     <li><a href="https://github.com/coolsamson7/velix">velix package</a></li>
 </ol>
 
-    <h5><span class="package-name">velix</span> <span class="package-kind">package</span></h5>
-    <ol>
+  <h5>
+    <span class="package-name">velix</span>
+    <span class="package-kind">package</span>
+  </h5>
+  <ol>
       <li class="section-title">Libraries</li>
       <li><a href="commands_command/">commands/command</a></li>
       <li><a href="components_command_button/">components/command_button</a></li>
@@ -77,6 +91,7 @@
       <li><a href="databinding_text_adapter/">databinding/text_adapter</a></li>
       <li><a href="databinding_valued_widget/">databinding/valued_widget</a></li>
       <li><a href="i18n_i18n/">i18n/i18n</a></li>
+      <li><a href="mapper_json/">mapper/json</a></li>
       <li><a href="mapper_mapper/">mapper/mapper</a></li>
       <li><a href="mapper_operation_builder/">mapper/operation_builder</a></li>
       <li><a href="mapper_transformer/">mapper/transformer</a></li>
@@ -86,14 +101,13 @@
       <li><a href="velix/">velix</a></li>
 </ol>
 
-  </div>
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
-  </div>
+</div>
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right"></div>
 </main>
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

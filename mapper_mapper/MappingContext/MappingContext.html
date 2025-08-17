@@ -63,7 +63,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MappingContext({required this.mapper});</code></pre>
+  <pre class="language-dart"><code class="language-dart">MappingContext({required this.mapper}) {
+  if ( mapper.checkCycles )
+    mappedObjects = Map.identity();
+}</code></pre>
 </section>
 
 
@@ -91,7 +94,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

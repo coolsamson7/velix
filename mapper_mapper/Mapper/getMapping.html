@@ -55,8 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../mapper_mapper/Mapping-class.html">Mapping</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span></span>
-<span class="name ">getMapping</span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getMapping-param-sourceClass"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceClass</span></span></li>
-</ol>)
+<span class="name ">getMapping</span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;(<wbr>)
 
       
 
@@ -67,8 +66,14 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Mapping&lt;S,T&gt; getMapping&lt;S,T&gt;(Type sourceClass) {
-  return mappings[sourceClass] as Mapping&lt;S,T&gt;;
+  <pre class="language-dart"><code class="language-dart">Mapping&lt;S,T&gt; getMapping&lt;S,T&gt;() {
+  var key = MappingKey(source: S, target: T);
+  var mapping = mappings[key];
+  if (mapping == null) {
+    throw MapperException(&#39;No mapping found for &lt;$S, $T&gt;&#39;);
+  }
+
+  return mapping as Mapping&lt;S,T&gt;;
 }</code></pre>
 </section>
 
@@ -97,7 +102,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

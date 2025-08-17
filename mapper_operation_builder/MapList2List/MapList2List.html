@@ -54,7 +54,8 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">MapList2List</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-sourceType"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceType</span>, </span></li>
+      <span class="name ">MapList2List</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-mapper"><span>required</span> <span class="type-annotation"><a href="../../mapper_mapper/Mapper-class.html">Mapper</a></span> <span class="parameter-name">mapper</span>, </span></li>
+<li><span class="parameter" id="-param-sourceType"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceType</span>, </span></li>
 <li><span class="parameter" id="-param-targetType"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">targetType</span>, </span></li>
 <li><span class="parameter" id="-param-property"><span>required</span> <span class="type-annotation"><a href="../../mapper_operation_builder/MapperProperty-class.html">MapperProperty</a></span> <span class="parameter-name">property</span>, </span></li>
 <li><span class="parameter" id="-param-factory"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a></span> <span class="parameter-name">factory</span>, </span></li>
@@ -66,7 +67,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MapList2List({required this.sourceType, required this.targetType, required this.property, required this.factory});</code></pre>
+  <pre class="language-dart"><code class="language-dart">MapList2List({required this.mapper, required this.sourceType, required this.targetType, required this.property, required this.factory}) {
+  &#47;&#47;mapping = mapper.getMappingX(sourceType, targetType);
+}</code></pre>
 </section>
 
 
@@ -94,7 +97,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

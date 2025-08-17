@@ -84,10 +84,13 @@
 void set(dynamic instance, dynamic value, MappingContext context) {
   if (value != null) {
     var list = value as List;
+    var len = list.length;
     var result = factory();
 
-    for (var element in list) {
-      result.add(context.mapper.map(element, context: context));
+    var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetType)); &#47;&#47; TODO...
+
+    for (var i = 0; i &lt; len; i++) {
+      result.add(mapper.map(list[i], context: context, mapping: m));
     }
 
     property.set(instance, result, context);
@@ -120,7 +123,7 @@ void set(dynamic instance, dynamic value, MappingContext context) {
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

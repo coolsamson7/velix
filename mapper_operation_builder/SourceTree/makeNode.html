@@ -70,7 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">SourceNode makeNode(SourceNode? parent, Accessor step, Match? match) {
-  step.resolve(parent?.accessor.type ??  type, false);
+  step.resolve(parent?.accessor.type ?? type, false);
 
   return SourceNode(accessor: step, parent: parent, match: match);
 }</code></pre>
@@ -101,7 +101,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

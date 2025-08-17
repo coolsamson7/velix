@@ -61,7 +61,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="Mapper.new" class="callable">
-          <span class="name"><a href="../mapper_mapper/Mapper/Mapper.html">Mapper.new</a></span><span class="signature">(<span class="parameter" id="-param-definitions"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mapper_mapper/MappingDefinition-class.html">MappingDefinition</a></span>&gt;</span></span> <span class="parameter-name">definitions</span></span>)</span>
+          <span class="name"><a href="../mapper_mapper/Mapper/Mapper.html">Mapper.new</a></span><span class="signature">(<span class="parameter" id="-param-definitions"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mapper_mapper/MappingDefinition-class.html">MappingDefinition</a></span>&gt;</span></span> <span class="parameter-name">definitions</span>, {</span><span class="parameter" id="-param-config"><span class="type-annotation"><a href="../mapper_mapper/MapperConfig.html">MapperConfig</a>?</span> <span class="parameter-name">config</span></span>})</span>
         </dt>
         <dd>
           
@@ -74,6 +74,18 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="checkCycles" class="property">
+  <span class="name"><a href="../mapper_mapper/Mapper/checkCycles.html">checkCycles</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -100,7 +112,7 @@
 
         <dt id="mappings" class="property">
   <span class="name"><a href="../mapper_mapper/Mapper/mappings.html">mappings</a></span>
-  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="../mapper_mapper/Mapping-class.html">Mapping</a></span>&gt;</span></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mapper_mapper/MappingKey-class.html">MappingKey</a></span>, <span class="type-parameter"><a href="../mapper_mapper/Mapping-class.html">Mapping</a></span>&gt;</span></span>
   
 
 </dt>
@@ -145,7 +157,7 @@
 </dd>
 
         <dt id="getMapping" class="callable">
-  <span class="name"><a href="../mapper_mapper/Mapper/getMapping.html">getMapping</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="getMapping-param-sourceClass"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceClass</span></span>)
+  <span class="name"><a href="../mapper_mapper/Mapper/getMapping.html">getMapping</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Mapping-class.html">Mapping</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span></span>
   </span>
   
@@ -157,8 +169,21 @@
 
 </dd>
 
+        <dt id="getMappingX" class="callable">
+  <span class="name"><a href="../mapper_mapper/Mapper/getMappingX.html">getMappingX</a></span><span class="signature">(<wbr><span class="parameter" id="getMappingX-param-source"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">source</span>, </span><span class="parameter" id="getMappingX-param-target"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">target</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Mapping-class.html">Mapping</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="map" class="callable">
-  <span class="name"><a href="../mapper_mapper/Mapper/map.html">map</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="map-param-source"><span class="type-annotation">S</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="map-param-context"><span class="type-annotation"><a href="../mapper_mapper/MappingContext-class.html">MappingContext</a>?</span> <span class="parameter-name">context</span></span>})
+  <span class="name"><a href="../mapper_mapper/Mapper/map.html">map</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="map-param-source"><span class="type-annotation">S</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="map-param-context"><span class="type-annotation"><a href="../mapper_mapper/MappingContext-class.html">MappingContext</a>?</span> <span class="parameter-name">context</span>, </span><span class="parameter" id="map-param-mapping"><span class="type-annotation"><a href="../mapper_mapper/Mapping-class.html">Mapping</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">mapping</span></span>})
     <span class="returntype parameter">&#8594; T?</span>
   </span>
   
@@ -237,6 +262,23 @@
     </dl>
   </section>
     
+  <section class="summary offset-anchor" id="static-properties">
+    <h2>Static Properties</h2>
+    <dl class="properties">
+        <dt id="typeConversions" class="property">
+  <span class="name"><a href="../mapper_mapper/Mapper/typeConversions.html">typeConversions</a></span>
+  <span class="signature">&#8596; <a href="../mapper_mapper/TypeConversions-class.html">TypeConversions</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+    </dl>
+  </section>
     
     
 
@@ -263,7 +305,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

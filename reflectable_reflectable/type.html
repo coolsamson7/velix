@@ -54,11 +54,13 @@
 
     <section class="multi-line-signature">
         
-<span class="returntype">void</span>
+<span class="returntype"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
 <span class="name ">type</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
 <li><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span></li>
 <li><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span></li>
 <li><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span></li>
+<li><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span></li>
+<li><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span>, </span></li>
 </ol>})
 
         
@@ -70,13 +72,15 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void type&lt;T&gt;({
+  <pre class="language-dart"><code class="language-dart">TypeDescriptor&lt;T&gt; type&lt;T&gt;({
   required String name,
   required Constructor&lt;T&gt; constructor,
   required List&lt;ConstructorParameter&gt; params,
-  required List&lt;FieldDescriptor&gt; fields
+  required List&lt;FieldDescriptor&gt; fields,
+  TypeDescriptor? superClass,
+  List&lt;Object&gt;? annotations,
 }) {
-  TypeDescriptor.register(TypeDescriptor&lt;T&gt;(name: name, constructor: constructor, constructorParameters: params, fields: fields));
+  return TypeDescriptor&lt;T&gt;(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }</code></pre>
 </section>
 
@@ -104,7 +108,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

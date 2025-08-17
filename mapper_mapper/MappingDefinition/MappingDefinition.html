@@ -54,7 +54,9 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">MappingDefinition&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span>(<wbr>)
+      <span class="name ">MappingDefinition&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-sourceClass"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">sourceClass</span>, </span></li>
+<li><span class="parameter" id="-param-targetClass"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">targetClass</span>, </span></li>
+</ol>})
     </section>
     
 
@@ -62,10 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MappingDefinition() {
-  this.sourceClass = S;
-  this.targetClass = T;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">MappingDefinition({Type? sourceClass, Type? targetClass}) : sourceClass = sourceClass ?? S,targetClass = targetClass ?? T;</code></pre>
 </section>
 
 
@@ -93,7 +92,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

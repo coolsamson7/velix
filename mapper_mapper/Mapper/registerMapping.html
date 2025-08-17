@@ -68,7 +68,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void registerMapping(Mapping mapping) {
-  mappings[mapping.definition.sourceClass] = mapping;
+  mappings[MappingKey(source: mapping.definition.sourceClass, target: mapping.definition.targetClass)] = mapping;
 }</code></pre>
 </section>
 
@@ -97,7 +97,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

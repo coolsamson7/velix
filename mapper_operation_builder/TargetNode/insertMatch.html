@@ -70,7 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void insertMatch(TargetTree tree, Match match, int index) {
-  TargetNode? root = findElement(children, (child) =&gt; child.accessor == match.paths[0][index]);
+  TargetNode? root = findElement(children, (child) =&gt; child.accessor == match.paths[1][index]);
 
   if (root == null) {
     children.add(root = tree.makeNode(
@@ -111,7 +111,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

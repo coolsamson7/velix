@@ -57,6 +57,7 @@
 <span class="returntype">T?</span>
 <span class="name ">map</span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list"> <li><span class="parameter" id="map-param-source"><span class="type-annotation">S</span> <span class="parameter-name">source</span>, {</span></li>
 <li><span class="parameter" id="map-param-context"><span class="type-annotation"><a href="../../mapper_mapper/MappingContext-class.html">MappingContext</a>?</span> <span class="parameter-name">context</span>, </span></li>
+<li><span class="parameter" id="map-param-mapping"><span class="type-annotation"><a href="../../mapper_mapper/Mapping-class.html">Mapping</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">mapping</span>, </span></li>
 </ol>})
 
       
@@ -75,11 +76,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T? map&lt;S,T&gt;(S source, {MappingContext? context}) {
+  <pre class="language-dart"><code class="language-dart">T? map&lt;S,T&gt;(S source, {MappingContext? context, Mapping&lt;S,T&gt;? mapping}) {
   if ( source == null)
     return null;
 
-  Mapping&lt;S,T&gt; mapping = getMapping&lt;S,T&gt;(source.runtimeType);
+  mapping = mapping ?? getMapping&lt;S,T&gt;();
 
   context ??= MappingContext(mapper: this);
 
@@ -87,7 +88,7 @@
 
   var lazyCreate = false;
   if ( target == null) {
-    lazyCreate = mapping.typeDescriptor.isImmutable() || !mapping.typeDescriptor.hasDefaultConstructor();
+    lazyCreate = mapping.lazy;
     if (lazyCreate)
       target = context; &#47;&#47; we need to set something....
     else {
@@ -102,19 +103,23 @@
     mapping.transformTarget(source, target, context);
 
     if ( lazyCreate ) {
-      target =  context.currentState!.result;
+      target = context.currentState!.result;
 
-      context.remember(source, target!!);
+      context.remember(source, target);
     }
   }
   finally {
     state.restore(context);
   }
 
+  &#47;&#47; run finalizer
+
   for (Function finalizer in mapping.finalizer)
     finalizer(source, target);
 
-  return target as T;
+  &#47;&#47; done
+
+  return target;
 }</code></pre>
 </section>
 
@@ -143,7 +148,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

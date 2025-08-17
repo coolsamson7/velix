@@ -80,7 +80,7 @@
     arguments[param] = value;
 
     if ( nSuppliedArgs == constructorArgs - 1) {
-      result = Function.apply(definition.constructor, [], arguments);
+      result = Function.apply(constructor, [], arguments);
     }
   } &#47;&#47; if
   else {
@@ -88,7 +88,7 @@
   }
 
   if ( ++nSuppliedArgs == nArgs) {
-    definition.valueReceiver.receive(mappingContext, instance, result!!);
+    valueReceiver.receive(mappingContext, instance, result!);
   }
 }</code></pre>
 </section>
@@ -118,7 +118,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

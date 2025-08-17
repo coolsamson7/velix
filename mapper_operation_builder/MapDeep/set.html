@@ -82,7 +82,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void set(dynamic instance,dynamic  value, MappingContext context) {
-  targetProperty.set(instance, context.mapper.map(value, context: context), context);
+  var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetProperty.getType())); &#47;&#47; TODO
+  targetProperty.set(instance, mapper.map(value, context: context, mapping: m), context); &#47;&#47; recursive call!
 }</code></pre>
 </section>
 
@@ -111,7 +112,7 @@ void set(dynamic instance,dynamic  value, MappingContext context) {
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

@@ -76,14 +76,14 @@
 MapperProperty makeTransformerProperty(bool write) {
   if ( write ) {
     if ( field.isWriteable()) {
-      return PropertyProperty(field: field);
+      return validate ? ValidatingPropertyProperty(field: field) : PropertyProperty(field: field);
     }
     else {
       throw MapperException(&quot;${field.typeDescriptor.type}.$name is final&quot;);
     }
   }
   else {
-    return PropertyProperty(field: field);
+    return validate ? ValidatingPropertyProperty(field: field) : PropertyProperty(field: field);
   }
 }</code></pre>
 </section>
@@ -113,7 +113,7 @@ MapperProperty makeTransformerProperty(bool write) {
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

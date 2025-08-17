@@ -57,6 +57,7 @@
       <span class="name ">FieldDescriptor&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
 <li><span class="parameter" id="-param-type"><span>required</span> <span class="type-annotation"><a href="../../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">V</span>&gt;</span></span> <span class="parameter-name">type</span>, </span></li>
 <li><span class="parameter" id="-param-getter"><span>required</span> <span class="type-annotation"><a href="../../reflectable_reflectable/Getter.html">Getter</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span></span> <span class="parameter-name">getter</span>, </span></li>
+<li><span class="parameter" id="-param-annotations"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span></span> <span class="parameter-name">annotations</span>, </span></li>
 <li><span class="parameter" id="-param-elementType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">elementType</span>, </span></li>
 <li><span class="parameter" id="-param-factoryConstructor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a>?</span> <span class="parameter-name">factoryConstructor</span>, </span></li>
 <li><span class="parameter" id="-param-setter"><span class="type-annotation"><a href="../../reflectable_reflectable/Setter.html">Setter</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span>?</span> <span class="parameter-name">setter</span>, </span></li>
@@ -74,11 +75,12 @@
   required this.name,
   required this.type,
   required this.getter,
+  required this.annotations,
   this.elementType,
   this.factoryConstructor,
   this.setter,
   this.isFinal = false,
-  this.isNullable = false
+  this.isNullable = false,
 });</code></pre>
 </section>
 
@@ -107,7 +109,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

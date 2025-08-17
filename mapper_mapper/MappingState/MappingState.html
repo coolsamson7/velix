@@ -63,12 +63,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">MappingState({required this.context}) {
-  nextState = context.currentState;
-
+  <pre class="language-dart"><code class="language-dart">MappingState({required this.context}) : resultBuffers = context.resultBuffers, stack = context.stack, nextState = context.currentState {
   context.currentState = this;
-  resultBuffers = context.resultBuffers;
-  stack = context.stack;
 }</code></pre>
 </section>
 
@@ -97,7 +93,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

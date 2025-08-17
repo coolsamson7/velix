@@ -71,7 +71,9 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Mapping({required this.mapper, required this.typeDescriptor, required this.constructor, required this.stackSize, required this.intermediateResultDefinitions, required this.definition, required List&lt;Operation&lt;MappingContext&gt;&gt; operations, required this.finalizer})
-    :super(operations);</code></pre>
+    :super(operations) {
+  lazy = typeDescriptor.isImmutable() || !typeDescriptor.hasDefaultConstructor();
+}</code></pre>
 </section>
 
 
@@ -99,7 +101,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

@@ -64,11 +64,11 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="Convert.new" class="callable">
-          <span class="name"><a href="../mapper_mapper/Convert/Convert.html">Convert.new</a></span><span class="signature">(<span class="parameter" id="-param-convert"><span class="type-annotation"><a href="../mapper_mapper/Converter.html">Converter</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">convert</span></span>)</span>
+          <span class="name"><a href="../mapper_mapper/Convert/Convert.html">Convert.new</a></span><span class="signature">(<span class="parameter" id="-param-convertSource"><span class="type-annotation"><a href="../mapper_mapper/Converter.html">Converter</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">convertSource</span>, {</span><span class="parameter" id="-param-convertTarget"><span class="type-annotation"><a href="../mapper_mapper/Converter.html">Converter</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">S</span>&gt;</span>?</span> <span class="parameter-name">convertTarget</span>, </span><span class="parameter" id="-param-sourceType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">sourceType</span>, </span><span class="parameter" id="-param-targetType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">targetType</span></span>})</span>
         </dt>
         <dd>
           Create a new <a href="../mapper_mapper/Convert-class.html">Convert</a> instance
-<code>convert</code> the <a href="../mapper_mapper/Converter.html">Converter</a>
+<a href="../mapper_mapper/Convert/convert.html">convert</a> the <a href="../mapper_mapper/Converter.html">Converter</a>
         </dd>
     </dl>
   </section>
@@ -78,9 +78,21 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="convert" class="property">
-  <span class="name"><a href="../mapper_mapper/Convert/convert.html">convert</a></span>
+        <dt id="convertSource" class="property">
+  <span class="name"><a href="../mapper_mapper/Convert/convertSource.html">convertSource</a></span>
   <span class="signature">&#8594; <a href="../mapper_mapper/Converter.html">Converter</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="convertTarget" class="property">
+  <span class="name"><a href="../mapper_mapper/Convert/convertTarget.html">convertTarget</a></span>
+  <span class="signature">&#8594; <a href="../mapper_mapper/Converter.html">Converter</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">S</span>&gt;</span>?</span>
   
 
 </dt>
@@ -116,25 +128,25 @@
 
         <dt id="sourceType" class="property">
   <span class="name"><a href="../mapper_mapper/Convert/sourceType.html">sourceType</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
   
 
 </dt>
 <dd>
   
-  <div class="features"><span class="feature">no setter</span></div>
+  <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
 
         <dt id="targetType" class="property">
   <span class="name"><a href="../mapper_mapper/Convert/targetType.html">targetType</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
   
 
 </dt>
 <dd>
   
-  <div class="features"><span class="feature">no setter</span></div>
+  <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
 
@@ -147,6 +159,19 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
+        <dt id="convert" class="callable">
+  <span class="name"><a href="../mapper_mapper/Convert/convert.html">convert</a></span><span class="signature">(<wbr><span class="parameter" id="convert-param-source"><span class="type-annotation">S</span> <span class="parameter-name">source</span></span>)
+    <span class="returntype parameter">&#8594; T</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="get" class="callable">
   <span class="name"><a href="../mapper_mapper/Convert/get.html">get</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Converter.html">Converter</a></span>
@@ -170,6 +195,32 @@
 <dd class="inherited">
   Invoked when a nonexistent method or property is accessed.
   <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="sourceConverter" class="callable">
+  <span class="name"><a href="../mapper_mapper/Convert/sourceConverter.html">sourceConverter</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Converter.html">Converter</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="targetConverter" class="callable">
+  <span class="name"><a href="../mapper_mapper/Convert/targetConverter.html">targetConverter</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Converter.html">Converter</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
 
 </dd>
 
@@ -236,7 +287,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.12.0
+      0.14.1
   </span>
   
 </footer>

@@ -24,7 +24,7 @@ class Convert<S, T> {
 
   /// Create a new [Convert] instance
   /// [convert] the [Converter]
-  Convert(this.convertSource, {this.convertTarget, Type? sourceType, Type? targetType}) : this.sourceType = sourceType ?? S,  this.targetType = targetType ?? T;
+  Convert(this.convertSource, {this.convertTarget, Type? sourceType, Type? targetType}) : sourceType = sourceType ?? S,  targetType = targetType ?? T;
 
   // public
 
@@ -849,7 +849,7 @@ class MappingKey {
 
   @override
   int get hashCode {
-    int hashType(Type t) => t == dynamic ? 0 : t.hashCode;
+    //int hashType(Type t) => t == dynamic ? 0 : t.hashCode;
     return 0;//Object.hash(hashType(source), hashType(target));
   }
 }

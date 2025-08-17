@@ -30,7 +30,7 @@ class NoTranslator extends Translator {
   }
 }
 
-const Translator NO_TRANSLATOR = NoTranslator();
+const Translator noTranslator = NoTranslator();
 
 /// A [TranslationProvider] is able to translate a specific object type
 /// [T] the object type

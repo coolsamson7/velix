@@ -160,7 +160,7 @@ class CommandManager {
 
   // constructor
 
-  CommandManager({this.interceptors = const [], this.translator = NO_TRANSLATOR});
+  CommandManager({this.interceptors = const [], this.translator = noTranslator});
 
   // public
 

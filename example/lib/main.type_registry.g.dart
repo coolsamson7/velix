@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
 import 'package:sample/models/todo.dart';
 import 'package:velix/reflectable/reflectable.dart';

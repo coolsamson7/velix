@@ -87,8 +87,6 @@ void main() {
 
       var json = JSON.serialize(input);
 
-      print(json);
-
       JSON.deserialize<Invoice>(json);
 
       // serialize

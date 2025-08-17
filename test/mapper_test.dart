@@ -59,20 +59,17 @@ void main() {
 
       var source = Collections(prices: [Money(currency: "EU", value: 1)]);
 
-      var target = mapper.map(source);
+       mapper.map(source);
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
 
-      // 👇 Code to benchmark
       for (int i = 0; i < loops; i++) {
         mapper.map(source);
       }
 
       stopwatch.stop();
       print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
-
-      print(target);
 
       //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
@@ -89,20 +86,17 @@ void main() {
 
       var source = Mutable(id: '1', price: Money(currency: "EU", value: 1), dateTime: DateTime.now());
 
-      Mutable target = mapper.map(source);
+      mapper.map(source);
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
 
-      // 👇 Code to benchmark
       for (int i = 0; i < loops; i++) {
         mapper.map(source);
       }
 
       stopwatch.stop();
       print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
-
-      print(target);
 
       //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
@@ -122,8 +116,6 @@ void main() {
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
-
-      // 👇 Code to benchmark
 
       for (int i = 0; i < loops; i++) {
         mapper.map(Money(currency: "EU", value: 1));
@@ -153,8 +145,6 @@ void main() {
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
-
-      // 👇 Code to benchmark
 
       for (int i = 0; i < loops; i++) {
         mapper.map(source);

@@ -57,13 +57,13 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   // abstract
 
-  generateCode(StringBuffer buffer, bool variable);
-
-  collectDependencies(TypeBuilder builder){}
+  void generateCode(StringBuffer buffer, bool variable);
 
   // public
 
-  collectImports(TypeBuilder builder) {
+  void collectDependencies(TypeBuilder builder){}
+
+  void collectImports(TypeBuilder builder) {
     builder.addImport(element.library.uri);
 
     collectAnnotationImports(element.metadata.annotations, builder);
@@ -478,9 +478,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     // Combine positional first (no names), then named (with names)
 
-      final args = <String>[]
-        ..addAll(positionalArgs)
-        ..addAll(namedArgs);
+      final args = <String>[...positionalArgs, ...namedArgs];
 
       write(args.join(", ")).writeln("),");
     }

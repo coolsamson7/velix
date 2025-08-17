@@ -183,7 +183,7 @@ class CommandGenerator extends Generator {
 
         output.writeln('  $returnType $publicName($signature) $asyncKeyword{');
         output.writeln(
-            '    returnKeyword${awaitPrefix}execute("$publicName", [$argList]);');
+            '    $returnKeyword${awaitPrefix}execute("$publicName", [$argList]);');
         output.writeln('  }');
       } // for
 

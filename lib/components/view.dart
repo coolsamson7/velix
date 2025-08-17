@@ -56,7 +56,7 @@ class _SpinnerInterceptor implements CommandInterceptor {
   }
 }
 
-const List<CommandDescriptor> NO_COMMANDS = [];
+const List<CommandDescriptor> noCommands = [];
 
 /// a widget that is associated with commands and will change the cursor or show a spinner while executing commands.
 class CommandView extends StatefulWidget {
@@ -74,7 +74,7 @@ class CommandView extends StatefulWidget {
     super.key,
     required this.child,
     required this.commands,
-    this.toolbarCommands = NO_COMMANDS,
+    this.toolbarCommands = noCommands,
   });
 
   // override

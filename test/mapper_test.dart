@@ -35,7 +35,7 @@ void main() {
           .map(from: "name", to: "name");
 
       var derivedMapping = mapping<Derived,Derived>()
-          // TODO inherits
+          .derives(baseMapping)
           .map(from: "number", to: "number");
 
       var mapper = Mapper([

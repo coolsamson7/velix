@@ -206,6 +206,7 @@ class TypeDescriptor<T> {
   final List<T>? enumValues;
 
   TypeDescriptor? superClass;
+  List<TypeDescriptor> childClasses = [];
 
   // constructor
 
@@ -220,10 +221,24 @@ class TypeDescriptor<T> {
   }) {
     type = nonNullableOf<T>();
 
+    // super class
+
+    if ( superClass != null) {
+      superClass!.childClasses.add(this);
+
+      // inherit fields
+
+      for ( var inheritedField in superClass!.getFields()) {
+        _fields[inheritedField.name] = inheritedField;
+      }
+    }
+
+    // own fields
+
     for (var field in fields) {
-        field.typeDescriptor = this;
+        field.typeDescriptor = this; // marker for a local field
         _fields[field.name] = field;
-      } // for
+    } // for
 
     // automatically register
 
@@ -241,6 +256,10 @@ class TypeDescriptor<T> {
   }
 
   // public
+
+  bool hasInheritedClasses() {
+    return childClasses.isNotEmpty;
+  }
 
   bool isEnum() {
     return this.enumValues != null;

@@ -577,7 +577,7 @@ class MappingDefinition<S,T> {
   List<MapOperation> operations = [];
   List<IntermediateResultDefinition> intermediateResultDefinitions = [];
   Finalizer<dynamic,dynamic>? finalizer;
-  MappingDefinition<S,T>? baseMapping;
+  MappingDefinition? baseMapping;
 
   // constructor
 
@@ -596,7 +596,7 @@ class MappingDefinition<S,T> {
 
     // local function
 
-    void collect(MappingDefinition<S,T> definition) {
+    void collect(MappingDefinition definition) {
       if ( definition.baseMapping != null )
         collect(definition.baseMapping!);
 
@@ -659,7 +659,7 @@ class MappingDefinition<S,T> {
 
   /// inherit all operations as specified in a parent mapping. This makes sense for inherited classes, where mappers inherit each other as well.
   /// [mappingDefinition] an inherited mapping
-  MappingDefinition<S,T>  derives(MappingDefinition<S,T> mappingDefinition) {
+  MappingDefinition<S,T>  derives(MappingDefinition mappingDefinition) {
     baseMapping = mappingDefinition;
 
     return this;

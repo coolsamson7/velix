@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
 
@@ -200,7 +198,7 @@ void main() {
           ]
       );
 
-      var result = mapper.map(input);
+      mapper.map(input);
 
       // benchmark
 
@@ -233,7 +231,6 @@ void main() {
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
 
-      // 👇 Code to benchmark
       for (int i = 0; i < loops; i++) {
         mapper.map(source);
       }

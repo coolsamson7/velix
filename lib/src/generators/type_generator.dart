@@ -1,8 +1,8 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:async';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:analyzer/dart/element/element2.dart';
 
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -19,8 +19,8 @@ bool isTypeNullable(DartType type) {
   return type.nullabilitySuffix == NullabilitySuffix.question;
 }
 
-bool isDataclass(InterfaceElement2 element) {
-  return element.metadata2.annotations.any((annotation) {
+bool isDataclass(InterfaceElement element) {
+  return element.metadata.annotations.any((annotation) {
     final value = annotation.computeConstantValue();
     if (value == null)
       return false;
@@ -29,7 +29,7 @@ bool isDataclass(InterfaceElement2 element) {
   });
 }
 
-abstract class GeneratorElement<T extends InterfaceElement2> {
+abstract class GeneratorElement<T extends InterfaceElement> {
   // instance data
 
   bool generateVariable = false;
@@ -64,9 +64,9 @@ abstract class GeneratorElement<T extends InterfaceElement2> {
   // public
 
   collectImports(TypeBuilder builder) {
-    builder.addImport(element.library2.uri);
+    builder.addImport(element.library.uri);
 
-    collectAnnotationImports(element.metadata2.annotations, builder);
+    collectAnnotationImports(element.metadata.annotations, builder);
   }
 
   void addDependency(GeneratorElement element) {
@@ -89,7 +89,7 @@ abstract class GeneratorElement<T extends InterfaceElement2> {
   }
 }
 
-class ClassGeneratorElement extends GeneratorElement<ClassElement2> {
+class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   static ClassCodeGenerator generator = ClassCodeGenerator();
 
   // instance data
@@ -106,9 +106,9 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement2> {
 
     final superType = element.supertype;
     if (superType != null && !superType.isDartCoreObject) {
-      final superElement = superType.element3;
+      final superElement = superType.element;
 
-      if (superElement != null && isDataclass(superElement)) {
+      if (isDataclass(superElement)) {
         var element = builder.checkElement(superElement);
 
         element.generateVariable = true;
@@ -119,12 +119,12 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement2> {
 
     // fields
 
-    for (final field in element.fields2) {
+    for (final field in element.fields) {
       if (field.isStatic)
         continue;
 
       final fieldTypeElem = field.type.element3;
-      if (fieldTypeElem != null && fieldTypeElem is InterfaceElement2 && fieldTypeElem != element && isDataclass(fieldTypeElem)) {
+      if (fieldTypeElem != null && fieldTypeElem is InterfaceElement && fieldTypeElem != element && isDataclass(fieldTypeElem)) {
         addDependency(builder.checkElement(fieldTypeElem));
       }
     } // for
@@ -134,8 +134,8 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement2> {
   collectImports(TypeBuilder builder) {
     super.collectImports(builder);
 
-    for (final field in element.fields2) {
-      collectAnnotationImports(field.metadata2.annotations, builder);
+    for (final field in element.fields) {
+      collectAnnotationImports(field.metadata.annotations, builder);
     }
   }
 
@@ -160,7 +160,7 @@ class EnumGeneratorElement extends GeneratorElement<EnumElement2> {
   }
 }
 
-abstract class CodeGenerator<T extends InterfaceElement2> {
+abstract class CodeGenerator<T extends InterfaceElement> {
   // instance data
 
   StringBuffer buffer = StringBuffer();
@@ -233,10 +233,10 @@ abstract class CodeGenerator<T extends InterfaceElement2> {
   void generate(StringBuffer buffer, T element, bool variable);
 }
 
-class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
+class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   // internal
 
-  DartType? getElementType(FieldElement2 field) {
+  DartType? getElementType(FieldElement field) {
     final type = field.type;
     if (type is ParameterizedType) {
       if (type.element?.name == 'List' && type.typeArguments.isNotEmpty) {
@@ -247,22 +247,22 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     return null;
   }
 
-  String? getSuperclass(ClassElement2 element) {
+  String? getSuperclass(ClassElement element) {
     // super class
 
     final superType = element.supertype;
     if (superType != null && !superType.isDartCoreObject) {
-      final superElement = superType.element3;
+      final superElement = superType.element;
 
-      if (superElement != null && isDataclass(superElement)) {
-        return superElement.name3;
+      if (isDataclass(superElement)) {
+        return superElement.name;
       }
     }
 
     return null;
   }
 
-  String fieldType(FieldElement2 field) {
+  String fieldType(FieldElement field) {
     var typeName =  field.type.getDisplayString();
 
     AbstractType? constraint = switch (typeName) {
@@ -274,7 +274,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     };
 
     if ( constraint != null) {
-      for (final annotation in field.metadata2.annotations) {
+      for (final annotation in field.metadata.annotations) {
         final constant = annotation.computeConstantValue();
         if (constant == null) continue;
 
@@ -302,19 +302,19 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     }
   }
 
-  void generateConstructorParams(ClassElement2 element) {
+  void generateConstructorParams(ClassElement element) {
     tab().write("params: ");
 
     // collect parameters
 
-    for (final ctor in element.constructors2) {
+    for (final ctor in element.constructors) {
       if (!ctor.isFactory && ctor.isPublic) {
         writeln("[").indent(1);
 
         int len = ctor.formalParameters.length;
         int i = 0;
         for (final param in ctor.formalParameters) {
-          final name = param.name3;
+          final name = param.name;
           final typeStr = param.type.getDisplayString(withNullability: false);
           final isNamed = param.isNamed;
           final isRequired = param.isRequiredNamed || param.isRequiredPositional;
@@ -345,7 +345,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     }
   }
 
-  void generateField(String className, FieldElement2 field, bool last) {
+  void generateField(String className, FieldElement field, bool last) {
     final name = field.name3;
     final type = field.type.getDisplayString(withNullability: false);
 
@@ -359,7 +359,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     if ( typeCode.contains("."))
       tab().writeln("type: $typeCode,");
 
-    generateAnnotations(field.metadata2.annotations);
+    generateAnnotations(field.metadata.annotations);
 
     final elementType = getElementType(field);
     if (elementType != null) {
@@ -384,14 +384,14 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     indent(-1).tab().write(')').writeln(last ? "" : ", ");
   }
 
-  void generateFields(ClassElement2 element) {
+  void generateFields(ClassElement element) {
     tab().writeln("fields: [").indent(1);
 
-    int len = element.fields2.length;
+    int len = element.fields.length;
     int i = 0;
-    for (final field in element.fields2) {
+    for (final field in element.fields) {
       if (!field.isStatic && !field.isPrivate)
-        generateField(element.name3!, field, i == len - 1);
+        generateField(element.name!, field, i == len - 1);
 
       i++;
     } // for
@@ -399,10 +399,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
     indent(-1).tab().writeln("]");
   }
 
-  void generateConstructor(ClassElement2 element) {
+  void generateConstructor(ClassElement element) {
     // For constructor function: keep generating for the first public constructor (or you can customize)
 
-    final firstCtor = findElement(element.constructors2, (c) => !c.isFactory && c.isPublic);
+    final firstCtor = findElement(element.constructors, (c) => !c.isFactory && c.isPublic);
 
     // write constructor function
 
@@ -416,7 +416,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
 
       for (final param in firstCtor.formalParameters) {
         var paramType = param.type.getDisplayString(withNullability: false);
-        final paramName = param.name3;
+        final paramName = param.name;
 
         // Use param.defaultValueCode or default literal for some common types if null
 
@@ -460,7 +460,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
         paramsStr = paramsStr.substring(0, paramsStr.length - 1);
       }
 
-      write(paramsStr).write("}) => ${element.name3}(");
+      write(paramsStr).write("}) => ${element.name}(");
 
       // Pass parameters to actual constructor, named if necessary
 
@@ -469,10 +469,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
 
       for (final param in firstCtor.formalParameters) {
         if (param.isNamed) {
-          namedArgs.add("${param.name3}: ${param.name3}");
+          namedArgs.add("${param.name}: ${param.name}");
         }
         else {
-          positionalArgs.add(param.name3!);
+          positionalArgs.add(param.name!);
         }
       }
 
@@ -489,12 +489,12 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
   // override
 
   @override
-  void generate(StringBuffer buffer, ClassElement2 element, bool variable) {
+  void generate(StringBuffer buffer, ClassElement element, bool variable) {
     start(buffer);
 
-    final className = element.name3;
-    final uri = element.library2.uri.toString(); // e.g., package:example/models/foo.dart
-    final qualifiedName = '$uri.${element.name3}';
+    final className = element.name;
+    final uri = element.library.uri.toString(); // e.g., package:example/models/foo.dart
+    final qualifiedName = '$uri.${element.name}';
 
     tab();
     if ( variable )
@@ -508,7 +508,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
       tab().writeln("superClass: ${superClass}Descriptor,");
     }
 
-    generateAnnotations(element.metadata2.annotations);
+    generateAnnotations(element.metadata.annotations);
     generateConstructorParams(element);
     generateConstructor(element);
     generateFields(element);
@@ -517,22 +517,22 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement2> {
   }
 }
 
-class EnumCodeGenerator extends CodeGenerator<EnumElement2> {
+class EnumCodeGenerator extends CodeGenerator<EnumElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, EnumElement2 element, bool variable) {
+  void generate(StringBuffer buffer, EnumElement element, bool variable) {
     start(buffer);
 
-    final className = element.name3;
+    final className = element.name;
 
-    final uri = element.library2.uri.toString(); // e.g., package:example/models/foo.dart
-    final qualifiedName = '$uri.${element.name3}';
+    final uri = element.library.uri.toString(); // e.g., package:example/models/foo.dart
+    final qualifiedName = '$uri.${element.name}';
 
     tab().writeln("enumeration<$className>(").indent(1);
     tab().writeln("name: '$qualifiedName',");
 
-    generateAnnotations(element.metadata2.annotations);
+    generateAnnotations(element.metadata.annotations);
 
     tab().writeln("values: $className.values");
     indent(-1).tab().writeln(");");
@@ -542,7 +542,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement2> {
 class TypeBuilder implements Builder {
   // instance data
 
-  Map<InterfaceElement2,GeneratorElement> visited = {};
+  Map<InterfaceElement,GeneratorElement> visited = {};
   List<GeneratorElement> elements = [];
   Set<Uri> imports = <Uri>{};
 
@@ -560,13 +560,13 @@ class TypeBuilder implements Builder {
     imports.add(value);
   }
 
-  GeneratorElement checkElement(InterfaceElement2 element) {
+  GeneratorElement checkElement(InterfaceElement element) {
     var result = visited[element];
 
     if ( result == null) {
-      if (element is ClassElement2)
+      if (element is ClassElement)
         elements.add(result = ClassGeneratorElement(element: element, builder: this));
-      else if (element is EnumElement2)
+      else if (element is EnumElement)
         elements.add(result = EnumGeneratorElement(element: element, builder: this));
 
       visited[element] = result!;
@@ -626,8 +626,8 @@ class TypeBuilder implements Builder {
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
       for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
-        if ( element.element is ClassElement2)
-          checkElement(element.element as ClassElement2);
+        if ( element.element is ClassElement)
+          checkElement(element.element as ClassElement);
       } // for
     }
 

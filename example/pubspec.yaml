@@ -33,8 +33,6 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.0
-  get_it: ^8.2.0
-  injectable: ^2.3.2
   build: ^3.0.0
   easy_localization: ^3.0.8
 
@@ -47,7 +45,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  injectable_generator: ^2.4.0
   build_runner: ^2.4.7
   flutter_lints: ^6.0.0
   glob: ^2.1.3

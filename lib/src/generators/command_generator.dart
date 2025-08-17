@@ -1,6 +1,6 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:async';
 
-import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -8,7 +8,7 @@ import 'package:analyzer/dart/element/element.dart';
 class CommandGenerator extends Generator {
   // internal
 
-  String getExtends(ClassElement2 classElement) {
+  String getExtends(ClassElement classElement) {
     // Get the superclass element
 
     final superClassElement = classElement.supertype;
@@ -39,9 +39,9 @@ class CommandGenerator extends Generator {
     final output = StringBuffer();
 
     for (final clazz in library.classes) {
-      final commands = <MethodElement2>[];
+      final commands = <MethodElement>[];
 
-      for (final method in clazz.methods2) {
+      for (final method in clazz.methods) {
         if (_isCommandMethod(method)) {
           commands.add(method);
         }
@@ -99,13 +99,13 @@ class CommandGenerator extends Generator {
           if (dartObj.variable2 != null) {
             // This works only if using analyzer >= 6.0.0 — otherwise need a cast
             final variable = dartObj.variable2!;
-            final iconName = variable.name3; // add
-            final iconType = variable.enclosingElement2?.name3; // CupertinoIcons
+            final iconName = variable.name; // add
+            final iconType = variable.enclosingElement?.name; // CupertinoIcons
             output.write(', icon: $iconType.$iconName');
           }
           /* TODO else if (dartObj.toFunctionValue() is PropertyAccessorElement) {
             final accessor = dartObj.toFunctionValue() as PropertyAccessorElement;
-            final variable = accessor.variable2;
+            final variable = accessor.variable;
             final iconName = variable.name;
             final iconType = variable.enclosingElement?.name;
             output.write(', icon: $iconType.$iconName');
@@ -144,7 +144,7 @@ class CommandGenerator extends Generator {
         final publicName = method.displayName.replaceFirst('_', '');
         final signature = method.formalParameters.map((param) {
           final typeStr = param.type.getDisplayString(withNullability: false);
-          return '$typeStr ${param.name3}';
+          return '$typeStr ${param.name}';
         }).join(', ');
 
         // Use the method's own declared return type
@@ -164,9 +164,9 @@ class CommandGenerator extends Generator {
         final publicName = method.displayName.replaceFirst('_', '');
         final signature = method.formalParameters.map((param) {
           final typeStr = param.type.getDisplayString(withNullability: false);
-          return '$typeStr ${param.name3}';
+          return '$typeStr ${param.name}';
         }).join(', ');
-        final argList = method.typeParameters2.map((param) => param.name3).join(', ');
+        final argList = method.typeParameters.map((param) => param.name).join(', ');
 
         final returnType = method.returnType.getDisplayString(
             withNullability: false);
@@ -195,13 +195,13 @@ class CommandGenerator extends Generator {
     return output.toString();
   }
 
-  bool _isCommandMethod(MethodElement2 method) {
-    return method.metadata2.annotations.any((m) =>
+  bool _isCommandMethod(MethodElement method) {
+    return method.metadata.annotations.any((m) =>
     m.computeConstantValue()?.type?.getDisplayString() == 'Command');
   }
 
-  ConstantReader? _getCommandAnnotation(MethodElement2 method) {
-    for (final meta in method.metadata2.annotations) {
+  ConstantReader? _getCommandAnnotation(MethodElement method) {
+    for (final meta in method.metadata.annotations) {
       final constantValue = meta.computeConstantValue();
       if (constantValue == null) continue;
       if (constantValue.type?.getDisplayString() == 'Command') {

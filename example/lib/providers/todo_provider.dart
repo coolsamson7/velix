@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/todo.dart';
-import 'package:injectable/injectable.dart';
 
-@lazySingleton
 class TodoProvider with ChangeNotifier {
   final List<Todo> _todos = [];
 

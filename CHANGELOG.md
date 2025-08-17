@@ -24,7 +24,7 @@
 
 - more docs
 
-## 0.14.0
+## 0.13.0
 
 - skipped, bad version number :-)
 
@@ -36,3 +36,7 @@
 ## 0.14.1
 
 - switched to analyzer 7.x
+
+## 0.14.2
+
+- switched to analyzer 8.x

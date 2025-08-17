@@ -637,6 +637,13 @@ class MappingDefinition<S,T> {
   Mapping<S,T> createMapping(Mapper mapper) {
     var result = createOperations(mapper);
 
+    // validate
+
+    for ( var intermediateResult in intermediateResultDefinitions)
+      if ( intermediateResult.missing > 0) {
+        throw MapperException("${ intermediateResult.typeDescriptor.type} misses ${intermediateResult.missing} arguments");
+      }
+
     return Mapping<S,T>(
         mapper: mapper,
         definition: this,

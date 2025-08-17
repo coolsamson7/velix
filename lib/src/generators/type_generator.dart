@@ -31,6 +31,7 @@ bool isDataclass(Element element) {
 abstract class GeneratorElement<T extends InterfaceElement> {
   // instance data
 
+  bool generateVariable = false;
   T element;
   List<GeneratorElement> dependencies = [];
   bool pending = true;
@@ -55,7 +56,7 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   // abstract
 
-  generateCode(StringBuffer buffer);
+  generateCode(StringBuffer buffer, bool variable);
 
   collectDependencies(TypeBuilder builder){}
 
@@ -69,6 +70,8 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   void addDependency(GeneratorElement element) {
     dependencies.add(element);
+
+    element.generateVariable = true;
   }
 
   void generate(TypeBuilder builder, StringBuffer buffer) {
@@ -82,7 +85,7 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
       // generate
 
-      generateCode(buffer);
+      generateCode(buffer, generateVariable);
     }
   }
 }
@@ -134,8 +137,8 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   }
 
   @override
-  generateCode(StringBuffer buffer) {
-    generator.generate(buffer, element);
+  generateCode(StringBuffer buffer, bool variable) {
+    generator.generate(buffer, element, variable);
   }
 }
 
@@ -149,8 +152,8 @@ class EnumGeneratorElement extends GeneratorElement<EnumElement> {
   // override
 
   @override
-  generateCode(StringBuffer buffer) {
-    generator.generate(buffer, element);
+  generateCode(StringBuffer buffer, bool variable) {
+    generator.generate(buffer, element, variable);
   }
 }
 
@@ -220,7 +223,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
   // abstract
 
-  void generate(StringBuffer buffer, T element);
+  void generate(StringBuffer buffer, T element, bool variable);
 }
 
 class ClassCodeGenerator extends CodeGenerator<ClassElement> {
@@ -473,14 +476,18 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, ClassElement element) {
+  void generate(StringBuffer buffer, ClassElement element, bool variable) {
     start(buffer);
 
     final className = element.name;
     final uri = element.source.uri.toString(); // e.g., package:example/models/foo.dart
     final qualifiedName = '$uri.${element.name}';
 
-    tab().write("var ${className}Descriptor = ").writeln("type<$className>(").indent(1);
+    tab();
+    if ( variable )
+      write("var ${className}Descriptor = ");
+
+    writeln("type<$className>(").indent(1);
     tab().writeln("name: '$qualifiedName',");
 
     var superClass = getSuperclass(element);
@@ -501,7 +508,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, EnumElement element) {
+  void generate(StringBuffer buffer, EnumElement element, bool variable) {
     start(buffer);
 
     final className = element.name;
@@ -552,7 +559,7 @@ class TypeBuilder implements Builder {
       visited[element] = result!;
     } // if
 
-    return result!;
+    return result;
   }
 
   // header

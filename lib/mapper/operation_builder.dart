@@ -139,7 +139,9 @@ class SetResultArgument extends MapperProperty {
 
   // constructor
 
-  SetResultArgument({required this.resultDefinition, required this.index, required this.param, required this.property});
+  SetResultArgument({required this.resultDefinition, required this.index, required this.param, required this.property}) {
+    resultDefinition.missing -= 1;
+  }
 
   // implement Property
 
@@ -482,10 +484,14 @@ class IntermediateResultDefinition {
   final ValueReceiver valueReceiver;
   final int constructorArgs;
 
+  int missing = 0;
+
   // constructor
 
   IntermediateResultDefinition({required this.typeDescriptor, required this.constructor, required this.index, required this.nArgs, required this.valueReceiver})
-  : constructorArgs = typeDescriptor.constructorParameters.length;
+  : constructorArgs = typeDescriptor.constructorParameters.length {
+    missing = constructorArgs;
+  }
 
   // public
 
@@ -524,6 +530,8 @@ class TargetNode {
 
   ValueReceiver computeValueReceiver() {
     if (parent?.resultDefinition != null) {
+      parent?.resultDefinition!.missing -= 1;
+
       return SetResultPropertyValueReceiver(
           resultIndex: parent!.resultDefinition!.index,
           prop: Symbol(accessor.name),

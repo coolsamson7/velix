@@ -134,6 +134,7 @@ void main() {
     test('map immutable root', () {
       var mapper = Mapper([
         mapping<Money, Money>()
+            //.map(from: "currency", to: "currency"),
             .map(all: matchingProperties()),
 
         mapping<Product, Product>()
@@ -175,13 +176,9 @@ void main() {
 
       stopwatch.stop();
       print('Execution time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
-
-
-      print(result);
     });
 
     test('map immutable root', () {
-      print("immutable root");
       var mapper = Mapper([
         mapping<Immutable, Immutable>()
             .map(from: "id", to: "id")

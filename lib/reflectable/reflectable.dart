@@ -154,15 +154,33 @@ class TypeDescriptor<T> {
         if (!deepEquals(valueA, valueB))
           return false;
       }
-      /* TODO if (valueA is List && valueB is List) {
-        if (!equality.equals(valueA, valueB)) return false;
+      if (field.type.runtimeType == ListType) {
+        final listA = valueA as List?;
+        final listB = valueB as List?;
+        if (listA == null || listB == null) {
+          if (listA != listB) return false;
+          continue;
+        }
+        if (listA.length != listB.length) return false;
+        for (var i = 0; i < listA.length; ++i) {
+          if (!deepEquals(listA[i], listB[i])) return false;
+        }
       }
       else if (valueA is Map && valueB is Map) {
-        if (!equality.equals(valueA, valueB)) return false;
+        if (valueA.length != valueB.length) return false;
+        for (final key in valueA.keys) {
+          if (!valueB.containsKey(key)) return false;
+          if (!deepEquals(valueA[key], valueB[key])) return false;
+        }
       }
       else if (valueA is Set && valueB is Set) {
-        if (!equality.equals(valueA, valueB)) return false;
-      } */
+        if (valueA.length != valueB.length) return false;
+        // Both must contain the same elements (unordered)
+        for (final entry in valueA) {
+          // Use `any` with deepEquals to handle nested set elements
+          if (!valueB.any((b) => deepEquals(entry, b))) return false;
+        }
+      }
       else {
         if (valueA != valueB)
           return false;

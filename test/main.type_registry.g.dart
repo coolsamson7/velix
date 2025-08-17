@@ -5,7 +5,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/mapper/json.dart';
 
 void registerAllDescriptors() {
-  var CollectionsDescriptor = type<Collections>(
+  type<Collections>(
     name: 'asset:velix/test/main.dart.Collections',
     params: [
       param<List<Money>>('prices', isNamed: true, isRequired: true),
@@ -51,7 +51,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var MutableDescriptor = type<Mutable>(
+  type<Mutable>(
     name: 'asset:velix/test/main.dart.Mutable',
     annotations: [
       JsonSerializable(includeNull: true),
@@ -88,7 +88,7 @@ void registerAllDescriptors() {
     values: Status.values
   );
 
-  var ProductDescriptor = type<Product>(
+  type<Product>(
     name: 'asset:velix/test/main.dart.Product',
     params: [
       param<String>('name', isNamed: true, isRequired: true),
@@ -112,7 +112,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var InvoiceDescriptor = type<Invoice>(
+  type<Invoice>(
     name: 'asset:velix/test/main.dart.Invoice',
     params: [
       param<List<Product>>('products', isNamed: true, isRequired: true),
@@ -133,7 +133,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var FlatDescriptor = type<Flat>(
+  type<Flat>(
     name: 'asset:velix/test/main.dart.Flat',
     params: [
       param<String>('id', isNamed: true, isRequired: true),
@@ -158,7 +158,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var ImmutableDescriptor = type<Immutable>(
+  type<Immutable>(
     name: 'asset:velix/test/main.dart.Immutable',
     params: [
       param<String>('id', isNamed: true, isRequired: true),

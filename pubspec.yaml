@@ -15,7 +15,7 @@ description: "flutter foundation library including validation, a reflection base
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.12.0
+version: 0.14.0
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

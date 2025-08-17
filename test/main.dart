@@ -44,11 +44,42 @@ class Mutable {
 }
 
 @Dataclass()
+class Base {
+  final String name;
+
+  Base(this.name);
+}
+
+@Dataclass()
+class Derived extends Base {
+  final int number;
+
+  Derived(super.name, {required this.number});
+}
+
+@Dataclass()
+class Types {
+  final int int_var;
+  final double double_var;
+  final bool bool_var;
+  final String string_var;
+
+  Types({required this.int_var, required this.double_var, required this.bool_var, required this.string_var});
+}
+
+
+@Dataclass()
+enum Status {
+  available
+}
+
+@Dataclass()
 class Product {
   final String name;
   final Money price;
+  final Status status;
 
-  Product({required this.name, required this.price});
+  Product({required this.name, required this.price, required this.status});
 }
 
 @Dataclass()

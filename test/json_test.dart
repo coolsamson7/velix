@@ -11,7 +11,7 @@ void main() {
     registerAllDescriptors();
 
     JSON(
-        validate: false,
+        validate: true,
         converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
         factories: [Enum2StringFactory()]);
 
@@ -86,6 +86,8 @@ void main() {
       // warm up
 
       var json = JSON.serialize(input);
+
+      print(json);
 
       var reverse = JSON.deserialize<Invoice>(json);
 

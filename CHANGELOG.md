@@ -23,3 +23,12 @@
 ## 0.12.0
 
 - more docs
+
+## 0.14.0
+
+- skipped, bad version number :-)
+
+## 0.14.0
+
+- finalized mapper
+- added json mapper

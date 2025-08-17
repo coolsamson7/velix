@@ -579,6 +579,7 @@ class TypeBuilder implements Builder {
 
   void generateHeader(StringBuffer buffer) {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
+    buffer.writeln('// ignore_for_file: unnecessary_import');
     buffer.writeln("import 'package:velix/velix.dart';");
   }
 

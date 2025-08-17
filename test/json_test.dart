@@ -36,7 +36,7 @@ void main() {
       var result = JSON.deserialize<Mutable>(json);
 
       final isEqual = TypeDescriptor.deepEquals(input, result);
-      //expect(isEqual, isTrue);
+      expect(isEqual, isTrue);
     });
 
     test('map list', () {
@@ -89,7 +89,7 @@ void main() {
 
       print(json);
 
-      var reverse = JSON.deserialize<Invoice>(json);
+      JSON.deserialize<Invoice>(json);
 
       // serialize
 

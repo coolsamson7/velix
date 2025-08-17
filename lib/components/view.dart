@@ -7,7 +7,7 @@ import '../commands/command.dart';
 import 'command_button.dart';
 import 'overlay.dart';
 
-/// @internal [CommandInterceptor] that is used to change the cursor after <n> ms
+/// @internal [CommandInterceptor] that is used to change the cursor after n ms
 class _CursorInterceptor implements CommandInterceptor {
   final void Function(bool) onChange;
   final Duration delay;

@@ -35,9 +35,7 @@ dependencies:
   provider: ^6.0.0
   get_it: ^8.2.0
   injectable: ^2.3.2
-  source_gen: ^2.0.0
-  analyzer: ^6.4.1
-  build: ^2.4.1
+  build: ^3.0.0
   easy_localization: ^3.0.8
 
   # The following adds the Cupertino Icons font to your application.

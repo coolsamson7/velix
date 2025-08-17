@@ -154,7 +154,7 @@ class TypeDescriptor<T> {
         if (!deepEquals(valueA, valueB))
           return false;
       }
-      if (field.type.runtimeType == ListType) {
+      else if (field.type.runtimeType == ListType) {
         final listA = valueA as List?;
         final listB = valueB as List?;
         if (listA == null || listB == null) {

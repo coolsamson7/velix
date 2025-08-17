@@ -1,14 +1,29 @@
 import 'dart:async';
 
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
 Builder widgetBuilder(BuilderOptions options) => WidgetBuilder();
 
-bool hasAnnotationByName(Element element, String annotationName) {
-  return element.metadata.any((annotation) {
+Uri? getSourceUri(ClassElement2 element) {
+  // Every class belongs to a library
+  final lib = element.library2;
+
+  return lib.uri;
+
+  // The `LibraryElement2` gives you access to the defining compilation unit
+  //final definingUnit = lib.definingCompilationUnit;
+
+  // That has the URI of the file
+  //return definingUnit.source2?.uri;
+}
+
+
+
+bool hasAnnotationByName(ClassElement2 element, String annotationName) {
+  return element.metadata2.annotations.any((annotation) {
     final name = annotation.element?.enclosingElement3?.name;
     // For a simple annotation like @Foo, name is 'Foo'.
     // If unresolved it can be null, so check safe.
@@ -31,17 +46,15 @@ class WidgetBuilder implements Builder {
   @override
   Future<void> build(BuildStep buildStep) async {
     final resolver = buildStep.resolver;
-    final classes = <ClassElement>[];
+    final classes = <ClassElement2>[];
 
     // Find all Dart files in lib/
     await for (final input in buildStep.findAssets(Glob('lib/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
-      for (final element in library.topLevelElements) {
-        if (element is ClassElement) {
+      for (final element in library.classes) {
           if (hasAnnotationByName(element, "WidgetAdapter"))
             classes.add(element);
         }
-      }
     }
 
     final buffer = StringBuffer();
@@ -50,7 +63,7 @@ class WidgetBuilder implements Builder {
 
     final seenImports = <String>{};
     for (final clazz in classes) {
-      final sourceUri = clazz.source.uri.toString();
+      final sourceUri = getSourceUri(clazz).toString();
       if (seenImports.add(sourceUri)) {
         buffer.writeln("import '$sourceUri';");
       }
@@ -60,7 +73,7 @@ class WidgetBuilder implements Builder {
 
     buffer.writeln('void registerWidgets() {');
     for (final clazz in classes) {
-      buffer.writeln("   ValuedWidget.register(${clazz.name}());");
+      buffer.writeln("   ValuedWidget.register(${clazz.name3}());"); // ?
     }
 
     buffer.writeln('}');

@@ -15,7 +15,7 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
     addCommand(
       "addTodo",
       _addTodo,
-      i18n: 'main.addTodo1',
+      i18n: 'main.addTodo',
       icon: CupertinoIcons.add,
       lock: LockType.view,
     );
@@ -41,10 +41,10 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
   }
 
   void removeTodo(String id) {
-    execute("removeTodo", [id]);
+    execute("removeTodo", []);
   }
 
   void toggleTodo(String id) {
-    execute("toggleTodo", [id]);
+    execute("toggleTodo", []);
   }
 }

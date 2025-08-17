@@ -15,7 +15,7 @@ description: "flutter foundation library including validation, a reflection base
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.14.0
+version: 0.14.1
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix
@@ -36,9 +36,9 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.0
-  source_gen: ^2.0.0
-  analyzer: ^6.4.1
-  build: ^2.4.1
+  source_gen: ^3.0.0
+  analyzer: '>=7.5.9 <=8.0.0'
+  build: ^3.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

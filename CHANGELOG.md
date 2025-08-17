@@ -32,3 +32,7 @@
 
 - finalized mapper
 - added json mapper
+
+## 0.14.1
+
+- switched to analyzer 7.x

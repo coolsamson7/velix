@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
       <span class="name ">CommandManager</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-interceptors"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../commands_command/CommandInterceptor-class.html">CommandInterceptor</a></span>&gt;</span></span> <span class="parameter-name">interceptors</span> = <span class="default-value">const []</span>, </span></li>
-<li><span class="parameter" id="-param-translator"><span class="type-annotation"><a href="../../i18n_i18n/Translator-class.html">Translator</a></span> <span class="parameter-name">translator</span> = <span class="default-value">NO_TRANSLATOR</span>, </span></li>
+<li><span class="parameter" id="-param-translator"><span class="type-annotation"><a href="../../i18n_i18n/Translator-class.html">Translator</a></span> <span class="parameter-name">translator</span> = <span class="default-value">noTranslator</span>, </span></li>
 </ol>})
     </section>
     
@@ -64,7 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">CommandManager({this.interceptors = const [], this.translator = NO_TRANSLATOR});</code></pre>
+  <pre class="language-dart"><code class="language-dart">CommandManager({this.interceptors = const [], this.translator = noTranslator});</code></pre>
 </section>
 
 
@@ -92,7 +92,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.14.2
+      0.14.3
   </span>
   
 </footer>

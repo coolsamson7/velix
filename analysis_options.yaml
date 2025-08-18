@@ -1,4 +1,4 @@
-include: package:flutter_lints/flutter.yaml
+include: package:lints/recommended.yaml
 
 linter:
   rules:
@@ -6,3 +6,5 @@ linter:
     curly_braces_in_flow_control_structures: false
     prefer_function_declarations_over_variables: false
     use_super_parameters: false
+    non_constant_identifier_names: false
+    type_literal_in_constant_pattern: false

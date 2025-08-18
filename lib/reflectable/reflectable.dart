@@ -50,8 +50,8 @@ class FieldDescriptor<T, V> {
 
   // public
 
-  T? find_annotation<T>() {
-    return findElement(annotations, (annotation) => annotation is T) as T?;
+  A? find_annotation<A>() {
+    return findElement(annotations, (annotation) => annotation is T) as A?;
   }
 
   bool isWriteable() {
@@ -262,11 +262,11 @@ class TypeDescriptor<T> {
   }
 
   bool isEnum() {
-    return this.enumValues != null;
+    return enumValues != null;
   }
 
-  T? find_annotation<T>() {
-    return findElement(annotations, (annotation) => annotation is T) as T?;
+  A? find_annotation<A>() {
+    return findElement(annotations, (annotation) => annotation is A) as A?;
   }
 
   // true, if all parameters have defaults ( either literal types or nullable object types )

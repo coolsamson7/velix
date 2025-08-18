@@ -40,3 +40,7 @@
 ## 0.14.2
 
 - switched to analyzer 8.x
+
+## 0.14.3
+
+- lint fixes

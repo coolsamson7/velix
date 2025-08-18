@@ -10,18 +10,12 @@ void main() {
 
       var code = type.code();
 
-      print(code);
-      //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
+      expect(code, equals("IntType().lessThan(7).greaterThan(0)"));
     });
   });
 
 
   group('StringType', () {
-    //test('passes for valid string', () {
-    //  var validator = StringType().notEmpty().minLength(3);
-    //  expect(() => validator.validate("hello"), returnsNormally);
-    //});
-
     test('fails for empty string', () {
       var type = StringType().notEmpty();
       expect(() => type.validate(""), throwsA(isA<ValidationException>()));
@@ -34,11 +28,6 @@ void main() {
   });
 
   group('IntType', () {
-    //test('passes for valid string', () {
-    //  var validator = StringType().notEmpty().minLength(3);
-    //  expect(() => validator.validate("hello"), returnsNormally);
-    //});
-
     test('<', () {
       var type = IntType().lessThan(1).lessThan(2);
       expect(
@@ -59,10 +48,6 @@ void main() {
   });
 
   group('DoubleType', () {
-    //test('passes for valid string', () {
-    //  var validator = StringType().notEmpty().minLength(3);
-    //  expect(() => validator.validate("hello"), returnsNormally);
-    //});
 
     test('<', () {
       var type = DoubleType().lessThan(1.0).lessThan(2.0);

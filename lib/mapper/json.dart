@@ -420,6 +420,7 @@ class Enum2StringFactory<T extends Enum> extends EnumConvertFactory<T, String> {
 
   // override
 
+  @override
   Convert<T,String> getConvert(Type sourceType) {
     var result = converters[sourceType];
     if ( result == null) {

@@ -1,5 +1,3 @@
-//TODO I18N import 'package:easy_localization/easy_localization.dart';
-
 import '../i18n/i18n.dart';
 import '../reflectable/reflectable.dart';
 
@@ -188,7 +186,7 @@ class AbstractType<T> {
   void baseType<V>(Type type) {
     this.type = type;
 
-    this.test<dynamic>(
+    test<dynamic>(
         type: type,
         name: "type",
         params: {
@@ -200,7 +198,7 @@ class AbstractType<T> {
   }
 
   AbstractType<T> required() {
-    var typeTest = this.tests[0];
+    var typeTest = tests[0];
 
     typeTest.ignore = false;
 
@@ -208,7 +206,7 @@ class AbstractType<T> {
   }
 
   AbstractType<T> optional()  {
-    var typeTest = this.tests[0];
+    var typeTest = tests[0];
 
     typeTest.ignore = true;
 

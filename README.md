@@ -4,15 +4,145 @@
 [![Docs](https://img.shields.io/badge/docs-online-blue?logo=github)](https://coolsamson7.github.io/velix/)
 [![Flutter CI](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg)](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml)
 
+<img width="320" height="320" alt="velix" src="https://github.com/user-attachments/assets/21141c08-9a34-4337-88af-173ad2f044a6" />
 
+# Introduction
+
+Velix is Dart/Flutter library implementing some of the core parts required in every Flutter application:
+- type meta data
+- specification and validation of type constraints
+- general purpose mapping framework
+- json mapper
+- model-based two-way form data-binding
+- command pattern for ui actions
+
+Check out some articles on Medium:
+
+  - [General purpose mapper](https://medium.com/@andreas.ernst7/velix-introducing-a-powerful-and-expressive-general-purpose-mapping-and-validation-library-e27a56501604)
+  - [Commands](https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb)
+  - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
+
+Lets get a quick overview on the topics
+
+# Validation
+
+As in somne popular Typescript libraries like yup, it is possible to declare type constraints with a simple fluent language
+
+```dart
+var type = IntType().greaterThan(0).lessThan(100);
+
+type.validate(-1); // meee....will throw
+```
+
+# Type Meta-Data
+
+In combination with a custom code generator, classes decorated with `@Dataclass` emit the meta data:
+
+```dart
+@Dataclass()
+class Money {
+  // instance data
+
+  @Attribute(type: "length 7")
+  final String currency;
+  @Attribute(type: ">= 0")
+  final int value;
+
+  const Money({required this.currency, required this.value});
+}
+```
+The information will be used by the mapping framework and a form data-binding.
+
+# Mapping
+
+A general pupose mapping framnework let's you declaratively specify mappings:
+```dart
+ var mapper = Mapper([
+        mapping<Money, Money>()
+            .map(all: matchingProperties()),
+
+        mapping<Product, Product>()
+            .map(from: "status", to: "status")
+            .map(from: "name", to: "name")
+            .map(from: "price", to: "price", deep: true),
+
+        mapping<Invoice, Invoice>()
+            .map(from: "date", to: "date")
+            .map(from: "products", to: "products", deep: true)
+      ]);
+
+var invoice = Invoice(...);
+
+var result = mapper.map(invoice);
+```
+
+
+As a special case, json mappiung is supported as well:
+```dart
+// overall configuration  
+
+JSON(
+   validate: true,
+   converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+   factories: [Enum2StringFactory()]
+);
+
+// funny money class
+
+@Dataclass()
+@JsonSerializable(includeNull: true) // doesn't make sense here, but anyway...
+class Money {
+  // instance data
+
+  @Attribute(type: "length 7")
+  @Json(name: "c", required: false, defaultValue: "EU")
+  final String currency;
+  @Json(name="v", required: false, defaultValue: 0)
+  @Attribute()
+  final int value;
+
+  const Money({required this.currency, this.value});
+}
+
+var price = Money(currency: "EU", value: 0);
+
+var json = JSON.serialize(price);
+var result = JSON.deserialize<Money>(json);
+```
+
+# Commands
+
+Commands let's you wrap simple methods in command objects, that 
+- are stateful ( enabled / disabled )
+- can invoke interceptors while being executed ( e.g. exception handling, tarcing, ...), and
+- influecn the UI whiel running ( e.g. spinner fro long-running commands )
+
+```dart
+class _PersonPageState extends State<PersonPage> with CommandController<PersonPage>, _PersonPageCommands {
+   ...
+     
+  // commands
+
+  @override
+  @Command(i18n: "person.details",  icon: CupertinoIcons.save)
+  Future<void> _save) async {
+      await ... // service call
+
+      updateCommandState();
+  }
+
+  // it's always good patternm to have state management in one single place, instead scattered everywhere
+
+  @override
+  void updateCommandState() {
+    setCommandEnabled("save",  _controller.text.isNotEmpty);
+  }
+}
+```
  
- <img width="1536" height="1024" alt="Futuristische Flutter App Arbeitsumgebung" src="https://github.com/user-attachments/assets/e746b067-5fc1-464b-a16c-c9c9251698a4" />
- 
- # Model-driven forms for Flutter
+# Model-base form data-binding
 
-Velix is a dart / flutter based library that vastly simplifies data binding and validation in forms.
-
-# Motivation
+## Motivation
 
 Looking at the effort required in Flutter to handle even simple forms i was shocked and started looking for 
 alternatives that gave my about the same level of verbosity or productivity as i have known for example in Angular.
@@ -21,7 +151,7 @@ While there are some form related libraries, they all skip the problem of bindin
 library reusing ideas, that i have known for at least 20 years :-)
 Starting with the form binding quickly other solutions where integrated as well, that simplify development. 
 
-# Solution idea
+## Solution idea
 
 The idea is a model based declarative approach, that utilizes
 - reflection information with respect to the bound classes and fields
@@ -30,7 +160,7 @@ The idea is a model based declarative approach, that utilizes
 
 As a result, all the typical boilerplate code is completely gone, resulting in a fraction of necessary code.
 
-# Example
+**Example**
 
 Let's look at a simple form example first.
 
@@ -133,7 +263,7 @@ would gain here is that the form mapper remembers the initial values and will ch
 a reverted change will bring the form back to a non-dirty state!
 
 
-# Benefits
+## Benefits
 Velix drastically reduces the manual wiring and repetitive boilerplate that normally comes with Flutter forms.
 With it, you get:
 
@@ -151,7 +281,7 @@ With it, you get:
 
 - Minimal code footprint – Complex forms can be expressed in a fraction of the lines you’d normally need.
 
-# Comparison to Existing Flutter Solutions
+## Comparison to Existing Flutter Solutions
 
 While Flutter has some established form libraries like
 flutter_form_builder and reactive_forms, they still expect you to:
@@ -178,6 +308,4 @@ The result is a WPF/Angular-style binding experience in Flutter — something cu
 
 # Installation
 
-The library is hosted on Github ( https://github.com/coolsamson7/velix )
-
-and published on pub.dev (https://pub.dev/packages/velix )
+The library is published on [pub.dev](https://pub.dev/packages/velix )

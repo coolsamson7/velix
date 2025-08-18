@@ -47,16 +47,132 @@
 <img src="https://img.shields.io/badge/Dart-3.0-blue" alt="Dart">
 <a href="https://coolsamson7.github.io/velix/"><img src="https://img.shields.io/badge/docs-online-blue?logo=github" alt="Docs"></a>
 <a href="https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml"><img src="https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg" alt="Flutter CI"></a></p>
-<img width="1536" height="1024" alt="Futuristische Flutter App Arbeitsumgebung" src="https://github.com/user-attachments/assets/e746b067-5fc1-464b-a16c-c9c9251698a4">
-<h1 id="model-driven-forms-for-flutter">Model-driven forms for Flutter</h1>
-<p>Velix is a dart / flutter based library that vastly simplifies data binding and validation in forms.</p>
-<h1 id="motivation">Motivation</h1>
+<img width="320" height="320" alt="velix" src="https://github.com/user-attachments/assets/21141c08-9a34-4337-88af-173ad2f044a6">
+<h1 id="introduction">Introduction</h1>
+<p>Velix is Dart/Flutter library implementing some of the core parts required in every Flutter application:</p>
+<ul>
+<li>type meta data</li>
+<li>specification and validation of type constraints</li>
+<li>general purpose mapping framework</li>
+<li>json mapper</li>
+<li>model-based two-way form data-binding</li>
+<li>command pattern for ui actions</li>
+</ul>
+<p>Check out some articles on Medium:</p>
+<ul>
+<li><a href="https://medium.com/@andreas.ernst7/velix-introducing-a-powerful-and-expressive-general-purpose-mapping-and-validation-library-e27a56501604">General purpose mapper</a></li>
+<li><a href="https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb">Commands</a></li>
+<li><a href="https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a">Model driven Forms</a></li>
+</ul>
+<p>Lets get a quick overview on the topics</p>
+<h1 id="validation">Validation</h1>
+<p>As in somne popular Typescript libraries like yup, it is possible to declare type constraints with a simple fluent language</p>
+<pre class="language-dart"><code class="language-dart">var type = IntType().greaterThan(0).lessThan(100);
+
+type.validate(-1); // meee....will throw
+</code></pre>
+<h1 id="type-meta-data">Type Meta-Data</h1>
+<p>In combination with a custom code generator, classes decorated with <code>@Dataclass</code> emit the meta data:</p>
+<pre class="language-dart"><code class="language-dart">@Dataclass()
+class Money {
+  // instance data
+
+  @Attribute(type: "length 7")
+  final String currency;
+  @Attribute(type: "&gt;= 0")
+  final int value;
+
+  const Money({required this.currency, required this.value});
+}
+</code></pre>
+<p>The information will be used by the mapping framework and a form data-binding.</p>
+<h1 id="mapping">Mapping</h1>
+<p>A general pupose mapping framnework let's you declaratively specify mappings:</p>
+<pre class="language-dart"><code class="language-dart"> var mapper = Mapper([
+        mapping&lt;Money, Money&gt;()
+            .map(all: matchingProperties()),
+
+        mapping&lt;Product, Product&gt;()
+            .map(from: "status", to: "status")
+            .map(from: "name", to: "name")
+            .map(from: "price", to: "price", deep: true),
+
+        mapping&lt;Invoice, Invoice&gt;()
+            .map(from: "date", to: "date")
+            .map(from: "products", to: "products", deep: true)
+      ]);
+
+var invoice = Invoice(...);
+
+var result = mapper.map(invoice);
+</code></pre>
+<p>As a special case, json mappiung is supported as well:</p>
+<pre class="language-dart"><code class="language-dart">// overall configuration  
+
+JSON(
+   validate: true,
+   converters: [Convert&lt;DateTime,String&gt;((value) =&gt; value.toIso8601String(), convertTarget: (str) =&gt; DateTime.parse(str))],
+   factories: [Enum2StringFactory()]
+);
+
+// funny money class
+
+@Dataclass()
+@JsonSerializable(includeNull: true) // doesn't make sense here, but anyway...
+class Money {
+  // instance data
+
+  @Attribute(type: "length 7")
+  @Json(name: "c", required: false, defaultValue: "EU")
+  final String currency;
+  @Json(name="v", required: false, defaultValue: 0)
+  @Attribute()
+  final int value;
+
+  const Money({required this.currency, this.value});
+}
+
+var price = Money(currency: "EU", value: 0);
+
+var json = JSON.serialize(price);
+var result = JSON.deserialize&lt;Money&gt;(json);
+</code></pre>
+<h1 id="commands">Commands</h1>
+<p>Commands let's you wrap simple methods in command objects, that</p>
+<ul>
+<li>are stateful ( enabled / disabled )</li>
+<li>can invoke interceptors while being executed ( e.g. exception handling, tarcing, ...), and</li>
+<li>influecn the UI whiel running ( e.g. spinner fro long-running commands )</li>
+</ul>
+<pre class="language-dart"><code class="language-dart">class _PersonPageState extends State&lt;PersonPage&gt; with CommandController&lt;PersonPage&gt;, _PersonPageCommands {
+   ...
+     
+  // commands
+
+  @override
+  @Command(i18n: "person.details",  icon: CupertinoIcons.save)
+  Future&lt;void&gt; _save) async {
+      await ... // service call
+
+      updateCommandState();
+  }
+
+  // it's always good patternm to have state management in one single place, instead scattered everywhere
+
+  @override
+  void updateCommandState() {
+    setCommandEnabled("save",  _controller.text.isNotEmpty);
+  }
+}
+</code></pre>
+<h1 id="model-base-form-data-binding">Model-base form data-binding</h1>
+<h2 id="motivation">Motivation</h2>
 <p>Looking at the effort required in Flutter to handle even simple forms i was shocked and started looking for
 alternatives that gave my about the same level of verbosity or productivity as i have known for example in Angular.</p>
 <p>While there are some form related libraries, they all skip the problem of binding widgets to values automatically, so i started my own
 library reusing ideas, that i have known for at least 20 years :-)
 Starting with the form binding quickly other solutions where integrated as well, that simplify development.</p>
-<h1 id="solution-idea">Solution idea</h1>
+<h2 id="solution-idea">Solution idea</h2>
 <p>The idea is a model based declarative approach, that utilizes</p>
 <ul>
 <li>reflection information with respect to the bound classes and fields</li>
@@ -64,7 +180,7 @@ Starting with the form binding quickly other solutions where integrated as well,
 <li>in combination with technical adapters that handle specific widgets and do the internal dirty work.</li>
 </ul>
 <p>As a result, all the typical boilerplate code is completely gone, resulting in a fraction of necessary code.</p>
-<h1 id="example">Example</h1>
+<p><strong>Example</strong></p>
 <p>Let's look at a simple form example first.</p>
 <p>Both the reflection and validation information is covered by specific decorators:</p>
 <pre class="language-dart"><code class="language-dart">@Dataclass()
@@ -157,7 +273,7 @@ class Person {
 If disabled, you would have to explicitly call <code>form.getValue()</code> to retrieve the updated model. The additional benefit you
 would gain here is that the form mapper remembers the initial values and will change its <code>dirty</code> state accordingly, which means that
 a reverted change will bring the form back to a non-dirty state!</p>
-<h1 id="benefits">Benefits</h1>
+<h2 id="benefits">Benefits</h2>
 <p>Velix drastically reduces the manual wiring and repetitive boilerplate that normally comes with Flutter forms.
 With it, you get:</p>
 <ul>
@@ -183,7 +299,7 @@ With it, you get:</p>
 <p>Minimal code footprint – Complex forms can be expressed in a fraction of the lines you’d normally need.</p>
 </li>
 </ul>
-<h1 id="comparison-to-existing-flutter-solutions">Comparison to Existing Flutter Solutions</h1>
+<h2 id="comparison-to-existing-flutter-solutions">Comparison to Existing Flutter Solutions</h2>
 <p>While Flutter has some established form libraries like
 flutter_form_builder and reactive_forms, they still expect you to:</p>
 <ul>
@@ -217,8 +333,7 @@ flutter_form_builder and reactive_forms, they still expect you to:</p>
 </ul>
 <p>The result is a WPF/Angular-style binding experience in Flutter — something currently missing from the ecosystem.</p>
 <h1 id="installation">Installation</h1>
-<p>The library is hosted on Github ( <a href="https://github.com/coolsamson7/velix">https://github.com/coolsamson7/velix</a> )</p>
-<p>and published on pub.dev (<a href="https://pub.dev/packages/velix">https://pub.dev/packages/velix</a> )</p>
+<p>The library is published on <a href="https://pub.dev/packages/velix">pub.dev</a></p>
 </section>
 
 

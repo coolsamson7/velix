@@ -157,9 +157,7 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
     TextEditingController? controller;
     FocusNode? focusNode;
 
-    final placeholder = args['placeholder'] as String?;
     final style = args['style'] as TextStyle?;
-    final padding = args['padding'] as EdgeInsetsGeometry?;
 
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;

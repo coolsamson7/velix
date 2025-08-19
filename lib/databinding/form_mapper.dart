@@ -37,7 +37,11 @@ class TypeProperty extends Property<ValuedWidgetContext> {
 
   void commit(ValuedWidgetContext context) {
     if ( isDirty()) {
-      callSetter(context.mapper!.instance, value, context);
+      if ( !context.mapper!.twoWay )
+        callSetter(context.mapper!.instance, value, context);
+
+      initialValue = value;
+      context.mapper!.addDirty(-1);
     }
   }
 
@@ -71,17 +75,15 @@ class TypeProperty extends Property<ValuedWidgetContext> {
         // take the value from the mapped child widget
 
         args[Symbol(name)] = child.value;
-
-        child.initialValue = child.value; // make it only happens once
       }
       else {
         // take it from the original - not mapped - object property
 
-        args[Symbol(name)] = typeDescriptor.get(this.initialValue, name); // ?? TEST TODO
+        args[Symbol(name)] = typeDescriptor.get(initialValue, name);
       }
     }
 
-    return initialValue = Function.apply(typeDescriptor.constructor, [], args);
+    return Function.apply(typeDescriptor.constructor, [], args);
   }
 
   void callSetter(dynamic instance, dynamic value, ValuedWidgetContext context) {
@@ -91,17 +93,13 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     if ( field!.isFinal ) {
       if ( parent != null) {
         // i need to construct a new instance of my parent, given all values
+        // was callSetter! TODO!
 
-        parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context);
-      }
-      else {
-        // the mapper instance is immutable, reconstruct it
-
-        context.mapper = null;
+        parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context); // TODO: ??? context.mapper!.instance
       }
     } // if
     else {
-      field!.setter!(instance, initialValue = value);
+      field!.setter!(instance, value);
     }
   }
 
@@ -122,7 +120,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
 
   @override
   void set(dynamic instance, dynamic value, ValuedWidgetContext context) {
-    if (this.value != value) {
+    if (this.value != value) { // oh fuck, value is Money, this sucks, since dirty is screedm, we need a == ...
       var wasDirty = isDirty();
 
       if (parent != null)
@@ -131,8 +129,6 @@ class TypeProperty extends Property<ValuedWidgetContext> {
       this.value = value;
 
       if (twoWay) {
-        initialValue = value;
-
         callSetter(instance, value, context);
       }
 
@@ -151,7 +147,7 @@ class RootProperty extends TypeProperty {
 
   // constructor
 
-  RootProperty({required this.mapper, super.field = null, super.path = ""});
+  RootProperty({required this.mapper, super.field, super.path = ""});
 
   // override
 
@@ -162,8 +158,10 @@ class RootProperty extends TypeProperty {
 
   @override
   void set(dynamic instance, dynamic value, ValuedWidgetContext context) {
-    print("l");
-  }
+    this.value = value;
+
+    mapper.instance = value;
+}
 
   @override
   void callSetter(dynamic instance, dynamic value, ValuedWidgetContext context) {
@@ -187,13 +185,11 @@ class RootProperty extends TypeProperty {
         // take the value from the mapped child widget
 
         args[Symbol(name)] = child.value;
-
-        child.initialValue = child.value; // make it only happens once
       }
       else {
         // take it from the original - not mapped - object property
 
-        args[Symbol(name)] = typeDescriptor.get(mapper.instance, name); // ?? TEST TODO
+        args[Symbol(name)] = typeDescriptor.get(mapper.instance, name);
       }
     }
 
@@ -207,7 +203,7 @@ class FormMapper {
 
   dynamic instance;
   late TypeDescriptor type;
-  late RootProperty? rootProperty;
+  RootProperty? rootProperty;
   final List<Operation<ValuedWidgetContext>> operations = [];
   final Map<String,Operation<ValuedWidgetContext>> path2Operation = {};
   late Transformer transformer;

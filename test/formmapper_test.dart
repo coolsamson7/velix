@@ -9,15 +9,15 @@ void main() {
   registerAllDescriptors();
   registerWidgets();
 
+  var price =  Money(currency: "EU", value: 1);
   var product = Product(name: 'product', price: Money(currency: "EU", value: 1), status: Status.available);
 
-  testWidgets('Replace text in a TextField', (WidgetTester tester) async {
+  testWidgets('deferred & mutable instance', (WidgetTester tester) async {
     // create mapper
 
     var mapper = FormMapper(instance: product, twoWay: false);
 
-    TextFormField currencyField;
-    TextFormField valueField;
+    bool dirty = false;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -28,11 +28,11 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    currencyField = mapper.bind<TextFormField>(
+                    mapper.bind<TextFormField>(
                       context: context,
                       path: 'price.currency',
                     ),
-                    valueField = mapper.bind<TextFormField>(
+                    mapper.bind<TextFormField>(
                       context: context,
                       path: 'price.value',
                     ),
@@ -46,30 +46,167 @@ void main() {
     );
 
     final currencyFinder = find.byKey(const Key('price.currency'));
-    final valueFinder = find.byKey(const Key('price.value'));
-
     // one-way mapper
 
     mapper.isDirty.addListener(() {
-     print( mapper.isDirty.value);
+     dirty = mapper.isDirty.value;
     });
 
     // set value
 
     mapper.setValue(product);
 
+    expect(dirty, equals(false));
+
     // change currency
 
     await tester.enterText(currencyFinder, 'EU1');
+
+    expect(dirty, equals(true));
+
+    await tester.enterText(currencyFinder, 'EU');
+
+    expect(dirty, equals(false));
+
+    await tester.enterText(currencyFinder, 'EU1');
+
+    expect(dirty, equals(true));
 
     // commit
 
     var productResult = mapper.commit<Product>();
 
-    print(productResult);
-
     // check text
 
     expect(productResult.price.currency, equals('EU1'));
   });
+
+  testWidgets('deferred & immutable instance', (WidgetTester tester) async {
+    // create mapper
+
+   var price =  Money(currency: "EU", value: 1);
+
+    var mapper = FormMapper(instance: price, twoWay: false);
+
+    bool dirty = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return Form(
+                key: mapper.getKey(),
+                child: Column(
+                  children: [
+                    mapper.bind<TextFormField>(
+                      context: context,
+                      path: 'currency',
+                    ),
+                    mapper.bind<TextFormField>(
+                      context: context,
+                      path: 'value',
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final currencyFinder = find.byKey(const Key('currency'));
+
+    // one-way mapper
+
+    mapper.isDirty.addListener(() {
+      dirty = mapper.isDirty.value;
+    });
+
+    // set value
+
+    mapper.setValue(price);
+
+    expect(dirty, equals(false));
+
+    // change currency
+
+    await tester.enterText(currencyFinder, 'EU1');
+
+    expect(dirty, equals(true));
+
+    // commit
+
+    var moneyResult = mapper.commit<Money>();
+
+    // check text
+
+    expect(moneyResult.currency, equals('EU1'));
+  });
+
+  testWidgets('deferred & immutable instance with partial mapping', (WidgetTester tester) async {
+    // create mapper
+
+    var price =  Money(currency: "EU", value: 1);
+
+    var mapper = FormMapper(instance: price, twoWay: false);
+
+    bool dirty = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return Form(
+                key: mapper.getKey(),
+                child: Column(
+                  children: [
+                    mapper.bind<TextFormField>(
+                      context: context,
+                      path: 'value',
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final valueFinder = find.byKey(const Key('value'));
+
+    // one-way mapper
+
+    mapper.isDirty.addListener(() {
+      dirty = mapper.isDirty.value;
+    });
+
+    // set value
+
+    mapper.setValue(price);
+
+    expect(dirty, equals(false));
+
+    // change currency
+
+    await tester.enterText(valueFinder, '2');
+
+    expect(dirty, equals(true));
+
+    // commit
+
+    var moneyResult = mapper.commit<Money>();
+
+    // check text
+
+    expect(moneyResult.currency, equals('EU'));
+    expect(moneyResult.value, equals(2));
+  });
+
+  // TODO testWidgets('two-way & mutable instance', (WidgetTester tester) async {});
+  // TODO testWidgets('two-way & immutable instance', (WidgetTester tester) async {});
+  // TODO testWidgets('two-way & immutable instance, not all fields mapped', (WidgetTester tester) async {});
 }

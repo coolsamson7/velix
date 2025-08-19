@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
+import 'package:velix/util/collections.dart';
 import 'text_adapter.dart';
 import 'valued_widget.dart';
 
@@ -13,7 +14,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
   // instance data
 
   final String path;
-  final FieldDescriptor field;
+  final FieldDescriptor? field;
 
   final List<TypeProperty> children = [];
 
@@ -50,39 +51,57 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     return value != initialValue;
   }
 
-  TypeProperty findChild(String property) {
-    return children.firstWhere((child) => child.path == property);
+  TypeProperty? findChild(String property) {
+    return findElement(children, (child) => child.path == property);
   }
 
   dynamic newInstance() {
     Map<Symbol, dynamic> args = {};
 
-    // TODO: check if not all attributes are mapped!
+    // fetch all required values
 
-    for (var constructorParameter in (field.type as ObjectType).typeDescriptor.constructorParameters) {
+    var typeDescriptor = (field!.type as ObjectType).typeDescriptor;
+
+    for (var constructorParameter in typeDescriptor.constructorParameters) {
       var name = constructorParameter.name;
 
       var child = findChild("$path.$name");
 
-      args[Symbol(name)] = child.value;
+      if ( child != null) {
+        // take the value from the mapped child widget
 
-      child.initialValue = child.value; // make it only happens once
+        args[Symbol(name)] = child.value;
+
+        child.initialValue = child.value; // make it only happens once
+      }
+      else {
+        // take it from the original - not mapped - object property
+
+        args[Symbol(name)] = typeDescriptor.get(this.initialValue, name); // ?? TEST TODO
+      }
     }
 
-    return Function.apply((field.type as ObjectType).typeDescriptor.constructor, [], args);
+    return initialValue = Function.apply(typeDescriptor.constructor, [], args);
   }
 
   void callSetter(dynamic instance, dynamic value, ValuedWidgetContext context) {
     if (parent != null)
       instance = parent!.get(instance, context);
 
-    if ( field.isFinal ) {
-      // i need to construct a new instance of my parent, given all values
+    if ( field!.isFinal ) {
+      if ( parent != null) {
+        // i need to construct a new instance of my parent, given all values
 
-      parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context); // TODO: check recursive
+        parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context);
+      }
+      else {
+        // the mapper instance is immutable, reconstruct it
+
+        context.mapper = null;
+      }
     } // if
     else {
-      field.setter!(instance, initialValue = value);
+      field!.setter!(instance, initialValue = value);
     }
   }
 
@@ -95,7 +114,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
         instance = parent!.get(instance, context);
       }
 
-      value = initialValue = field.getter(instance);
+      value = initialValue = field!.getter(instance);
     }
 
     return value;
@@ -125,12 +144,70 @@ class TypeProperty extends Property<ValuedWidgetContext> {
   }
 }
 
+class RootProperty extends TypeProperty {
+  // instance data
+
+  FormMapper mapper;
+
+  // constructor
+
+  RootProperty({required this.mapper, super.field = null, super.path = ""});
+
+  // override
+
+  @override
+  dynamic get(dynamic instance, ValuedWidgetContext context) {
+    return instance;
+  }
+
+  @override
+  void set(dynamic instance, dynamic value, ValuedWidgetContext context) {
+    print("l");
+  }
+
+  @override
+  void callSetter(dynamic instance, dynamic value, ValuedWidgetContext context) {
+    mapper.instance = value;
+  }
+
+  @override
+  dynamic newInstance() {
+    Map<Symbol, dynamic> args = {};
+
+    // fetch all required values
+
+    var typeDescriptor = mapper.type;
+
+    for (var constructorParameter in typeDescriptor.constructorParameters) {
+      var name = constructorParameter.name;
+
+      var child = findChild(name);
+
+      if ( child != null) {
+        // take the value from the mapped child widget
+
+        args[Symbol(name)] = child.value;
+
+        child.initialValue = child.value; // make it only happens once
+      }
+      else {
+        // take it from the original - not mapped - object property
+
+        args[Symbol(name)] = typeDescriptor.get(mapper.instance, name); // ?? TEST TODO
+      }
+    }
+
+    return Function.apply(typeDescriptor.constructor, [], args);
+  }
+}
+
 /// A [FormMapper] is used to bind field values to form elements
 class FormMapper {
   // instance data
 
-  final dynamic instance;
+  dynamic instance;
   late TypeDescriptor type;
+  late RootProperty? rootProperty;
   final List<Operation<ValuedWidgetContext>> operations = [];
   final Map<String,Operation<ValuedWidgetContext>> path2Operation = {};
   late Transformer transformer;
@@ -152,6 +229,9 @@ class FormMapper {
   FormMapper({required this.instance, this.twoWay=false}) {
     transformer = Transformer(operations);
     type = TypeDescriptor.forType(instance.runtimeType);
+
+    if ( type.isImmutable())
+      rootProperty = RootProperty(mapper: this);
   }
 
   // public
@@ -177,7 +257,7 @@ class FormMapper {
 
   TypeProperty computeProperty(TypeDescriptor typeDescriptor, String path) {
     TypeProperty? result = properties[path];
-    TypeProperty? parent;
+    TypeProperty? parent = rootProperty;
 
     if ( result == null) {
       String attribute = path;
@@ -188,7 +268,7 @@ class FormMapper {
 
         parent = computeProperty(typeDescriptor, parentPath);
 
-        typeDescriptor = (parent.field.type as ObjectType).typeDescriptor;
+        typeDescriptor = (parent.field!.type as ObjectType).typeDescriptor;
 
         attribute = path.substring(lastDot + 1);
       } // if

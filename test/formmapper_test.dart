@@ -64,7 +64,7 @@ void main() {
 
     // commit
 
-    var productResult = mapper.commit() as Product;
+    var productResult = mapper.commit<Product>();
 
     print(productResult);
 

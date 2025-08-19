@@ -132,6 +132,7 @@ class FormMapper {
   final dynamic instance;
   late TypeDescriptor type;
   final List<Operation<ValuedWidgetContext>> operations = [];
+  final Map<String,Operation<ValuedWidgetContext>> path2Operation = {};
   late Transformer transformer;
   final _formKey = GlobalKey<FormState>();
 
@@ -203,12 +204,12 @@ class FormMapper {
   }
 
   /// commit all pending changes to the instance and return it
-  dynamic commit() {
+  T commit<T>() {
     ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
     for ( Operation operation in operations)
       (operation.source as TypeProperty).commit(context);
 
-    return instance;
+    return instance as T;
   }
 
   void addDirty(int delta) {
@@ -238,6 +239,8 @@ class FormMapper {
           typeProperty,
           WidgetProperty(widget: widget, adapter: adapter, displayValue: displayValue, parseValue: parseValue)
       ));
+
+      path2Operation[path] = operations.last;
     }
     else {
       // just replace
@@ -247,21 +250,12 @@ class FormMapper {
     }
   }
 
-  Operation? findOperation(String path) { // TODO map!
-    for ( Operation operation in operations) {
-      if ( (operation.source as TypeProperty).path == path)
-        return operation;
-    }
-
-    return null;
+  Operation<ValuedWidgetContext>? findOperation(String path) {
+    return path2Operation[path];
   }
 
   TypeProperty findProperty(String path) {
-    for ( Operation operation in operations)
-      if ( (operation.source as TypeProperty).path == path)
-        return operation.source as TypeProperty;
-
-    throw Exception("unknown property $path");
+    return findOperation(path)!.source as TypeProperty;
   }
 
   void notifyChange({required String path, required dynamic value}) {

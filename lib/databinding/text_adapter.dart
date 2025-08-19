@@ -173,7 +173,7 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
 
     String? validate(dynamic value) {
       try {
-        typeProperty.field.type.validate(parseValue(value));
+        typeProperty.field.type.validate(value);
 
         return null;
       }
@@ -206,9 +206,9 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
       controller = TextEditingController();
 
       controller.addListener(() {
-        var error = validate(controller!.text); // does the coercion already!
+        final newValue = parseValue(controller!.text);
 
-        final newValue = parseValue(controller.text);
+        var error = validate(newValue);
 
         mapper.notifyChange(path: path, value: newValue);
 

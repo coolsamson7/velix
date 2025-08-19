@@ -156,12 +156,12 @@ class FormMapper {
   // public
 
   /// bind a field to a form element
-  /// [type] the element type
+  /// [T] the element type
   /// [path] a field path
   /// [context] the [BuildContext]
   /// [args] any parameters that will be passed to the newly created element
-  Widget bind(Type type, {required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
-    return ValuedWidget.build(type, context: context, mapper: this, path: path, args: args);
+  T bind<T>({required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
+    return ValuedWidget.build<T>(context: context, mapper: this, path: path, args: args);
   }
 
   /// return [True] if the form is valid.
@@ -247,7 +247,7 @@ class FormMapper {
     }
   }
 
-  Operation? findOperation(String path) {
+  Operation? findOperation(String path) { // TODO map!
     for ( Operation operation in operations) {
       if ( (operation.source as TypeProperty).path == path)
         return operation;

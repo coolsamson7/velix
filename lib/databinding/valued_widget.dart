@@ -120,14 +120,14 @@ class ValuedWidget {
   static ValuedWidgetAdapter getAdapter(Type type) {
     ValuedWidgetAdapter? adapter =  _adapters[type];
     if (adapter == null)
-      throw Exception("ouch");
+      throw Exception("missing adapter for type $type");
 
     return adapter;
   }
 
   // public
 
-  static Widget build(Type type, {required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
-    return getAdapter(type).build(context: context, mapper: mapper, path: path, args: args);
+  static T build<T>({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+    return getAdapter(T).build(context: context, mapper: mapper, path: path, args: args);
   }
 }

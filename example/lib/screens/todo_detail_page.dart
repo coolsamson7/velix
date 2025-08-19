@@ -109,19 +109,19 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              mapper.bind(CupertinoTextFormFieldRow, path: "title", context: context, args: {
+              mapper.bind<CupertinoTextFormFieldRow>(path: "title", context: context, args: {
                 "placeholder": 'Titel',
                 "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),   // add vertical padding
               }),
               const SizedBox(height: 16),
-              mapper.bind(CupertinoTextFormFieldRow, context: context,  path: "details.author", args: {
+              mapper.bind<CupertinoTextFormFieldRow>(context: context,  path: "details.author", args: {
                 "placeholder": 'Author',
                 "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               }),
               const SizedBox(height: 16),
-              mapper.bind(CupertinoTextFormFieldRow, context: context,  path: "details.priority", args: {
+              mapper.bind<CupertinoTextFormFieldRow>(context: context,  path: "details.priority", args: {
                 "placeholder": 'Priority',
                 "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -130,7 +130,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
               Row(
                 children: [
                   const Text('Erledigt:', style: TextStyle(fontSize: 18)),
-                  mapper.bind(CupertinoSwitch, context: context, path: "completed")
+                  mapper.bind<CupertinoSwitch>(context: context, path: "completed")
                 ],
               ),
               const SizedBox(height: 24),

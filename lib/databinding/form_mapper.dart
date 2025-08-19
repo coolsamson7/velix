@@ -47,6 +47,10 @@ class TypeProperty extends Property<ValuedWidgetContext> {
 
   // internal
 
+  Type getType() {
+    return field!.type.type;
+  }
+
   bool isInitialized() {
     return initialValue != this;
   }

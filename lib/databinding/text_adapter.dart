@@ -58,12 +58,12 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
       }
     }
 
-    if ( typeProperty.field!.type.type == int) { // TODO AAAAAA
+    if ( typeProperty.getType() == int) {
       parseValue = (dynamic value) => int.parse(value);
       textInputType = TextInputType.numberWithOptions(decimal: false);
       inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*')));
     }
-    else if  ( typeProperty.field!.type.type == double) {
+    else if  ( typeProperty.getType() == double) {
       parseValue = (dynamic value) => int.parse(value);
       textInputType = TextInputType.numberWithOptions(decimal: true);
       inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')));
@@ -183,12 +183,12 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
       }
     }
 
-    if ( typeProperty.field!.type.type == int) {
+    if ( typeProperty.getType() == int) {
       parseValue = (dynamic value) => int.parse(value);
       textInputType = TextInputType.numberWithOptions(decimal: false);
       inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*')));
     }
-    else if  ( typeProperty.field!.type.type == double) {
+    else if  ( typeProperty.getType() == double) {
       parseValue = (dynamic value) => int.parse(value);
       textInputType = TextInputType.numberWithOptions(decimal: true);
       inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')));

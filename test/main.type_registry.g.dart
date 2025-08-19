@@ -52,6 +52,87 @@ void registerAllDescriptors() {
     ]
   );
 
+  enumeration<Status>(
+    name: 'asset:velix/test/main.dart.Status',
+    values: Status.values
+  );
+
+  type<ImmutableProduct>(
+    name: 'asset:velix/test/main.dart.ImmutableProduct',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<Money>('price', isNamed: true, isRequired: true), 
+      param<Status>('status', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required Money price, required Status status}) => ImmutableProduct(name: name, price: price, status: status),
+    fields: [
+      field<ImmutableProduct,String>('name',
+        getter: (obj) => (obj as ImmutableProduct).name,
+        isFinal: true,
+      ), 
+      field<ImmutableProduct,Money>('price',
+        getter: (obj) => (obj as ImmutableProduct).price,
+        isFinal: true,
+      ), 
+      field<ImmutableProduct,Status>('status',
+        getter: (obj) => (obj as ImmutableProduct).status,
+        isFinal: true,
+      )
+    ]
+  );
+
+  type<ImmutableRoot>(
+    name: 'asset:velix/test/main.dart.ImmutableRoot',
+    params: [
+      param<ImmutableProduct>('product', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required ImmutableProduct product}) => ImmutableRoot(product: product),
+    fields: [
+      field<ImmutableRoot,ImmutableProduct>('product',
+        getter: (obj) => (obj as ImmutableRoot).product,
+        isFinal: true,
+      )
+    ]
+  );
+
+  type<Product>(
+    name: 'asset:velix/test/main.dart.Product',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<Money>('price', isNamed: true, isRequired: true), 
+      param<Status>('status', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
+    fields: [
+      field<Product,String>('name',
+        getter: (obj) => (obj as Product).name,
+        setter: (obj, value) => (obj as Product).name = value,
+      ), 
+      field<Product,Money>('price',
+        getter: (obj) => (obj as Product).price,
+        setter: (obj, value) => (obj as Product).price = value,
+      ), 
+      field<Product,Status>('status',
+        getter: (obj) => (obj as Product).status,
+        setter: (obj, value) => (obj as Product).status = value,
+      )
+    ]
+  );
+
+  type<MutableRoot>(
+    name: 'asset:velix/test/main.dart.MutableRoot',
+    params: [
+      param<Product>('product', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required Product product}) => MutableRoot(product: product),
+    fields: [
+      field<MutableRoot,Product>('product',
+        getter: (obj) => (obj as MutableRoot).product,
+        isFinal: true,
+      )
+    ]
+  );
+
   type<Mutable>(
     name: 'asset:velix/test/main.dart.Mutable',
     annotations: [
@@ -138,35 +219,6 @@ void registerAllDescriptors() {
       ), 
       field<Types,String>('string_var',
         getter: (obj) => (obj as Types).string_var,
-        isFinal: true,
-      )
-    ]
-  );
-
-  enumeration<Status>(
-    name: 'asset:velix/test/main.dart.Status',
-    values: Status.values
-  );
-
-  type<Product>(
-    name: 'asset:velix/test/main.dart.Product',
-    params: [
-      param<String>('name', isNamed: true, isRequired: true), 
-      param<Money>('price', isNamed: true, isRequired: true), 
-      param<Status>('status', isNamed: true, isRequired: true)
-    ],
-    constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
-    fields: [
-      field<Product,String>('name',
-        getter: (obj) => (obj as Product).name,
-        isFinal: true,
-      ), 
-      field<Product,Money>('price',
-        getter: (obj) => (obj as Product).price,
-        isFinal: true,
-      ), 
-      field<Product,Status>('status',
-        getter: (obj) => (obj as Product).status,
         isFinal: true,
       )
     ]

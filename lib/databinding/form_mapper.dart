@@ -90,12 +90,16 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     if (parent != null)
       instance = parent!.get(instance, context);
 
+    this.value = value;
+
     if ( field!.isFinal ) {
       if ( parent != null) {
         // i need to construct a new instance of my parent, given all values
-        // was callSetter! TODO!
 
-        parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context); // TODO: ??? context.mapper!.instance
+        parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context);
+      }
+      else {
+        print(1);
       }
     } // if
     else {

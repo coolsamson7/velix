@@ -289,15 +289,19 @@ class TypeDescriptor<T> {
   }
 
   /// return [true], if the type has a named field
-  /// [field] the field name
-  bool hasField(String field) {
-    return _fields[field] != null;
+  /// [name] the field name
+  bool hasField(String name) {
+    return _fields[name] != null;
   }
 
   /// return a named field.
-  /// [field] the field name
-  FieldDescriptor getField(String field) {
-    return _fields[field]!;
+  /// [name] the field name
+  FieldDescriptor getField(String name) {
+    var field = _fields[name];
+    if ( field != null)
+      return field;
+    else
+      throw Exception("unknown field $type.$name");
   }
 
   /// return all fields

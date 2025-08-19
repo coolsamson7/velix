@@ -97,14 +97,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     this.value = value;
 
     if ( field!.isFinal ) {
-      if ( parent != null) {
-        // i need to construct a new instance of my parent, given all values
-
         parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context);
-      }
-      else {
-        print(1);
-      }
     } // if
     else {
       field!.setter!(instance, value);
@@ -128,7 +121,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
 
   @override
   void set(dynamic instance, dynamic value, ValuedWidgetContext context) {
-    if (this.value != value) { // oh fuck, value is Money, this sucks, since dirty is screedm, we need a == ...
+    if (this.value != value) {
       var wasDirty = isDirty();
 
       if (parent != null)

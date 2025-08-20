@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/databinding/form_mapper.dart';
 import 'package:velix/databinding/registry.dart';
+import 'package:velix/databinding/text_adapter.dart';
 import 'package:velix/validation/validation.dart';
 import "main.dart";
 import 'main.type_registry.g.dart';
@@ -32,11 +33,11 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'price.currency',
                     ),
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'price.value',
                     ),
@@ -104,11 +105,11 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'product.price.currency',
                     ),
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'product.price.value',
                     ),
@@ -167,7 +168,7 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'currency',
                     )
@@ -216,7 +217,7 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'value',
                     )
@@ -271,7 +272,7 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'value',
                     ),
@@ -333,7 +334,7 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'value',
                     ),
@@ -396,7 +397,7 @@ void main() {
                 key: mapper.getKey(),
                 child: Column(
                   children: [
-                    mapper.bind<TextFormField>(
+                    mapper.text(
                       context: context,
                       path: 'price.value',
                     ),

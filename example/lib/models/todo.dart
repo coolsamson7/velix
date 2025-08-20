@@ -8,8 +8,10 @@ class Details {
   final String author;
   @Attribute(type: "greaterThan 0")
   final int priority;
+  @Attribute()
+  final DateTime date;
 
-  const Details({required this.author, required this.priority});
+  const Details({required this.author, required this.priority, required this.date});
 }
 
 @Dataclass()

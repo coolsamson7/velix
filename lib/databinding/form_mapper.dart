@@ -32,6 +32,11 @@ class SmartFormState extends FormState {
 
   bool get submitted => _submitted;
 
+  void triggerValidation() {
+    super.validate();
+    setState(() => {});
+  }
+
   // override
 
   @override
@@ -286,12 +291,12 @@ class FormMapper {
   // public
 
   /// bind a field to a form element
-  /// [T] the element type
+  /// [name] the element name
   /// [path] a field path
   /// [context] the [BuildContext]
   /// [args] any parameters that will be passed to the newly created element
-  T bind<T>({required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
-    return ValuedWidget.build<T>(context: context, mapper: this, path: path, args: args);
+  Widget bind(String name, {required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
+    return ValuedWidget.build(name, context: context, mapper: this, path: path, args: args);
   }
 
   /// return [True] if the form is valid.

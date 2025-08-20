@@ -1,5 +1,8 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:velix/util/collections.dart';
 
 import 'form_mapper.dart';
 import 'text_adapter.dart';
@@ -54,6 +57,12 @@ abstract class ValuedWidgetAdapter<T> {
   /// return the element type
   Type getType();
 
+  /// return the platform name
+  String getPlatform();
+
+  /// return the element name
+  String getName();
+
   /// return the current value given a widget
   /// [widget] the widget
   dynamic getValue(T widget);
@@ -72,7 +81,7 @@ abstract class ValuedWidgetAdapter<T> {
   /// [mapper] the [FormMapper]
   /// [path] a field path
   /// [args] and parameters that will be handled by the adapter
-  T build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}});
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}});
 }
 
 /// base class for widget adapters
@@ -80,12 +89,14 @@ abstract class ValuedWidgetAdapter<T> {
 abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   // instance data
 
-  late Type type;
+  final String name;
+  final Type type;
+  final String platform;
 
   // constructor
 
-  AbstractValuedWidgetAdapter() {
-    type = T;
+  AbstractValuedWidgetAdapter(this.name, this.platform) : type = T {
+    ValuedWidget.register(this);
   }
 
   // override
@@ -93,6 +104,16 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   @override
   Type getType() {
     return type;
+  }
+
+  @override
+  String getPlatform() {
+    return platform;
+  }
+
+  @override
+  String getName() {
+    return name;
   }
 
   @override
@@ -109,25 +130,39 @@ class ValuedWidgetContext {
 class ValuedWidget {
   // properties
 
-  static final Map<Type, ValuedWidgetAdapter> _adapters = {};
+  static final Map<String, List<ValuedWidgetAdapter>> _adapters = {};
+
+  static String platform = detectPlatform();
+
+  static String detectPlatform() {
+    return "iOS";
+    if (Platform.isIOS)
+      return TargetPlatform.iOS.name;
+    else
+      return ""; // wildcard?
+  }
 
   // administration
 
   static void register(ValuedWidgetAdapter adapter) {
-    _adapters[adapter.getType()] = adapter;
+    if ( !_adapters.containsKey(adapter.getName()))
+      _adapters[adapter.getName()] = [adapter];
+    else {
+      _adapters[adapter.getName()]!.add(adapter);
+    }
   }
 
-  static ValuedWidgetAdapter getAdapter(Type type) {
-    ValuedWidgetAdapter? adapter =  _adapters[type];
-    if (adapter == null)
-      throw Exception("missing adapter for type $type");
+  static ValuedWidgetAdapter getAdapter(String name) {
+    List<ValuedWidgetAdapter>? adapters = _adapters[name];
+    if (adapters == null)
+      throw Exception("missing adapter for type $name");
 
-    return adapter;
+    return findElement(adapters, (adapter) => adapter.getName() == name && (adapter.getPlatform() == platform || adapter.getPlatform() == ""))!;
   }
 
   // public
 
-  static T build<T>({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
-    return getAdapter(T).build(context: context, mapper: mapper, path: path, args: args);
+  static Widget build<T>(String name, {required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+    return getAdapter(name).build(context: context, mapper: mapper, path: path, args: args);
   }
 }

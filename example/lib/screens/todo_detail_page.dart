@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import 'package:velix/databinding/text_adapter.dart';
+import 'package:velix/databinding/slider_adapter.dart';
+import 'package:velix/databinding/datepicker_adapter.dart';
+
 import 'package:velix/velix.dart';
 
 import '../models/todo.dart';
@@ -106,34 +110,40 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
         child: SmartForm(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: mapper.getKey(),
-            //child: Builder(
-            //    builder: (context) {
-            //     return
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              mapper.bind<CupertinoTextFormFieldRow>(path: "title", context: context, args: {
-                "placeholder": 'Titel',
-                "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),   // add vertical padding
-              }),
+              mapper.text(path: "title",
+                context: context,
+                placeholder: 'Titel',
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),  // add vertical padding
+              ),
               const SizedBox(height: 16),
-              mapper.bind<CupertinoTextFormFieldRow>(context: context,  path: "details.author", args: {
-                "placeholder": 'Author',
-                "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              }),
+              mapper.text(context: context,  path: "details.author",
+                  placeholder: 'Author',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8)
+              ),
               const SizedBox(height: 16),
-              mapper.bind<CupertinoTextFormFieldRow>(context: context,  path: "details.priority", args: {
-                "placeholder": 'Priority',
-                "style": const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                "padding": const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              }),
+              mapper.slider(context: context,  path: "details.priority",
+                min: 0,
+                max: 10,
+                //placeholder: 'Priority',
+                //style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                //padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8
+                ),
+              //const SizedBox(height: 16),
+              //mapper.date(context: context,  path: "details.date",
+                //placeholder: 'Priority',
+                //style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                //padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8
+              //),
               const SizedBox(height: 16),
               Row(
                 children: [
                   const Text('Erledigt:', style: TextStyle(fontSize: 18)),
-                  mapper.bind<CupertinoSwitch>(context: context, path: "completed")
+                  mapper.bind("switch", context: context, path: "completed")
                 ],
               ),
               const SizedBox(height: 24),

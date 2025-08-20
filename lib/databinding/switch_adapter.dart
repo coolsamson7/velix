@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'valued_widget.dart';
 import 'form_mapper.dart';
 
-///  A [ValuedWidgetAdapter] for a [CupertinoSwitch]
+///  A [ValuedWidgetAdapter] for a [Switch]
 @WidgetAdapter()
-class CupertinoSwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
+class SwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
   // constructor
 
-  CupertinoSwitchAdapter();
+  SwitchAdapter() : super('switch', '');
 
   // override
 
@@ -40,5 +41,14 @@ class CupertinoSwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch
   @override
   void setValue(CupertinoSwitch widget, dynamic value, ValuedWidgetContext context) {
     // noop
+  }
+}
+
+extension BindSwitch on FormMapper {
+  Widget Switch({required String path,  required BuildContext context}) {
+    Map<String, dynamic> args = {
+    };
+
+    return bind("switch", path: path, context: context, args: args);
   }
 }

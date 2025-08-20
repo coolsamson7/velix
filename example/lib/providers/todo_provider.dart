@@ -9,7 +9,7 @@ class TodoProvider with ChangeNotifier {
   List<Todo> get todos => _todos;
 
   Future<Todo> addTodo(String title) async {
-    Todo todo = Todo(id: DateTime.now().toString(), details: Details(author: "Andreas", priority: 1), title: title);
+    Todo todo = Todo(id: DateTime.now().toString(), details: Details(author: "Andreas", priority: 1, date: DateTime.now()), title: title);
 
     _todos.add(todo);
 

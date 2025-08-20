@@ -12,135 +12,13 @@ typedef ParseValue<S,T> = S Function(T text);
 
 typedef Validator = String? Function(String value);
 
-///  A [ValuedWidgetAdapter] for a [CupertinoTextFormFieldRow]
-@WidgetAdapter()
-class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldRow> {
+abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<T> {
   // constructor
 
-  TextFieldAdapter();
+  AbstractTextWidgetAdapter(super.name, super.platform);
 
-  // override
+  // protected
 
-  @override
-  void dispose(WidgetProperty property) {
-    property.getArg<TextEditingController>("controller").dispose();
-    property.getArg<FocusNode>("focusNode").dispose();
-  }
-
-  @override
-  CupertinoTextFormFieldRow build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
-    TextEditingController? controller;
-    FocusNode? focusNode;
-
-    final placeholder = args['placeholder'] as String?;
-    final style = args['style'] as TextStyle?;
-    final padding = args['padding'] as EdgeInsetsGeometry?;
-
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
-
-    var displayValue, parseValue, validate, textInputType, inputFormatters;
-
-    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
-
-    bool blurred = false;
-    SmartFormState? form;
-
-    void Function() getFocusListener(FocusNode focusNode) {
-      return () {
-        if ( !focusNode.hasFocus) {
-          blurred = true;
-          print("$path is blurred" );
-        }
-      };
-    }
-
-    if ( widgetProperty != null) {
-      controller = widgetProperty.args["controller"];
-      focusNode = widgetProperty.args["focusNode"];
-    }
-    else {
-      controller = TextEditingController();
-      focusNode = FocusNode();
-
-      focusNode.addListener(getFocusListener(focusNode));
-
-      controller.addListener(() {
-        mapper.notifyChange(path: path, value: parseValue(controller!.text));
-
-        if (form != null) {
-          form!.validate();
-        }
-      });
-    } // else
-
-    String? Function(String? value) getValidator() {
-      return (String? value) {
-        final hasSubmitted = form?.submitted ?? false;
-        final error = validate(value);
-
-        // show only if for is submitted or the user has touched the field
-
-        final showError = hasSubmitted || (typeProperty.isDirty() && blurred);
-
-        return showError ? error : null;
-      };
-    }
-
-    final key = GlobalKey();
-
-    CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
-      key: key,
-      controller: controller,
-      focusNode: focusNode,
-      placeholder: placeholder,
-      style: style,
-      padding: padding,
-      validator: getValidator(),
-      keyboardType: textInputType,
-      inputFormatters: inputFormatters
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      form = SmartForm.of(key.currentContext ?? context);
-    });
-
-    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
-
-    if ( widgetProperty == null) {
-      widgetProperty = mapper.findOperation(path)?.target as WidgetProperty;
-
-      widgetProperty.args["controller"] = controller;
-      widgetProperty.args["focusNode"] = focusNode;
-    }
-
-    return result;
-  }
-
-  @override
-  dynamic getValue(CupertinoTextFormFieldRow widget) {
-    return widget.controller?.text;
-  }
-
-  @override
-  void setValue(CupertinoTextFormFieldRow widget, dynamic value, ValuedWidgetContext context) {
-    var newText =  value as String;
-
-    if (newText != widget.controller?.text) {
-      final previousSelection = widget.controller!.selection;
-
-      // set text
-
-      widget.controller?.text = newText;
-
-      // restore cursor
-
-      widget.controller!.selection = previousSelection;
-    }
-  }
-}
-
-abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<T> {
   (DisplayValue<dynamic,dynamic> displayValue, ParseValue<dynamic, dynamic> parseValue, FormFieldValidator<String> validate, TextInputType textInputTpye, List<TextInputFormatter> textInputFormatters) customize(TypeProperty typeProperty) {
 
     DisplayValue<dynamic,dynamic> displayValue = (dynamic value) => value.toString();
@@ -177,9 +55,13 @@ abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<
   }
 }
 
-///  A [ValuedWidgetAdapter] for a [TextFormField]
+///  A [ValuedWidgetAdapter] for a [CupertinoTextFormFieldRow]
 @WidgetAdapter()
-class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
+class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldRow> {
+  // constructor
+
+  TextFieldAdapter() : super('text', 'iOS');
+
   // override
 
   @override
@@ -189,7 +71,143 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
   }
 
   @override
-  TextFormField build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+    TextEditingController? controller;
+    FocusNode? focusNode;
+
+    final placeholder = args['placeholder'] as String?;
+    final style = args['style'] as TextStyle?;
+    final padding = args['padding'] as EdgeInsetsGeometry?;
+
+    var typeProperty = mapper.computeProperty(mapper.type, path);
+    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
+
+    var displayValue, parseValue, validate, textInputType, inputFormatters;
+
+    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
+
+    bool blurred = false;
+    SmartFormState? form;
+
+    final key = GlobalKey<FormFieldState>();
+
+    void Function() getFocusListener(FocusNode focusNode) {
+      return () {
+        if ( !focusNode.hasFocus && typeProperty.isDirty()) {
+          blurred = true;
+          print("$path trigger validation");
+          //form!.triggerValidation();
+          key.currentState?.validate();
+        }
+      };
+    }
+
+    if ( widgetProperty != null) {
+      controller = widgetProperty.args["controller"];
+      focusNode = widgetProperty.args["focusNode"];
+    }
+    else {
+      controller = TextEditingController();
+      focusNode = FocusNode();
+
+      focusNode.addListener(getFocusListener(focusNode));
+
+      controller.addListener(() {
+        mapper.notifyChange(path: path, value: parseValue(controller!.text));
+
+        if (form != null) {
+          //form!.triggerValidation();
+          key.currentState?.validate();
+        }
+      });
+    } // else
+
+    String? Function(String? value) getValidator() {
+      return (String? value) {
+        final hasSubmitted = form?.submitted ?? false;
+        final error = validate(value);
+
+        // show only if for is submitted or the user has touched the field
+
+        final showError = hasSubmitted || (typeProperty.isDirty() && blurred);
+
+        return showError ? error : null;
+      };
+    }
+
+
+
+    CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
+          key: key,//ValueKey(path),
+          controller: controller,
+          focusNode: focusNode,
+          placeholder: placeholder,
+          style: style,
+          padding: padding,
+          validator: getValidator(),
+          keyboardType: textInputType,
+          inputFormatters: inputFormatters
+      );
+
+    //key.currentState?.validate();
+
+    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
+
+    if ( widgetProperty == null) {
+      widgetProperty = mapper.findOperation(path)?.target as WidgetProperty;
+
+      widgetProperty.args["controller"] = controller;
+      widgetProperty.args["focusNode"] = focusNode;
+    }
+
+    return Builder(
+        builder: (ctx) {
+          form = SmartForm.of(ctx);
+
+          return result;
+        });
+  }
+
+  @override
+  dynamic getValue(CupertinoTextFormFieldRow widget) {
+    return widget.controller?.text;
+  }
+
+  @override
+  void setValue(CupertinoTextFormFieldRow widget, dynamic value, ValuedWidgetContext context) {
+    var newText =  value as String;
+
+    if (newText != widget.controller?.text) {
+      final previousSelection = widget.controller!.selection;
+
+      // set text
+
+      widget.controller?.text = newText;
+
+      // restore cursor
+
+      widget.controller!.selection = previousSelection;
+    }
+  }
+}
+
+///  A [ValuedWidgetAdapter] for a [TextFormField]
+@WidgetAdapter()
+class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
+  // constructor
+
+  TextFormFieldAdapter():super("text", "");
+
+  // override
+
+  @override
+  void dispose(WidgetProperty property) {
+    property.getArg<TextEditingController>("controller").dispose();
+    property.getArg<FocusNode>("focusNode").dispose();
+  }
+
+  @override
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
 
@@ -216,8 +234,6 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
         mapper.notifyChange(path: path, value: parseValue(controller!.text)); // TODO: if the parse fails?
       });
     } // else
-
-    // form hat: autovalidateMode: AutovalidateMode.onUserInteraction,
 
     TextFormField result = TextFormField(
       key: Key(path),
@@ -261,5 +277,17 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
 
       widget.controller!.selection = previousSelection;
     }
+  }
+}
+
+extension BindText on FormMapper {
+  Widget text({required String path,  required BuildContext context,  String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
+    Map<String, dynamic> args = {
+      "placeholder": placeholder,
+      "style": style,
+      "padding": padding,
+    };
+
+    return bind("text", path: path, context: context, args: args);
   }
 }

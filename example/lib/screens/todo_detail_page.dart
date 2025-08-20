@@ -29,7 +29,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   @override
   void _save() {
     if (mapper.validate()) {
-      Todo todo = mapper.commit();
+      Todo todo = mapper.commit<Todo>();
 
       // it could be a different object in case of immutable classes!
 
@@ -103,10 +103,13 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
+        child: SmartForm(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: mapper.getKey(),
-          child: Column(
+            //child: Builder(
+            //    builder: (context) {
+            //     return
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               mapper.bind<CupertinoTextFormFieldRow>(path: "title", context: context, args: {
@@ -151,7 +154,9 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
                 ],
               ),
             ],
-          ),
+          )
+                //}
+                //),
         ),
       ),
     );

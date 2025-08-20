@@ -10,9 +10,11 @@ import 'form_mapper.dart';
 typedef DisplayValue<S,T> = T Function(S);
 typedef ParseValue<S,T> = S Function(T text);
 
+typedef Validator = String? Function(String value);
+
 ///  A [ValuedWidgetAdapter] for a [CupertinoTextFormFieldRow]
 @WidgetAdapter()
-class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFieldRow> {
+class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldRow> {
   // constructor
 
   TextFieldAdapter();
@@ -37,39 +39,21 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
 
-    DisplayValue<dynamic,dynamic> displayValue  = (dynamic value) => value.toString();
-    ParseValue<dynamic,dynamic> parseValue = identity;
+    var displayValue, parseValue, validate, textInputType, inputFormatters;
 
-    TextInputType? textInputType;
+    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
 
-    List<TextInputFormatter> inputFormatters = [];
+    bool blurred = false;
+    SmartFormState? form;
 
-    String? validate(dynamic value) {
-      try {
-        typeProperty.field!.type.validate(parseValue(value));
-
-        return null;
-      }
-      on ValidationException catch(e) {
-        return TranslationManager.translate(e.violations.first);
-      }
-      catch(e) {
-        return e.toString();
-      }
+    void Function() getFocusListener(FocusNode focusNode) {
+      return () {
+        if ( !focusNode.hasFocus) {
+          blurred = true;
+          print("$path is blurred" );
+        }
+      };
     }
-
-    if ( typeProperty.getType() == int) {
-      parseValue = (dynamic value) => int.parse(value);
-      textInputType = TextInputType.numberWithOptions(decimal: false);
-      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*')));
-    }
-    else if  ( typeProperty.getType() == double) {
-      parseValue = (dynamic value) => int.parse(value);
-      textInputType = TextInputType.numberWithOptions(decimal: true);
-      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')));
-    }
-
-    String? errorText;
 
     if ( widgetProperty != null) {
       controller = widgetProperty.args["controller"];
@@ -77,34 +61,49 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
     }
     else {
       controller = TextEditingController();
+      focusNode = FocusNode();
+
+      focusNode.addListener(getFocusListener(focusNode));
 
       controller.addListener(() {
-        var error = validate(controller!.text); // does the coercion already!
+        mapper.notifyChange(path: path, value: parseValue(controller!.text));
 
-        final newValue = parseValue(controller.text);
-
-        mapper.notifyChange(path: path, value: newValue);
-
-        if (error != errorText) {
-          errorText = error;
+        if (form != null) {
+          form!.validate();
         }
       });
-
-      focusNode = FocusNode();
     } // else
 
+    String? Function(String? value) getValidator() {
+      return (String? value) {
+        final hasSubmitted = form?.submitted ?? false;
+        final error = validate(value);
+
+        // show only if for is submitted or the user has touched the field
+
+        final showError = hasSubmitted || (typeProperty.isDirty() && blurred);
+
+        return showError ? error : null;
+      };
+    }
+
+    final key = GlobalKey();
+
     CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
+      key: key,
       controller: controller,
       focusNode: focusNode,
       placeholder: placeholder,
       style: style,
       padding: padding,
-      validator: validate,
+      validator: getValidator(),
       keyboardType: textInputType,
-      inputFormatters: inputFormatters,
-      //errorText: errorText
-
+      inputFormatters: inputFormatters
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      form = SmartForm.of(key.currentContext ?? context);
+    });
 
     mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
@@ -141,37 +140,28 @@ class TextFieldAdapter extends AbstractValuedWidgetAdapter<CupertinoTextFormFiel
   }
 }
 
-///  A [ValuedWidgetAdapter] for a [TextFormField]
-@WidgetAdapter()
-class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
-  // override
+abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<T> {
+  (DisplayValue<dynamic,dynamic> displayValue, ParseValue<dynamic, dynamic> parseValue, FormFieldValidator<String> validate, TextInputType textInputTpye, List<TextInputFormatter> textInputFormatters) customize(TypeProperty typeProperty) {
 
-  @override
-  void dispose(WidgetProperty property) {
-    property.getArg<TextEditingController>("controller").dispose();
-    property.getArg<FocusNode>("focusNode").dispose();
-  }
-
-  @override
-  TextFormField build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
-    TextEditingController? controller;
-    FocusNode? focusNode;
-
-    final style = args['style'] as TextStyle?;
-
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
-
-    DisplayValue<dynamic,dynamic> displayValue  = (dynamic value) => value.toString();
-    ParseValue<dynamic,dynamic> parseValue = identity;
-
-    TextInputType? textInputType;
-
+    DisplayValue<dynamic,dynamic> displayValue = (dynamic value) => value.toString();
+    ParseValue<dynamic, dynamic> parseValue = identity;
+    TextInputType textInputType = TextInputType.text;
     List<TextInputFormatter> inputFormatters = [];
+
+    if ( typeProperty.getType() == int) {
+      parseValue = (dynamic value) => int.parse(value);
+      textInputType = TextInputType.numberWithOptions(decimal: false);
+      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*'))); // TODO
+    }
+    else if  ( typeProperty.getType() == double) {
+      parseValue = (dynamic value) => int.parse(value);
+      textInputType = TextInputType.numberWithOptions(decimal: true);
+      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')));
+    }
 
     String? validate(dynamic value) {
       try {
-        typeProperty.field!.type.validate(value);
+        typeProperty.validate(parseValue(value));
 
         return null;
       }
@@ -183,18 +173,36 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
       }
     }
 
-    if ( typeProperty.getType() == int) {
-      parseValue = (dynamic value) => int.parse(value);
-      textInputType = TextInputType.numberWithOptions(decimal: false);
-      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*')));
-    }
-    else if  ( typeProperty.getType() == double) {
-      parseValue = (dynamic value) => int.parse(value);
-      textInputType = TextInputType.numberWithOptions(decimal: true);
-      inputFormatters.add(FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')));
-    }
+    return (displayValue, parseValue, validate, textInputType, inputFormatters);
+  }
+}
 
-    String? errorText;
+///  A [ValuedWidgetAdapter] for a [TextFormField]
+@WidgetAdapter()
+class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
+  // override
+
+  @override
+  void dispose(WidgetProperty property) {
+    property.getArg<TextEditingController>("controller").dispose();
+    property.getArg<FocusNode>("focusNode").dispose();
+  }
+
+  @override
+  TextFormField build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+    var typeProperty = mapper.computeProperty(mapper.type, path);
+    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
+
+    DisplayValue<dynamic,dynamic> displayValue;
+    ParseValue<dynamic, dynamic> parseValue;
+    FormFieldValidator<String> validate;
+    TextInputType textInputType;
+    List<TextInputFormatter> inputFormatters;
+
+    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
+
+    TextEditingController? controller;
+    FocusNode? focusNode;
 
     if ( widgetProperty != null) {
       controller = widgetProperty.args["controller"];
@@ -202,31 +210,23 @@ class TextFormFieldAdapter extends AbstractValuedWidgetAdapter<TextFormField> {
     }
     else {
       controller = TextEditingController();
+      focusNode = FocusNode();
 
       controller.addListener(() {
-        final newValue = parseValue(controller!.text);
-
-        var error = validate(newValue);
-
-        mapper.notifyChange(path: path, value: newValue);
-
-        if (error != errorText) {
-          errorText = error;
-        }
+        mapper.notifyChange(path: path, value: parseValue(controller!.text)); // TODO: if the parse fails?
       });
-
-      focusNode = FocusNode();
     } // else
+
+    // form hat: autovalidateMode: AutovalidateMode.onUserInteraction,
 
     TextFormField result = TextFormField(
       key: Key(path),
       controller: controller,
       focusNode: focusNode,
-      style: style,
+      style: args['style'] as TextStyle?,
       validator: validate,
       keyboardType: textInputType,
-      inputFormatters: inputFormatters,
-      //errorText: errorText
+      inputFormatters: inputFormatters
     );
 
     mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);

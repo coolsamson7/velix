@@ -9,6 +9,48 @@ import '../reflectable/reflectable.dart';
 import '../mapper/transformer.dart';
 import '../validation/validation.dart';
 
+class SmartForm extends Form {
+  // static methods
+
+  static SmartFormState? of(BuildContext context) =>
+      context.findAncestorStateOfType<SmartFormState>();
+
+  // constructor
+
+  SmartForm({super.key, required super.child, super.onWillPop, super.onChanged, AutovalidateMode super.autovalidateMode = AutovalidateMode.disabled});
+
+  // override
+
+  @override
+  SmartFormState createState() => SmartFormState();
+}
+
+class SmartFormState extends FormState {
+  // instance data
+
+  bool _submitted = false;
+
+  bool get submitted => _submitted;
+
+  // override
+
+  @override
+  bool validate() {
+    _submitted = true;
+
+    final result = super.validate();
+    setState(() => {});
+
+    return result;
+  }
+
+  @override
+  void reset() {
+    _submitted = false;
+    super.reset();
+  }
+}
+
 /// @internal
 class TypeProperty extends Property<ValuedWidgetContext> {
   // instance data
@@ -35,6 +77,12 @@ class TypeProperty extends Property<ValuedWidgetContext> {
     }
   }
 
+  void rollback(ValuedWidgetContext context) {
+    if ( isDirty()) {
+      set(context.mapper!.instance, initialValue, context);
+    }
+  }
+
   void commit(ValuedWidgetContext context) {
     if ( isDirty()) {
       if ( !context.mapper!.twoWay )
@@ -46,6 +94,10 @@ class TypeProperty extends Property<ValuedWidgetContext> {
   }
 
   // internal
+
+  void validate(dynamic value) {
+    field!.type.validate(value);
+  }
 
   Type getType() {
     return field!.type.type;
@@ -287,6 +339,13 @@ class FormMapper {
       (operation.source as TypeProperty).commit(context);
 
     return instance as T;
+  }
+
+  /// rollback all changes
+  void rollback() {
+    ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
+    for ( Operation operation in operations)
+      (operation.source as TypeProperty).rollback(context);
   }
 
   void addDirty(int delta) {

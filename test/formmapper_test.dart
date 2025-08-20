@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/databinding/form_mapper.dart';
 import 'package:velix/databinding/registry.dart';
+import 'package:velix/validation/validation.dart';
 import "main.dart";
 import 'main.type_registry.g.dart';
 
@@ -10,6 +11,8 @@ void main() {
 
   registerAllDescriptors();
   registerWidgets();
+
+  TypeViolationTranslationProvider();
 
   var product = Product(name: 'product', price: Money(currency: "EU", value: 1), status: Status.available);
 
@@ -25,7 +28,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              return Form(
+              return SmartForm(
                 key: mapper.getKey(),
                 child: Column(
                   children: [
@@ -97,7 +100,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              return Form(
+              return SmartForm(
                 key: mapper.getKey(),
                 child: Column(
                   children: [
@@ -147,10 +150,113 @@ void main() {
     expect(rootResult.product.price.currency, equals('EU1'));
   });
 
+  testWidgets('rollback', (WidgetTester tester) async {
+    // create mapper
+
+    var price = Money(currency: "EU", value: 1);
+    var mapper = FormMapper(instance: price, twoWay: false);
+
+    bool dirty = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return SmartForm(
+                key: mapper.getKey(),
+                child: Column(
+                  children: [
+                    mapper.bind<TextFormField>(
+                      context: context,
+                      path: 'currency',
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final currencyFinder = find.byKey(const Key('currency'));
+
+    // one-way mapper
+
+    mapper.isDirty.addListener(() {
+      dirty = mapper.isDirty.value;
+    });
+
+    // set value
+
+    mapper.setValue(price);
+
+    await tester.enterText(currencyFinder, 'EU1');
+
+    mapper.rollback();
+
+    expect(dirty, equals(false));
+  });
+
+  testWidgets('validation', (WidgetTester tester) async {
+    // create mapper
+
+    var price = Money(currency: "EU", value: -1);
+    var mapper = FormMapper(instance: price, twoWay: false);
+
+    bool dirty = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return SmartForm(
+                key: mapper.getKey(),
+                child: Column(
+                  children: [
+                    mapper.bind<TextFormField>(
+                      context: context,
+                      path: 'value',
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final valueFinder = find.byKey(const Key('value'));
+
+    // one-way mapper
+
+    mapper.isDirty.addListener(() {
+      dirty = mapper.isDirty.value;
+    });
+
+    // set value
+
+    mapper.setValue(price);
+
+    expect(mapper.validate(), equals(false));
+
+    await tester.enterText(valueFinder, '1');
+    await tester.pump(); // let the widget rebuild
+
+    expect(mapper.validate(), equals(true));
+
+    var result = mapper.commit<Money>();
+
+    expect(result.value, equals(1));
+  });
+
   testWidgets('deferred & immutable instance with partial mapping', (WidgetTester tester) async {
     // create mapper
 
-    var price =  Money(currency: "EU", value: 1);
+    var price = Money(currency: "EU", value: 1);
 
     var mapper = FormMapper(instance: price, twoWay: false);
 
@@ -161,7 +267,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              return Form(
+              return SmartForm(
                 key: mapper.getKey(),
                 child: Column(
                   children: [
@@ -223,7 +329,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              return Form(
+              return SmartForm(
                 key: mapper.getKey(),
                 child: Column(
                   children: [
@@ -286,7 +392,7 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) {
-              return Form(
+              return SmartForm(
                 key: mapper.getKey(),
                 child: Column(
                   children: [

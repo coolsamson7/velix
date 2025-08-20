@@ -11,6 +11,26 @@ class Collections {
 }
 
 @Dataclass()
+class ImmutableRoot {
+  // instance data
+
+  @Attribute()
+  final ImmutableProduct product;
+
+  const ImmutableRoot({required this.product});
+}
+
+@Dataclass()
+class MutableRoot {
+  // instance data
+
+  @Attribute()
+  final Product product;
+
+  const MutableRoot({required this.product});
+}
+
+@Dataclass()
 @JsonSerializable(includeNull: true)
 class Money {
   // instance data
@@ -74,10 +94,19 @@ enum Status {
 }
 
 @Dataclass()
-class Product {
+class ImmutableProduct {
   final String name;
   final Money price;
   final Status status;
+
+  ImmutableProduct({required this.name, required this.price, required this.status});
+}
+
+@Dataclass()
+class Product {
+  String name;
+  Money price;
+  Status status;
 
   Product({required this.name, required this.price, required this.status});
 }

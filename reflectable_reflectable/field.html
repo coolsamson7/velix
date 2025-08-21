@@ -85,7 +85,7 @@
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType&lt;V&gt;(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isNullable: isNullable);
+  return FieldDescriptor(name: name, type: inferType&lt;V&gt;(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
 }</code></pre>
 </section>
 
@@ -113,7 +113,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.15.1
+      0.15.0
   </span>
   
 </footer>

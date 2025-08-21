@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'todo_home_page.dart';
+import 'test_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static const List<Widget> _pages = <Widget>[
     TodoHomePage(),
-    Center(child: Text('Einstellungen')),
+    TestPage(),
   ];
 
   void _onItemTapped(int index) {

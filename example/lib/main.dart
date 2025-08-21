@@ -60,8 +60,10 @@ class TODOApp extends StatelessWidget {
       ],
       child: CupertinoApp(
         title: 'TODO',
+
         theme: const CupertinoThemeData(
           primaryColor: CupertinoColors.activeBlue,
+
         ),
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,

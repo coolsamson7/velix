@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 
 import 'package:velix/databinding/widgets.dart';
 
@@ -12,9 +11,7 @@ part "test_page.command.g.dart";
 class TestPage extends StatefulWidget {
   // instance data
 
-  TestData data = TestData(string_data: '', int_data: 1, slider_int_data: 1, bool_data: false, datetime_data: DateTime.now());
-
-  TestPage({super.key});
+  const TestPage({super.key});
 
   @override
   State<TestPage> createState() => TestPageState();
@@ -24,6 +21,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   // instance data
 
   late FormMapper mapper;
+  TestData data = TestData(string_data: '', int_data: 1, slider_int_data: 1, bool_data: false, datetime_data: DateTime.now());
 
   // commands
 
@@ -65,7 +63,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   void initState() {
     super.initState();
 
-    mapper = FormMapper(instance: widget.data, twoWay: false);
+    mapper = FormMapper(instance: data, twoWay: false);
 
     mapper.isDirty.addListener(() {
       setState(() {
@@ -87,7 +85,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   Widget build(BuildContext context) {
     Widget result = CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text(widget.data.title,
+        middle: Text(data.string_data,
           style: TextStyle(
             fontSize: 17,         // Recommended standard size for nav bar
             fontWeight: FontWeight.w600,
@@ -105,46 +103,25 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-                mapper.text(path: "title",
+                mapper.text(path: "string_data",
                   context: context,
-                  placeholder: 'Titel',
+                  placeholder: 'String',
                   style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),  // add vertical padding
                 ),
                 const SizedBox(height: 16),
-                mapper.text(context: context,  path: "details.author",
-                    placeholder: 'Author',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8)
-                ),
-                const SizedBox(height: 16),
-                mapper.slider(context: context,  path: "details.priority",
+                mapper.slider(context: context,  path: "slider_int_data",
                   min: 0,
                   max: 10,
                 ),
                 const SizedBox(height: 16),
-                mapper.date(context: context,  path: "details.date"),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Text('Erledigt:', style: TextStyle(fontSize: 18)),
-                    mapper.bind("switch", context: context, path: "completed")
-                  ],
-                ),
+                mapper.Switch(context: context,  path: "bool_data"),
                 const SizedBox(height: 24),
                 Row(
                   children: [
                     CupertinoButton(
                         onPressed: isCommandEnabled("save") ?  save : null,
                         child: const Text('Speichern')
-                    ),
-                    const SizedBox(width: 16),
-                    CupertinoButton.filled(
-                      child: const Text('Löschen'),
-                      onPressed: () {
-                        todoProvider.removeTodo(widget.todo.id);
-                        Navigator.pop(context);
-                      },
                     ),
                   ],
                 ),
@@ -158,7 +135,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
 
     // set value
 
-    mapper.setValue(widget.data);
+    mapper.setValue(data);
 
     // done
 

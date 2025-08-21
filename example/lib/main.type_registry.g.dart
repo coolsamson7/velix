@@ -9,9 +9,10 @@ void registerAllDescriptors() {
     name: 'package:sample/models/todo.dart.Details',
     params: [
       param<String>('author', isNamed: true, isRequired: true), 
-      param<int>('priority', isNamed: true, isRequired: true)
+      param<int>('priority', isNamed: true, isRequired: true), 
+      param<DateTime>('date', isNamed: true, isRequired: true)
     ],
-    constructor: ({String author = '', int priority = 0}) => Details(author: author, priority: priority, date: DateTime.now()),
+    constructor: ({String author = '', int priority = 0, required DateTime date}) => Details(author: author, priority: priority, date: date),
     fields: [
       field<Details,String>('author',
         type: StringType().maxLength(7),
@@ -22,9 +23,8 @@ void registerAllDescriptors() {
         type: IntType().greaterThan(0),
         getter: (obj) => (obj as Details).priority,
         isFinal: true,
-      ),
+      ), 
       field<Details,DateTime>('date',
-        type: DateTimeType(),
         getter: (obj) => (obj as Details).date,
         isFinal: true,
       )
@@ -59,6 +59,43 @@ void registerAllDescriptors() {
         getter: (obj) => (obj as Todo).details,
         setter: (obj, value) => (obj as Todo).details = value,
         isNullable: true
+      )
+    ]
+  );
+
+  type<TestData>(
+    name: 'package:sample/models/todo.dart.TestData',
+    params: [
+      param<String>('string_data', isNamed: true, isRequired: true), 
+      param<int>('int_data', isNamed: true, isRequired: true), 
+      param<int>('slider_int_data', isNamed: true, isRequired: true), 
+      param<bool>('bool_data', isNamed: true, isRequired: true), 
+      param<DateTime>('datetime_data', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String string_data = '', int int_data = 0, int slider_int_data = 0, bool bool_data = false, required DateTime datetime_data}) => TestData(string_data: string_data, int_data: int_data, slider_int_data: slider_int_data, bool_data: bool_data, datetime_data: datetime_data),
+    fields: [
+      field<TestData,String>('string_data',
+        type: StringType().maxLength(7),
+        getter: (obj) => (obj as TestData).string_data,
+        isFinal: true,
+      ), 
+      field<TestData,int>('int_data',
+        type: IntType().greaterThan(0),
+        getter: (obj) => (obj as TestData).int_data,
+        setter: (obj, value) => (obj as TestData).int_data = value,
+      ), 
+      field<TestData,int>('slider_int_data',
+        type: IntType().greaterThan(0),
+        getter: (obj) => (obj as TestData).slider_int_data,
+        setter: (obj, value) => (obj as TestData).slider_int_data = value,
+      ), 
+      field<TestData,bool>('bool_data',
+        getter: (obj) => (obj as TestData).bool_data,
+        setter: (obj, value) => (obj as TestData).bool_data = value,
+      ), 
+      field<TestData,DateTime>('datetime_data',
+        getter: (obj) => (obj as TestData).datetime_data,
+        setter: (obj, value) => (obj as TestData).datetime_data = value,
       )
     ]
   );

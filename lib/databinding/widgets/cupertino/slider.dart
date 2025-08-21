@@ -4,7 +4,7 @@ import '../../../util/collections.dart';
 import '../../form_mapper.dart';
 import '../../valued_widget.dart';
 
-///  A [ValuedWidgetAdapter] for a [Slider]
+///  A [ValuedWidgetAdapter] for a [CupertinoSlider]
 @WidgetAdapter()
 class SliderAdapter extends AbstractValuedWidgetAdapter<CupertinoSlider> {
   // constructor

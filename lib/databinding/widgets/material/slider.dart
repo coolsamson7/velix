@@ -9,7 +9,7 @@ import '../../valued_widget.dart';
 class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   // constructor
 
-  SliderAdapter() : super('slider', 'iOS');
+  SliderAdapter() : super('slider', 'material');
 
   // override
 

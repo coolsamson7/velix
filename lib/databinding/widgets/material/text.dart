@@ -11,7 +11,7 @@ import '../../valued_widget.dart';
 class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
   // constructor
 
-  TextFormFieldAdapter():super("text", "");
+  TextFormFieldAdapter():super("text", "material");
 
   // override
 

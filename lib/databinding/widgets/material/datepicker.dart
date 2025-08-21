@@ -7,7 +7,7 @@ import '../../form_mapper.dart';
 
 @WidgetAdapter()
 class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>> {
-  DatePickerAdapter() : super('date', 'iOS');
+  DatePickerAdapter() : super('date', 'material');
 
   @override
   FormField<DateTime> build({

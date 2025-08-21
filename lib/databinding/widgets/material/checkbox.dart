@@ -9,7 +9,7 @@ import '../../valued_widget.dart';
 class CheckboxAdapter extends AbstractValuedWidgetAdapter<Checkbox> {
   // constructor
 
-  CheckboxAdapter() : super('checkbox', '');
+  CheckboxAdapter() : super('checkbox', 'material');
 
   // override
 

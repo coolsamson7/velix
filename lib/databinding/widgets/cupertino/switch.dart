@@ -4,7 +4,7 @@ import '../../../util/collections.dart';
 import '../../form_mapper.dart';
 import '../../valued_widget.dart';
 
-///  A [ValuedWidgetAdapter] for a [Switch]
+///  A [ValuedWidgetAdapter] for a [CupertinoSwitch]
 @WidgetAdapter()
 class SwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
   // constructor

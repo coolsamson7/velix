@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 
 import 'package:flutter/widgets.dart';
+import 'package:velix/databinding/valued_widget.dart';
 import 'package:velix/databinding/widgets/cupertino/registry.dart';
 import 'package:velix/databinding/widgets/material/registry.dart';
 
@@ -10,10 +11,16 @@ import '../util/collections.dart';
 import 'form_mapper.dart';
 
 void registerWidgets(TargetPlatform platform) {
-  if ( platform == TargetPlatform.iOS || platform == TargetPlatform.macOS)
+
+
+  if ( platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+    ValuedWidget.platform = "iOS";
     registerCupertinoWidgets();
-  else if ( platform == TargetPlatform.android)
+  }
+  else if ( platform == TargetPlatform.android) {
+    ValuedWidget.platform = "material";
     registerMaterialWidgets();
+  }
   else
     throw Exception("unsupported platform $platform");
 }

@@ -133,15 +133,7 @@ class ValuedWidget {
 
   static final Map<Key, ValuedWidgetAdapter> _adapters = {};
 
-  static String platform = detectPlatform();
-
-  static String detectPlatform() {
-    return "iOS"; // TODO
-    if (Platform.isIOS)
-      return TargetPlatform.iOS.name;
-    else
-      return ""; // wildcard?
-  }
+  static String platform = "iOS";
 
   // administration
 
@@ -155,7 +147,7 @@ class ValuedWidget {
     if (result == null)
       throw Exception("missing adapter for type $name");
 
-    return result!;
+    return result;
   }
 
   // public

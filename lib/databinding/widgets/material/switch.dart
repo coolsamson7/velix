@@ -9,7 +9,7 @@ import '../../valued_widget.dart';
 class SwitchAdapter extends AbstractValuedWidgetAdapter<Switch> {
   // constructor
 
-  SwitchAdapter() : super('switch', '');
+  SwitchAdapter() : super('switch', 'material');
 
   // override
 

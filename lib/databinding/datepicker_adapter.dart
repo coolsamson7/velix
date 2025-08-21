@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show showCupertinoModalPopup;
 import 'package:intl/intl.dart';
 import 'package:velix/databinding/valued_widget.dart';
 
+import '../util/collections.dart';
 import 'form_mapper.dart';
 
 @WidgetAdapter()
@@ -14,8 +15,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
     required BuildContext context,
     required FormMapper mapper,
     required String path,
-    Map<String, dynamic> args = const {},
-  }) {
+    required Keywords args}) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
     DateTime? initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
 
@@ -115,13 +115,10 @@ extension DatePickerFormFieldExtension on FormMapper {
     String? label,
     DateFormat? dateFormat,
   }) {
-    Map<String, dynamic> args = {
-      if (firstDate != null) 'firstDate': firstDate,
-      if (lastDate != null) 'lastDate': lastDate,
-      if (label != null) 'label': label,
-      if (dateFormat != null) 'dateFormat': dateFormat,
-    };
-
-    return bind('date', path: path, context: context, args: args);
+    return bind('date', path: path, context: context, args: Keywords({
+      'firstDate': firstDate,
+      'lastDate': lastDate,
+      'dateFormat': dateFormat
+    }));
   }
 }

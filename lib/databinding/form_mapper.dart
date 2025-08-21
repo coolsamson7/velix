@@ -295,8 +295,8 @@ class FormMapper {
   /// [path] a field path
   /// [context] the [BuildContext]
   /// [args] any parameters that will be passed to the newly created element
-  Widget bind(String name, {required String path,  required BuildContext context, Map<String, dynamic> args = const {} }) {
-    return ValuedWidget.build(name, context: context, mapper: this, path: path, args: args);
+  Widget bind(String name, {required String path,  required BuildContext context, Keywords? args }) {
+    return ValuedWidget.build(name, context: context, mapper: this, path: path, args: args ?? Keywords.empty);
   }
 
   /// return [True] if the form is valid.

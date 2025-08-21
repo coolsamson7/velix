@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:velix/i18n/i18n.dart';
 
+import '../util/collections.dart';
 import '../validation/validation.dart';
 import 'valued_widget.dart';
 import 'form_mapper.dart';
@@ -66,18 +67,16 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
 
   @override
   void dispose(WidgetProperty property) {
-    property.getArg<TextEditingController>("controller").dispose();
-    property.getArg<FocusNode>("focusNode").dispose();
+    property.arg<TextEditingController>("controller").dispose();
+    property.arg<FocusNode>("focusNode").dispose();
   }
 
   @override
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
     TextEditingController? controller;
     FocusNode? focusNode;
 
-    final placeholder = args['placeholder'] as String?;
-    final style = args['style'] as TextStyle?;
-    final padding = args['padding'] as EdgeInsetsGeometry?;
+
 
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
@@ -135,15 +134,13 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
       };
     }
 
-
-
     CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
           key: key,//ValueKey(path),
           controller: controller,
           focusNode: focusNode,
-          placeholder: placeholder,
-          style: style,
-          padding: padding,
+          placeholder:  args.get<String>('placeholder'),
+          style: args.get<TextStyle>('style'),
+          padding: args.get<EdgeInsetsGeometry>('padding'),
           validator: getValidator(),
           keyboardType: textInputType,
           inputFormatters: inputFormatters
@@ -202,12 +199,12 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
 
   @override
   void dispose(WidgetProperty property) {
-    property.getArg<TextEditingController>("controller").dispose();
-    property.getArg<FocusNode>("focusNode").dispose();
+    property.arg<TextEditingController>("controller").dispose();
+    property.arg<FocusNode>("focusNode").dispose();
   }
 
   @override
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
 
@@ -239,7 +236,7 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
       key: Key(path),
       controller: controller,
       focusNode: focusNode,
-      style: args['style'] as TextStyle?,
+      style: args.get<TextStyle>('style'),
       validator: validate,
       keyboardType: textInputType,
       inputFormatters: inputFormatters
@@ -282,12 +279,10 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
 
 extension BindText on FormMapper {
   Widget text({required String path,  required BuildContext context,  String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
-    Map<String, dynamic> args = {
+    return bind("text", path: path, context: context, args: Keywords({
       "placeholder": placeholder,
       "style": style,
       "padding": padding,
-    };
-
-    return bind("text", path: path, context: context, args: args);
+    }));
   }
 }

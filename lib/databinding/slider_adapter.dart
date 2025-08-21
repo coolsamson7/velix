@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../util/collections.dart';
 import 'valued_widget.dart';
 import 'form_mapper.dart';
 
@@ -14,7 +15,7 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<CupertinoSlider> {
   // override
 
   @override
-  CupertinoSlider build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+  CupertinoSlider build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
 
     var initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
@@ -49,11 +50,9 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<CupertinoSlider> {
 
 extension BindSlider on FormMapper {
   Widget slider({required String path,  required BuildContext context, required int min,  required int max}) {
-    Map<String, dynamic> args = {
+    return bind("slider", path: path, context: context, args: Keywords({
       "min": min,
       "max": max,
-    };
-
-    return bind("slider", path: path, context: context, args: args);
+    }));
   }
 }

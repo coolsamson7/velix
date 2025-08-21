@@ -30,7 +30,7 @@ class WidgetProperty extends Property<ValuedWidgetContext> {
 
   // public
 
-  T getArg<T>(String key) {
+  T arg<T>(String key) {
     return args[key] as T;
   }
 
@@ -81,7 +81,7 @@ abstract class ValuedWidgetAdapter<T> {
   /// [mapper] the [FormMapper]
   /// [path] a field path
   /// [args] and parameters that will be handled by the adapter
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}});
+  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args});
 }
 
 /// base class for widget adapters
@@ -162,7 +162,7 @@ class ValuedWidget {
 
   // public
 
-  static Widget build<T>(String name, {required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
-    return getAdapter(name).build(context: context, mapper: mapper, path: path, args: args);
+  static Widget build<T>(String name, {required BuildContext context, required FormMapper mapper, required String path, Keywords? args}) {
+    return getAdapter(name).build(context: context, mapper: mapper, path: path, args: args ?? Keywords.empty);
   }
 }

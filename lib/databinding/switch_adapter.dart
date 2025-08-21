@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../util/collections.dart';
 import 'valued_widget.dart';
 import 'form_mapper.dart';
 
@@ -14,7 +15,7 @@ class SwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
   // override
 
   @override
-  CupertinoSwitch build({required BuildContext context, required FormMapper mapper, required String path, Map<String, dynamic> args = const {}}) {
+  CupertinoSwitch build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
 
     var initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
@@ -46,9 +47,6 @@ class SwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
 
 extension BindSwitch on FormMapper {
   Widget Switch({required String path,  required BuildContext context}) {
-    Map<String, dynamic> args = {
-    };
-
-    return bind("switch", path: path, context: context, args: args);
+    return bind("switch", path: path, context: context, args: Keywords({}));
   }
 }

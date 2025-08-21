@@ -365,7 +365,7 @@ ConstructorParameter param<T>(String name, {
 }
 
 /// @internal
-AbstractType inferType<T>(AbstractType? t) {
+AbstractType inferType<T>(AbstractType? t, bool isNullable) {
   if ( t != null)
     return t;
 
@@ -379,15 +379,29 @@ AbstractType inferType<T>(AbstractType? t) {
     DateTime: DateTimeType()
   };
 
-  var result = types[type];
+  final Map<Type, AbstractType> nullableTypes = {
+    String: StringType().optional(),    // default unconstrained
+    int: IntType().optional(),
+    double: DoubleType().optional(),
+    bool: BoolType().optional(),
+    DateTime: DateTimeType().optional()
+  };
+
+  var result = isNullable ? nullableTypes[type] : types[type];
 
   if ( result == null)
-    if ( type.toString().startsWith("List<"))
-      return ListType(type);
-    else
-      return ObjectType(type);
-  else
-    return types[type]!;
+    if ( type.toString().startsWith("List<")) {
+      result = ListType(type);
+      if ( isNullable )
+        result = result.optional();
+    }
+    else {
+      result = ObjectType(type);
+      if ( isNullable )
+        result = result.optional();
+    }
+
+   return result;
 }
 
 FieldDescriptor field<T,V>(String name, {
@@ -400,5 +414,5 @@ FieldDescriptor field<T,V>(String name, {
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType<V>(type), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
+  return FieldDescriptor(name: name, type: inferType<V>(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
 }

@@ -155,6 +155,7 @@ void registerAllDescriptors() {
         setter: (obj, value) => (obj as Mutable).price = value,
       ), 
       field<Mutable,DateTime>('dateTime',
+        type: DateTimeType().optional(),
         annotations: [
           Json(name: "date-time")
         ],

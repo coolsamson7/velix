@@ -8,7 +8,7 @@ typedef Check<T> = bool Function(T);
 class Test<T> {
   final Type type;
   final String name;
-  final bool stop;
+  bool stop;
   bool ignore;
   final Map<String, dynamic> params;
   final Check<T> check;
@@ -125,6 +125,9 @@ class AbstractType<T> {
       if (index == 0) {
         buffer.write(runtimeType.toString());
         buffer.write("()");
+
+        if ( test.ignore)
+          buffer.write(".optional()");
       }
       else {
         buffer.write('.$name');
@@ -209,6 +212,7 @@ class AbstractType<T> {
     var typeTest = tests[0];
 
     typeTest.ignore = true;
+    typeTest.stop = true;
 
     return this;
   }

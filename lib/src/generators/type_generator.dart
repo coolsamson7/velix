@@ -263,9 +263,16 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   }
 
   String fieldType(FieldElement field) {
+    var nullable = false;
     var typeName =  field.type.getDisplayString();
 
+    if (typeName.endsWith("?")) {
+      typeName = typeName.substring(0, typeName.length - 1);
+      nullable = true;
+    }
+
     AbstractType? constraint = switch (typeName) {
+      "DateTime" => DateTimeType(),
       "String" => StringType(),
       "int" => IntType(),
       "double" => DoubleType(),
@@ -273,7 +280,17 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       _ => null
     };
 
+    // literal types
+
     if ( constraint != null) {
+      // add optional
+
+      if ( nullable) {
+        constraint = constraint.optional();
+      }
+
+      // add constraints
+
       for (final annotation in field.metadata.annotations) {
         final constant = annotation.computeConstantValue();
         if (constant == null) continue;
@@ -291,9 +308,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       return constraint.code();
     }
     else {
-      if (typeName.endsWith("?"))
-        typeName = typeName.substring(0, typeName.length - 1);
-
       if ( typeName.startsWith("List<")) {
         return "ListType($typeName)";
       }

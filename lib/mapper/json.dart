@@ -525,9 +525,9 @@ class JSON {
   }
 
   JSONMapper getMapper(Type type) {
-    var mapper = mappers[type.runtimeType];
+    var mapper = mappers[type];
     if ( mapper == null) {
-      mappers[type.runtimeType] = mapper = JSONMapper(type: type, validate: validate);
+      mappers[type] = mapper = JSONMapper(type: type, validate: validate);
     }
 
     return mapper;

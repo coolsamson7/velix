@@ -195,6 +195,7 @@ void main() {
     await tester.enterText(currencyFinder, 'EU1');
 
     mapper.rollback();
+    await tester.pump();
 
     expect(dirty, equals(false));
   });
@@ -369,6 +370,7 @@ void main() {
     // commit
 
     mapper.commit();
+    await tester.pump();
 
     expect(dirty, equals(false));
 
@@ -432,6 +434,7 @@ void main() {
     // commit
 
     mapper.commit();
+    await tester.pump();
 
     expect(dirty, equals(false));
 

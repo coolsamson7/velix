@@ -396,7 +396,7 @@ class FormMapper {
 
   void markDirty(bool dirty) {
     if ( emitOnDirty )
-      eventStream.add(FormEvent(isDirty: isDirty));
+      eventStream.add(FormEvent(isDirty: dirty));
   }
 
   void dispose() {

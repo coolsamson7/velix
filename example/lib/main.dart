@@ -23,6 +23,13 @@ class EasyLocalizationTranslator extends Translator {
 }
 
 void main() async {
+  // configure json stuff
+
+  JSON(
+      validate: false,
+      converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+      factories: [Enum2StringFactory()]);
+
   TypeViolationTranslationProvider();
 
   registerAllDescriptors();
@@ -62,8 +69,8 @@ class TODOApp extends StatelessWidget {
         title: 'TODO',
 
         theme: const CupertinoThemeData(
+          brightness: Brightness.light,
           primaryColor: CupertinoColors.activeBlue,
-
         ),
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,

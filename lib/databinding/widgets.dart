@@ -28,10 +28,11 @@ void registerWidgets(TargetPlatform platform) {
 // text
 
 extension BindText on FormMapper {
-  Widget text({required String path,  required BuildContext context,  String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
+  Widget text({required String path,  required BuildContext context,  String? prefix, String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
     return bind("text", path: path, context: context, args: Keywords({
       "placeholder": placeholder,
       "style": style,
+      "prefix": prefix,
       "padding": padding,
     }));
   }

@@ -85,6 +85,7 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
           key: ValueKey(path), // key
           controller: controller,
           focusNode: focusNode,
+          prefix: args.get<String>('prefix') != null ? Text(args.get<String>('prefix')!) : null,
           placeholder:  args.get<String>('placeholder'),
           style: args.get<TextStyle>('style'),
           padding: args.get<EdgeInsetsGeometry>('padding'),

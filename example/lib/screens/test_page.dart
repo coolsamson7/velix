@@ -1,7 +1,6 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
-
-import 'package:velix/databinding/widgets.dart';
-
 import 'package:velix/velix.dart';
 
 import '../models/todo.dart';
@@ -17,11 +16,18 @@ class TestPage extends StatefulWidget {
   State<TestPage> createState() => TestPageState();
 }
 
-class TestPageState extends State<TestPage> with CommandController<TestPage>, TestPageStateCommands {
+class TestPageState extends State<TestPage>
+    with CommandController<TestPage>, TestPageStateCommands {
   // instance data
 
   late FormMapper mapper;
-  TestData data = TestData(string_data: '', int_data: 1, slider_int_data: 1, bool_data: false, datetime_data: DateTime.now());
+  TestData data = TestData(
+    string_data: '',
+    int_data: 1,
+    slider_int_data: 1,
+    bool_data: false,
+    datetime_data: DateTime.now(),
+  );
 
   // commands
 
@@ -31,7 +37,6 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
     if (mapper.validate()) {
       // mapper.commit<Todo>();
 
-
       // close screen
 
       Navigator.pop(context);
@@ -40,9 +45,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
 
   @Command()
   @override
-  void _cancel() {
-
-  }
+  void _cancel() {}
 
   // override
 
@@ -63,7 +66,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   void initState() {
     super.initState();
 
-    mapper = FormMapper(instance: data, twoWay: false);
+    mapper = FormMapper(instance: data, twoWay: true);
 
     mapper.isDirty.addListener(() {
       setState(() {
@@ -84,51 +87,68 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   @override
   Widget build(BuildContext context) {
     Widget result = CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(data.string_data,
-          style: TextStyle(
-            fontSize: 17,         // Recommended standard size for nav bar
-            fontWeight: FontWeight.w600,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,),
-
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SmartForm(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            key: mapper.getKey(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      navigationBar: CupertinoNavigationBar(middle: Text('Databinding')),
+      child: SafeArea(
+        child: Column(
+          children: [
+            CupertinoFormSection.insetGrouped(
               children: [
-                const SizedBox(height: 16),
-                mapper.text(path: "string_data",
+                mapper.text(
+                  path: "string_data",
                   context: context,
-                  placeholder: 'String',
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),  // add vertical padding
+                  placeholder: "Enter",
+                  prefix: "String",
                 ),
-                const SizedBox(height: 16),
-                mapper.slider(context: context,  path: "slider_int_data",
-                  min: 0,
-                  max: 10,
+
+                mapper.text(
+                  path: "int_data",
+                  context: context,
+                  placeholder: "Enter",
+                  prefix: "Int",
                 ),
-                const SizedBox(height: 16),
-                mapper.Switch(context: context,  path: "bool_data"),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    CupertinoButton(
-                        onPressed: isCommandEnabled("save") ?  save : null,
-                        child: const Text('Speichern')
-                    ),
-                  ],
+
+                CupertinoFormRow(
+                  prefix: Text('Slider'),
+                  child: mapper.slider(
+                    path: "slider_int_data",
+                    context: context,
+                    min: 0,
+                    max: 10,
+                  ),
+                ),
+
+                CupertinoFormRow(
+                  prefix: Text('Bool'),
+                  child: mapper.Switch(path: "bool_data", context: context),
                 ),
               ],
-            )
-          //}
-          //),
+            ),
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: CupertinoColors.systemGrey6,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: CupertinoColors.separator),
+              ),
+              child: CupertinoTextField(
+                controller: TextEditingController(
+                  text: const JsonEncoder.withIndent(
+                    '  ',
+                  ).convert(JSON.serialize(data)),
+                ),
+                readOnly: true,
+                maxLines: 8,
+                minLines: 3,
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 14,
+                  color: CupertinoColors.black,
+                ),
+                decoration: null,
+              ),
+            ),
+          ],
         ),
       ),
     );

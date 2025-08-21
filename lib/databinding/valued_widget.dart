@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:velix/util/collections.dart';
 
 import 'form_mapper.dart';
-import 'text_adapter.dart';
 import '../mapper/transformer.dart';
 
 /// decorates widget adapters
@@ -126,16 +125,18 @@ class ValuedWidgetContext {
   ValuedWidgetContext({required this.mapper});
 }
 
+typedef Key = (String, String);
+
 /// A registry for [ValuedWidgetAdapter]s
 class ValuedWidget {
   // properties
 
-  static final Map<String, List<ValuedWidgetAdapter>> _adapters = {};
+  static final Map<Key, ValuedWidgetAdapter> _adapters = {};
 
   static String platform = detectPlatform();
 
   static String detectPlatform() {
-    return "iOS";
+    return "iOS"; // TODO
     if (Platform.isIOS)
       return TargetPlatform.iOS.name;
     else
@@ -145,19 +146,16 @@ class ValuedWidget {
   // administration
 
   static void register(ValuedWidgetAdapter adapter) {
-    if ( !_adapters.containsKey(adapter.getName()))
-      _adapters[adapter.getName()] = [adapter];
-    else {
-      _adapters[adapter.getName()]!.add(adapter);
-    }
+     _adapters[(platform, adapter.getName())] = adapter;
   }
 
   static ValuedWidgetAdapter getAdapter(String name) {
-    List<ValuedWidgetAdapter>? adapters = _adapters[name];
-    if (adapters == null)
+    ValuedWidgetAdapter? result = _adapters[(platform, name)] ?? _adapters[("", name)];
+
+    if (result == null)
       throw Exception("missing adapter for type $name");
 
-    return findElement(adapters, (adapter) => adapter.getName() == name && (adapter.getPlatform() == platform || adapter.getPlatform() == ""))!;
+    return result!;
   }
 
   // public

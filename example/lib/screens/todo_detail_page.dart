@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import 'package:velix/databinding/text_adapter.dart';
-import 'package:velix/databinding/slider_adapter.dart';
-import 'package:velix/databinding/datepicker_adapter.dart';
+import 'package:velix/databinding/widgets.dart';
 
 import 'package:velix/velix.dart';
 

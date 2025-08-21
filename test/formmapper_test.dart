@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/databinding/form_mapper.dart';
-import 'package:velix/databinding/registry.dart';
-import 'package:velix/databinding/text_adapter.dart';
+import 'package:velix/databinding/widgets.dart';
 import 'package:velix/validation/validation.dart';
 import "main.dart";
 import 'main.type_registry.g.dart';
@@ -11,7 +10,7 @@ void main() {
   // initialize
 
   registerAllDescriptors();
-  registerWidgets();
+  registerWidgets(TargetPlatform.iOS);
 
   TypeViolationTranslationProvider();
 

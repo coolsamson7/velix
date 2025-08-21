@@ -14,11 +14,8 @@ export './components/view.dart';
 // databinding
 
 export './databinding/form_mapper.dart';
-export './databinding/switch_adapter.dart';
-export './databinding/text_adapter.dart';
+export './databinding/widgets.dart';
 export './databinding/valued_widget.dart';
-
-export './databinding/registry.dart';
 
 // mapper
 

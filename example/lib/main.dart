@@ -26,7 +26,7 @@ void main() async {
   TypeViolationTranslationProvider();
 
   registerAllDescriptors();
-  registerWidgets();
+  registerWidgets(TargetPlatform.iOS);
 
   WidgetsFlutterBinding.ensureInitialized();
 

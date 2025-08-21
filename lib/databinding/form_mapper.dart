@@ -2,12 +2,14 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:velix/util/collections.dart';
-import 'text_adapter.dart';
 import 'valued_widget.dart';
 
 import '../reflectable/reflectable.dart';
 import '../mapper/transformer.dart';
 import '../validation/validation.dart';
+
+typedef DisplayValue<S,T> = T Function(S);
+typedef ParseValue<S,T> = S Function(T text);
 
 class SmartForm extends Form {
   // static methods

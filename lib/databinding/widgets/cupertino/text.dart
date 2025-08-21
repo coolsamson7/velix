@@ -35,15 +35,15 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
     bool blurred = false;
     SmartFormState? form;
 
-    final key = GlobalKey<FormFieldState>();
+    //final key = GlobalKey<FormFieldState>();
 
     void Function() getFocusListener(FocusNode focusNode) {
       return () {
         if ( !focusNode.hasFocus && typeProperty.isDirty()) {
           blurred = true;
           print("$path trigger validation");
-          //form!.triggerValidation();
-          key.currentState?.validate();
+          form!.triggerValidation();
+          //key.currentState?.validate();
         }
       };
     }
@@ -62,8 +62,8 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
         mapper.notifyChange(path: path, value: parseValue(controller!.text));
 
         if (form != null) {
-          //form!.triggerValidation();
-          key.currentState?.validate();
+          form!.triggerValidation();
+          //key.currentState?.validate();
         }
       });
     } // else
@@ -82,7 +82,7 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
     }
 
     CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
-          key: key,//ValueKey(path),
+          key: ValueKey(path), // key
           controller: controller,
           focusNode: focusNode,
           placeholder:  args.get<String>('placeholder'),

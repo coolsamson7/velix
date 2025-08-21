@@ -77,7 +77,7 @@ void registerAllDescriptors() {
       field<TestData,String>('string_data',
         type: StringType().maxLength(7),
         getter: (obj) => (obj as TestData).string_data,
-        isFinal: true,
+        setter: (obj, value) => (obj as TestData).string_data = value,
       ), 
       field<TestData,int>('int_data',
         type: IntType().greaterThan(0),

@@ -287,7 +287,10 @@ class FormMapper {
   final Map<String, TypeProperty> properties = HashMap();
 
   bool get isDirty => dirtyWidgets > 0;
+  bool get isTouched => changes > 0;
+  bool get isValid => validate();
   int dirtyWidgets = 0;
+  int changes = 0;
   final bool twoWay;
 
   bool emitOnDirty  = false;
@@ -427,6 +430,8 @@ class FormMapper {
 
   void notifyChange({required String path, required dynamic value}) {
     var property = findProperty(path);
+
+    changes += 1;
 
     if ( emitOnChange )
       eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));

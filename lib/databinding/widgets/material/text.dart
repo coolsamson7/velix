@@ -88,9 +88,13 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
 
       widget.controller?.text = newText;
 
-      // restore cursor
+      // clamp selection
 
-      widget.controller!.selection = previousSelection;
+      final maxOffset = newText.length;
+      final start = previousSelection.start.clamp(0, maxOffset);
+      final end = previousSelection.end.clamp(0, maxOffset);
+
+      widget.controller!.selection = TextSelection(baseOffset: start, extentOffset: end);
     }
   }
 }

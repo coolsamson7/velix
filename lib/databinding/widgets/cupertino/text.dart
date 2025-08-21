@@ -59,11 +59,17 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
       focusNode.addListener(getFocusListener(focusNode));
 
       controller.addListener(() {
-        mapper.notifyChange(path: path, value: parseValue(controller!.text));
+        try {
+          var value = parseValue(controller!.text);
+          mapper.notifyChange(path: path, value: value);
 
-        if (form != null) {
-          form!.triggerValidation();
-          //key.currentState?.validate();
+          if (form != null) {
+            form!.triggerValidation();
+            //key.currentState?.validate();
+          }
+        }
+        catch(e) {
+          // noop? the validation should take care
         }
       });
     } // else
@@ -129,9 +135,13 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
 
       widget.controller?.text = newText;
 
-      // restore cursor
+      // clamp selection
 
-      widget.controller!.selection = previousSelection;
+      final maxOffset = newText.length;
+      final start = previousSelection.start.clamp(0, maxOffset);
+      final end = previousSelection.end.clamp(0, maxOffset);
+
+      widget.controller!.selection = TextSelection(baseOffset: start, extentOffset: end);
     }
   }
 }

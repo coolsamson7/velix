@@ -195,7 +195,7 @@ class AbstractType<T> {
         params: {
           "type": type
         },
-        check: (dynamic object) => object is V,
+        check: (dynamic object) => object.runtimeType == type,
         stop: true
     );
   }

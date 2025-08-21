@@ -10,48 +10,66 @@ part "test_page.command.g.dart";
 class TestPage extends StatefulWidget {
   // instance data
 
-  const TestPage({super.key});
+  TestData data;
+
+  // constructor
+
+  TestPage({super.key}) : data=TestData(
+      string_data: '',
+      int_data: 1,
+      slider_int_data: 1,
+      bool_data: false,
+      datetime_data: DateTime.now(),
+    );
 
   @override
   State<TestPage> createState() => TestPageState();
 }
 
-class TestPageState extends State<TestPage> with CommandController<TestPage>, TestPageStateCommands {
+class TestPageState extends State<TestPage>
+    with CommandController<TestPage>, TestPageStateCommands {
   // instance data
 
   late FormMapper mapper;
-  TestData data = TestData(
-    string_data: '',
-    int_data: 1,
-    slider_int_data: 1,
-    bool_data: false,
-    datetime_data: DateTime.now(),
-  );
+
+  String json = "";
+
+  // constructor
+
+  TestPageState();
+
+  // internal
+
+  void toJSON() {
+    json = "";
+    if (mapper.instance != null)
+      json = JsonEncoder.withIndent(
+        '  ',
+      ).convert(JSON.serialize(mapper.instance));
+  }
 
   // commands
 
-  @Command()
+  @Command(label: "Save",  icon: CupertinoIcons.check_mark)
   @override
   void _save() {
     if (mapper.validate()) {
-      // mapper.commit<Todo>();
-
-      // close screen
-
-      Navigator.pop(context);
+      widget.data = mapper.commit();
     }
   }
 
-  @Command()
+  @Command(label: "Revert", icon: CupertinoIcons.arrow_uturn_left)
   @override
-  void _cancel() {}
+  void _revert() {
+    mapper.rollback();
+  }
 
   // override
 
   @override
   void updateCommandState() {
-    setCommandEnabled("save", mapper.isDirty);
-    setCommandEnabled("cancel", mapper.isDirty);
+    setCommandEnabled("save", mapper.isDirty && mapper.isValid);
+    setCommandEnabled("revert", mapper.isDirty);
   }
 
   // override
@@ -65,13 +83,26 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
   void initState() {
     super.initState();
 
-    mapper = FormMapper(instance: data, twoWay: true);
+    mapper = FormMapper(
+      instance: TestData(
+        string_data: '',
+        int_data: 1,
+        slider_int_data: 1,
+        bool_data: false,
+        datetime_data: DateTime.now(),
+      ),
+      twoWay: true,
+    );
 
-    mapper.addListener((event) {
-      setState(() {
+    mapper.addListener(
+      (event) {
         updateCommandState();
-      });
-    }, emitOnChange: true, emitOnDirty: true);
+
+        setState(() {});
+      },
+      emitOnChange: true,
+      emitOnDirty: true,
+    );
 
     updateCommandState();
   }
@@ -85,73 +116,99 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
 
   @override
   Widget build(BuildContext context) {
+    updateCommandState();
+
+    toJSON();
+
     Widget result = CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text('Databinding')),
       child: SafeArea(
-        child: SmartForm(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          key: mapper.getKey(),
-          child: Column(
-            children: [
-              CupertinoFormSection.insetGrouped(
-                children: [
-                  CupertinoFormRow(
-                    prefix: Text("String"),
-                    child: mapper.text(
-                      path: "string_data",
-                      context: context,
-                      placeholder: "Enter",
-                      //prefix: "String",
+        child: CommandView(
+          commands: getCommands(),
+          toolbarCommands: [getCommand("save"), getCommand("revert")],
+          child: SmartForm(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            key: mapper.getKey(),
+            child: Column(
+              children: [
+                CupertinoFormSection.insetGrouped(
+                  children: [
+                    CupertinoFormRow(
+                      prefix: Text("String"),
+                      child: mapper.text(
+                        path: "string_data",
+                        context: context,
+                        placeholder: "Enter",
+                        //prefix: "String",
+                      ),
                     ),
-                  ),
 
-                  CupertinoFormRow(
-                    prefix: Text("Int"),
-                    child: mapper.text(
-                      path: "int_data",
-                      context: context,
-                      placeholder: "Enter",
-                      //prefix: "Int",
+                    CupertinoFormRow(
+                      prefix: Text("Int"),
+                      child: mapper.text(
+                        path: "int_data",
+                        context: context,
+                        placeholder: "Enter",
+                        //prefix: "Int",
+                      ),
                     ),
-                  ),
 
-                  CupertinoFormRow(
-                    prefix: Text('Slider'),
-                    child: mapper.slider(
-                      path: "slider_int_data",
-                      context: context,
-                      min: 0,
-                      max: 10,
+                    CupertinoFormRow(
+                      prefix: Text('Slider'),
+                      child: mapper.slider(
+                        path: "slider_int_data",
+                        context: context,
+                        min: 0,
+                        max: 10,
+                      ),
                     ),
-                  ),
 
-                  CupertinoFormRow(
-                    prefix: Text('Bool'),
-                    child: mapper.Switch(path: "bool_data", context: context),
-                  ),
-                ],
-              ),
-              CupertinoFormSection.insetGrouped(
-                children: [
-                  CupertinoTextField(
-                    controller: TextEditingController(
-                      text: const JsonEncoder.withIndent(
-                        '  ',
-                      ).convert(JSON.serialize(data)),
+                    CupertinoFormRow(
+                      prefix: Text('Bool'),
+                      child: mapper.Switch(path: "bool_data", context: context),
                     ),
-                    readOnly: true,
-                    maxLines: 8,
-                    minLines: 3,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 14,
-                      color: CupertinoColors.black,
+                  ],
+                ),
+                CupertinoFormSection.insetGrouped(
+                  children: [
+                    CupertinoFormRow(
+                      prefix: Text("Touched"),
+                      child: Text(mapper.isTouched ? "Yes" : "No"),
                     ),
-                    decoration: null,
-                  ),
-                ],
-              ),
-            ],
+
+                    CupertinoFormRow(
+                      prefix: Text("Dirty"),
+                      child: Text(mapper.isDirty ? "Yes" : "No"),
+                    ),
+
+                    CupertinoFormRow(
+                      prefix: Text("Valid"),
+                      child: Text(mapper.validate() ? "Yes" : "No"),
+                    ),
+
+                    CupertinoFormRow(
+                      prefix: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text("Data"),
+                      ),
+
+                      child: CupertinoTextField(
+                        controller: TextEditingController(text: json),
+                        readOnly: true,
+                        maxLines: 8,
+                        minLines: 3,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 14,
+                          color: CupertinoColors.black,
+                        ),
+                        decoration: null,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -159,7 +216,7 @@ class TestPageState extends State<TestPage> with CommandController<TestPage>, Te
 
     // set value
 
-    mapper.setValue(data);
+    mapper.setValue(widget.data);
 
     // done
 

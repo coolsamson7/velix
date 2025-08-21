@@ -13,22 +13,26 @@
 
   "validation": {
     "string": {
+      "type": "Expected a string",
       "minLength": "must have a minimum of {minLength} characters",
       "maxLength": "must have a maximum of {maxLength} characters"
     },
     "int": {
-      "greaterThan": "must have greater than {greaterThan}",
-      "greaterThanEquals": "must have greater or equal to {greaterThan}",
-      "lessThan": "must have less than {lessThan}",
-      "lessThanEquals": "must have less or equal to {lessThanEquals}"
+      "type": "Expected an number",
+      "greaterThan": "must be greater than {greaterThan}",
+      "greaterThanEquals": "must be greater or equal to {greaterThan}",
+      "lessThan": "must be less than {lessThan}",
+      "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },
     "double": {
-      "greaterThan": "must have greater than {greaterThan}",
-      "greaterThanEquals": "must have greater or equal to {greaterThan}",
-      "lessThan": "must have less than {lessThan}",
-      "lessThanEquals": "must have less or equal to {lessThanEquals}"
+      "type": "Expected a number",
+      "greaterThan": "must be greater than {greaterThan}",
+      "greaterThanEquals": "must be greater or equal to {greaterThan}",
+      "lessThan": "must be less than {lessThan}",
+      "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },
     "bool": {
+      "type": "Expected a boolean"
     }
   }
 }

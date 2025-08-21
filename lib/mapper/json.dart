@@ -164,9 +164,10 @@ class JSONProperty extends MapperProperty {
 
 
 /// @internal
-class JSONMapper<T> {
+class JSONMapper {
   // instance data
 
+  Type type;
   late Mapper serializer;
   late Mapper deserializer;
   late Mapping? serializerMapping;
@@ -175,7 +176,7 @@ class JSONMapper<T> {
 
   // constructor
 
-  JSONMapper({this.validate = false}) {
+  JSONMapper({required this.type, this.validate = false}) {
     serializer = createSerializer();
     deserializer = createDeserializer();
   }
@@ -184,7 +185,7 @@ class JSONMapper<T> {
 
   Mapper createSerializer() {
     Map<Type, MappingDefinition> mappings = {};
-    var queue = Queue<Type>.from([T]);
+    var queue = Queue<Type>.from([type]);
 
     // local function
 
@@ -194,7 +195,7 @@ class JSONMapper<T> {
     }
 
     MappingDefinition process(Type type) {
-      var typeMapping = MappingDefinition<T,Map<String, dynamic>>(sourceClass: type, targetClass: Map<String, dynamic>);
+      var typeMapping = MappingDefinition<dynamic,Map<String, dynamic>>(sourceClass: type, targetClass: Map<String, dynamic>);
       var typeDescriptor = TypeDescriptor.forType(type);
 
       var jsonSerializable = typeDescriptor.find_annotation<JsonSerializable>() ?? JsonSerializable();
@@ -267,14 +268,14 @@ class JSONMapper<T> {
 
     var mapper = Mapper(mappings.values.toList());
 
-    serializerMapping = mapper.getMappingX(T, Map<String,dynamic>);
+    serializerMapping = mapper.getMappingX(type, Map<String,dynamic>);
 
     return mapper;
   }
 
   Mapper createDeserializer() {
     Map<Type, MappingDefinition> mappings = {};
-    var queue = Queue<Type>.from([T]);
+    var queue = Queue<Type>.from([type]);
 
     // local function
 
@@ -377,18 +378,18 @@ class JSONMapper<T> {
 
     var mapper = Mapper(mappings.values.toList());
 
-    deserializerMapping = mapper.mappings.values.firstWhere((mapping) => mapping.typeDescriptor.type == T);
+    deserializerMapping = mapper.mappings.values.firstWhere((mapping) => mapping.typeDescriptor.type == type);
 
     return mapper;
   }
 
   // public
 
-  Map serialize(T instance) {
+  Map<String,dynamic> serialize(dynamic instance) {
     return serializer.map(instance, mapping: serializerMapping);
   }
 
-  V deserialize<V>(Map json) {
+  V deserialize<V>(Map<String,dynamic> json) {
     return deserializer.map(json, mapping: deserializerMapping);
   }
 }
@@ -523,10 +524,10 @@ class JSON {
     return converters.getConvert(sourceType);
   }
 
-  JSONMapper getMapper<T>() {
-    var mapper = mappers[T];
+  JSONMapper getMapper(Type type) {
+    var mapper = mappers[type.runtimeType];
     if ( mapper == null) {
-      mappers[T] = mapper = JSONMapper<T>(validate: validate);
+      mappers[type.runtimeType] = mapper = JSONMapper(type: type, validate: validate);
     }
 
     return mapper;
@@ -536,14 +537,14 @@ class JSON {
 
   /// serialize an instance to a 'JSON' map
   /// [instance] an instance
-  static Map serialize<T>(T instance) {
-    return JSON.instance.getMapper<T>().serialize(instance);
+  static Map<String,dynamic> serialize(dynamic instance) {
+    return JSON.instance.getMapper(instance.runtimeType).serialize(instance);
   }
 
   /// deserialize an 'JSON' to the specified class
   /// [T] the expected type
   /// [json] a 'JSON' map
-  static dynamic deserialize<T>(Map json) {
-    return JSON.instance.getMapper<T>().deserialize<T>(json);
+  static dynamic deserialize<T>(Map<String,dynamic> json) {
+    return JSON.instance.getMapper(T).deserialize<T>(json);
   }
 }

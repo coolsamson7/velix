@@ -44,7 +44,7 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('de')],
       path: 'assets/translations', // folder path!
       fallbackLocale: const Locale('en'),
-      child: const TODOApp(),
+      child: TODOApp(),
     ),
   );
 }

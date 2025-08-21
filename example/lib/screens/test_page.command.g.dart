@@ -12,14 +12,19 @@ mixin TestPageStateCommands on CommandController<TestPage> {
 
   @override
   void initCommands() {
-    addCommand("save", _save);
-    addCommand("cancel", _cancel);
+    addCommand("save", _save, label: 'Save', icon: CupertinoIcons.check_mark);
+    addCommand(
+      "revert",
+      _revert,
+      label: 'Revert',
+      icon: CupertinoIcons.arrow_uturn_left,
+    );
   }
 
   // command declarations
 
   void _save();
-  void _cancel();
+  void _revert();
 
   // command bodies
 
@@ -27,7 +32,7 @@ mixin TestPageStateCommands on CommandController<TestPage> {
     execute("save", []);
   }
 
-  void cancel() {
-    execute("cancel", []);
+  void revert() {
+    execute("revert", []);
   }
 }

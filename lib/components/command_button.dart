@@ -41,9 +41,7 @@ class _CommandButtonState extends State<CommandButton> {
   void initState() {
     super.initState();
 
-    listener = () => setState(() {
-      print("notfy " + widget.command.name);
-    }); // just rerender
+    listener = () => setState(() {}); // just rerender
     widget.command.addListener(listener);
   }
 
@@ -68,8 +66,6 @@ class _CommandButtonState extends State<CommandButton> {
 
     String label = widget.label ?? widget.command.label!;
     IconData? icon = widget.icon ?? widget.command.icon;
-
-    print("build " + label + " = " + isEnabled.toString());
 
     return IgnorePointer(
       ignoring: !isEnabled,

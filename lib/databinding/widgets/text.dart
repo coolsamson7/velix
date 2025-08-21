@@ -43,7 +43,10 @@ abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<
           typeProperty.validate(propValue);
         }
         catch(e) {
-          typeProperty.validate(null); // should a t least get a good text
+          if ( e is ValidationException)
+            throw e;
+          else
+            typeProperty.validate(null); // should a t least get a good text
         }
 
         return null;

@@ -379,6 +379,8 @@ class FormMapper {
     ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
     for ( Operation operation in operations)
       (operation.source as TypeProperty).rollback(context);
+
+    changes = 0;
   }
 
   void addDirty(int delta) {

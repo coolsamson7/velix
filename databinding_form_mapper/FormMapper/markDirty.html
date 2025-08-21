@@ -69,7 +69,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void markDirty(bool dirty) {
   if ( emitOnDirty )
-    eventStream.add(FormEvent(isDirty: isDirty));
+    eventStream.add(FormEvent(isDirty: dirty));
 }</code></pre>
 </section>
 
@@ -98,7 +98,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.15.0
+      0.15.1
   </span>
   
 </footer>

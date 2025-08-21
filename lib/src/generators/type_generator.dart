@@ -388,9 +388,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if ( !isFinal) {
       tab().writeln("setter: (obj, value) => (obj as $className).$name = value,");
     }
-    else {
-      tab().writeln("isFinal: $isFinal,");
-    }
+    //else {
+    //  tab().writeln("isFinal: $isFinal,");
+    //}
 
     if ( isNullable )
       tab().writeln("isNullable: true");

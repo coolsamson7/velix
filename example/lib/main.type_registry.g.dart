@@ -17,16 +17,13 @@ void registerAllDescriptors() {
       field<Details,String>('author',
         type: StringType().maxLength(7),
         getter: (obj) => (obj as Details).author,
-        isFinal: true,
       ), 
       field<Details,int>('priority',
         type: IntType().greaterThan(0),
         getter: (obj) => (obj as Details).priority,
-        isFinal: true,
       ), 
       field<Details,DateTime>('date',
         getter: (obj) => (obj as Details).date,
-        isFinal: true,
       )
     ]
   );
@@ -95,7 +92,6 @@ void registerAllDescriptors() {
       ), 
       field<TestData,DateTime>('datetime_data',
         getter: (obj) => (obj as TestData).datetime_data,
-        setter: (obj, value) => (obj as TestData).datetime_data = value,
       )
     ]
   );

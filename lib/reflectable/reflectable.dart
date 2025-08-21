@@ -31,8 +31,9 @@ class FieldDescriptor<T, V> {
   final Getter<T, V> getter;
   final Setter<T, V>? setter;
   late TypeDescriptor typeDescriptor;
-  final bool isFinal;
   final bool isNullable;
+
+  bool get isFinal => setter == null;
 
   // constructor
 
@@ -44,7 +45,6 @@ class FieldDescriptor<T, V> {
     this.elementType,
     this.factoryConstructor,
     this.setter,
-    this.isFinal = false,
     this.isNullable = false,
   });
 
@@ -414,5 +414,5 @@ FieldDescriptor field<T,V>(String name, {
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType<V>(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isFinal: isFinal, isNullable: isNullable);
+  return FieldDescriptor(name: name, type: inferType<V>(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isNullable: isNullable);
 }

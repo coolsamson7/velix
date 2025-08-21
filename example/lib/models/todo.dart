@@ -45,7 +45,7 @@ class TestData {
   @Attribute()
   bool bool_data;
   @Attribute()
-  DateTime datetime_data;
+  final DateTime datetime_data;
 
   // constructor
 

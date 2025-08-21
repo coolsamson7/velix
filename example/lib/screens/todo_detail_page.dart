@@ -113,6 +113,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 16),
               mapper.text(path: "title",
                 context: context,
                 placeholder: 'Titel',
@@ -129,16 +130,9 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
               mapper.slider(context: context,  path: "details.priority",
                 min: 0,
                 max: 10,
-                //placeholder: 'Priority',
-                //style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                //padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8
                 ),
-              //const SizedBox(height: 16),
-              //mapper.date(context: context,  path: "details.date",
-                //placeholder: 'Priority',
-                //style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                //padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8
-              //),
+              const SizedBox(height: 16),
+              mapper.date(context: context,  path: "details.date"),
               const SizedBox(height: 16),
               Row(
                 children: [

@@ -1,17 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
-import 'valued_widget.dart';
-import 'form_mapper.dart';
+import 'package:flutter/material.dart' show showCupertinoModalPopup;
 import 'package:intl/intl.dart';
+import 'package:velix/databinding/valued_widget.dart';
+
+import 'form_mapper.dart';
 
 @WidgetAdapter()
 class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>> {
-  // constructor
-
-  DatePickerAdapter() : super('date', '');
-
-  // override
+  DatePickerAdapter() : super('date', 'iOS');
 
   @override
   FormField<DateTime> build({
@@ -21,10 +17,11 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
     Map<String, dynamic> args = const {},
   }) {
     var typeProperty = mapper.computeProperty(mapper.type, path);
-
     DateTime? initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
 
     final DateFormat dateFormat = args['dateFormat'] ?? DateFormat.yMd();
+    final DateTime minDate = args['firstDate'] ?? DateTime(1900);
+    final DateTime maxDate = args['lastDate'] ?? DateTime(2100);
 
     return FormField<DateTime>(
       key: ValueKey(path),
@@ -34,59 +31,81 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
           typeProperty.validate(date);
           return null;
         } catch (e) {
-          // You may want to use your translation manager or error formatter here
           return e.toString();
         }
       },
       builder: (FormFieldState<DateTime> state) {
         String displayText = state.value != null ? dateFormat.format(state.value!) : 'Tap to select date';
 
-        return InkWell(
-          onTap: () async {
-            FocusScope.of(context).requestFocus(FocusNode()); // dismiss keyboard if any
-
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: state.value ?? DateTime.now(),
-              firstDate: args['firstDate'] ?? DateTime(1900),
-              lastDate: args['lastDate'] ?? DateTime(2100),
-            );
-
-            if (pickedDate != null) {
-              state.didChange(pickedDate);
-              mapper.notifyChange(path: path, value: pickedDate);
-            }
-          },
-          child: InputDecorator(
-            decoration: InputDecoration(
-              labelText: args['label'] ?? 'Select Date',
-              errorText: state.errorText,
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        void _showCupertinoDatePicker() {
+          showCupertinoModalPopup(
+            context: context,
+            builder: (_) => Container(
+              height: 250,
+              color: CupertinoColors.systemBackground.resolveFrom(context),
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+                minimumDate: minDate,
+                maximumDate: maxDate,
+                initialDateTime: state.value ?? DateTime.now(),
+                onDateTimeChanged: (DateTime newDate) {
+                  state.didChange(newDate);
+                  mapper.notifyChange(path: path, value: newDate);
+                },
+              ),
             ),
-            child: Text(displayText),
+          );
+        }
+
+        return GestureDetector(
+          onTap: () {
+            // Dismiss keyboard if visible
+            FocusScope.of(context).requestFocus(FocusNode());
+            _showCupertinoDatePicker();
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: (state.hasError) ? CupertinoColors.systemRed.resolveFrom(context) : CupertinoColors.separator.resolveFrom(context),
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  displayText,
+                  style: CupertinoTheme.of(context).textTheme.textStyle,
+                ),
+                Icon(
+                  CupertinoIcons.calendar,
+                  color: CupertinoColors.systemGrey.resolveFrom(context),
+                ),
+              ],
+            ),
           ),
         );
       },
       onSaved: (date) {
-        // Save logic if workflow requires
+        // if you need to save
       },
     );
   }
 
   @override
   dynamic getValue(FormField<DateTime> widget) {
-    // Usually, you get the current selected date value from the FormField's state
-    // This requires a global key to access state, so return null here or override if you manage keys
-    return null;
+    return null; // override if you track state
   }
 
   @override
   void setValue(FormField<DateTime> widget, dynamic value, ValuedWidgetContext context) {
-    // To implement if you keep a reference to state, else noop
+    // override if you track state
   }
 }
 
+// Extension to use in FormMapper as before
 extension DatePickerFormFieldExtension on FormMapper {
   Widget date({
     required String path,

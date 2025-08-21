@@ -51,3 +51,7 @@
 - added a number of base widgets
 - more sophisticated handling of form errors
 - separated iOS and material widgets
+
+## 0.15.1
+
+- added test page for databinding

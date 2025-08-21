@@ -22,16 +22,19 @@ Check out some articles on Medium:
   - [Commands](https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb)
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
+
+Detailed infromation can be foun din the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
+
 Lets get a quick overview on the topics
 
 # Validation
 
-As in somne popular Typescript libraries like yup, it is possible to declare type constraints with a simple fluent language
+As in some popular Typescript libraries like `yup`, it is possible to declare type constraints with a simple fluent language
 
 ```dart
 var type = IntType().greaterThan(0).lessThan(100);
 
-type.validate(-1); // meee....will throw
+type.validate(-1); // meeeh....will throw
 ```
 
 # Type Meta-Data
@@ -77,7 +80,7 @@ var result = mapper.map(invoice);
 ```
 
 
-As a special case, json mappiung is supported as well:
+As a special case, json mapping is supported as well:
 ```dart
 // overall configuration  
 
@@ -114,8 +117,8 @@ var result = JSON.deserialize<Money>(json);
 
 Commands let's you wrap simple methods in command objects, that 
 - are stateful ( enabled / disabled )
-- can invoke interceptors while being executed ( e.g. exception handling, tarcing, ...), and
-- influecn the UI whiel running ( e.g. spinner fro long-running commands )
+- can invoke interceptors while being executed ( e.g. exception handling, tracing, ...), and
+- influence the UI automatically while running ( e.g. spinner fro long-running commands )
 
 ```dart
 class _PersonPageState extends State<PersonPage> with CommandController<PersonPage>, _PersonPageCommands {

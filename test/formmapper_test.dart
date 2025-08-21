@@ -52,9 +52,9 @@ void main() {
     final currencyFinder = find.byKey(const Key('price.currency'));
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-     dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+     dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 
@@ -125,9 +125,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+   mapper.addListener((event) {
+     dirty = event.isDirty;
+   }, emitOnDirty: true);
 
     // set value
 
@@ -184,9 +184,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+      dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 
@@ -233,9 +233,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+      dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 
@@ -288,9 +288,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+      dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 
@@ -350,9 +350,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+      dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 
@@ -413,9 +413,9 @@ void main() {
 
     // one-way mapper
 
-    mapper.isDirty.addListener(() {
-      dirty = mapper.isDirty.value;
-    });
+    mapper.addListener((event) {
+      dirty = event.isDirty;
+    }, emitOnDirty: true);
 
     // set value
 

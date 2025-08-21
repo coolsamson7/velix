@@ -53,8 +53,8 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
   @override
   void updateCommandState() {
-    setCommandEnabled("save", mapper.isDirty.value);
-    setCommandEnabled("cancel", mapper.isDirty.value);
+    setCommandEnabled("save", mapper.isDirty);
+    setCommandEnabled("cancel", mapper.isDirty);
   }
 
   // override
@@ -72,11 +72,11 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
     mapper = FormMapper(instance: widget.todo, twoWay: false);
 
-    mapper.isDirty.addListener(() {
+    mapper.addListener((event) {
       setState(() {
         updateCommandState();
       });
-    });
+    }, emitOnDirty: true, emitOnChange: true);
 
     updateCommandState();
   }

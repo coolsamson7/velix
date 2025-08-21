@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
@@ -257,6 +258,18 @@ class RootProperty extends TypeProperty {
   }
 }
 
+class FormEvent {
+  // instance data
+
+  bool isDirty;
+  String? path;
+  dynamic value;
+
+  // constructor
+
+  FormEvent({required this.isDirty, this.path, this.value});
+}
+
 /// A [FormMapper] is used to bind field values to form elements
 class FormMapper {
   // instance data
@@ -269,13 +282,16 @@ class FormMapper {
   late Transformer transformer;
   final _formKey = GlobalKey<FormState>();
 
-  final _dirtyController = ValueNotifier<bool>(false);
+  final eventStream = StreamController<FormEvent>.broadcast();
 
   final Map<String, TypeProperty> properties = HashMap();
 
-  ValueNotifier<bool> get isDirty => _dirtyController;
+  bool get isDirty => dirtyWidgets > 0;
   int dirtyWidgets = 0;
   final bool twoWay;
+
+  bool emitOnDirty  = false;
+  bool emitOnChange = false;
 
   // constructor
 
@@ -288,6 +304,13 @@ class FormMapper {
 
     if ( type.isImmutable())
       rootProperty = RootProperty(mapper: this);
+  }
+
+  void addListener(void onData(FormEvent event), {emitOnDirty = false, emitOnChange=false}) {
+    this.emitOnDirty = emitOnDirty;
+    this.emitOnChange = emitOnChange;
+
+    eventStream.stream.listen(onData);
   }
 
   // public
@@ -367,7 +390,8 @@ class FormMapper {
   }
 
   void markDirty(bool dirty) {
-    _dirtyController.value = dirty;
+    if ( emitOnDirty )
+      eventStream.add(FormEvent(isDirty: isDirty));
   }
 
   void dispose() {
@@ -403,6 +427,9 @@ class FormMapper {
 
   void notifyChange({required String path, required dynamic value}) {
     var property = findProperty(path);
+
+    if ( emitOnChange )
+      eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));
 
     property.set(instance, value, ValuedWidgetContext(mapper: this));
   }

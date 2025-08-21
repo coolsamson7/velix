@@ -16,8 +16,7 @@ class TestPage extends StatefulWidget {
   State<TestPage> createState() => TestPageState();
 }
 
-class TestPageState extends State<TestPage>
-    with CommandController<TestPage>, TestPageStateCommands {
+class TestPageState extends State<TestPage> with CommandController<TestPage>, TestPageStateCommands {
   // instance data
 
   late FormMapper mapper;
@@ -51,8 +50,8 @@ class TestPageState extends State<TestPage>
 
   @override
   void updateCommandState() {
-    setCommandEnabled("save", mapper.isDirty.value);
-    setCommandEnabled("cancel", mapper.isDirty.value);
+    setCommandEnabled("save", mapper.isDirty);
+    setCommandEnabled("cancel", mapper.isDirty);
   }
 
   // override
@@ -68,11 +67,11 @@ class TestPageState extends State<TestPage>
 
     mapper = FormMapper(instance: data, twoWay: true);
 
-    mapper.isDirty.addListener(() {
+    mapper.addListener((event) {
       setState(() {
         updateCommandState();
       });
-    });
+    }, emitOnChange: true, emitOnDirty: true);
 
     updateCommandState();
   }
@@ -89,61 +88,71 @@ class TestPageState extends State<TestPage>
     Widget result = CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text('Databinding')),
       child: SafeArea(
-        child: Column(
-          children: [
-            CupertinoFormSection.insetGrouped(
-              children: [
-                mapper.text(
-                  path: "string_data",
-                  context: context,
-                  placeholder: "Enter",
-                  prefix: "String",
-                ),
-
-                mapper.text(
-                  path: "int_data",
-                  context: context,
-                  placeholder: "Enter",
-                  prefix: "Int",
-                ),
-
-                CupertinoFormRow(
-                  prefix: Text('Slider'),
-                  child: mapper.slider(
-                    path: "slider_int_data",
-                    context: context,
-                    min: 0,
-                    max: 10,
+        child: SmartForm(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          key: mapper.getKey(),
+          child: Column(
+            children: [
+              CupertinoFormSection.insetGrouped(
+                children: [
+                  CupertinoFormRow(
+                    prefix: Text("String"),
+                    child: mapper.text(
+                      path: "string_data",
+                      context: context,
+                      placeholder: "Enter",
+                      //prefix: "String",
+                    ),
                   ),
-                ),
 
-                CupertinoFormRow(
-                  prefix: Text('Bool'),
-                  child: mapper.Switch(path: "bool_data", context: context),
-                ),
-              ],
-            ),
-            CupertinoFormSection.insetGrouped(
-              children: [
-                CupertinoTextField(
-                  controller: TextEditingController(
-                    text: const JsonEncoder.withIndent(
-                      '  ',
-                    ).convert(JSON.serialize(data)),
+                  CupertinoFormRow(
+                    prefix: Text("Int"),
+                    child: mapper.text(
+                      path: "int_data",
+                      context: context,
+                      placeholder: "Enter",
+                      //prefix: "Int",
+                    ),
                   ),
-                  readOnly: true,
-                  maxLines: 8,
-                  minLines: 3,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 14,
-                    color: CupertinoColors.black,
+
+                  CupertinoFormRow(
+                    prefix: Text('Slider'),
+                    child: mapper.slider(
+                      path: "slider_int_data",
+                      context: context,
+                      min: 0,
+                      max: 10,
+                    ),
                   ),
-                  decoration: null,
-                ),
-              ],
-            ),
-          ],
+
+                  CupertinoFormRow(
+                    prefix: Text('Bool'),
+                    child: mapper.Switch(path: "bool_data", context: context),
+                  ),
+                ],
+              ),
+              CupertinoFormSection.insetGrouped(
+                children: [
+                  CupertinoTextField(
+                    controller: TextEditingController(
+                      text: const JsonEncoder.withIndent(
+                        '  ',
+                      ).convert(JSON.serialize(data)),
+                    ),
+                    readOnly: true,
+                    maxLines: 8,
+                    minLines: 3,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 14,
+                      color: CupertinoColors.black,
+                    ),
+                    decoration: null,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

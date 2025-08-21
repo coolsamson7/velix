@@ -48,6 +48,44 @@ class TestPageState extends State<TestPage>
       ).convert(JSON.serialize(mapper.instance));
   }
 
+  Widget buildToolbar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          CupertinoButton(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            //color: CupertinoColors.systemGrey5,
+            borderRadius: BorderRadius.circular(8),
+            onPressed: getCommand("revert").enabled ? _revert : null,
+            child: Row(
+              children: const [
+                Icon(CupertinoIcons.arrow_uturn_left, size: 18),
+                SizedBox(width: 4),
+                Text("Revert"),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          CupertinoButton(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            //color: CupertinoColors.activeBlue,
+            borderRadius: BorderRadius.circular(8),
+            onPressed: getCommand("save").enabled ? _save : null,
+            child: Row(
+              children: const [
+                Icon(CupertinoIcons.check_mark, size: 18),
+                SizedBox(width: 4),
+                Text("Save"),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // commands
 
   @Command(label: "Save",  icon: CupertinoIcons.check_mark)
@@ -125,12 +163,13 @@ class TestPageState extends State<TestPage>
       child: SafeArea(
         child: CommandView(
           commands: getCommands(),
-          toolbarCommands: [getCommand("save"), getCommand("revert")],
+          //toolbarCommands: [getCommand("save"), getCommand("revert")],
           child: SmartForm(
             autovalidateMode: AutovalidateMode.onUserInteraction,
             key: mapper.getKey(),
             child: Column(
               children: [
+                buildToolbar(),
                 CupertinoFormSection.insetGrouped(
                   children: [
                     CupertinoFormRow(
@@ -187,10 +226,10 @@ class TestPageState extends State<TestPage>
                     ),
 
                     CupertinoFormRow(
-                      prefix: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text("Data"),
-                      ),
+                      //prefix: Align(
+                      //  alignment: Alignment.topLeft,
+                      //  child: Text("Data"),
+                      //),
 
                       child: CupertinoTextField(
                         controller: TextEditingController(text: json),

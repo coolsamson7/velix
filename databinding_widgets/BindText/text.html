@@ -57,6 +57,7 @@
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
 <span class="name ">text</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="text-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
 <li><span class="parameter" id="text-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
+<li><span class="parameter" id="text-param-prefix"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">prefix</span>, </span></li>
 <li><span class="parameter" id="text-param-placeholder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">placeholder</span>, </span></li>
 <li><span class="parameter" id="text-param-style"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/TextStyle-class.html">TextStyle</a>?</span> <span class="parameter-name">style</span>, </span></li>
 <li><span class="parameter" id="text-param-padding"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/EdgeInsetsGeometry-class.html">EdgeInsetsGeometry</a>?</span> <span class="parameter-name">padding</span>, </span></li>
@@ -71,10 +72,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Widget text({required String path,  required BuildContext context,  String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
+  <pre class="language-dart"><code class="language-dart">Widget text({required String path,  required BuildContext context,  String? prefix, String? placeholder, TextStyle? style, EdgeInsetsGeometry? padding}) {
   return bind(&quot;text&quot;, path: path, context: context, args: Keywords({
     &quot;placeholder&quot;: placeholder,
     &quot;style&quot;: style,
+    &quot;prefix&quot;: prefix,
     &quot;padding&quot;: padding,
   }));
 }</code></pre>

@@ -121,11 +121,17 @@ Widget build({required BuildContext context, required FormMapper mapper, require
     focusNode.addListener(getFocusListener(focusNode));
 
     controller.addListener(() {
-      mapper.notifyChange(path: path, value: parseValue(controller!.text));
+      try {
+        var value = parseValue(controller!.text);
+        mapper.notifyChange(path: path, value: value);
 
-      if (form != null) {
-        form!.triggerValidation();
-        &#47;&#47;key.currentState?.validate();
+        if (form != null) {
+          form!.triggerValidation();
+          &#47;&#47;key.currentState?.validate();
+        }
+      }
+      catch(e) {
+        &#47;&#47; noop? the validation should take care
       }
     });
   } &#47;&#47; else
@@ -147,6 +153,7 @@ Widget build({required BuildContext context, required FormMapper mapper, require
         key: ValueKey(path), &#47;&#47; key
         controller: controller,
         focusNode: focusNode,
+        prefix: args.get&lt;String&gt;(&#39;prefix&#39;) != null ? Text(args.get&lt;String&gt;(&#39;prefix&#39;)!) : null,
         placeholder:  args.get&lt;String&gt;(&#39;placeholder&#39;),
         style: args.get&lt;TextStyle&gt;(&#39;style&#39;),
         padding: args.get&lt;EdgeInsetsGeometry&gt;(&#39;padding&#39;),

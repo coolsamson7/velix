@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the JSON class from the json library, for the Dart programming language.">
-  <title>JSON class - json library - Dart API</title>
+  <meta name="description" content="API docs for the FormEvent class from the form_mapper library, for the Dart programming language.">
+  <title>FormEvent class - form_mapper library - Dart API</title>
 
 
   
@@ -25,10 +25,10 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">velix</a></li>
-    <li><a href="../mapper_json/">mapper&#47;json.dart</a></li>
-    <li class="self-crumb">JSON class</li>
+    <li><a href="../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
+    <li class="self-crumb">FormEvent class</li>
   </ol>
-  <div class="self-name">JSON</div>
+  <div class="self-name">FormEvent</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,17 +45,14 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="mapper_json&#47;mapper_json-library-sidebar.html"
-    data-below-sidebar="mapper_json&#47;JSON-class-sidebar.html">
+    data-above-sidebar="databinding_form_mapper&#47;databinding_form_mapper-library-sidebar.html"
+    data-below-sidebar="databinding_form_mapper&#47;FormEvent-class-sidebar.html">
     <div>
-<h1><span class="kind-class">JSON</span> class 
+<h1><span class="kind-class">FormEvent</span> class 
  
 </h1></div>
 
     
-<section class="desc markdown">
-  <p>Main class that offers serialize and deserialize methods</p>
-</section>
 
 
 
@@ -63,8 +60,8 @@
   <section class="summary offset-anchor" id="constructors">
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
-        <dt id="JSON.new" class="callable">
-          <span class="name"><a href="../mapper_json/JSON/JSON.html">JSON.new</a></span><span class="signature">({<span class="parameter" id="-param-validate"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">validate</span>, </span><span class="parameter" id="-param-converters"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mapper_mapper/Convert-class.html">Convert</a></span>&gt;</span>?</span> <span class="parameter-name">converters</span>, </span><span class="parameter" id="-param-factories"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../mapper_json/ConvertFactory-class.html">ConvertFactory</a></span>&gt;</span>?</span> <span class="parameter-name">factories</span></span>})</span>
+        <dt id="FormEvent.new" class="callable">
+          <span class="name"><a href="../databinding_form_mapper/FormEvent/FormEvent.html">FormEvent.new</a></span><span class="signature">({<span class="parameter" id="-param-isDirty"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isDirty</span>, </span><span class="parameter" id="-param-path"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">path</span>, </span><span class="parameter" id="-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span></span>})</span>
         </dt>
         <dd>
           
@@ -77,18 +74,6 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="converters" class="property">
-  <span class="name"><a href="../mapper_json/JSON/converters.html">converters</a></span>
-  <span class="signature">&#8596; <a href="../mapper_json/Converters-class.html">Converters</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">getter/setter pair</span></div>
-
-</dd>
-
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -101,9 +86,21 @@
 
 </dd>
 
-        <dt id="mappers" class="property">
-  <span class="name"><a href="../mapper_json/JSON/mappers.html">mappers</a></span>
-  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="../mapper_json/JSONMapper-class.html">JSONMapper</a></span>&gt;</span></span>
+        <dt id="isDirty" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormEvent/isDirty.html">isDirty</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="path" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormEvent/path.html">path</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
   
 
 </dt>
@@ -125,15 +122,15 @@
 
 </dd>
 
-        <dt id="validate" class="property">
-  <span class="name"><a href="../mapper_json/JSON/validate.html">validate</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+        <dt id="value" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormEvent/value.html">value</a></span>
+  <span class="signature">&#8596; dynamic</span>
   
 
 </dt>
 <dd>
   
-  <div class="features"><span class="feature">final</span></div>
+  <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
 
@@ -142,36 +139,10 @@
 
     
   <section
-      class="summary offset-anchor"
+      class="summary offset-anchor inherited"
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
-        <dt id="getConvert" class="callable">
-  <span class="name"><a href="../mapper_json/JSON/getConvert.html">getConvert</a></span><span class="signature">(<wbr><span class="parameter" id="getConvert-param-sourceType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">sourceType</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../mapper_mapper/Convert-class.html">Convert</a>?</span>
-  </span>
-  
-
-</dt>
-<dd>
-  
-  
-
-</dd>
-
-        <dt id="getMapper" class="callable">
-  <span class="name"><a href="../mapper_json/JSON/getMapper.html">getMapper</a></span><span class="signature">(<wbr><span class="parameter" id="getMapper-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../mapper_json/JSONMapper-class.html">JSONMapper</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  
-  
-
-</dd>
-
         <dt id="noSuchMethod" class="callable inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
     <span class="returntype parameter">&#8594; dynamic</span>
@@ -222,58 +193,7 @@
     </dl>
   </section>
     
-  <section class="summary offset-anchor" id="static-properties">
-    <h2>Static Properties</h2>
-    <dl class="properties">
-        <dt id="instance" class="property">
-  <span class="name"><a href="../mapper_json/JSON/instance.html">instance</a></span>
-  <span class="signature">&#8596; <a href="../mapper_json/JSON-class.html">JSON</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">getter/setter pair</span></div>
-
-</dd>
-
-    </dl>
-  </section>
     
-  <section class="summary offset-anchor" id="static-methods">
-    <h2>Static Methods</h2>
-    <dl class="callables">
-        <dt id="deserialize" class="callable">
-  <span class="name"><a href="../mapper_json/JSON/deserialize.html">deserialize</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="deserialize-param-json"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span></span>)
-    <span class="returntype parameter">&#8594; dynamic</span>
-  </span>
-  
-
-</dt>
-<dd>
-  deserialize an 'JSON' to the specified class
-<code>T</code> the expected type
-<code>json</code> a 'JSON' map
-  
-
-</dd>
-
-        <dt id="serialize" class="callable">
-  <span class="name"><a href="../mapper_json/JSON/serialize.html">serialize</a></span><span class="signature">(<wbr><span class="parameter" id="serialize-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span></span>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
-  </span>
-  
-
-</dt>
-<dd>
-  serialize an instance to a 'JSON' map
-<code>instance</code> an instance
-  
-
-</dd>
-
-    </dl>
-  </section>
     
 
   </div> <!-- /.main-content -->
@@ -286,11 +206,11 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">velix</a></li>
-    <li><a href="../mapper_json/">json</a></li>
-    <li class="self-crumb">JSON class</li>
+    <li><a href="../databinding_form_mapper/">form_mapper</a></li>
+    <li class="self-crumb">FormEvent class</li>
 </ol>
 
-    <h5>json library</h5>
+    <h5>form_mapper library</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div>
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

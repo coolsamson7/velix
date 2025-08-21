@@ -27,7 +27,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
     <li><a href="../../mapper_json/JSON-class.html">JSON</a></li>
-    <li class="self-crumb">serialize&lt;<wbr><span class="type-parameter">T</span>&gt; static method</li>
+    <li class="self-crumb">serialize static method</li>
   </ol>
   <div class="self-name">serialize</div>
   <form class="search navbar-right" role="search">
@@ -49,13 +49,13 @@
     data-above-sidebar="mapper_json&#47;JSON-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">serialize&lt;<wbr><span class="type-parameter">T</span>&gt;</span> static method 
+<h1><span class="kind-method">serialize</span> static method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a></span>
-<span class="name ">serialize</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="serialize-param-instance"><span class="type-annotation">T</span> <span class="parameter-name">instance</span></span></li>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
+<span class="name ">serialize</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="serialize-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span></span></li>
 </ol>)
 
       
@@ -71,8 +71,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Map serialize&lt;T&gt;(T instance) {
-  return JSON.instance.getMapper&lt;T&gt;().serialize(instance);
+  <pre class="language-dart"><code class="language-dart">static Map&lt;String,dynamic&gt; serialize(dynamic instance) {
+  return JSON.instance.getMapper(instance.runtimeType).serialize(instance);
 }</code></pre>
 </section>
 
@@ -89,7 +89,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
     <li><a href="../../mapper_json/JSON-class.html">JSON</a></li>
-    <li class="self-crumb">serialize&lt;<wbr><span class="type-parameter">T</span>&gt; static method</li>
+    <li class="self-crumb">serialize static method</li>
 </ol>
 
     <h5>JSON class</h5>

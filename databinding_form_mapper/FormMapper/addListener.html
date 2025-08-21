@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the notifyChange method from the FormMapper class, for the Dart programming language.">
-  <title>notifyChange method - FormMapper class - form_mapper library - Dart API</title>
+  <meta name="description" content="API docs for the addListener method from the FormMapper class, for the Dart programming language.">
+  <title>addListener method - FormMapper class - form_mapper library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">notifyChange method</li>
+    <li class="self-crumb">addListener method</li>
   </ol>
-  <div class="self-name">notifyChange</div>
+  <div class="self-name">addListener</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,14 +49,16 @@
     data-above-sidebar="databinding_form_mapper&#47;FormMapper-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">notifyChange</span> method 
+<h1><span class="kind-method">addListener</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">notifyChange</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="notifyChange-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
-<li><span class="parameter" id="notifyChange-param-value"><span>required</span> <span class="type-annotation">dynamic</span> <span class="parameter-name">value</span>, </span></li>
+<span class="name ">addListener</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="addListener-param-onData"><span class="type-annotation">void</span> <span class="parameter-name">onData</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="onData-param-event"><span class="type-annotation"><a href="../../databinding_form_mapper/FormEvent-class.html">FormEvent</a></span> <span class="parameter-name">event</span></span></li>
+</ol>), {</span></li>
+<li><span class="parameter" id="addListener-param-emitOnDirty"><span class="type-annotation">dynamic</span> <span class="parameter-name">emitOnDirty</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="addListener-param-emitOnChange"><span class="type-annotation">dynamic</span> <span class="parameter-name">emitOnChange</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -68,15 +70,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void notifyChange({required String path, required dynamic value}) {
-  var property = findProperty(path);
+  <pre class="language-dart"><code class="language-dart">void addListener(void onData(FormEvent event), {emitOnDirty = false, emitOnChange=false}) {
+  this.emitOnDirty = emitOnDirty;
+  this.emitOnChange = emitOnChange;
 
-  changes += 1;
-
-  if ( emitOnChange )
-    eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));
-
-  property.set(instance, value, ValuedWidgetContext(mapper: this));
+  eventStream.stream.listen(onData);
 }</code></pre>
 </section>
 
@@ -93,7 +91,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">form_mapper</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">notifyChange method</li>
+    <li class="self-crumb">addListener method</li>
 </ol>
 
     <h5>FormMapper class</h5>

@@ -72,13 +72,13 @@
       <li><a href="../databinding_widgets/BindSlider.html">BindSlider</a></li>
       <li><a href="../databinding_widgets_cupertino_slider/BindSlider.html">BindSlider</a></li>
       <li><a href="../databinding_widgets_material_slider/BindSlider.html">BindSlider</a></li>
-      <li><a href="../databinding_widgets/BindSwitch.html">BindSwitch</a></li>
       <li><a href="../databinding_widgets_material_switch/BindSwitch.html">BindSwitch</a></li>
+      <li><a href="../databinding_widgets/BindSwitch.html">BindSwitch</a></li>
       <li><a href="../databinding_widgets_cupertino_switch/BindSwitch.html">BindSwitch</a></li>
       <li><a href="../databinding_widgets/BindText.html">BindText</a></li>
-      <li><a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider.html">CheckboxSlider</a></li>
       <li><a href="../databinding_widgets/CheckboxSlider.html">CheckboxSlider</a></li>
       <li><a href="../databinding_widgets_material_checkbox/CheckboxSlider.html">CheckboxSlider</a></li>
+      <li><a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider.html">CheckboxSlider</a></li>
       <li><a href="../databinding_widgets_cupertino_datepicker/DatePickerFormFieldExtension.html">DatePickerFormFieldExtension</a></li>
       <li><a href="../databinding_widgets/DatePickerFormFieldExtension.html">DatePickerFormFieldExtension</a></li>
       <li><a href="../databinding_widgets_material_datepicker/DatePickerFormFieldExtension.html">DatePickerFormFieldExtension</a></li>
@@ -109,6 +109,18 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="changes" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/changes.html">changes</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="dirtyWidgets" class="property">
   <span class="name"><a href="../databinding_form_mapper/FormMapper/dirtyWidgets.html">dirtyWidgets</a></span>
   <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -118,6 +130,42 @@
 <dd>
   
   <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="emitOnChange" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/emitOnChange.html">emitOnChange</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="emitOnDirty" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/emitOnDirty.html">emitOnDirty</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+        <dt id="eventStream" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/eventStream.html">eventStream</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/StreamController-class.html">StreamController</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../databinding_form_mapper/FormEvent-class.html">FormEvent</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 
@@ -147,7 +195,31 @@
 
         <dt id="isDirty" class="property">
   <span class="name"><a href="../databinding_form_mapper/FormMapper/isDirty.html">isDirty</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html">ValueNotifier</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="isTouched" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/isTouched.html">isTouched</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="isValid" class="property">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/isValid.html">isValid</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
   
 
 </dt>
@@ -275,6 +347,19 @@
 
 </dd>
 
+        <dt id="addListener" class="callable">
+  <span class="name"><a href="../databinding_form_mapper/FormMapper/addListener.html">addListener</a></span><span class="signature">(<wbr><span class="parameter" id="addListener-param-onData"><span class="type-annotation">void</span> <span class="parameter-name">onData</span>(<span class="parameter" id="onData-param-event"><span class="type-annotation"><a href="../databinding_form_mapper/FormEvent-class.html">FormEvent</a></span> <span class="parameter-name">event</span></span>), {</span><span class="parameter" id="addListener-param-emitOnDirty"><span class="type-annotation">dynamic</span> <span class="parameter-name">emitOnDirty</span> = <span class="default-value">false</span>, </span><span class="parameter" id="addListener-param-emitOnChange"><span class="type-annotation">dynamic</span> <span class="parameter-name">emitOnChange</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="bind" class="callable">
   <span class="name"><a href="../databinding_form_mapper/FormMapper/bind.html">bind</a></span><span class="signature">(<wbr><span class="parameter" id="bind-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="bind-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="bind-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="bind-param-args"><span class="type-annotation"><a href="../util_collections/Keywords-class.html">Keywords</a>?</span> <span class="parameter-name">args</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
@@ -288,23 +373,6 @@
 <code>path</code> a field path
 <code>context</code> the <a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a>
 <code>args</code> any parameters that will be passed to the newly created element
-  
-
-</dd>
-
-        <dt id="checkbox" class="callable">
-  <span class="name"><a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider/checkbox.html">checkbox</a></span><span class="signature">(<wbr>{<span class="parameter" id="checkbox-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="checkbox-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="checkbox-param-min"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">min</span>, </span><span class="parameter" id="checkbox-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">max</span></span>})
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-      <p class="from-extension">
-        <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
-        provided by the <a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider.html">CheckboxSlider</a> extension</span>
-      </p>
-  
   
 
 </dd>
@@ -337,6 +405,23 @@
       <p class="from-extension">
         <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
         provided by the <a href="../databinding_widgets_material_checkbox/CheckboxSlider.html">CheckboxSlider</a> extension</span>
+      </p>
+  
+  
+
+</dd>
+
+        <dt id="checkbox" class="callable">
+  <span class="name"><a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider/checkbox.html">checkbox</a></span><span class="signature">(<wbr>{<span class="parameter" id="checkbox-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="checkbox-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="checkbox-param-min"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">min</span>, </span><span class="parameter" id="checkbox-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">max</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
+        provided by the <a href="../databinding_widgets_cupertino_checkbox/CheckboxSlider.html">CheckboxSlider</a> extension</span>
       </p>
   
   
@@ -603,23 +688,6 @@
 </dd>
 
         <dt id="Switch" class="callable">
-  <span class="name"><a href="../databinding_widgets/BindSwitch/Switch.html">Switch</a></span><span class="signature">(<wbr>{<span class="parameter" id="Switch-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="Switch-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span>})
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-      <p class="from-extension">
-        <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
-        provided by the <a href="../databinding_widgets/BindSwitch.html">BindSwitch</a> extension</span>
-      </p>
-  
-  
-
-</dd>
-
-        <dt id="Switch" class="callable">
   <span class="name"><a href="../databinding_widgets_material_switch/BindSwitch/Switch.html">Switch</a></span><span class="signature">(<wbr>{<span class="parameter" id="Switch-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="Switch-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
@@ -630,6 +698,23 @@
       <p class="from-extension">
         <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
         provided by the <a href="../databinding_widgets_material_switch/BindSwitch.html">BindSwitch</a> extension</span>
+      </p>
+  
+  
+
+</dd>
+
+        <dt id="Switch" class="callable">
+  <span class="name"><a href="../databinding_widgets/BindSwitch/Switch.html">Switch</a></span><span class="signature">(<wbr>{<span class="parameter" id="Switch-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="Switch-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>,
+        provided by the <a href="../databinding_widgets/BindSwitch.html">BindSwitch</a> extension</span>
       </p>
   
   
@@ -654,7 +739,7 @@
 </dd>
 
         <dt id="text" class="callable">
-  <span class="name"><a href="../databinding_widgets/BindText/text.html">text</a></span><span class="signature">(<wbr>{<span class="parameter" id="text-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="text-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="text-param-placeholder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">placeholder</span>, </span><span class="parameter" id="text-param-style"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/TextStyle-class.html">TextStyle</a>?</span> <span class="parameter-name">style</span>, </span><span class="parameter" id="text-param-padding"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/EdgeInsetsGeometry-class.html">EdgeInsetsGeometry</a>?</span> <span class="parameter-name">padding</span></span>})
+  <span class="name"><a href="../databinding_widgets/BindText/text.html">text</a></span><span class="signature">(<wbr>{<span class="parameter" id="text-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="text-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="text-param-prefix"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">prefix</span>, </span><span class="parameter" id="text-param-placeholder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">placeholder</span>, </span><span class="parameter" id="text-param-style"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/TextStyle-class.html">TextStyle</a>?</span> <span class="parameter-name">style</span>, </span><span class="parameter" id="text-param-padding"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/EdgeInsetsGeometry-class.html">EdgeInsetsGeometry</a>?</span> <span class="parameter-name">padding</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
   

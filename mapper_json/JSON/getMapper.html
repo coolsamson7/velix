@@ -27,7 +27,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
     <li><a href="../../mapper_json/JSON-class.html">JSON</a></li>
-    <li class="self-crumb">getMapper&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li class="self-crumb">getMapper method</li>
   </ol>
   <div class="self-name">getMapper</div>
   <form class="search navbar-right" role="search">
@@ -49,13 +49,14 @@
     data-above-sidebar="mapper_json&#47;JSON-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">getMapper&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
+<h1><span class="kind-method">getMapper</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></span>
-<span class="name ">getMapper</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>)
+<span class="name ">getMapper</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getMapper-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span></span></li>
+</ol>)
 
       
 
@@ -66,10 +67,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">JSONMapper getMapper&lt;T&gt;() {
-  var mapper = mappers[T];
+  <pre class="language-dart"><code class="language-dart">JSONMapper getMapper(Type type) {
+  var mapper = mappers[type.runtimeType];
   if ( mapper == null) {
-    mappers[T] = mapper = JSONMapper&lt;T&gt;(validate: validate);
+    mappers[type.runtimeType] = mapper = JSONMapper(type: type, validate: validate);
   }
 
   return mapper;
@@ -89,7 +90,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
     <li><a href="../../mapper_json/JSON-class.html">JSON</a></li>
-    <li class="self-crumb">getMapper&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li class="self-crumb">getMapper method</li>
 </ol>
 
     <h5>JSON class</h5>

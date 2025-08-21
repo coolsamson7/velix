@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">deserialize&lt;<wbr><span class="type-parameter">V</span>&gt; method</li>
   </ol>
   <div class="self-name">deserialize</div>
@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype">V</span>
-<span class="name ">deserialize</span>&lt;<wbr><span class="type-parameter">V</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="deserialize-param-json"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a></span> <span class="parameter-name">json</span></span></li>
+<span class="name ">deserialize</span>&lt;<wbr><span class="type-parameter">V</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="deserialize-param-json"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span></span></li>
 </ol>)
 
       
@@ -67,7 +67,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">V deserialize&lt;V&gt;(Map json) {
+  <pre class="language-dart"><code class="language-dart">V deserialize&lt;V&gt;(Map&lt;String,dynamic&gt; json) {
   return deserializer.map(json, mapping: deserializerMapping);
 }</code></pre>
 </section>
@@ -84,7 +84,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">deserialize&lt;<wbr><span class="type-parameter">V</span>&gt; method</li>
 </ol>
 

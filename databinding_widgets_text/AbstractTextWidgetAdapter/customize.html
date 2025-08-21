@@ -87,7 +87,18 @@
 
   String? validate(dynamic value) {
     try {
-      typeProperty.validate(parseValue(value));
+      var propValue = null;
+
+      try {
+        propValue = parseValue(value);
+        typeProperty.validate(propValue);
+      }
+      catch(e) {
+        if ( e is ValidationException)
+          throw e;
+        else
+          typeProperty.validate(null); &#47;&#47; should a t least get a good text
+      }
 
       return null;
     }

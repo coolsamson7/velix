@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">JSONMapper.new constructor</li>
   </ol>
   <div class="self-name">JSONMapper.new</div>
@@ -49,12 +49,13 @@
       data-above-sidebar="mapper_json&#47;JSONMapper-class-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-constructor">JSONMapper&lt;<wbr><span class="type-parameter">T</span>&gt;</span> constructor 
+<h1><span class="kind-constructor">JSONMapper</span> constructor 
 </h1></div>
 
     <section class="multi-line-signature">
       
-      <span class="name ">JSONMapper&lt;<wbr><span class="type-parameter">T</span>&gt;</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-validate"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">validate</span> = <span class="default-value">false</span>, </span></li>
+      <span class="name ">JSONMapper</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span>, </span></li>
+<li><span class="parameter" id="-param-validate"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">validate</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
     </section>
     
@@ -63,7 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">JSONMapper({this.validate = false}) {
+  <pre class="language-dart"><code class="language-dart">JSONMapper({required this.type, this.validate = false}) {
   serializer = createSerializer();
   deserializer = createDeserializer();
 }</code></pre>
@@ -81,7 +82,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">JSONMapper.new constructor</li>
 </ol>
 

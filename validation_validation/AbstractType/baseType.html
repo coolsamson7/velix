@@ -76,7 +76,7 @@
       params: {
         &quot;type&quot;: type
       },
-      check: (dynamic object) =&gt; object is V,
+      check: (dynamic object) =&gt; object.runtimeType == type,
       stop: true
   );
 }</code></pre>

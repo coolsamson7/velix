@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">createSerializer method</li>
   </ol>
   <div class="self-name">createSerializer</div>
@@ -68,7 +68,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Mapper createSerializer() {
   Map&lt;Type, MappingDefinition&gt; mappings = {};
-  var queue = Queue&lt;Type&gt;.from([T]);
+  var queue = Queue&lt;Type&gt;.from([type]);
 
   &#47;&#47; local function
 
@@ -78,7 +78,7 @@
   }
 
   MappingDefinition process(Type type) {
-    var typeMapping = MappingDefinition&lt;T,Map&lt;String, dynamic&gt;&gt;(sourceClass: type, targetClass: Map&lt;String, dynamic&gt;);
+    var typeMapping = MappingDefinition&lt;dynamic,Map&lt;String, dynamic&gt;&gt;(sourceClass: type, targetClass: Map&lt;String, dynamic&gt;);
     var typeDescriptor = TypeDescriptor.forType(type);
 
     var jsonSerializable = typeDescriptor.find_annotation&lt;JsonSerializable&gt;() ?? JsonSerializable();
@@ -151,7 +151,7 @@
 
   var mapper = Mapper(mappings.values.toList());
 
-  serializerMapping = mapper.getMappingX(T, Map&lt;String,dynamic&gt;);
+  serializerMapping = mapper.getMappingX(type, Map&lt;String,dynamic&gt;);
 
   return mapper;
 }</code></pre>
@@ -169,7 +169,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">createSerializer method</li>
 </ol>
 

@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">mapper&#47;json.dart</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">createDeserializer method</li>
   </ol>
   <div class="self-name">createDeserializer</div>
@@ -68,7 +68,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Mapper createDeserializer() {
   Map&lt;Type, MappingDefinition&gt; mappings = {};
-  var queue = Queue&lt;Type&gt;.from([T]);
+  var queue = Queue&lt;Type&gt;.from([type]);
 
   &#47;&#47; local function
 
@@ -171,7 +171,7 @@
 
   var mapper = Mapper(mappings.values.toList());
 
-  deserializerMapping = mapper.mappings.values.firstWhere((mapping) =&gt; mapping.typeDescriptor.type == T);
+  deserializerMapping = mapper.mappings.values.firstWhere((mapping) =&gt; mapping.typeDescriptor.type == type);
 
   return mapper;
 }</code></pre>
@@ -189,7 +189,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../mapper_json/">json</a></li>
-    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../mapper_json/JSONMapper-class.html">JSONMapper</a></li>
     <li class="self-crumb">createDeserializer method</li>
 </ol>
 

@@ -91,9 +91,13 @@ void setValue(CupertinoTextFormFieldRow widget, dynamic value, ValuedWidgetConte
 
     widget.controller?.text = newText;
 
-    &#47;&#47; restore cursor
+    &#47;&#47; clamp selection
 
-    widget.controller!.selection = previousSelection;
+    final maxOffset = newText.length;
+    final start = previousSelection.start.clamp(0, maxOffset);
+    final end = previousSelection.end.clamp(0, maxOffset);
+
+    widget.controller!.selection = TextSelection(baseOffset: start, extentOffset: end);
   }
 }</code></pre>
 </section>

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the notifyChange method from the FormMapper class, for the Dart programming language.">
-  <title>notifyChange method - FormMapper class - form_mapper library - Dart API</title>
+  <meta name="description" content="API docs for the value property from the FormEvent class, for the Dart programming language.">
+  <title>value property - FormEvent class - form_mapper library - Dart API</title>
 
 
   
@@ -26,10 +26,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
-    <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">notifyChange method</li>
+    <li><a href="../../databinding_form_mapper/FormEvent-class.html">FormEvent</a></li>
+    <li class="self-crumb">value property</li>
   </ol>
-  <div class="self-name">notifyChange</div>
+  <div class="self-name">value</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,44 +46,33 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="databinding_form_mapper&#47;FormMapper-class-sidebar.html"
+    data-above-sidebar="databinding_form_mapper&#47;FormEvent-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">notifyChange</span> method 
+<h1><span class="kind-property">value</span> property 
 </h1></div>
 
-    <section class="multi-line-signature">
-      
-<span class="returntype">void</span>
-<span class="name ">notifyChange</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="notifyChange-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
-<li><span class="parameter" id="notifyChange-param-value"><span>required</span> <span class="type-annotation">dynamic</span> <span class="parameter-name">value</span>, </span></li>
-</ol>})
-
-      
-
-    </section>
     
+      <section class="multi-line-signature">
+        
+        dynamic
+        <span class="name ">value</span>
+        <div class="features"><span class="feature">getter/setter pair</span></div>
 
+      </section>
+      
 
-    
+      
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void notifyChange({required String path, required dynamic value}) {
-  var property = findProperty(path);
-
-  changes += 1;
-
-  if ( emitOnChange )
-    eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));
-
-  property.set(instance, value, ValuedWidgetContext(mapper: this));
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">dynamic value;</code></pre>
 </section>
 
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+    
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -92,14 +81,14 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">form_mapper</a></li>
-    <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">notifyChange method</li>
+    <li><a href="../../databinding_form_mapper/FormEvent-class.html">FormEvent</a></li>
+    <li class="self-crumb">value property</li>
 </ol>
 
-    <h5>FormMapper class</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>FormEvent class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>

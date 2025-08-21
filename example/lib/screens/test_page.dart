@@ -123,30 +123,25 @@ class TestPageState extends State<TestPage>
                 ),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: CupertinoColors.systemGrey6,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: CupertinoColors.separator),
-              ),
-              child: CupertinoTextField(
-                controller: TextEditingController(
-                  text: const JsonEncoder.withIndent(
-                    '  ',
-                  ).convert(JSON.serialize(data)),
+            CupertinoFormSection.insetGrouped(
+              children: [
+                CupertinoTextField(
+                  controller: TextEditingController(
+                    text: const JsonEncoder.withIndent(
+                      '  ',
+                    ).convert(JSON.serialize(data)),
+                  ),
+                  readOnly: true,
+                  maxLines: 8,
+                  minLines: 3,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                    color: CupertinoColors.black,
+                  ),
+                  decoration: null,
                 ),
-                readOnly: true,
-                maxLines: 8,
-                minLines: 3,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 14,
-                  color: CupertinoColors.black,
-                ),
-                decoration: null,
-              ),
+              ],
             ),
           ],
         ),

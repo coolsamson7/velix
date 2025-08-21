@@ -44,3 +44,10 @@
 ## 0.14.3
 
 - lint fixes
+
+## 0.15.0
+
+- added extension methods to the form mapper
+- added a number of base widgets
+- more sophisticated handling of form errors
+- separated iOS and material widgets

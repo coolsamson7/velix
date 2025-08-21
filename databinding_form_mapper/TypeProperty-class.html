@@ -73,6 +73,10 @@
         
         
 
+          <dt>Implementers</dt>
+          <dd><ul class="comma-separated clazz-relationships">
+              <li><a href="../databinding_form_mapper/RootProperty-class.html">RootProperty</a></li>
+          </ul></dd>
 
         
         
@@ -86,7 +90,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="TypeProperty.new" class="callable">
-          <span class="name"><a href="../databinding_form_mapper/TypeProperty/TypeProperty.html">TypeProperty.new</a></span><span class="signature">({<span class="parameter" id="-param-field"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span> <span class="parameter-name">field</span>, </span><span class="parameter" id="-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="-param-parent"><span class="type-annotation"><a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>?</span> <span class="parameter-name">parent</span>, </span><span class="parameter" id="-param-twoWay"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">twoWay</span> = <span class="default-value">false</span></span>})</span>
+          <span class="name"><a href="../databinding_form_mapper/TypeProperty/TypeProperty.html">TypeProperty.new</a></span><span class="signature">({<span class="parameter" id="-param-field"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a>?</span> <span class="parameter-name">field</span>, </span><span class="parameter" id="-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="-param-parent"><span class="type-annotation"><a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>?</span> <span class="parameter-name">parent</span>, </span><span class="parameter" id="-param-twoWay"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">twoWay</span> = <span class="default-value">false</span></span>})</span>
         </dt>
         <dd>
           
@@ -113,7 +117,7 @@
 
         <dt id="field" class="property">
   <span class="name"><a href="../databinding_form_mapper/TypeProperty/field.html">field</a></span>
-  <span class="signature">&#8594; <a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>
+  <span class="signature">&#8594; <a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a>?</span>
   
 
 </dt>
@@ -244,7 +248,7 @@
 
         <dt id="findChild" class="callable">
   <span class="name"><a href="../databinding_form_mapper/TypeProperty/findChild.html">findChild</a></span><span class="signature">(<wbr><span class="parameter" id="findChild-param-property"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">property</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span>
+    <span class="returntype parameter">&#8594; <a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>?</span>
   </span>
   
 
@@ -265,6 +269,19 @@
 <dd>
   Read a property value given an instance
   <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="getType" class="callable">
+  <span class="name"><a href="../databinding_form_mapper/TypeProperty/getType.html">getType</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
 
 </dd>
 
@@ -320,6 +337,19 @@
 
 </dd>
 
+        <dt id="rollback" class="callable">
+  <span class="name"><a href="../databinding_form_mapper/TypeProperty/rollback.html">rollback</a></span><span class="signature">(<wbr><span class="parameter" id="rollback-param-context"><span class="type-annotation"><a href="../databinding_valued_widget/ValuedWidgetContext-class.html">ValuedWidgetContext</a></span> <span class="parameter-name">context</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="set" class="callable">
   <span class="name"><a href="../databinding_form_mapper/TypeProperty/set.html">set</a></span><span class="signature">(<wbr><span class="parameter" id="set-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="set-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span>, </span><span class="parameter" id="set-param-context"><span class="type-annotation"><a href="../databinding_valued_widget/ValuedWidgetContext-class.html">ValuedWidgetContext</a></span> <span class="parameter-name">context</span></span>)
     <span class="returntype parameter">&#8594; void</span>
@@ -343,6 +373,19 @@
 <dd class="inherited">
   A string representation of this object.
   <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="validate" class="callable">
+  <span class="name"><a href="../databinding_form_mapper/TypeProperty/validate.html">validate</a></span><span class="signature">(<wbr><span class="parameter" id="validate-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
 
 </dd>
 

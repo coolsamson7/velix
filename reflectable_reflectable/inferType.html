@@ -55,7 +55,8 @@
     <section class="multi-line-signature">
         
 <span class="returntype"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
-<span class="name ">inferType</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span></span></li>
+<span class="name ">inferType</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span>, </span></li>
+<li><span class="parameter" id="inferType-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span></span></li>
 </ol>)
 
         
@@ -70,7 +71,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">AbstractType inferType&lt;T&gt;(AbstractType? t) {
+  <pre class="language-dart"><code class="language-dart">AbstractType inferType&lt;T&gt;(AbstractType? t, bool isNullable) {
   if ( t != null)
     return t;
 
@@ -84,15 +85,29 @@
     DateTime: DateTimeType()
   };
 
-  var result = types[type];
+  final Map&lt;Type, AbstractType&gt; nullableTypes = {
+    String: StringType().optional(),    &#47;&#47; default unconstrained
+    int: IntType().optional(),
+    double: DoubleType().optional(),
+    bool: BoolType().optional(),
+    DateTime: DateTimeType().optional()
+  };
+
+  var result = isNullable ? nullableTypes[type] : types[type];
 
   if ( result == null)
-    if ( type.toString().startsWith(&quot;List&lt;&quot;))
-      return ListType(type);
-    else
-      return ObjectType(type);
-  else
-    return types[type]!;
+    if ( type.toString().startsWith(&quot;List&lt;&quot;)) {
+      result = ListType(type);
+      if ( isNullable )
+        result = result.optional();
+    }
+    else {
+      result = ObjectType(type);
+      if ( isNullable )
+        result = result.optional();
+    }
+
+   return result;
 }</code></pre>
 </section>
 

@@ -251,14 +251,6 @@
   @internal
 </dd>
 
-          <dt id="CupertinoSwitchAdapter">
-  <span class="name "><a href="../databinding_switch_adapter/CupertinoSwitchAdapter-class.html">CupertinoSwitchAdapter</a></span> 
-
-</dt>
-<dd>
-  A <a href="../databinding_valued_widget/ValuedWidgetAdapter-class.html">ValuedWidgetAdapter</a> for a <a href="https://api.flutter.dev/flutter/cupertino/CupertinoSwitch-class.html">CupertinoSwitch</a>
-</dd>
-
           <dt id="Dataclass">
   <span class="name "><a href="../reflectable_reflectable/Dataclass-class.html">Dataclass</a></span> 
 
@@ -385,6 +377,14 @@
 </dt>
 <dd>
   decorator used to influence the json serialization
+</dd>
+
+          <dt id="Keywords">
+  <span class="name "><a href="../util_collections/Keywords-class.html">Keywords</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="ListType">
@@ -647,6 +647,14 @@ to read values from a source and set the result in the target object
   @internal
 </dd>
 
+          <dt id="RootProperty">
+  <span class="name "><a href="../databinding_form_mapper/RootProperty-class.html">RootProperty</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="SetPropertyValueReceiver">
   <span class="name "><a href="../mapper_operation_builder/SetPropertyValueReceiver-class.html">SetPropertyValueReceiver</a></span> 
 
@@ -669,6 +677,22 @@ to read values from a source and set the result in the target object
 </dt>
 <dd>
   @internal
+</dd>
+
+          <dt id="SmartForm">
+  <span class="name "><a href="../databinding_form_mapper/SmartForm-class.html">SmartForm</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="SmartFormState">
+  <span class="name "><a href="../databinding_form_mapper/SmartFormState-class.html">SmartFormState</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="SourceNode">
@@ -717,14 +741,6 @@ to read values from a source and set the result in the target object
 </dt>
 <dd>
   @internal
-</dd>
-
-          <dt id="TextFieldAdapter">
-  <span class="name "><a href="../databinding_text_adapter/TextFieldAdapter-class.html">TextFieldAdapter</a></span> 
-
-</dt>
-<dd>
-  A <a href="../databinding_valued_widget/ValuedWidgetAdapter-class.html">ValuedWidgetAdapter</a> for a <a href="https://api.flutter.dev/flutter/cupertino/CupertinoTextFormFieldRow-class.html">CupertinoTextFormFieldRow</a>
 </dd>
 
           <dt id="TracingCommandInterceptor">
@@ -930,6 +946,61 @@ to read values from a source and set the result in the target object
     </section>
 
 
+    <section class="summary offset-anchor" id="extensions">
+      <h2>Extensions</h2>
+      <dl>
+          <dt id="BindSlider">
+  <span class="name "><a href="../databinding_widgets/BindSlider.html">BindSlider</a></span>
+  on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="BindSwitch">
+  <span class="name "><a href="../databinding_widgets/BindSwitch.html">BindSwitch</a></span>
+  on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="BindText">
+  <span class="name "><a href="../databinding_widgets/BindText.html">BindText</a></span>
+  on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="CheckboxSlider">
+  <span class="name "><a href="../databinding_widgets/CheckboxSlider.html">CheckboxSlider</a></span>
+  on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="DatePickerFormFieldExtension">
+  <span class="name "><a href="../databinding_widgets/DatePickerFormFieldExtension.html">DatePickerFormFieldExtension</a></span>
+  on <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
+      </dl>
+    </section>
 
     <section class="summary offset-anchor" id="constants">
       <h2>Constants</h2>
@@ -1018,7 +1089,7 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="inferType" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/inferType.html">inferType</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span></span>)
+  <span class="name"><a href="../reflectable_reflectable/inferType.html">inferType</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span>, </span><span class="parameter" id="inferType-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span></span>)
     <span class="returntype parameter">&#8594; <a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
   </span>
   
@@ -1111,7 +1182,7 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="registerWidgets" class="callable">
-  <span class="name"><a href="../databinding_registry/registerWidgets.html">registerWidgets</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../databinding_widgets/registerWidgets.html">registerWidgets</a></span><span class="signature">(<wbr><span class="parameter" id="registerWidgets-param-platform"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/TargetPlatform.html">TargetPlatform</a></span> <span class="parameter-name">platform</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -1189,7 +1260,7 @@ to read values from a source and set the result in the target object
 
           
   <dt id="DisplayValue" class="callable">
-    <span class="name"><a href="../databinding_text_adapter/DisplayValue.html">DisplayValue</a></span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;<span class="signature">
+    <span class="name"><a href="../databinding_form_mapper/DisplayValue.html">DisplayValue</a></span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;<span class="signature">
       <span class="returntype parameter">= T Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation">S</span></span>)</span></span>
     </span>
     
@@ -1232,6 +1303,21 @@ to read values from a source and set the result in the target object
   </dd>
 
           
+  <dt id="Key" class="">
+  <span class="name"><a href="../databinding_valued_widget/Key.html">Key</a></span>
+    = (<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span></span>)
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+
+          
   <dt id="MapperConfig" class="">
   <span class="name"><a href="../mapper_mapper/MapperConfig.html">MapperConfig</a></span>
     = (<span class="field">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="field-name">checkCycles</span>}</span>)
@@ -1262,7 +1348,7 @@ to read values from a source and set the result in the target object
 
           
   <dt id="ParseValue" class="callable">
-    <span class="name"><a href="../databinding_text_adapter/ParseValue.html">ParseValue</a></span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;<span class="signature">
+    <span class="name"><a href="../databinding_form_mapper/ParseValue.html">ParseValue</a></span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;<span class="signature">
       <span class="returntype parameter">= S Function<span class="signature">(<span class="parameter" id="param-text"><span class="type-annotation">T</span> <span class="parameter-name">text</span></span>)</span></span>
     </span>
     
@@ -1334,10 +1420,21 @@ to read values from a source and set the result in the target object
       <li><a href="../components_overlay/">components/overlay</a></li>
       <li><a href="../components_view/">components/view</a></li>
       <li><a href="../databinding_form_mapper/">databinding/form_mapper</a></li>
-      <li><a href="../databinding_registry/">databinding/registry</a></li>
-      <li><a href="../databinding_switch_adapter/">databinding/switch_adapter</a></li>
-      <li><a href="../databinding_text_adapter/">databinding/text_adapter</a></li>
       <li><a href="../databinding_valued_widget/">databinding/valued_widget</a></li>
+      <li><a href="../databinding_widgets/">databinding/widgets</a></li>
+      <li><a href="../databinding_widgets_cupertino_checkbox/">databinding/widgets/cupertino/checkbox</a></li>
+      <li><a href="../databinding_widgets_cupertino_datepicker/">databinding/widgets/cupertino/datepicker</a></li>
+      <li><a href="../databinding_widgets_cupertino_registry/">databinding/widgets/cupertino/registry</a></li>
+      <li><a href="../databinding_widgets_cupertino_slider/">databinding/widgets/cupertino/slider</a></li>
+      <li><a href="../databinding_widgets_cupertino_switch/">databinding/widgets/cupertino/switch</a></li>
+      <li><a href="../databinding_widgets_cupertino_text/">databinding/widgets/cupertino/text</a></li>
+      <li><a href="../databinding_widgets_material_checkbox/">databinding/widgets/material/checkbox</a></li>
+      <li><a href="../databinding_widgets_material_datepicker/">databinding/widgets/material/datepicker</a></li>
+      <li><a href="../databinding_widgets_material_registry/">databinding/widgets/material/registry</a></li>
+      <li><a href="../databinding_widgets_material_slider/">databinding/widgets/material/slider</a></li>
+      <li><a href="../databinding_widgets_material_switch/">databinding/widgets/material/switch</a></li>
+      <li><a href="../databinding_widgets_material_text/">databinding/widgets/material/text</a></li>
+      <li><a href="../databinding_widgets_text/">databinding/widgets/text</a></li>
       <li><a href="../i18n_i18n/">i18n/i18n</a></li>
       <li><a href="../mapper_json/">mapper/json</a></li>
       <li><a href="../mapper_mapper/">mapper/mapper</a></li>

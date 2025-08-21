@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span>
+<span class="returntype"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>?</span>
 <span class="name ">findChild</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="findChild-param-property"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">property</span></span></li>
 </ol>)
 
@@ -67,8 +67,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">TypeProperty findChild(String property) {
-  return children.firstWhere((child) =&gt; child.path == property);
+  <pre class="language-dart"><code class="language-dart">TypeProperty? findChild(String property) {
+  return findElement(children, (child) =&gt; child.path == property);
 }</code></pre>
 </section>
 

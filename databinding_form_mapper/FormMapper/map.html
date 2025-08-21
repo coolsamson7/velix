@@ -59,8 +59,8 @@
 <li><span class="parameter" id="map-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
 <li><span class="parameter" id="map-param-widget"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">widget</span>, </span></li>
 <li><span class="parameter" id="map-param-adapter"><span>required</span> <span class="type-annotation"><a href="../../databinding_valued_widget/ValuedWidgetAdapter-class.html">ValuedWidgetAdapter</a></span> <span class="parameter-name">adapter</span>, </span></li>
-<li><span class="parameter" id="map-param-displayValue"><span class="type-annotation"><a href="../../databinding_text_adapter/DisplayValue.html">DisplayValue</a></span> <span class="parameter-name">displayValue</span> = <span class="default-value">identity</span>, </span></li>
-<li><span class="parameter" id="map-param-parseValue"><span class="type-annotation"><a href="../../databinding_text_adapter/DisplayValue.html">DisplayValue</a></span> <span class="parameter-name">parseValue</span> = <span class="default-value">identity</span>, </span></li>
+<li><span class="parameter" id="map-param-displayValue"><span class="type-annotation"><a href="../../databinding_form_mapper/DisplayValue.html">DisplayValue</a></span> <span class="parameter-name">displayValue</span> = <span class="default-value">identity</span>, </span></li>
+<li><span class="parameter" id="map-param-parseValue"><span class="type-annotation"><a href="../../databinding_form_mapper/DisplayValue.html">DisplayValue</a></span> <span class="parameter-name">parseValue</span> = <span class="default-value">identity</span>, </span></li>
 </ol>})
 
       
@@ -79,6 +79,8 @@
         typeProperty,
         WidgetProperty(widget: widget, adapter: adapter, displayValue: displayValue, parseValue: parseValue)
     ));
+
+    path2Operation[path] = operations.last;
   }
   else {
     &#47;&#47; just replace

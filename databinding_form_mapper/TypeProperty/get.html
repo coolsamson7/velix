@@ -86,7 +86,7 @@ dynamic get(dynamic instance, ValuedWidgetContext context) {
       instance = parent!.get(instance, context);
     }
 
-    value = initialValue = field.getter(instance);
+    value = initialValue = field!.getter(instance);
   }
 
   return value;

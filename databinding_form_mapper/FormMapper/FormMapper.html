@@ -72,6 +72,9 @@
   <pre class="language-dart"><code class="language-dart">FormMapper({required this.instance, this.twoWay=false}) {
   transformer = Transformer(operations);
   type = TypeDescriptor.forType(instance.runtimeType);
+
+  if ( type.isImmutable())
+    rootProperty = RootProperty(mapper: this);
 }</code></pre>
 </section>
 

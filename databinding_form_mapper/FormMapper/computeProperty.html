@@ -70,7 +70,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">TypeProperty computeProperty(TypeDescriptor typeDescriptor, String path) {
   TypeProperty? result = properties[path];
-  TypeProperty? parent;
+  TypeProperty? parent = rootProperty;
 
   if ( result == null) {
     String attribute = path;
@@ -81,7 +81,7 @@
 
       parent = computeProperty(typeDescriptor, parentPath);
 
-      typeDescriptor = (parent.field.type as ObjectType).typeDescriptor;
+      typeDescriptor = (parent.field!.type as ObjectType).typeDescriptor;
 
       attribute = path.substring(lastDot + 1);
     } &#47;&#47; if

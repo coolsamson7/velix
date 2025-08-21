@@ -27,7 +27,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit method</li>
+    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
   </ol>
   <div class="self-name">commit</div>
   <form class="search navbar-right" role="search">
@@ -49,13 +49,13 @@
     data-above-sidebar="databinding_form_mapper&#47;FormMapper-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">commit</span> method 
+<h1><span class="kind-method">commit&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype">dynamic</span>
-<span class="name ">commit</span>(<wbr>)
+<span class="returntype">T</span>
+<span class="name ">commit</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>)
 
       
 
@@ -69,12 +69,12 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">dynamic commit() {
+  <pre class="language-dart"><code class="language-dart">T commit&lt;T&gt;() {
   ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
   for ( Operation operation in operations)
     (operation.source as TypeProperty).commit(context);
 
-  return instance;
+  return instance as T;
 }</code></pre>
 </section>
 
@@ -91,7 +91,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">form_mapper</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit method</li>
+    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
 </ol>
 
     <h5>FormMapper class</h5>

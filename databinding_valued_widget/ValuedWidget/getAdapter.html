@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../databinding_valued_widget/ValuedWidgetAdapter-class.html">ValuedWidgetAdapter</a></span>
-<span class="name ">getAdapter</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getAdapter-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span></span></li>
+<span class="name ">getAdapter</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getAdapter-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span></li>
 </ol>)
 
       
@@ -67,12 +67,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static ValuedWidgetAdapter getAdapter(Type type) {
-  ValuedWidgetAdapter? adapter =  _adapters[type];
-  if (adapter == null)
-    throw Exception(&quot;ouch&quot;);
+  <pre class="language-dart"><code class="language-dart">static ValuedWidgetAdapter getAdapter(String name) {
+  ValuedWidgetAdapter? result = _adapters[(platform, name)] ?? _adapters[(&quot;&quot;, name)];
 
-  return adapter;
+  if (result == null)
+    throw Exception(&quot;missing adapter for type $name&quot;);
+
+  return result;
 }</code></pre>
 </section>
 

@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>
-<span class="name ">getField</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getField-param-field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">field</span></span></li>
+<span class="name ">getField</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getField-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span></li>
 </ol>)
 
       
@@ -64,15 +64,19 @@
     
 <section class="desc markdown">
   <p>return a named field.
-<code>field</code> the field name</p>
+<code>name</code> the field name</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">FieldDescriptor getField(String field) {
-  return _fields[field]!;
+  <pre class="language-dart"><code class="language-dart">FieldDescriptor getField(String name) {
+  var field = _fields[name];
+  if ( field != null)
+    return field;
+  else
+    throw Exception(&quot;unknown field $type.$name&quot;);
 }</code></pre>
 </section>
 

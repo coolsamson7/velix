@@ -69,7 +69,11 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void commit(ValuedWidgetContext context) {
   if ( isDirty()) {
-    callSetter(context.mapper!.instance, value, context);
+    if ( !context.mapper!.twoWay )
+      callSetter(context.mapper!.instance, value, context);
+
+    initialValue = value;
+    context.mapper!.addDirty(-1);
   }
 }</code></pre>
 </section>

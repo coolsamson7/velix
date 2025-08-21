@@ -68,11 +68,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">TypeProperty findProperty(String path) {
-  for ( Operation operation in operations)
-    if ( (operation.source as TypeProperty).path == path)
-      return operation.source as TypeProperty;
-
-  throw Exception(&quot;unknown property $path&quot;);
+  return findOperation(path)!.source as TypeProperty;
 }</code></pre>
 </section>
 

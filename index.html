@@ -64,12 +64,13 @@
 <li><a href="https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb">Commands</a></li>
 <li><a href="https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a">Model driven Forms</a></li>
 </ul>
+<p>Detailed infromation can be foun din the corresponding <a href="https://github.com/coolsamson7/velix/wiki">Wiki</a>.</p>
 <p>Lets get a quick overview on the topics</p>
 <h1 id="validation">Validation</h1>
-<p>As in somne popular Typescript libraries like yup, it is possible to declare type constraints with a simple fluent language</p>
+<p>As in some popular Typescript libraries like <code>yup</code>, it is possible to declare type constraints with a simple fluent language</p>
 <pre class="language-dart"><code class="language-dart">var type = IntType().greaterThan(0).lessThan(100);
 
-type.validate(-1); // meee....will throw
+type.validate(-1); // meeeh....will throw
 </code></pre>
 <h1 id="type-meta-data">Type Meta-Data</h1>
 <p>In combination with a custom code generator, classes decorated with <code>@Dataclass</code> emit the meta data:</p>
@@ -106,7 +107,7 @@ var invoice = Invoice(...);
 
 var result = mapper.map(invoice);
 </code></pre>
-<p>As a special case, json mappiung is supported as well:</p>
+<p>As a special case, json mapping is supported as well:</p>
 <pre class="language-dart"><code class="language-dart">// overall configuration  
 
 JSON(
@@ -141,8 +142,8 @@ var result = JSON.deserialize&lt;Money&gt;(json);
 <p>Commands let's you wrap simple methods in command objects, that</p>
 <ul>
 <li>are stateful ( enabled / disabled )</li>
-<li>can invoke interceptors while being executed ( e.g. exception handling, tarcing, ...), and</li>
-<li>influecn the UI whiel running ( e.g. spinner fro long-running commands )</li>
+<li>can invoke interceptors while being executed ( e.g. exception handling, tracing, ...), and</li>
+<li>influence the UI automatically while running ( e.g. spinner fro long-running commands )</li>
 </ul>
 <pre class="language-dart"><code class="language-dart">class _PersonPageState extends State&lt;PersonPage&gt; with CommandController&lt;PersonPage&gt;, _PersonPageCommands {
    ...
@@ -382,29 +383,106 @@ flutter_form_builder and reactive_forms, they still expect you to:</p>
 <dd>
 </dd>
 
-          <dt id="registry">
-  <span class="name"><a href="databinding_registry/">databinding/registry</a></span> 
-
-</dt>
-<dd>
-</dd>
-
-          <dt id="switch_adapter">
-  <span class="name"><a href="databinding_switch_adapter/">databinding/switch_adapter</a></span> 
-
-</dt>
-<dd>
-</dd>
-
-          <dt id="text_adapter">
-  <span class="name"><a href="databinding_text_adapter/">databinding/text_adapter</a></span> 
-
-</dt>
-<dd>
-</dd>
-
           <dt id="valued_widget">
   <span class="name"><a href="databinding_valued_widget/">databinding/valued_widget</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="widgets">
+  <span class="name"><a href="databinding_widgets/">databinding/widgets</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="checkbox">
+  <span class="name"><a href="databinding_widgets_cupertino_checkbox/">databinding/widgets/cupertino/checkbox</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="datepicker">
+  <span class="name"><a href="databinding_widgets_cupertino_datepicker/">databinding/widgets/cupertino/datepicker</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="registry">
+  <span class="name"><a href="databinding_widgets_cupertino_registry/">databinding/widgets/cupertino/registry</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="slider">
+  <span class="name"><a href="databinding_widgets_cupertino_slider/">databinding/widgets/cupertino/slider</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="switch">
+  <span class="name"><a href="databinding_widgets_cupertino_switch/">databinding/widgets/cupertino/switch</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="text">
+  <span class="name"><a href="databinding_widgets_cupertino_text/">databinding/widgets/cupertino/text</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="checkbox">
+  <span class="name"><a href="databinding_widgets_material_checkbox/">databinding/widgets/material/checkbox</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="datepicker">
+  <span class="name"><a href="databinding_widgets_material_datepicker/">databinding/widgets/material/datepicker</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="registry">
+  <span class="name"><a href="databinding_widgets_material_registry/">databinding/widgets/material/registry</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="slider">
+  <span class="name"><a href="databinding_widgets_material_slider/">databinding/widgets/material/slider</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="switch">
+  <span class="name"><a href="databinding_widgets_material_switch/">databinding/widgets/material/switch</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="text">
+  <span class="name"><a href="databinding_widgets_material_text/">databinding/widgets/material/text</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+          <dt id="text">
+  <span class="name"><a href="databinding_widgets_text/">databinding/widgets/text</a></span> 
 
 </dt>
 <dd>
@@ -496,10 +574,21 @@ flutter_form_builder and reactive_forms, they still expect you to:</p>
       <li><a href="components_overlay/">components/overlay</a></li>
       <li><a href="components_view/">components/view</a></li>
       <li><a href="databinding_form_mapper/">databinding/form_mapper</a></li>
-      <li><a href="databinding_registry/">databinding/registry</a></li>
-      <li><a href="databinding_switch_adapter/">databinding/switch_adapter</a></li>
-      <li><a href="databinding_text_adapter/">databinding/text_adapter</a></li>
       <li><a href="databinding_valued_widget/">databinding/valued_widget</a></li>
+      <li><a href="databinding_widgets/">databinding/widgets</a></li>
+      <li><a href="databinding_widgets_cupertino_checkbox/">databinding/widgets/cupertino/checkbox</a></li>
+      <li><a href="databinding_widgets_cupertino_datepicker/">databinding/widgets/cupertino/datepicker</a></li>
+      <li><a href="databinding_widgets_cupertino_registry/">databinding/widgets/cupertino/registry</a></li>
+      <li><a href="databinding_widgets_cupertino_slider/">databinding/widgets/cupertino/slider</a></li>
+      <li><a href="databinding_widgets_cupertino_switch/">databinding/widgets/cupertino/switch</a></li>
+      <li><a href="databinding_widgets_cupertino_text/">databinding/widgets/cupertino/text</a></li>
+      <li><a href="databinding_widgets_material_checkbox/">databinding/widgets/material/checkbox</a></li>
+      <li><a href="databinding_widgets_material_datepicker/">databinding/widgets/material/datepicker</a></li>
+      <li><a href="databinding_widgets_material_registry/">databinding/widgets/material/registry</a></li>
+      <li><a href="databinding_widgets_material_slider/">databinding/widgets/material/slider</a></li>
+      <li><a href="databinding_widgets_material_switch/">databinding/widgets/material/switch</a></li>
+      <li><a href="databinding_widgets_material_text/">databinding/widgets/material/text</a></li>
+      <li><a href="databinding_widgets_text/">databinding/widgets/text</a></li>
       <li><a href="i18n_i18n/">i18n/i18n</a></li>
       <li><a href="mapper_json/">mapper/json</a></li>
       <li><a href="mapper_mapper/">mapper/mapper</a></li>

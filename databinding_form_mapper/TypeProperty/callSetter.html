@@ -73,13 +73,13 @@
   if (parent != null)
     instance = parent!.get(instance, context);
 
-  if ( field.isFinal ) {
-    &#47;&#47; i need to construct a new instance of my parent, given all values
+  this.value = value;
 
-    parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context); &#47;&#47; TODO: check recursive
+  if ( field!.isFinal ) {
+      parent!.callSetter(context.mapper!.instance, parent!.newInstance(), context);
   } &#47;&#47; if
   else {
-    field.setter!(instance, initialValue = value);
+    field!.setter!(instance, value);
   }
 }</code></pre>
 </section>

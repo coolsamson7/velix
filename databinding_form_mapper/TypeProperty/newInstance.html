@@ -69,19 +69,28 @@
   <pre class="language-dart"><code class="language-dart">dynamic newInstance() {
   Map&lt;Symbol, dynamic&gt; args = {};
 
-  &#47;&#47; TODO: check if not all attributes are mapped!
+  &#47;&#47; fetch all required values
 
-  for (var constructorParameter in (field.type as ObjectType).typeDescriptor.constructorParameters) {
+  var typeDescriptor = (field!.type as ObjectType).typeDescriptor;
+
+  for (var constructorParameter in typeDescriptor.constructorParameters) {
     var name = constructorParameter.name;
 
     var child = findChild(&quot;$path.$name&quot;);
 
-    args[Symbol(name)] = child.value;
+    if ( child != null) {
+      &#47;&#47; take the value from the mapped child widget
 
-    child.initialValue = child.value; &#47;&#47; make it only happens once
+      args[Symbol(name)] = child.value;
+    }
+    else {
+      &#47;&#47; take it from the original - not mapped - object property
+
+      args[Symbol(name)] = typeDescriptor.get(initialValue, name);
+    }
   }
 
-  return Function.apply((field.type as ObjectType).typeDescriptor.constructor, [], args);
+  return Function.apply(typeDescriptor.constructor, [], args);
 }</code></pre>
 </section>
 

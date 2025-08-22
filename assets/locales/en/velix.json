@@ -1,37 +1,29 @@
 {
-  "hello": "Hello",
-  "welcome": "Welcome, {{name}}!",
-
-  "main": {
-    "todos": "TODOs",
-    "settings": "Settings",
-
-    "addTodo": "Add",
-    "removeTodo": "Delete",
-    "toggleTodo": "Toggle"
-  },
-
   "validation": {
     "string": {
-      "type": "Zeichenkette erwartet",
+      "type": "expected a string",
       "minLength": "must have a minimum of {minLength} characters",
       "maxLength": "must have a maximum of {maxLength} characters"
     },
     "int": {
-      "type": "Zahl erwartet",
+      "type": "expected an integer",
       "greaterThan": "must be greater than {greaterThan}",
       "greaterThanEquals": "must be greater or equal to {greaterThan}",
       "lessThan": "must be less than {lessThan}",
       "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },
     "double": {
-      "type": "Zahl erwartet",
+      "type": "expected a double",
       "greaterThan": "must be greater than {greaterThan}",
-      "greaterThanEquals": "must be greater or equal to {greaterThan}",
+      "greaterThanEquals": "be have greater or equal to {greaterThan}",
       "lessThan": "must be less than {lessThan}",
       "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },
     "bool": {
+      "type": "expected a bool"
+    },
+    "datetime": {
+      "type": "expcted a date"
     }
   }
 }

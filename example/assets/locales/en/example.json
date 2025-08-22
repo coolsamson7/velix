@@ -1,0 +1,12 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome, {{name}}!",
+  "main": {
+    "todos": "TODOs",
+    "settings": "Settings",
+
+    "addTodo": "Add",
+    "removeTodo": "Delete",
+    "toggleTodo": "Toggle"
+  }
+}

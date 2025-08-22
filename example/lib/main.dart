@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:velix/velix.dart';
 
@@ -22,6 +24,52 @@ class EasyLocalizationTranslator extends Translator {
   }
 }
 
+
+class MultiAssetLoader extends AssetLoader {
+  // instance data
+
+  final List<String> paths;
+
+  // constructor
+
+  MultiAssetLoader({required this.paths});
+
+  // override
+
+  @override
+  Future<Map<String, dynamic>> load(String path, Locale locale) async {
+    Map<String, dynamic> translations = {};
+
+    for (final basePath in paths) {
+      try {
+        // Determine the full path based on locale folder + filename
+        late String file;
+
+        // Split the last segment of basePath as filename
+
+        final segments = basePath.split('/');
+        final fileName = segments.last; // e.g. 'example.json' or 'velix.json'
+        final dirPath = segments.sublist(0, segments.length - 1).join('/');
+
+        file = '$dirPath/${locale.languageCode}/$fileName.json';
+
+
+        final jsonStr = await rootBundle.loadString(file);
+        final Map<String, dynamic> jsonMap = json.decode(jsonStr);
+
+        translations.addAll(jsonMap); // Merge
+      }
+      catch (e) {
+        // Ignore missing files
+        print(e);
+      }
+    }
+
+    return translations;
+  }
+}
+
+
 void main() async {
   // configure json stuff
 
@@ -42,7 +90,11 @@ void main() async {
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('de')],
-      path: 'assets/translations', // folder path!
+      path: '.', // folder path!
+      assetLoader: MultiAssetLoader(paths: [
+        "assets/locales/example",
+        "packages/velix/assets/locales/velix",
+      ]),
       fallbackLocale: const Locale('en'),
       child: TODOApp(),
     ),

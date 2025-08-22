@@ -73,12 +73,7 @@
   &#39;length&#39;: MethodSpec(1, [ArgType.intType], (t, a) =&gt; (t as dynamic)
       .minLength(a[0])
       .maxLength(a[0])),
-  &#39;re&#39;: MethodSpec(1, [ArgType.stringType], (t, a) =&gt; (t as dynamic).test&lt;String&gt;(
-    type: String,
-    name: &quot;re&quot;,
-    params: {&quot;pattern&quot;: a[0]},
-    check: (s) =&gt; RegExp(a[0]).hasMatch(s),
-  )),
+  &#39;re&#39;: MethodSpec(1, [ArgType.stringType], (t, a) =&gt; (t as dynamic).re&lt;String&gt;()),
   &#39;notEmpty&#39;: MethodSpec(0, [], (t, a) =&gt; (t as dynamic).notEmpty()),
   &#39;not-empty&#39;: MethodSpec(0, [], (t, a) =&gt; (t as dynamic).notEmpty()),
 };</code></pre>
@@ -110,7 +105,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.15.1
+      0.16.0
   </span>
   
 </footer>

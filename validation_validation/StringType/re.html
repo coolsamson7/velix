@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the lessThanEquals method from the DoubleType class, for the Dart programming language.">
-  <title>lessThanEquals method - DoubleType class - validation library - Dart API</title>
+  <meta name="description" content="API docs for the re method from the StringType class, for the Dart programming language.">
+  <title>re method - StringType class - validation library - Dart API</title>
 
 
   
@@ -26,10 +26,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../validation_validation/">validation&#47;validation.dart</a></li>
-    <li><a href="../../validation_validation/DoubleType-class.html">DoubleType</a></li>
-    <li class="self-crumb">lessThanEquals method</li>
+    <li><a href="../../validation_validation/StringType-class.html">StringType</a></li>
+    <li class="self-crumb">re method</li>
   </ol>
-  <div class="self-name">lessThanEquals</div>
+  <div class="self-name">re</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,16 +46,16 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="validation_validation&#47;DoubleType-class-sidebar.html"
+    data-above-sidebar="validation_validation&#47;StringType-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">lessThanEquals</span> method 
+<h1><span class="kind-method">re</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="../../validation_validation/DoubleType-class.html">DoubleType</a></span>
-<span class="name ">lessThanEquals</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="lessThanEquals-param-value"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">value</span></span></li>
+<span class="returntype"><a href="../../validation_validation/StringType-class.html">StringType</a></span>
+<span class="name ">re</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="re-param-re"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">re</span></span></li>
 </ol>)
 
       
@@ -63,22 +63,20 @@
     </section>
     
 <section class="desc markdown">
-  <p>allow only values &lt;= value
-<code>value</code> the upper limit</p>
+  <p>requires the value to match a regular expression
+<code>re</code> the regular expression</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">DoubleType lessThanEquals(double value) {
-  test&lt;double&gt;(
-    type: double,
-    name: &quot;lessThanEquals&quot;,
-    params: {
-      &quot;lessThanEquals&quot;: value
-    },
-    check: (obj) =&gt; obj &lt;= value,
+  <pre class="language-dart"><code class="language-dart">StringType re(String re) {
+  var reExpr = RegExp(re);
+  test&lt;String&gt;(
+    type: String,
+    name: &quot;re&quot;,
+    check: (s) =&gt; reExpr.hasMatch(s),
   );
 
   return this;
@@ -97,11 +95,11 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../validation_validation/">validation</a></li>
-    <li><a href="../../validation_validation/DoubleType-class.html">DoubleType</a></li>
-    <li class="self-crumb">lessThanEquals method</li>
+    <li><a href="../../validation_validation/StringType-class.html">StringType</a></li>
+    <li class="self-crumb">re method</li>
 </ol>
 
-    <h5>DoubleType class</h5>
+    <h5>StringType class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

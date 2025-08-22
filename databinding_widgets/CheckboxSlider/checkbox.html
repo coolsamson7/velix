@@ -57,8 +57,6 @@
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
 <span class="name ">checkbox</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="checkbox-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
 <li><span class="parameter" id="checkbox-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
-<li><span class="parameter" id="checkbox-param-min"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">min</span>, </span></li>
-<li><span class="parameter" id="checkbox-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">max</span>, </span></li>
 </ol>})
 
       
@@ -70,11 +68,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Widget checkbox({required String path,  required BuildContext context, required int min,  required int max}) {
-  return bind(&quot;checkbox&quot;, path: path, context: context, args: Keywords({
-    &quot;min&quot;: min,
-    &quot;max&quot;: max,
-  }));
+  <pre class="language-dart"><code class="language-dart">Widget checkbox({required String path,  required BuildContext context}) {
+  return bind(&quot;checkbox&quot;, path: path, context: context, args: Keywords({}));
 }</code></pre>
 </section>
 
@@ -103,7 +98,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.15.1
+      0.16.0
   </span>
   
 </footer>

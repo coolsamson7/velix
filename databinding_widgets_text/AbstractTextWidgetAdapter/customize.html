@@ -87,7 +87,7 @@
 
   String? validate(dynamic value) {
     try {
-      var propValue = null;
+      late var propValue;
 
       try {
         propValue = parseValue(value);
@@ -95,7 +95,7 @@
       }
       catch(e) {
         if ( e is ValidationException)
-          throw e;
+          rethrow;
         else
           typeProperty.validate(null); &#47;&#47; should a t least get a good text
       }
@@ -139,7 +139,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.15.1
+      0.16.0
   </span>
   
 </footer>

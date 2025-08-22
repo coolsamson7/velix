@@ -60,11 +60,8 @@ extension BindSwitch on FormMapper {
 // checkbox
 
 extension CheckboxSlider on FormMapper {
-  Widget checkbox({required String path,  required BuildContext context, required int min,  required int max}) {
-    return bind("checkbox", path: path, context: context, args: Keywords({
-      "min": min,
-      "max": max,
-    }));
+  Widget checkbox({required String path,  required BuildContext context}) {
+    return bind("checkbox", path: path, context: context, args: Keywords({}));
   }
 }
 

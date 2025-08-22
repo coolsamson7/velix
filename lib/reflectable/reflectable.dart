@@ -322,7 +322,7 @@ class TypeDescriptor<T> {
   /// get the field value of a specific instance
   /// [instance] the instance
   /// [field] the field name
-  dynamic get(Object instance, String field) {
+  V get<V>(Object instance, String field) {
     return _getField(field).getter(instance);
   }
 

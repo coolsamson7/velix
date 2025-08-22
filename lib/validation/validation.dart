@@ -642,12 +642,7 @@ class StringType extends AbstractType<String> {
     'length': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic)
         .minLength(a[0])
         .maxLength(a[0])),
-    're': MethodSpec(1, [ArgType.stringType], (t, a) => (t as dynamic).test<String>(
-      type: String,
-      name: "re",
-      params: {"pattern": a[0]},
-      check: (s) => RegExp(a[0]).hasMatch(s),
-    )),
+    're': MethodSpec(1, [ArgType.stringType], (t, a) => (t as dynamic).re<String>()),
     'notEmpty': MethodSpec(0, [], (t, a) => (t as dynamic).notEmpty()),
     'not-empty': MethodSpec(0, [], (t, a) => (t as dynamic).notEmpty()),
   };
@@ -691,6 +686,20 @@ class StringType extends AbstractType<String> {
 
     return this;
   }
+
+  /// requires the value to match a regular expression
+  /// [re] the regular expression
+  StringType re(String re) {
+    var reExpr = RegExp(re);
+    test<String>(
+      type: String,
+      name: "re",
+      check: (s) => reExpr.hasMatch(s),
+    );
+
+    return this;
+  }
+
 
   /// requires the value to be non empty
   StringType notEmpty() {

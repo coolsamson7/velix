@@ -3,7 +3,10 @@
     "string": {
       "type": "expected a string",
       "minLength": "must have a minimum of {minLength} characters",
-      "maxLength": "must have a maximum of {maxLength} characters"
+      "maxLength": "must have a maximum of {maxLength} characters",
+      "length": "must have a maximum of {length} characters",
+      "re": "must comply with a regular expression {re}",
+      "nonEmpty": "must be non empty"
     },
     "int": {
       "type": "expected an integer",

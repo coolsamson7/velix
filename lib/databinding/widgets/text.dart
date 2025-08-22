@@ -36,7 +36,7 @@ abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<
 
     String? validate(dynamic value) {
       try {
-        var propValue = null;
+        late var propValue;
 
         try {
           propValue = parseValue(value);
@@ -44,7 +44,7 @@ abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<
         }
         catch(e) {
           if ( e is ValidationException)
-            throw e;
+            rethrow;
           else
             typeProperty.validate(null); // should a t least get a good text
         }

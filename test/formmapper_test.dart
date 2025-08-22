@@ -247,6 +247,8 @@ void main() {
     await tester.enterText(valueFinder, '1');
     await tester.pump(); // let the widget rebuild
 
+    expect(dirty, equals(true));
+
     expect(mapper.validate(), equals(true));
 
     var result = mapper.commit<Money>();

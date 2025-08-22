@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import 'package:velix/databinding/widgets.dart';
-
 import 'package:velix/velix.dart';
 
 import '../models/todo.dart';

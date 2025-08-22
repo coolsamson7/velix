@@ -256,7 +256,7 @@ class PersonFormPageState extends State<PersonFormPage> {
 
 You can already see some highlights:
 - automatic handling of type validation ( e.g. length constraints ) and generation of error messages
-- automatic coercion of types ( e.g. "age" bound to a test field )
+- automatic coercion of types ( e.g. "age" is bound to a text field )
 - handling of paths ( "address.city" ) including the necessary reconstruction of immutable classes ( with final fields )
 - two-way data-binding, if requested
 

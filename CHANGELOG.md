@@ -55,3 +55,7 @@
 ## 0.15.1
 
 - added test page for databinding
+
+## 0.16.0
+
+- proper i18n assets

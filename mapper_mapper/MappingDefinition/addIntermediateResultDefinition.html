@@ -56,7 +56,7 @@
       
 <span class="returntype"><a href="../../mapper_operation_builder/IntermediateResultDefinition-class.html">IntermediateResultDefinition</a></span>
 <span class="name ">addIntermediateResultDefinition</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="addIntermediateResultDefinition-param-typeDescriptor"><span class="type-annotation"><a href="../../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a></span> <span class="parameter-name">typeDescriptor</span>, </span></li>
-<li><span class="parameter" id="addIntermediateResultDefinition-param-ctr"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a></span> <span class="parameter-name">ctr</span>, </span></li>
+<li><span class="parameter" id="addIntermediateResultDefinition-param-ctr"><span class="type-annotation"><a href="../../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a></span> <span class="parameter-name">ctr</span>, </span></li>
 <li><span class="parameter" id="addIntermediateResultDefinition-param-nargs"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">nargs</span>, </span></li>
 <li><span class="parameter" id="addIntermediateResultDefinition-param-valueReceiver"><span class="type-annotation"><a href="../../mapper_operation_builder/ValueReceiver-class.html">ValueReceiver</a></span> <span class="parameter-name">valueReceiver</span>, </span></li>
 </ol>)
@@ -70,7 +70,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">IntermediateResultDefinition addIntermediateResultDefinition(TypeDescriptor typeDescriptor, Function ctr, int nargs, ValueReceiver valueReceiver) {
+  <pre class="language-dart"><code class="language-dart">IntermediateResultDefinition addIntermediateResultDefinition(TypeDescriptor typeDescriptor, FromArrayConstructor ctr, int nargs, ValueReceiver valueReceiver) {
   intermediateResultDefinitions.add(IntermediateResultDefinition (typeDescriptor: typeDescriptor, constructor:  ctr, index: intermediateResultDefinitions.length, nArgs: nargs, valueReceiver: valueReceiver));
 
   return intermediateResultDefinitions.last;
@@ -102,7 +102,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.0
+      0.16.1
   </span>
   
 </footer>

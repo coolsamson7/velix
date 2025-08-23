@@ -78,7 +78,7 @@
     var descriptor = TypeDescriptor.forType(targetTree.type);
 
     if (descriptor.isImmutable() || !descriptor.hasDefaultConstructor()) {
-      resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.constructor, children.length, MappingResultValueReceiver());
+      resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromArrayConstructor, children.length, MappingResultValueReceiver());
     }
 
     &#47;&#47; recursion
@@ -92,7 +92,7 @@
 
     var valueReceiver = computeValueReceiver();
 
-    var constructor = descriptor.constructor;
+    var constructor = descriptor.fromArrayConstructor;
 
     &#47;&#47; done
 
@@ -140,7 +140,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.0
+      0.16.1
   </span>
   
 </footer>

@@ -58,7 +58,7 @@
 <span class="name ">set</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="set-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span></li>
 <li><span class="parameter" id="set-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span>, </span></li>
 <li><span class="parameter" id="set-param-property"><span class="type-annotation"><a href="../../mapper_transformer/Property-class.html">Property</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../mapper_mapper/MappingContext-class.html">MappingContext</a></span>&gt;</span>?</span> <span class="parameter-name">property</span>, </span></li>
-<li><span class="parameter" id="set-param-param"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Symbol-class.html">Symbol</a></span> <span class="parameter-name">param</span>, </span></li>
+<li><span class="parameter" id="set-param-index"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span></li>
 <li><span class="parameter" id="set-param-mappingContext"><span class="type-annotation"><a href="../../mapper_mapper/MappingContext-class.html">MappingContext</a></span> <span class="parameter-name">mappingContext</span>, </span></li>
 </ol>)
 
@@ -71,16 +71,17 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void set(dynamic instance, dynamic value, Property&lt;MappingContext&gt;? property, Symbol param, MappingContext mappingContext) {
+  <pre class="language-dart"><code class="language-dart">void set(dynamic instance, dynamic value, Property&lt;MappingContext&gt;? property, int index, MappingContext mappingContext) {
   &#47;&#47; are we done?
 
   if (nSuppliedArgs &lt; constructorArgs) {
     &#47;&#47; create instance
 
-    arguments[param] = value;
+    &#47;&#47;arguments[param] = value;
+    arrayArguments[index] = value;
 
     if ( nSuppliedArgs == constructorArgs - 1) {
-      result = Function.apply(constructor, [], arguments);
+      result = constructor(arrayArguments);
     }
   } &#47;&#47; if
   else {
@@ -118,7 +119,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.0
+      0.16.1
   </span>
   
 </footer>

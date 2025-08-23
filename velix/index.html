@@ -1203,7 +1203,7 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="type" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span></span>})
+  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromMapConstructor</span>, </span><span class="parameter" id="type-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromArrayConstructor</span>, </span><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span></span>})
     <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
   </span>
   
@@ -1292,6 +1292,34 @@ to read values from a source and set the result in the target object
     A <a href="../mapper_mapper/Finalizer.html">Finalizer</a> is executed given the mapped source and target and is used to perform any logic not expressible with the mapper.
 <code>S</code> the source type
 <code>T</code> the target type
+    
+
+  </dd>
+
+          
+  <dt id="FromArrayConstructor" class="callable">
+    <span class="name"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a></span>&lt;<wbr><span class="type-parameter">T</span>&gt;<span class="signature">
+      <span class="returntype parameter">= T Function<span class="signature">(<span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
+  <dt id="FromMapConstructor" class="callable">
+    <span class="name"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a></span>&lt;<wbr><span class="type-parameter">T</span>&gt;<span class="signature">
+      <span class="returntype parameter">= T Function<span class="signature">(<span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">args</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
     
 
   </dd>
@@ -1462,7 +1490,7 @@ to read values from a source and set the result in the target object
 <footer>
   <span class="no-break">
     velix
-      0.16.0
+      0.16.1
   </span>
   
 </footer>

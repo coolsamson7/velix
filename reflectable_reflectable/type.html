@@ -57,6 +57,8 @@
 <span class="returntype"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
 <span class="name ">type</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
 <li><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span></li>
+<li><span class="parameter" id="type-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromMapConstructor</span>, </span></li>
+<li><span class="parameter" id="type-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromArrayConstructor</span>, </span></li>
 <li><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span></li>
 <li><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span></li>
 <li><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span></li>
@@ -75,12 +77,14 @@
   <pre class="language-dart"><code class="language-dart">TypeDescriptor&lt;T&gt; type&lt;T&gt;({
   required String name,
   required Constructor&lt;T&gt; constructor,
+  required FromMapConstructor&lt;T&gt; fromMapConstructor,
+  required FromArrayConstructor&lt;T&gt; fromArrayConstructor,
   required List&lt;ConstructorParameter&gt; params,
   required List&lt;FieldDescriptor&gt; fields,
   TypeDescriptor? superClass,
   List&lt;Object&gt;? annotations,
 }) {
-  return TypeDescriptor&lt;T&gt;(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
+  return TypeDescriptor&lt;T&gt;(name: name, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }</code></pre>
 </section>
 
@@ -108,7 +112,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.0
+      0.16.1
   </span>
   
 </footer>

@@ -134,7 +134,7 @@ class SetResultArgument extends MapperProperty {
 
   final IntermediateResultDefinition  resultDefinition;
   final int index;
-  final Symbol param;
+  final String param;
   final MapperProperty property;
 
   // constructor
@@ -261,7 +261,7 @@ class SetResultPropertyValueReceiver extends ValueReceiver {
 
   final int resultIndex;
   final int index;
-  final Symbol prop;
+  final String prop;
   final Property<MappingContext>? property;
 
   // constructor
@@ -438,7 +438,7 @@ class Buffer {
   final ValueReceiver valueReceiver;
 
   int nSuppliedArgs = 0;
-  final Map<Symbol,dynamic> arguments = {};
+  final Map<String,dynamic> arguments = {};
   dynamic result;
 
  // constructor
@@ -451,7 +451,7 @@ class Buffer {
 
   // public
 
-  void set(dynamic instance, dynamic value, Property<MappingContext>? property, Symbol param, MappingContext mappingContext) {
+  void set(dynamic instance, dynamic value, Property<MappingContext>? property, String param, MappingContext mappingContext) {
     // are we done?
 
     if (nSuppliedArgs < constructorArgs) {
@@ -460,7 +460,7 @@ class Buffer {
       arguments[param] = value;
 
       if ( nSuppliedArgs == constructorArgs - 1) {
-        result = Function.apply(constructor, [], arguments);
+        result = constructor(arguments);
       }
     } // if
     else {
@@ -478,7 +478,7 @@ class IntermediateResultDefinition {
   // instance data
 
   final TypeDescriptor typeDescriptor;
-  final Function constructor;
+  final FromMapConstructor constructor;
   int index;
   int nArgs;
   final ValueReceiver valueReceiver;
@@ -534,7 +534,7 @@ class TargetNode {
 
       return SetResultPropertyValueReceiver(
           resultIndex: parent!.resultDefinition!.index,
-          prop: Symbol(accessor.name),
+          prop: accessor.name,
           index: accessor.index,
           property: accessor.index >= parent!.resultDefinition!.constructorArgs ? accessor.makeTransformerProperty(true) : null
     );
@@ -631,7 +631,7 @@ class TargetNode {
       writeProperty = SetResultArgument(
         resultDefinition: parent!.resultDefinition!,
         index: accessor.index,
-        param: Symbol(accessor.name),
+        param: accessor.name,
         property: writeProperty
       );
     }
@@ -651,7 +651,7 @@ class TargetNode {
       var descriptor = TypeDescriptor.forType(targetTree.type);
 
       if (descriptor.isImmutable() || !descriptor.hasDefaultConstructor()) {
-        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.constructor, children.length, MappingResultValueReceiver());
+        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromMapConstructor, children.length, MappingResultValueReceiver());
       }
 
       // recursion
@@ -665,7 +665,7 @@ class TargetNode {
 
       var valueReceiver = computeValueReceiver();
 
-      var constructor = descriptor.constructor;
+      var constructor = descriptor.fromMapConstructor;
 
       // done
 

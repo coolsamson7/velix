@@ -413,6 +413,77 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     indent(-1).tab().writeln("]");
   }
 
+  void generateFromMapConstructor(ClassElement element) {
+    // For constructor function: keep generating for the first public constructor (or you can customize)
+
+    final firstCtor = findElement(element.constructors, (c) => !c.isFactory && c.isPublic);
+
+    // write constructor function
+
+    if (firstCtor == null) {
+      tab().writeln("//fromMapConstructor: () => throw UnsupportedError('No public constructor'),");
+    }
+    else {
+      tab().write("fromMapConstructor: (Map<String,dynamic> args) => ${element.name}(");
+
+      bool first = true;
+      for (final param in firstCtor.formalParameters) {
+        if ( !first )
+          write(", ");
+        else
+          first = false;
+
+        var paramType = param.type.getDisplayString(withNullability: false);
+        final paramName = param.name;
+
+        if ( param.isPositional) {
+          write("args['$paramName'] as $paramType");
+        }
+        else if ( param.isNamed) {
+          write("$paramName: args['$paramName'] as $paramType");
+
+          // Use param.defaultValueCode or default literal for some common types if null
+
+          String? defaultValue = param.defaultValueCode;
+          if (defaultValue == null) {
+            if (paramType == 'String') {
+              defaultValue = "''";
+            }
+            else if (paramType == 'int') {
+              defaultValue = "0";
+            }
+            else if (paramType == 'double') {
+              defaultValue = "0.0";
+            }
+            else if (paramType == 'bool') {
+              defaultValue = "false";
+            }
+            else if (paramType.endsWith('?')) {
+              // nullable type
+              defaultValue = "null";
+            }
+            else {
+              defaultValue = "NULL"; // fallback
+            }
+          }
+
+          if (defaultValue == "NULL")
+            ;//write("required $paramType $paramName, ");
+          else {
+            if ( defaultValue == "null")
+              write(" ?? null");
+            else
+              write(" ?? $defaultValue");
+          }
+        }
+
+
+      }
+
+      writeln("),");
+    }
+  }
+
   void generateConstructor(ClassElement element) {
     // For constructor function: keep generating for the first public constructor (or you can customize)
 
@@ -523,6 +594,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     generateAnnotations(element.metadata.annotations);
     generateConstructorParams(element);
     generateConstructor(element);
+    generateFromMapConstructor(element);
     generateFields(element);
 
     indent(-1).tab().writeln(");");

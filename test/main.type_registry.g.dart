@@ -12,12 +12,12 @@ void registerAllDescriptors() {
       param<List<Money>>('prices', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Money> prices}) => Collections(prices: prices),
+    fromMapConstructor: (Map<String,dynamic> args) => Collections(prices: args['prices'] as List<Money>),
     fields: [
       field<Collections,List<Money>>('prices',
         elementType: Money,
         factoryConstructor: () => <Money>[],
         getter: (obj) => (obj as Collections).prices,
-        isFinal: true,
       )
     ]
   );
@@ -32,6 +32,7 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String ?? '', value: args['value'] as int ?? 0),
     fields: [
       field<Money,String>('currency',
         type: StringType().maxLength(7),
@@ -39,7 +40,6 @@ void registerAllDescriptors() {
           Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
         ],
         getter: (obj) => (obj as Money).currency,
-        isFinal: true,
       ), 
       field<Money,int>('value',
         type: IntType().greaterThan(0),
@@ -47,7 +47,6 @@ void registerAllDescriptors() {
           Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
         ],
         getter: (obj) => (obj as Money).value,
-        isFinal: true,
       )
     ]
   );
@@ -65,18 +64,16 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => ImmutableProduct(name: name, price: price, status: status),
+    fromMapConstructor: (Map<String,dynamic> args) => ImmutableProduct(name: args['name'] as String ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fields: [
       field<ImmutableProduct,String>('name',
         getter: (obj) => (obj as ImmutableProduct).name,
-        isFinal: true,
       ), 
       field<ImmutableProduct,Money>('price',
         getter: (obj) => (obj as ImmutableProduct).price,
-        isFinal: true,
       ), 
       field<ImmutableProduct,Status>('status',
         getter: (obj) => (obj as ImmutableProduct).status,
-        isFinal: true,
       )
     ]
   );
@@ -87,10 +84,10 @@ void registerAllDescriptors() {
       param<ImmutableProduct>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required ImmutableProduct product}) => ImmutableRoot(product: product),
+    fromMapConstructor: (Map<String,dynamic> args) => ImmutableRoot(product: args['product'] as ImmutableProduct),
     fields: [
       field<ImmutableRoot,ImmutableProduct>('product',
         getter: (obj) => (obj as ImmutableRoot).product,
-        isFinal: true,
       )
     ]
   );
@@ -103,6 +100,7 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
+    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fields: [
       field<Product,String>('name',
         getter: (obj) => (obj as Product).name,
@@ -125,10 +123,10 @@ void registerAllDescriptors() {
       param<Product>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required Product product}) => MutableRoot(product: product),
+    fromMapConstructor: (Map<String,dynamic> args) => MutableRoot(product: args['product'] as Product),
     fields: [
       field<MutableRoot,Product>('product',
         getter: (obj) => (obj as MutableRoot).product,
-        isFinal: true,
       )
     ]
   );
@@ -144,6 +142,7 @@ void registerAllDescriptors() {
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
+    fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
     fields: [
       field<Mutable,String>('id',
         type: StringType().maxLength(7),
@@ -172,10 +171,10 @@ void registerAllDescriptors() {
       param<String>('name', isRequired: true)
     ],
     constructor: ({String name = ''}) => Base(name),
+    fromMapConstructor: (Map<String,dynamic> args) => Base(args['name'] as String),
     fields: [
       field<Base,String>('name',
         getter: (obj) => (obj as Base).name,
-        isFinal: true,
       )
     ]
   );
@@ -188,10 +187,10 @@ void registerAllDescriptors() {
       param<int>('number', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', int number = 0}) => Derived(name, number: number),
+    fromMapConstructor: (Map<String,dynamic> args) => Derived(args['name'] as String, number: args['number'] as int ?? 0),
     fields: [
       field<Derived,int>('number',
         getter: (obj) => (obj as Derived).number,
-        isFinal: true,
       )
     ]
   );
@@ -205,22 +204,19 @@ void registerAllDescriptors() {
       param<String>('string_var', isNamed: true, isRequired: true)
     ],
     constructor: ({int int_var = 0, double double_var = 0.0, bool bool_var = false, String string_var = ''}) => Types(int_var: int_var, double_var: double_var, bool_var: bool_var, string_var: string_var),
+    fromMapConstructor: (Map<String,dynamic> args) => Types(int_var: args['int_var'] as int ?? 0, double_var: args['double_var'] as double ?? 0.0, bool_var: args['bool_var'] as bool ?? false, string_var: args['string_var'] as String ?? ''),
     fields: [
       field<Types,int>('int_var',
         getter: (obj) => (obj as Types).int_var,
-        isFinal: true,
       ), 
       field<Types,double>('double_var',
         getter: (obj) => (obj as Types).double_var,
-        isFinal: true,
       ), 
       field<Types,bool>('bool_var',
         getter: (obj) => (obj as Types).bool_var,
-        isFinal: true,
       ), 
       field<Types,String>('string_var',
         getter: (obj) => (obj as Types).string_var,
-        isFinal: true,
       )
     ]
   );
@@ -232,16 +228,15 @@ void registerAllDescriptors() {
       param<DateTime>('date', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
+    fromMapConstructor: (Map<String,dynamic> args) => Invoice(products: args['products'] as List<Product>, date: args['date'] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
         getter: (obj) => (obj as Invoice).date,
-        isFinal: true,
       ), 
       field<Invoice,List<Product>>('products',
         elementType: Product,
         factoryConstructor: () => <Product>[],
         getter: (obj) => (obj as Invoice).products,
-        isFinal: true,
       )
     ]
   );
@@ -254,19 +249,17 @@ void registerAllDescriptors() {
       param<int>('priceValue', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', String priceCurrency = '', int priceValue = 0}) => Flat(id: id, priceCurrency: priceCurrency, priceValue: priceValue),
+    fromMapConstructor: (Map<String,dynamic> args) => Flat(id: args['id'] as String ?? '', priceCurrency: args['priceCurrency'] as String ?? '', priceValue: args['priceValue'] as int ?? 0),
     fields: [
       field<Flat,String>('id',
         type: StringType().maxLength(7),
         getter: (obj) => (obj as Flat).id,
-        isFinal: true,
       ), 
       field<Flat,String>('priceCurrency',
         getter: (obj) => (obj as Flat).priceCurrency,
-        isFinal: true,
       ), 
       field<Flat,int>('priceValue',
         getter: (obj) => (obj as Flat).priceValue,
-        isFinal: true,
       )
     ]
   );
@@ -278,15 +271,14 @@ void registerAllDescriptors() {
       param<Money>('price', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price}) => Immutable(id: id, price: price),
+    fromMapConstructor: (Map<String,dynamic> args) => Immutable(id: args['id'] as String ?? '', price: args['price'] as Money),
     fields: [
       field<Immutable,String>('id',
         type: StringType().maxLength(7),
         getter: (obj) => (obj as Immutable).id,
-        isFinal: true,
       ), 
       field<Immutable,Money>('price',
         getter: (obj) => (obj as Immutable).price,
-        isFinal: true,
       )
     ]
   );

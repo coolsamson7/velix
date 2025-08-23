@@ -105,6 +105,7 @@ class ConstructorDescriptor {
 }
 
 typedef Constructor<T> = Function;// T Function(Map<String, dynamic> args);//
+typedef FromMapConstructor<T> = T Function(Map<String, dynamic> args);
 
 /// Class covering the meta-data of a type.
 /// [T] the reflected type
@@ -201,6 +202,7 @@ class TypeDescriptor<T> {
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
   final Constructor<T> constructor;
+  final FromMapConstructor<T> fromMapConstructor;
   final List<ConstructorParameter> constructorParameters;
   final List<Object> annotations;
   final List<T>? enumValues;
@@ -213,6 +215,7 @@ class TypeDescriptor<T> {
   TypeDescriptor({
     required this.name,
     required this.constructor,
+    required this.fromMapConstructor,
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
     required this.annotations,
@@ -340,12 +343,13 @@ class TypeDescriptor<T> {
 TypeDescriptor<T> type<T>({
   required String name,
   required Constructor<T> constructor,
+  required FromMapConstructor<T> fromMapConstructor,
   required List<ConstructorParameter> params,
   required List<FieldDescriptor> fields,
   TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  return TypeDescriptor<T>(name: name, constructor: constructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
+  return TypeDescriptor<T>(name: name, constructor: constructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({
@@ -353,7 +357,8 @@ TypeDescriptor<T> enumeration<T extends Enum>({
   required List<T> values,
   List<Object>? annotations,
 }) {
-  return TypeDescriptor<T>(name: name, constructor: () => null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  var fromMapConstructor = (Map<String,dynamic> args) => null  as T; // TODO!!!!!
+  return TypeDescriptor<T>(name: name, constructor: () => null, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
 ConstructorParameter param<T>(String name, {

@@ -507,7 +507,9 @@ class JSON {
 
     // ugly... we need a type descriptor
 
-    TypeDescriptor<Map<String, dynamic>>(name: "json" , annotations: [], constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
+    var fromMapConstructor = (Map<String,dynamic> args) => Map<String,dynamic>() ; // TODO
+
+    TypeDescriptor<Map<String, dynamic>>(name: "json" , annotations: [], fromMapConstructor: fromMapConstructor, constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
   }
 
   // internal

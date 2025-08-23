@@ -585,7 +585,7 @@ class MappingDefinition<S,T> {
 
   // internal
 
-  IntermediateResultDefinition addIntermediateResultDefinition(TypeDescriptor typeDescriptor, FromMapConstructor ctr, int nargs, ValueReceiver valueReceiver) {
+  IntermediateResultDefinition addIntermediateResultDefinition(TypeDescriptor typeDescriptor, FromArrayConstructor ctr, int nargs, ValueReceiver valueReceiver) {
     intermediateResultDefinitions.add(IntermediateResultDefinition (typeDescriptor: typeDescriptor, constructor:  ctr, index: intermediateResultDefinitions.length, nArgs: nargs, valueReceiver: valueReceiver));
 
     return intermediateResultDefinitions.last;

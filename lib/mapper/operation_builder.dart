@@ -154,7 +154,7 @@ class SetResultArgument extends MapperProperty {
   void set(dynamic instance, dynamic value, MappingContext context) {
     property.validate(value); // hmm...maybe we can optimize that
 
-    context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, context);
+    context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, index, context);
   }
 
   @override
@@ -272,7 +272,7 @@ class SetResultPropertyValueReceiver extends ValueReceiver {
 
   @override
   void receive(MappingContext context, dynamic instance, dynamic value) {
-    context.getResultBuffer(resultIndex).set(instance, value, property, prop, context);
+    context.getResultBuffer(resultIndex).set(instance, value, property, prop, index, context);
   }
 }
 
@@ -434,33 +434,35 @@ class Buffer {
   int nArgs;
   int constructorArgs;
 
-  final Function constructor;
+  final FromArrayConstructor constructor;
   final ValueReceiver valueReceiver;
 
   int nSuppliedArgs = 0;
-  final Map<String,dynamic> arguments = {};
+  //final Map<String,dynamic> arguments = {};
+  final List<dynamic> arrayArguments;
   dynamic result;
 
  // constructor
 
-  Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) : constructor = definition.constructor, valueReceiver = definition.valueReceiver {
+  Buffer({required this.definition, required this.nArgs, required this.constructorArgs}) : arrayArguments = List<dynamic>.filled(constructorArgs, null), constructor = definition.constructor, valueReceiver = definition.valueReceiver {
     if ( constructorArgs == 0) {
-      result = constructor();
+      result = constructor([]);
     }
   }
 
   // public
 
-  void set(dynamic instance, dynamic value, Property<MappingContext>? property, String param, MappingContext mappingContext) {
+  void set(dynamic instance, dynamic value, Property<MappingContext>? property, String param, int index, MappingContext mappingContext) {
     // are we done?
 
     if (nSuppliedArgs < constructorArgs) {
       // create instance
 
-      arguments[param] = value;
+      //arguments[param] = value;
+      arrayArguments[index] = value;
 
       if ( nSuppliedArgs == constructorArgs - 1) {
-        result = constructor(arguments);
+        result = constructor(arrayArguments);
       }
     } // if
     else {
@@ -478,7 +480,7 @@ class IntermediateResultDefinition {
   // instance data
 
   final TypeDescriptor typeDescriptor;
-  final FromMapConstructor constructor;
+  final FromArrayConstructor constructor;
   int index;
   int nArgs;
   final ValueReceiver valueReceiver;
@@ -651,7 +653,7 @@ class TargetNode {
       var descriptor = TypeDescriptor.forType(targetTree.type);
 
       if (descriptor.isImmutable() || !descriptor.hasDefaultConstructor()) {
-        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromMapConstructor, children.length, MappingResultValueReceiver());
+        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromArrayConstructor, children.length, MappingResultValueReceiver());
       }
 
       // recursion
@@ -665,7 +667,7 @@ class TargetNode {
 
       var valueReceiver = computeValueReceiver();
 
-      var constructor = descriptor.fromMapConstructor;
+      var constructor = descriptor.fromArrayConstructor;
 
       // done
 

@@ -11,14 +11,14 @@
     "int": {
       "type": "expected an integer",
       "greaterThan": "must be greater than {greaterThan}",
-      "greaterThanEquals": "must be greater or equal to {greaterThan}",
+      "greaterThanEquals": "must be greater or equal to {greaterThanEquals}",
       "lessThan": "must be less than {lessThan}",
       "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },
     "double": {
       "type": "expected a double",
       "greaterThan": "must be greater than {greaterThan}",
-      "greaterThanEquals": "be have greater or equal to {greaterThan}",
+      "greaterThanEquals": "be have greater or equal to {greaterThanEquals}",
       "lessThan": "must be less than {lessThan}",
       "lessThanEquals": "must be less or equal to {lessThanEquals}"
     },

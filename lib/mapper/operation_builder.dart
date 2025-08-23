@@ -134,12 +134,11 @@ class SetResultArgument extends MapperProperty {
 
   final IntermediateResultDefinition  resultDefinition;
   final int index;
-  final String param;
   final MapperProperty property;
 
   // constructor
 
-  SetResultArgument({required this.resultDefinition, required this.index, required this.param, required this.property}) {
+  SetResultArgument({required this.resultDefinition, required this.index, required this.property}) {
     resultDefinition.missing -= 1;
   }
 
@@ -154,7 +153,7 @@ class SetResultArgument extends MapperProperty {
   void set(dynamic instance, dynamic value, MappingContext context) {
     property.validate(value); // hmm...maybe we can optimize that
 
-    context.getResultBuffer(resultDefinition.index).set(instance, value, property, param, index, context);
+    context.getResultBuffer(resultDefinition.index).set(instance, value, property, index, context);
   }
 
   @override
@@ -261,18 +260,17 @@ class SetResultPropertyValueReceiver extends ValueReceiver {
 
   final int resultIndex;
   final int index;
-  final String prop;
   final Property<MappingContext>? property;
 
   // constructor
 
-  SetResultPropertyValueReceiver({required this.resultIndex, required this.index, required this.prop, required this.property});
+  SetResultPropertyValueReceiver({required this.resultIndex, required this.index, required this.property});
 
   // implement ValueReceiver
 
   @override
   void receive(MappingContext context, dynamic instance, dynamic value) {
-    context.getResultBuffer(resultIndex).set(instance, value, property, prop, index, context);
+    context.getResultBuffer(resultIndex).set(instance, value, property, index, context);
   }
 }
 
@@ -452,7 +450,7 @@ class Buffer {
 
   // public
 
-  void set(dynamic instance, dynamic value, Property<MappingContext>? property, String param, int index, MappingContext mappingContext) {
+  void set(dynamic instance, dynamic value, Property<MappingContext>? property, int index, MappingContext mappingContext) {
     // are we done?
 
     if (nSuppliedArgs < constructorArgs) {
@@ -536,7 +534,6 @@ class TargetNode {
 
       return SetResultPropertyValueReceiver(
           resultIndex: parent!.resultDefinition!.index,
-          prop: accessor.name,
           index: accessor.index,
           property: accessor.index >= parent!.resultDefinition!.constructorArgs ? accessor.makeTransformerProperty(true) : null
     );
@@ -633,7 +630,6 @@ class TargetNode {
       writeProperty = SetResultArgument(
         resultDefinition: parent!.resultDefinition!,
         index: accessor.index,
-        param: accessor.name,
         property: writeProperty
       );
     }

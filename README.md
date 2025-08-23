@@ -232,18 +232,18 @@ class PersonFormPageState extends State<PersonFormPage> {
   @override
   Widget build(BuildContext context) {
 
-    Widget result = Form(
+    Widget result = SmartForm(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       key: mapper.getKey(),
       ...
-      mapper.bind(CupertinoTextFormFieldRow, path: "firstName", context: context, args: {"placeholder": 'First Name'}), 
-      mapper.bind(CupertinoTextFormFieldRow, path: "lastName", context: context, args: {"placeholder": 'Last Name'}),
-      mapper.bind(CupertinoTextFormFieldRow, path: "age", context: context, args: {"placeholder": 'Age'}),
-      mapper.bind(CupertinoTextFormFieldRow, path: "address.city", context: context, args: {"placeholder": 'City'}),
-      mapper.bind(CupertinoTextFormFieldRow, path: "address.street", context: context, args: {"placeholder": 'Street'}),
+      mapper.text(path: "firstName", context: context, placeholder: 'First Name'), 
+      mapper.text(path: "lastName", context: context, placeholder: 'Last Name'),
+      mapper.text(path: "age", context: context, placeholder: 'Age'),
+      mapper.text(path: "address.city", context: context, placeholder: 'City'),
+      mapper.text(path: "address.street", context: context, placeholder: 'Street'),
     );
 
-    // set initial value
+    // set value
 
     mapper.setValue(widget.person);
 

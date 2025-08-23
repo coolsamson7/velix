@@ -82,7 +82,7 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   Widget build(BuildContext context) {
     return CommandView(
       commands: getCommands(),
-      toolbarCommands: [getCommand("addTodo")],
+      //toolbarCommands: [getCommand("addTodo")],
       child: Consumer<TodoProvider>(
         builder: (context, todoProvider, _) {
           return Column(

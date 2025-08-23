@@ -59,3 +59,8 @@
 ## 0.16.0
 
 - proper i18n assets
+
+## 0.16.1
+
+- performance optimization mapper ( factor 4! )
+- example app is a bit prettier

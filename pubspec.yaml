@@ -1,6 +1,6 @@
 name: velix
 description: "flutter foundation library including validation, a reflection based mapper and automatic two-way form binding ."
-version: 0.16.0
+version: 0.16.1
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

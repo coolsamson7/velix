@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:velix/velix.dart';
@@ -44,7 +45,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   @Command()
   @override
   void _cancel() {
-
+    Navigator.pop(context);
   }
 
   // override
@@ -52,7 +53,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
   @override
   void updateCommandState() {
     setCommandEnabled("save", mapper.isDirty);
-    setCommandEnabled("cancel", mapper.isDirty);
+    setCommandEnabled("cancel", true);
   }
 
   // override
@@ -71,9 +72,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
     mapper = FormMapper(instance: widget.todo, twoWay: false);
 
     mapper.addListener((event) {
-      setState(() {
-        updateCommandState();
-      });
+      setState(() {});
     }, emitOnDirty: true, emitOnChange: true);
 
     updateCommandState();
@@ -88,10 +87,45 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
   @override
   Widget build(BuildContext context) {
-    final todoProvider = Provider.of<TodoProvider>(context, listen: false);
+    // update command state
+
+    updateCommandState();
 
     Widget result = CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: Colors.transparent,
+
+        // leading
+
+        leading: CupertinoButton(
+          minSize: 0,
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          color: Colors.transparent,
+          disabledColor: CupertinoColors.white,
+          child: Text('Save', style: TextStyle(
+            fontSize: 17,
+            color: isCommandEnabled("save")
+                ? CupertinoColors.activeBlue
+                : CupertinoColors.inactiveGray, // grey text when disabled
+          )),
+          onPressed: isCommandEnabled("save") ? save : null,
+        ),
+
+        // trailing
+
+        trailing: CupertinoButton(
+          minSize: 0,
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          color: Colors.transparent,
+          child: Text('Cancel', style: TextStyle(
+            fontSize: 17,
+            color: isCommandEnabled("cancel")
+                ? CupertinoColors.activeBlue
+                : CupertinoColors.inactiveGray, // grey text when disabled
+          ),),
+          onPressed: isCommandEnabled("cancel") ? cancel : null,
+        ),
+
         middle: Text(widget.todo.title,
           style: TextStyle(
             fontSize: 17,         // Recommended standard size for nav bar
@@ -101,62 +135,57 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
           overflow: TextOverflow.ellipsis,),
 
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      child: SafeArea(
         child: SmartForm(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: mapper.getKey(),
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              mapper.text(path: "title",
-                context: context,
-                placeholder: 'Titel',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),  // add vertical padding
-              ),
-              const SizedBox(height: 16),
-              mapper.text(context: context,  path: "details.author",
-                  placeholder: 'Author',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8)
-              ),
-              const SizedBox(height: 16),
-              mapper.slider(context: context,  path: "details.priority",
-                min: 0,
-                max: 10,
-                ),
-              const SizedBox(height: 16),
-              mapper.date(context: context,  path: "details.date"),
-              const SizedBox(height: 16),
-              Row(
+              CupertinoFormSection.insetGrouped(
                 children: [
-                  const Text('Erledigt:', style: TextStyle(fontSize: 18)),
-                  mapper.bind("switch", context: context, path: "completed")
+                  // title
+
+                  CupertinoFormRow(
+                      prefix: Text("Title"),
+                      child: mapper.text(path: "title",
+                        context: context,
+                        placeholder: 'Enter'
+                      )),
+
+                  // author
+
+                  CupertinoFormRow(
+                      prefix: Text("Author"),
+                      child:  mapper.text(path: "details.author",
+                        context: context,
+                        placeholder: 'Enter',
+                      )),
+
+                  // priority
+
+                  CupertinoFormRow(
+                      prefix: Text("Priority"),
+                      child:  mapper.slider(context: context,  path: "details.priority",
+                        min: 0,
+                        max: 10,
+                      )),
+
+                  // date
+
+                  //CupertinoFormRow(
+                  //    prefix: Text("Date"),
+                  //    child:   mapper.date(context: context,  path: "details.date")),
+
+                  // done
+
+                  CupertinoFormRow(
+                      prefix: Text("Completed"),
+                      child:  mapper.bind("switch", context: context, path: "completed")),
                 ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  CupertinoButton(
-                    onPressed: isCommandEnabled("save") ?  save : null,
-                    child: const Text('Speichern')
-                  ),
-                  const SizedBox(width: 16),
-                  CupertinoButton.filled(
-                    child: const Text('Löschen'),
-                    onPressed: () {
-                      todoProvider.removeTodo(widget.todo.id);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
+              )
             ],
           )
-                //}
-                //),
         ),
       ),
     );

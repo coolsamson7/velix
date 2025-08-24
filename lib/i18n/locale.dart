@@ -100,7 +100,7 @@ class CurrencyFormatter extends Formatter {
 class Interpolator {
   // instance data
 
-  LruCache<String, I18NFunction> _cache = LruCache<String, I18NFunction>(50); // ?
+  LruCache<String, I18NFunction> _cache;
 
   Map<String,Formatter> formatter = {
     "number": NumberFormatter(),
@@ -108,127 +108,127 @@ class Interpolator {
     "date": DateFormatter()
   };
 
-  RegExp variablePattern =  RegExp(r'^{(?<variable>\w+)}$');
-  RegExp variableFormatPattern = RegExp(r'^{(?<variable>\w+)\s*:\s*(?<format>\w+)}$');
-  RegExp variableFormatArgsPattern = RegExp(r"^{(?<variable>\w+)\s*:\s*(?<format>\w+)\((?<parameters>[\d: ,a-zA-Z']+)\)}$");
+  final regex = RegExp(r'\{[^}]+\}'); // RegExp(r'\{[^{}]*\}');//
+  final placeholderPattern = RegExp(
+      r'^{(?<variable>\w+)(?::(?<format>\w+)(?:\((?<params>[^)]*)\))?)?}$'
+  );
+  final paramPattern = RegExp(r'\s*(\w+)\s*:\s*([^,]+)\s*');
 
-  RegExp paramPattern = RegExp(r"\s*(?<parameter>\w+)\s*:\s*(?<value>-?\d+|true|false|\'\w+\')");
+  // constructor
 
-  final regex = RegExp(r'\{[^}]+\}');
+  Interpolator({int cacheSize = 50}) : _cache = LruCache<String, I18NFunction>(cacheSize);
 
   // internal
 
-  I18NFunction parsePlaceholder(String placeholder) {
-    // variable
+  I18NFunction _parsePlaceholder(String placeholder) {
+    final match = placeholderPattern.firstMatch(placeholder);
+    if (match == null)
+      throw Exception("syntax error: $placeholder");
 
-    var match = variablePattern.firstMatch(placeholder);
-    if ( match != null) {
-      final variable = match.namedGroup('variable');
+    final variable = match.namedGroup('variable')!;
+    final format = match.namedGroup('format');
+    final paramStr = match.namedGroup('params');
 
-      return (Map<String, dynamic> args) => args[variable].toString();
+    // {variable}
+
+    if (format == null) {
+      return (args) => args[variable]?.toString() ?? "";
     }
 
-    // variable:formatter
+    // Params are parsed once into raw map (strings, ints, bools, or I18NFunction)
 
-    match = variableFormatPattern.firstMatch(placeholder);
+    final rawParams = _parseParams(paramStr);
 
-    if ( match != null) {
-      final variable = match.namedGroup('variable')!;
-      final format = match.namedGroup('format')!;
+    // Return composed function:
+    // At render time, eval any I18NFunction params
 
-      return formatter[format]!.create(variable, {});
-    }
+    return (args) {
+      final evaluated = <String, dynamic>{};
 
-    // variable:formatter(args)
-
-    void parseParam(String param, Map<String, dynamic> parameters) {
-      final match = paramPattern.firstMatch(param);
-
-      if (match != null) {
-        final parameter = match.namedGroup('parameter')!;
-        final valueStr = match.namedGroup('value')!;
-
-        // convert value to proper type
-        dynamic value;
-        if (valueStr == 'true' || valueStr == 'false') {
-          value = valueStr == 'true';
-        }
-        else if (valueStr!.startsWith("'") && valueStr.endsWith("'")) {
-          value = valueStr.substring(1, valueStr.length - 1);
+      for (final entry in rawParams.entries) {
+        final val = entry.value;
+        if (val is I18NFunction) {
+          evaluated[entry.key] = val(args); // dynamic placeholder
         }
         else {
-          value = int.parse(valueStr);
+          evaluated[entry.key] = val;
         }
-
-        parameters[parameter] = value;
-      } // if
-    }
-
-    match = variableFormatArgsPattern.firstMatch(placeholder);
-    if ( match != null) {
-      Map<String, dynamic> params = {};
-
-      final variable = match.namedGroup('variable')!;
-      final format = match.namedGroup('format')!;
-      final parameters = match.namedGroup('parameters')!;
-
-      int start = 0;
-      int index = parameters.indexOf(",");
-      var parameter = "";
-      while ( index > 0) {
-        var parameter = parameters.substring(start, index).trim();
-
-        parseParam(parameter, params);
-
-        start += parameter.length + 1;
-        index = parameters.indexOf(",", start);
       }
 
-      // last
+      // Formatter returns a function → call with args immediately
 
-      parameter = parameters.substring(start).trim();
+      return formatter[format]!.create(variable, evaluated)(args);
+    };
+  }
 
-      parseParam(parameter, params);
+  Map<String, dynamic> _parseParams(String? paramStr) {
+    if (paramStr == null)
+      return {};
 
-      // done
+    final params = <String, dynamic>{};
 
-      return formatter[format]!.create(variable, params);
-    } // if
+    for (final match in paramPattern.allMatches(paramStr)) {
+      final key = match.group(1)!;
+      final raw = match.group(2)!;
 
-    // nada
+      params[key] = _parseValue(raw);
+    }
 
-    throw Exception("syntax error");
+    return params;
+  }
+
+  dynamic _parseValue(String raw) {
+    // Placeholder? → compile to I18NFunction
+
+    if (raw.startsWith(r'$')) {
+      final varName = raw.substring(1);
+      return (Map<String, dynamic> args) => args[varName]?.toString() ?? '';
+    }
+
+    // boolean
+
+    if (raw == 'true' || raw == 'false')
+      return raw == 'true';
+
+    // quoted string
+
+    if (raw.startsWith("'") && raw.endsWith("'")) {
+      return raw.substring(1, raw.length - 1);
+    }
+
+    // integer
+
+    final intVal = int.tryParse(raw);
+    if (intVal != null)
+      return intVal;
+
+    // fallback
+
+    return raw;
   }
 
   // public
-
-  I18NFunction get(String input) {
-    I18NFunction? result = _cache.get(input);
-    if ( result == null) {
-      _cache.set(input, result = parse(input));
-    }
-
-    return result;
-  }
 
   I18NFunction parse(String input) {
     final parts = <dynamic>[];
 
     var last = 0;
     for (final match in regex.allMatches(input)) {
-      // Literal before placeholder
+      // literal before placeholder
+
       if (match.start > last) {
         final literal = input.substring(last, match.start);
-        if (literal.isNotEmpty) parts.add(literal);
+        if (literal.isNotEmpty)
+          parts.add(literal);
       }
 
-      // Placeholder
+      // placeholder
 
-      parts.add(parsePlaceholder(match.group(0)!));
+      parts.add(_parsePlaceholder(match.group(0)!));
       last = match.end;
     }
 
-    // Trailing literal
+    // trailing literal
 
     if (last < input.length) {
       parts.add(input.substring(last));
@@ -238,6 +238,7 @@ class Interpolator {
 
     final merged = <dynamic>[];
     final buffer = StringBuffer();
+
     for (final part in parts) {
       if (part is String) {
         buffer.write(part);
@@ -249,7 +250,8 @@ class Interpolator {
         }
         merged.add(part);
       }
-    }
+    } // for
+
     if (buffer.isNotEmpty)
       merged.add(buffer.toString());
 
@@ -257,6 +259,7 @@ class Interpolator {
 
     return (Map<String, dynamic> args) {
       final out = StringBuffer();
+
       for (final part in merged) {
         if (part is String) {
           out.write(part);
@@ -268,6 +271,17 @@ class Interpolator {
 
       return out.toString();
     };
+  }
+
+  // public
+
+  I18NFunction get(String input) {
+    I18NFunction? result = _cache.get(input);
+    if ( result == null) {
+      _cache.set(input, result = parse(input));
+    }
+
+    return result;
   }
 }
 

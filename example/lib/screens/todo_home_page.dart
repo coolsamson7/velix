@@ -21,11 +21,12 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
 
   final TextEditingController _controller = TextEditingController();
   late TodoProvider todoProvider;
+  late LocaleManager localeManager;
 
   // commands
 
   @override
-  @Command(i18n: "main.addTodo",  icon: CupertinoIcons.add, lock: LockType.view)
+  @Command(i18n: "example:main.addTodo",  icon: CupertinoIcons.add, lock: LockType.view)
   Future<Todo> _addTodo() async {
       var todo = await todoProvider.addTodo(_controller.text);
 
@@ -37,15 +38,24 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
   }
 
   @override
-  @Command(i18n: "main.removeTodo",  icon: CupertinoIcons.delete)
+  @Command(i18n: "example:main.removeTodo",  icon: CupertinoIcons.delete)
   void _removeTodo(String id) {
     context.read<TodoProvider>().removeTodo(id);
   }
 
   @override
-  @Command(i18n: "main.toggleTodo")
+  @Command(i18n: "example:main.toggleTodo")
   void _toggleTodo(String id) {
     context.read<TodoProvider>().toggleTodo(id);
+  }
+
+  @override
+  @Command(i18n: "example:main.switchLocale", icon: CupertinoIcons.globe)
+  void _switchLocale() {
+    if (localeManager.locale.toString().contains("de"))
+      localeManager.locale = Locale("en");
+    else
+      localeManager.locale = Locale("de");
   }
 
   // internal
@@ -80,9 +90,11 @@ class _TodoHomePageState extends State<TodoHomePage> with CommandController<Todo
 
   @override
   Widget build(BuildContext context) {
+    localeManager = context.watch<LocaleManager>();
+
     return CommandView(
       commands: getCommands(),
-      //toolbarCommands: [getCommand("addTodo")],
+      toolbarCommands: [getCommand("switchLocale")],
       child: Consumer<TodoProvider>(
         builder: (context, todoProvider, _) {
           return Column(

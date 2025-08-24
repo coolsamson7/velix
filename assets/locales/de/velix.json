@@ -27,6 +27,11 @@
     },
     "datetime": {
       "type": "Datum erwartet"
+    },
+
+
+    "currency": {
+      "type": "expected {currency:currency(symbol: $symbol)}!"
     }
   }
 }

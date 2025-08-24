@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix/velix.dart';
 
 import 'package:provider/provider.dart';
@@ -19,8 +20,8 @@ class EasyLocalizationTranslator extends Translator {
   // implement
 
   @override
-  String translate(String key, {Map<String, String>  args = const {}}) {
-    return key.tr(namedArgs: args);
+  String translate(String key, {Map<String, dynamic>  args = const {}}) {
+    return I18N.instance.translate(key, args: args);
   }
 }
 
@@ -85,27 +86,61 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  await EasyLocalization.ensureInitialized();
+  //await EasyLocalization.ensureInitialized();
+
+  Tracer.enabled = true;
+  Tracer(
+      trace: ConsoleTrace("%d [%l] %p: %m"), // d(ate), l(evel), p(ath), m(message)
+      paths: {
+        "i18n": TraceLevel.full
+      });
+
+  var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
+  var i18n = I18N(
+      fallbackLocale: Locale("en", "EN"),
+      localeManager: localeManager,
+      loader: AssetTranslationLoader(
+        namespacePackageMap: {
+          "velix": "velix"
+        }
+      ),
+      missingKeyHandler: (key) => '##$key##',
+      preloadNamespaces: ["velix", "example"]
+  );
+
+  // load namespaces
 
   runApp(
-    EasyLocalization(
+    /*EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('de')],
       path: '.', // folder path!
       assetLoader: MultiAssetLoader(paths: [
         "assets/locales/example",
         "packages/velix/assets/locales/velix",
       ]),
-      fallbackLocale: const Locale('en'),
-      child: TODOApp(),
+      fallbackLocale: const Locale('en'),*/
+    ChangeNotifierProvider.value(
+      value: localeManager,
+      child: TODOApp(i18n: i18n),
     ),
   );
 }
 
 class TODOApp extends StatelessWidget {
-  const TODOApp({super.key});
+  // instance data
+
+  final I18N i18n;
+  
+  // constructor
+  
+  const TODOApp({super.key, required this.i18n});
+  
+  // override
 
   @override
   Widget build(BuildContext context) {
+    final localeManager = context.watch<LocaleManager>();
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TodoProvider()),
@@ -124,9 +159,13 @@ class TODOApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: CupertinoColors.activeBlue,
         ),
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
+
+        // localization
+
+        localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
+        supportedLocales: localeManager.supportedLocales,
+        locale: localeManager.locale,
+
         home: const MainScreen(),
       ),
     );

@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'todo_home_page.dart';
 import 'test_page.dart';
+import 'package:velix/i18n/locale.dart';
+import 'package:provider/provider.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -25,11 +28,13 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleManager>();
+
     return Stack(
       children: [
         CupertinoPageScaffold(
-          navigationBar: const CupertinoNavigationBar(
-            middle: Text('TODOs'),
+          navigationBar: CupertinoNavigationBar(
+            middle: Text('example:main.todos'.tr()),
           ),
           child: SafeArea(
             child: IndexedStack(
@@ -44,14 +49,14 @@ class _MainScreenState extends State<MainScreen> {
           bottom: 0,
           child: CupertinoTabBar(
             currentIndex: _selectedIndex,
-            items: const [
+            items: [
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.list_bullet),
-                label: 'TODOs',
+                label:  'example:main.todos'.tr(),
               ),
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.settings),
-                label: 'Einstellungen',
+                label: 'example:main.settings'.tr(),
               ),
             ],
             onTap: _onItemTapped,

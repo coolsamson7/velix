@@ -3,7 +3,7 @@
   "welcome": "Welcome, {{name}}!",
   "main": {
     "todos": "TODOs",
-    "settings": "Settings",
+    "settings": "Einstellungen",
     "addTodo": "Add",
     "removeTodo": "Delete",
     "toggleTodo": "Toggle"

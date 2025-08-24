@@ -20,7 +20,7 @@ void main() {
 
       final localeManager = LocaleManager(Locale('en'));
 
-      I18n(
+      I18N(
         localeManager: localeManager,
         loader: AssetTranslationLoader(),
         missingKeyHandler: (key) => '##$key##',
@@ -28,9 +28,11 @@ void main() {
 
       // load namespaces
 
-      await I18n.instance.loadNamespaces(["velix"]);
+      await I18N.instance.loadNamespaces(["velix"]);
 
       // test
+
+      print('velix:validation.currency.type'.tr({'currency': 11, 'symbol': 'EUR'}));
 
       print('velix:validation.int.lessThan'.tr({'lessThan': 1}));
 

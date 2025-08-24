@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:intl/intl.dart';
+
+import '../util/tracer.dart';
 
 class LruCache<K, V> {
   // instance data
@@ -288,70 +289,95 @@ class Interpolator {
 
 typedef MissingKeyHandler = String Function(String key);
 
+List<Locale> empty_locales = [];
+
 /// A `LocaleManager` 
-class LocaleManager {
+class LocaleManager extends ChangeNotifier {
   // instance data
-  
-  final ValueNotifier<Locale> _currentLocale;
+
+  Locale _currentLocale;
+  List<Locale> supportedLocales;
 
   // constructor
-  
-  LocaleManager(Locale initialLocale) : _currentLocale = ValueNotifier(initialLocale);
+
+  LocaleManager(this._currentLocale, {List<Locale>? supportedLocales }) : supportedLocales = supportedLocales ?? [];
 
   // public
 
-  Locale get locale => _currentLocale.value;
+  Locale get locale => _currentLocale;
 
-  set locale(Locale value) => _currentLocale.value = value;
+  set locale(Locale value) {
+    if ( value != _currentLocale) {
+      Tracer.trace("i18n", TraceLevel.high, "set locale $value");
 
-  void addListener(VoidCallback listener) {
-    _currentLocale.addListener(listener);
-  }
-
-  void removeListener(VoidCallback listener) {
-    _currentLocale.removeListener(listener);
+      _currentLocale = value;
+      notifyListeners();
+    }
   }
 }
 
 /// A `TranslationLoader` loads translations.
 
 abstract class TranslationLoader {
-  Future<Map<String, dynamic>> load(Locale locale, String namespace);
+  Future<Map<String, dynamic>> load(List<Locale> locales, String namespace);
 }
 
 class AssetTranslationLoader implements TranslationLoader {
   // instance data
 
   final String basePath;
+  final Map<String, String> namespacePackageMap;
 
   // constructor
 
   /// [basePath] is the folder where your locales live, e.g. 'assets/locales'
-  AssetTranslationLoader({this.basePath = 'assets/locales'});
+  AssetTranslationLoader({this.basePath = 'assets/locales',  Map<String, String>? namespacePackageMap}) : namespacePackageMap = namespacePackageMap ?? {};
 
   // override
 
   @override
-  Future<Map<String, dynamic>> load(Locale locale, String namespace) async {
-    final path = '$basePath/${locale.languageCode}/$namespace.json';
+  Future<Map<String, dynamic>> load(List<Locale> locales, String namespace) async {
+    final packageName = namespacePackageMap[namespace];
+    String path;
 
-    try {
-      final jsonString = await rootBundle.loadString(path);
-      final Map<String, dynamic> map = json.decode(jsonString);
-      return map;
-    }
-    catch (e) {
-      // Could not load the file; return empty map or handle missing file
-      debugPrint('Translation file not found: $path, error: $e');
-      return {};
-    }
+    Map<String, dynamic> mergedTranslations = {};
+
+    for (var locale in locales) {
+      if (packageName != null) {
+        path = 'packages/$packageName/$basePath/$locale/$namespace.json';
+      }
+      else {
+        path = '$basePath/$locale/$namespace.json';
+      }
+
+      try {
+        final jsonString = await rootBundle.loadString(path);
+
+        Tracer.trace("i18n", TraceLevel.high, "load $path");
+
+        final Map<String, dynamic> map = json.decode(jsonString);
+
+        map.forEach((key, value) {
+          mergedTranslations.putIfAbsent(key, () => value);
+        });
+      }
+      catch (e) {
+        // Could not load the file; return empty map or handle missing file
+
+        if ( !e.toString().startsWith("Unable to load"))
+          debugPrint('Translation file not found: $path, error: $e');
+      }
+    } // for
+
+    return mergedTranslations;
   }
 }
+
 ///  I18n Core
-class I18n {
+class I18N {
   // static data
 
-  static late I18n instance;
+  static late I18N instance;
 
   // instance data
 
@@ -365,12 +391,19 @@ class I18n {
 
   Interpolator interpolator = Interpolator();
 
+  List<String>? preloadNamespaces;
+  Locale? fallbackLocale;
+
+  List<Locale> locales = [];
+
   // constructor
 
-  I18n({
+  I18N({
     required LocaleManager localeManager,
     required TranslationLoader loader,
     MissingKeyHandler? missingKeyHandler,
+    this.preloadNamespaces,
+    this.fallbackLocale
   })
       : _localeManager = localeManager,
         _loader = loader,
@@ -378,10 +411,39 @@ class I18n {
     instance = this;
 
     _localeListener = () => _reloadTranslations();
-    _localeManager.addListener(_localeListener);
+
+    //_localeManager.addListener(_localeListener);
+
+    // remember preload namespaces
+
+    if ( preloadNamespaces != null)
+      for ( var preload in  preloadNamespaces!)
+        _namespaces[preload] = {};
   }
 
   // internal
+
+  List<Locale> buildFallbackLocales(Locale locale, Locale? fallback) {
+    final fallbackLocales = <Locale>[];
+
+    // Start with exact locale, e.g. de_DE
+    fallbackLocales.add(locale);
+
+    // Then fallback to language only e.g. de
+    if (locale.countryCode != null && locale.countryCode!.isNotEmpty) {
+      fallbackLocales.add(Locale(locale.languageCode));
+    }
+
+    if ( fallback != null) {
+      fallbackLocales.add(fallback);
+
+      if (fallback.countryCode != null && fallback.countryCode!.isNotEmpty) {
+        fallbackLocales.add(Locale(fallback.languageCode));
+      }
+    }
+
+    return fallbackLocales;
+  }
 
   T? get<T>(dynamic object, String key, [T? defaultValue]) {
     final path = key.split('.');
@@ -418,14 +480,15 @@ class I18n {
   }
 
   Future<void> _reloadTranslations() async {
-    final futures = _namespaces.keys.map((ns) => _loadTranslations(ns).catchError((e) { /* TODO */}));
+    locales = buildFallbackLocales(_localeManager.locale, fallbackLocale);
+    final futures = _namespaces.keys.map((ns) => _loadTranslations(ns, locales).catchError((e) { /* TODO */}));
 
     await Future.wait(futures);
   }
 
-  Future<void> _loadTranslations(String namespace) async {
+  Future<void> _loadTranslations(String namespace, List<Locale> locales) async {
     final locale = _localeManager.locale;
-    _namespaces[namespace] = await _loader.load(locale, namespace);
+    _namespaces[namespace] = await _loader.load(locales, namespace);
   }
 
   String interpolate(String template, {Map<String, dynamic>? args}) {
@@ -434,10 +497,14 @@ class I18n {
 
   // public
 
+  List<Locale> supportedLocales() {
+    return _localeManager.supportedLocales;
+  }
+
   Future<void> loadNamespaces(List<String> namespaces) async {
     final futures = namespaces
         .where((ns) => !isLoaded(ns))
-        .map((ns) => _loadTranslations(ns));
+        .map((ns) => _loadTranslations(ns, locales));
 
     // wait for all of them in parallel
 
@@ -448,7 +515,7 @@ class I18n {
     var (namespace, path) = extractNamespace(key);
 
     if (!isLoaded(namespace)) {
-      _loadTranslations(namespace);
+      _loadTranslations(namespace, locales);
       return _missingKeyHandler!(key);
     }
 
@@ -470,7 +537,7 @@ class I18n {
     var (namespace, path) = extractNamespace(key);
 
     if (!isLoaded(namespace)) {
-      await _loadTranslations(namespace);
+      await _loadTranslations(namespace, locales);
     }
 
     var value = get(_namespaces[namespace], path);
@@ -483,10 +550,36 @@ class I18n {
   }
 }
 
+// delegate
+class I18nDelegate extends LocalizationsDelegate<I18N> {
+    // instance data
+
+    I18N i18n;
+
+    // constructor
+
+    I18nDelegate({required this.i18n});
+
+    // override
+
+    @override
+    bool isSupported(Locale locale) => i18n.supportedLocales().contains(locale);
+
+    @override
+    Future<I18N> load(Locale locale) async {
+      await i18n._reloadTranslations();
+
+      return i18n;
+    }
+
+    @override
+    bool shouldReload(LocalizationsDelegate<I18N> old) => false;
+  }
+
 // extension
 
 extension I18nStringExtension on String {
-  String tr(Map<String, dynamic>? args) {
-    return I18n.instance.translate(this, args: args);
+  String tr([Map<String, dynamic>? args]) {
+    return I18N.instance.translate(this, args: args);
   }
 }

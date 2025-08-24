@@ -114,6 +114,8 @@ class Interpolator {
 
   RegExp paramPattern = RegExp(r"\s*(?<parameter>\w+)\s*:\s*(?<value>-?\d+|true|false|\'\w+\')");
 
+  final regex = RegExp(r'\{[^}]+\}');
+
   // internal
 
   I18NFunction parsePlaceholder(String placeholder) {
@@ -210,57 +212,61 @@ class Interpolator {
   }
 
   I18NFunction parse(String input) {
-    final parts = [];
+    final parts = <dynamic>[];
 
-    // closure
-
-    I18NFunction template(int start, int end) {
-      return (Map<String, dynamic> parameters) => input.substring(start, end);
-    }
-
-    var start = 0;
-    var index = input.indexOf('{');
-    if (index >= 0) {
-      while (index >= 0) {
-        // add up to first bracket
-
-        parts.add(input.substring(start, index));
-
-        start = index;
-        index = input.indexOf('}', index + 1);
-
-        // add bracket
-
-        var variable = input.substring(start, index + 1);
-
-        parts.add(parsePlaceholder(variable));
-
-        // next
-
-        start = index + 1;
-        index = input.indexOf('{', start);
+    var last = 0;
+    for (final match in regex.allMatches(input)) {
+      // Literal before placeholder
+      if (match.start > last) {
+        final literal = input.substring(last, match.start);
+        if (literal.isNotEmpty) parts.add(literal);
       }
 
-      // add end
+      // Placeholder
 
-      parts.add(input.substring(start, input.length));
-    } // if
-    else {
-      parts.add(input.substring(0, input.length));
+      parts.add(parsePlaceholder(match.group(0)!));
+      last = match.end;
     }
 
-    // return the overall function
+    // Trailing literal
 
-    return (Map<String, dynamic> parameters)  {
-      var buffer = StringBuffer();
+    if (last < input.length) {
+      parts.add(input.substring(last));
+    }
 
-      for ( var part in parts)
-        if ( part is String)
-          buffer.write(part);
-        else
-          buffer.write(part(parameters));
+    // Merge adjacent literals
 
-      return buffer.toString();
+    final merged = <dynamic>[];
+    final buffer = StringBuffer();
+    for (final part in parts) {
+      if (part is String) {
+        buffer.write(part);
+      }
+      else {
+        if (buffer.isNotEmpty) {
+          merged.add(buffer.toString());
+          buffer.clear();
+        }
+        merged.add(part);
+      }
+    }
+    if (buffer.isNotEmpty)
+      merged.add(buffer.toString());
+
+    // final function
+
+    return (Map<String, dynamic> args) {
+      final out = StringBuffer();
+      for (final part in merged) {
+        if (part is String) {
+          out.write(part);
+        }
+        else {
+          out.write(part(args));
+        }
+      }
+
+      return out.toString();
     };
   }
 }

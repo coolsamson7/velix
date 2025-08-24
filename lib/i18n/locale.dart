@@ -210,7 +210,7 @@ class Interpolator {
   }
 
   I18NFunction parse(String input) {
-    List<I18NFunction> parts = [];
+    final parts = [];
 
     // closure
 
@@ -224,7 +224,7 @@ class Interpolator {
       while (index >= 0) {
         // add up to first bracket
 
-        parts.add(template(start, index));
+        parts.add(input.substring(start, index));
 
         start = index;
         index = input.indexOf('}', index + 1);
@@ -243,10 +243,10 @@ class Interpolator {
 
       // add end
 
-      parts.add(template(start, input.length));
+      parts.add(input.substring(start, input.length));
     } // if
     else {
-      parts.add(template(0, input.length));
+      parts.add(input.substring(0, input.length));
     }
 
     // return the overall function
@@ -255,7 +255,10 @@ class Interpolator {
       var buffer = StringBuffer();
 
       for ( var part in parts)
-        buffer.write(part(parameters));
+        if ( part is String)
+          buffer.write(part);
+        else
+          buffer.write(part(parameters));
 
       return buffer.toString();
     };

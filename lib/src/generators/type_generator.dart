@@ -286,7 +286,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       // add optional
 
       if ( nullable) {
-        constraint = constraint.optional();
+        constraint = (constraint as dynamic).optional();
       }
 
       // add constraints
@@ -300,12 +300,12 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
             type.getDisplayString() == 'Attribute') {
           final typeValue = constant.getField('type');
           if (typeValue != null && typeValue.toStringValue() != "") {
-            constraint.constraint(typeValue.toStringValue()!);
+            (constraint as dynamic).constraint(typeValue.toStringValue()!);
           }
         }
       }
 
-      return constraint.code();
+      return  (constraint as dynamic).code();
     }
     else {
       if ( typeName.startsWith("List<")) {

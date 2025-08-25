@@ -9,13 +9,12 @@ class Test<T> {
   final Type type;
   final String name;
   bool stop;
-  bool ignore;
   final Map<String, dynamic> params;
   final Check<T> check;
 
   // constructor
 
-  Test({required this.type, required this.name, required this.check,this.params = const <String, dynamic>{}, this.stop = false, this.ignore = false});
+  Test({required this.type, required this.name, required this.check,this.params = const <String, dynamic>{}, this.stop = false});
 
   // public
 
@@ -28,7 +27,7 @@ class Test<T> {
 }
 
 /// @internal
-typedef MethodApplier<T> = void Function(AbstractType<T>, List<dynamic> args);
+typedef MethodApplier<T> = void Function(AbstractType<T, AbstractType>, List<dynamic> args);
 
 /// @internal
 enum ArgType {
@@ -62,11 +61,13 @@ class MethodSpec {
 }
 
 /// Base class for type constraints based on a literal type.
+/// [B] the type type :-)
 /// [T] the literal type
-class AbstractType<T> {
+class AbstractType<T, B extends AbstractType<T, B>> {
   // instance data
 
   late Type type;
+  bool nullable = false;
   List<Test<dynamic>> tests = [];
 
   // constructor
@@ -77,12 +78,12 @@ class AbstractType<T> {
 
   // internal
 
-  AbstractType constraint(String input){
-    return this;
+  B constraint(String input) {
+    return this as B;
   }
 
-  void parse(Map<String, MethodSpec> methods, String expression) {
-    final tokens = expression.split(RegExp(r'\s+'));
+  B parse(Map<String, MethodSpec> methods, String expression) {
+    final tokens = expression.trim().split(RegExp(r'\s+'));
 
     for (int i = 0; i < tokens.length;) {
       final name = tokens[i];
@@ -110,6 +111,8 @@ class AbstractType<T> {
 
       spec.apply(this, args);
     }
+
+    return this as B;
   }
 
   // create the code
@@ -126,7 +129,7 @@ class AbstractType<T> {
         buffer.write(runtimeType.toString());
         buffer.write("()");
 
-        if ( test.ignore)
+        if ( nullable )
           buffer.write(".optional()");
       }
       else {
@@ -154,15 +157,14 @@ class AbstractType<T> {
   void check(dynamic object, ValidationContext context) {
     for ( Test test in tests) {
       if (!test.run(object)) {
-        if (!test.ignore)
-          context.addViolation(
-            type: test.type,
-            name: test.name,
-            params: test.params,
-            path: context.path,
-            value: object,
-            message: ""//test.message
-          );
+        context.addViolation(
+          type: test.type,
+          name: test.name,
+          params: test.params,
+          path: context.path,
+          value: object,
+          message: ""//test.message
+        );
 
         if ( test.stop) {
           break;
@@ -171,17 +173,16 @@ class AbstractType<T> {
     }
   }
 
-  AbstractType<T> test<S>({required Type type, required String name, required Check<S> check, params = const <String, dynamic>{}, stop = false, ignore = false}) {
+  B test<S>({required Type type, required String name, required Check<S> check, params = const <String, dynamic>{}, stop = false}) {
     tests.add(Test<S>(
         type: type,
         name: name,
         params: params,
         check: check,
-        stop: stop,
-        ignore: ignore
+        stop: stop
     ));
 
-    return this;
+    return this as B;
   }
 
   // fluent
@@ -195,26 +196,25 @@ class AbstractType<T> {
         params: {
           "type": type
         },
-        check: (dynamic object) => object.runtimeType == type,
+        check: (dynamic object) => (object == null && nullable) || object.runtimeType == type,
         stop: true
     );
   }
 
-  AbstractType<T> required() {
-    var typeTest = tests[0];
+  B required() {
+    nullable = false;
 
-    typeTest.ignore = false;
-
-    return this;
+    return this as B;
   }
 
-  AbstractType<T> optional()  {
+  B optional()  {
+    nullable = true;
+
     var typeTest = tests[0];
 
-    typeTest.ignore = true;
     typeTest.stop = true;
 
-    return this;
+    return this as B;
   }
 
   // public
@@ -327,7 +327,7 @@ class ValidationContext {
 // number
 
 /// The type specification of int types
-class IntType extends AbstractType<int> {
+class IntType extends AbstractType<int, IntType> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -348,11 +348,7 @@ class IntType extends AbstractType<int> {
   // static methods
 
   static IntType fromString(String input) {
-    var result = IntType();
-
-    result.parse(methods, input);
-
-    return result;
+    return IntType().constraint(input);
   }
 
   // constructor
@@ -365,21 +361,7 @@ class IntType extends AbstractType<int> {
   // fluent
 
   @override
-  IntType required() {
-    super.required();
-
-    return this;
-  }
-
-  @override
-  IntType optional() {
-    super.optional();
-
-    return this;
-  }
-
-  @override
-  AbstractType constraint(String input) {
+  IntType constraint(String input) {
     super.parse(methods, input);
 
     return this;
@@ -479,7 +461,7 @@ class IntType extends AbstractType<int> {
 // double
 
 /// type constraint for double values
-class DoubleType extends AbstractType<double> {
+class DoubleType extends AbstractType<double, DoubleType> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -500,11 +482,7 @@ class DoubleType extends AbstractType<double> {
   // static methods
 
   static DoubleType fromString(String input) {
-    var result = DoubleType();
-
-    result.parse(methods, input);
-
-    return result;
+    return DoubleType().constraint(input);
   }
 
   // constructor
@@ -517,21 +495,7 @@ class DoubleType extends AbstractType<double> {
   // fluent
 
   @override
-  DoubleType required() {
-    super.required();
-
-    return this;
-  }
-
-  @override
-  DoubleType optional() {
-    super.optional();
-
-    return this;
-  }
-
-  @override
-  AbstractType constraint(String input) {
+  DoubleType constraint(String input) {
     super.parse(methods, input);
 
     return this;
@@ -631,7 +595,7 @@ class DoubleType extends AbstractType<double> {
 // string
 
 /// The type specification of String types
-class StringType extends AbstractType<String> {
+class StringType extends AbstractType<String, StringType> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -650,11 +614,7 @@ class StringType extends AbstractType<String> {
   // static methods
 
   static StringType fromString(String input) {
-    var result = StringType();
-
-    result.parse(methods, input);
-
-    return result;
+    return StringType().constraint(input);
   }
 
   // constructor
@@ -667,24 +627,8 @@ class StringType extends AbstractType<String> {
   // fluent
 
   @override
-  StringType required() {
-    super.required();
-
-    return this;
-  }
-
-  @override
-  StringType optional() {
-    super.optional();
-
-    return this;
-  }
-
-  @override
-  AbstractType constraint(String input) {
-    super.parse(methods, input);
-
-    return this;
+  StringType constraint(String input) {
+    return super.parse(methods, input);
   }
 
   /// requires the value to match a regular expression
@@ -742,7 +686,7 @@ class StringType extends AbstractType<String> {
 }
 
 /// type specification for  [bool] values
-class BoolType extends AbstractType<bool> {
+class BoolType extends AbstractType<bool, BoolType> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -751,11 +695,7 @@ class BoolType extends AbstractType<bool> {
   // static methods
 
   static BoolType fromString(String input) {
-    var result = BoolType();
-
-    result.parse(methods, input);
-
-    return result;
+    return BoolType().constraint(input);
   }
 
   // constructor
@@ -768,29 +708,13 @@ class BoolType extends AbstractType<bool> {
   // override
 
   @override
-  BoolType required() {
-    super.required();
-
-    return this;
-  }
-
-  @override
-  BoolType optional() {
-    super.optional();
-
-    return this;
-  }
-
-  @override
-  AbstractType constraint(String input) {
-    super.parse(methods, input);
-
-    return this;
+  BoolType constraint(String input) {
+    return super.parse(methods, input);
   }
 }
 
 /// type specification for  [bool] values
-class DateTimeType extends AbstractType<DateTime> {
+class DateTimeType extends AbstractType<DateTime, DateTimeType> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -799,11 +723,7 @@ class DateTimeType extends AbstractType<DateTime> {
   // static methods
 
   static DateTimeType fromString(String input) {
-    var result = DateTimeType();
-
-    result.parse(methods, input);
-
-    return result;
+    return DateTimeType().constraint(input);
   }
 
   // constructor
@@ -816,21 +736,7 @@ class DateTimeType extends AbstractType<DateTime> {
   // override
 
   @override
-  DateTimeType required() {
-    super.required();
-
-    return this;
-  }
-
-  @override
-  DateTimeType optional() {
-    super.optional();
-
-    return this;
-  }
-
-  @override
-  AbstractType constraint(String input) {
+  DateTimeType constraint(String input) {
     super.parse(methods, input);
 
     return this;
@@ -839,7 +745,7 @@ class DateTimeType extends AbstractType<DateTime> {
 
 /// Type specification for class values of a certain type.
 /// [T] the corresponding type
-class ObjectType<T> extends AbstractType<T> {
+class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -858,10 +764,8 @@ class ObjectType<T> extends AbstractType<T> {
   }
 
   @override
-  AbstractType constraint(String input) {
-    super.parse(methods, input);
-
-    return this;
+  ObjectType<T> constraint(String input) {
+    return super.parse(methods, input);
   }
 
   @override
@@ -883,7 +787,7 @@ class ObjectType<T> extends AbstractType<T> {
 }
 
 /// Type specification for List types
-class ListType<T> extends AbstractType<T> {
+class ListType<T> extends AbstractType<T, ListType<T>> {
   // static data
 
   static final Map<String, MethodSpec> methods = {
@@ -912,7 +816,7 @@ class ListType<T> extends AbstractType<T> {
   // fluent
 
   /// requires that the list should have a minimum length
-  ListType min(int length) {
+  ListType<T> min(int length) {
     test<List> (
       type: List,
       name: "min",
@@ -926,7 +830,7 @@ class ListType<T> extends AbstractType<T> {
   }
 
   /// requires that the list should have a maximum length
-  ListType max(int length) {
+  ListType<T> max(int length) {
     test<List> (
       type: List,
       name: "max",
@@ -940,10 +844,8 @@ class ListType<T> extends AbstractType<T> {
   }
 
   @override
-  AbstractType constraint(String input) {
-    super.parse(methods, input);
-
-    return this;
+  ListType<T> constraint(String input) {
+    return super.parse(methods, input);
   }
 }
 

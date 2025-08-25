@@ -27,7 +27,7 @@ class FieldDescriptor<T, V> {
   final Type? elementType;
   final Function? factoryConstructor;
 
-  final AbstractType<V> type;
+  final AbstractType<V, AbstractType> type;
   final Getter<T, V> getter;
   final Setter<T, V>? setter;
   late TypeDescriptor typeDescriptor;
@@ -375,7 +375,7 @@ ConstructorParameter param<T>(String name, {
 }
 
 /// @internal
-AbstractType inferType<T>(AbstractType? t, bool isNullable) {
+dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
   if ( t != null)
     return t;
 
@@ -403,19 +403,19 @@ AbstractType inferType<T>(AbstractType? t, bool isNullable) {
     if ( type.toString().startsWith("List<")) {
       result = ListType(type);
       if ( isNullable )
-        result = result.optional();
+        result = (result as dynamic).optional();
     }
     else {
       result = ObjectType(type);
       if ( isNullable )
-        result = result.optional();
+        result = (result as dynamic).optional();
     }
 
-   return result;
+   return result as dynamic;
 }
 
 FieldDescriptor field<T,V>(String name, {
-  AbstractType<V>? type,
+  AbstractType<V, AbstractType>? type,
   List<Object>? annotations,
   required Getter getter,
   Setter? setter,

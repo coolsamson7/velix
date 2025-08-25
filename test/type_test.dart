@@ -6,7 +6,7 @@ void main() {
   group('StringParser', () {
 
     test('parse', () {
-      var type = IntType.fromString("< 7 > 0");
+      var type = IntType().constraint("< 7 > 0");
 
       var code = type.code();
 
@@ -16,6 +16,18 @@ void main() {
 
 
   group('StringType', () {
+    test('test null', () {
+      var type = StringType().optional();
+
+      expect(type.isValid(null), equals(true));
+      expect(type.isValid(1), equals(false));
+
+      type = StringType().required();
+
+      expect(type.isValid(null), equals(false));
+      expect(type.isValid(1), equals(false));
+    });
+
     test('fails for empty string', () {
       var type = StringType().notEmpty();
       expect(() => type.validate(""), throwsA(isA<ValidationException>()));

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:velix/i18n/interpolator.dart';
 
 void main() {
@@ -21,17 +22,29 @@ void main() {
 
       // with format args
 
-      //TODO func = interpolator.parse("hello {andi}, you are worth {price:currency(digits:2)}!");
-      //TODO result = func({"andi": "andi", "price": 100.123, "symbol": "EUR"});
+      func = interpolator.parse("hello {andi}, you are worth {price:currency(name: 'EUR', decimalDigits: 2)}!");
+      result = func({"andi": "andi", "price": 100.123});//, "symbol": "EUR"});
 
-      //TODO expect(result, "hello andi, you are worth EUR100.12!");
+      expect(result, "hello andi, you are worth EUR100.12!");
+
+      // with template args
+
+      func = interpolator.parse("hello {andi}, you are worth {price:currency(name: \$symbol, decimalDigits: 2)}!");
+      result = func({"andi": "andi", "price": 100.123, "symbol": "EUR"});
+
+      expect(result, "hello andi, you are worth EUR100.12!");
 
       // date
 
-      func = interpolator.parse("today is {now:date(style: 'yMd')}!");
+      var today = DateTime.now();
+      var format = DateFormat('yyyy-MM-dd');
+
+      var str = format.format(today);
+
+      func = interpolator.parse("today is {now:date(pattern: 'yyyy-MM-dd')}!");
       result = func({"now": DateTime.now()});
 
-      //TODO expect(true, equals(true));
+      expect(result, equals("today is $str!"));
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 import '../util/tracer.dart';
 
@@ -14,7 +15,9 @@ class LocaleManager extends ChangeNotifier {
 
   // constructor
 
-  LocaleManager(this._currentLocale, {List<Locale>? supportedLocales }) : supportedLocales = supportedLocales ?? [];
+  LocaleManager(this._currentLocale, {List<Locale>? supportedLocales }) : supportedLocales = supportedLocales ?? [] {
+    Intl.defaultLocale = _currentLocale.toString();
+}
 
   // public
 
@@ -25,6 +28,9 @@ class LocaleManager extends ChangeNotifier {
       Tracer.trace("i18n", TraceLevel.high, "set locale $value");
 
       _currentLocale = value;
+
+      Intl.defaultLocale = _currentLocale.toString();
+
       notifyListeners();
     }
   }

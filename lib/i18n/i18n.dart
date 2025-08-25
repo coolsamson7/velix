@@ -1,12 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'interpolator.dart';
 import 'locale.dart';
 
 typedef I18NFunction = String Function(Map<String, dynamic> args);
 
+
 abstract class Formatter {
+  String locale(Map<String, dynamic> args) {
+    var locale = args["locale"];
+    if ( locale is String)
+      return locale;
+
+    else if ( locale is Locale)
+      return locale.toString();
+
+    else return Intl.defaultLocale ?? "en";
+  }
+
+  // abstract
+
   I18NFunction create(String variable, Map<String, dynamic> args);
 }
 

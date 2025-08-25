@@ -50,3 +50,51 @@ class Keywords {
   dynamic operator [](String name) => _data[name];
   void operator []=(String name, dynamic value) => _data[name] = value;
 }
+
+
+class LruCache<K, V> {
+  // instance data
+
+  final int maxSize;
+  final _cache = <K, V>{};
+
+  // constructor
+
+  LruCache(this.maxSize) {
+    if (maxSize <= 0) {
+      throw ArgumentError('maxSize must be > 0');
+    }
+  }
+
+  // public
+
+  V? get(K key) {
+    if (!_cache.containsKey(key))
+      return null;
+
+    // Move key to the end to mark it as recently used
+    final value = _cache.remove(key)!;
+    _cache[key] = value;
+
+    return value;
+  }
+
+  void set(K key, V value) {
+    if (_cache.containsKey(key)) {
+      _cache.remove(key);
+    }
+    else if (_cache.length >= maxSize) {
+      // Remove the least recently used (first) entry
+      _cache.remove(_cache.keys.first);
+    }
+
+    _cache[key] = value;
+  }
+
+  bool containsKey(K key) => _cache.containsKey(key);
+
+  void clear() => _cache.clear();
+
+  @override
+  String toString() => _cache.toString();
+}

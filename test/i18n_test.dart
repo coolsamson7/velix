@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/i18n/i18n.dart';
+import 'package:velix/i18n/loader/asset_loader.dart';
 import 'package:velix/i18n/locale.dart';
 
 import 'main.type_registry.g.dart';

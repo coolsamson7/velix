@@ -1,4 +1,4 @@
-import '../i18n/i18n.dart';
+import '../i18n/translator.dart';
 import '../reflectable/reflectable.dart';
 
 /// @internal

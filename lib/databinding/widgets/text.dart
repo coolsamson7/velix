@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:velix/i18n/i18n.dart';
 
+import '../../i18n/translator.dart';
 import '../../validation/validation.dart';
 import '../form_mapper.dart';
 import '../valued_widget.dart';

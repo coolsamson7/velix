@@ -1,3 +1,6 @@
+
+import 'package:stack_trace/stack_trace.dart';
+
 enum TraceLevel { off, low, medium, high, full }
 
 class TraceEntry {
@@ -5,11 +8,13 @@ class TraceEntry {
   final TraceLevel level;
   final String message;
   final DateTime timestamp;
+  final Frame? stackFrame;
 
   TraceEntry({
     required this.path,
     required this.level,
     required this.message,
+    required this.stackFrame,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 }
@@ -19,12 +24,14 @@ class TraceModel {
   final String date;
   final String level;
   final String message;
+  final String stackFrame;
 
   TraceModel({
     required this.path,
     required this.date,
     required this.level,
     required this.message,
+   required this.stackFrame,
   });
 }
 
@@ -36,11 +43,26 @@ class TraceFormatter {
   TraceFormatter(String format) : _renderers = _parse(format);
 
   String format(TraceEntry entry) {
+    String frameInfo = '';
+    if (entry.stackFrame != null) {
+      final f = entry.stackFrame!;
+      String path = entry.stackFrame!.uri.toString();
+
+      if ( path.startsWith("package:")) {
+        frameInfo = "$path:${f.line ?? 0}:${f.column ?? 0}";
+      }
+      else {
+        final uri = entry.stackFrame!.uri;
+        frameInfo =  '${uri.pathSegments.last}:${f.line ?? 0}:${f.column ?? 0} ';
+      }
+    }
+
     final model = TraceModel(
       path: entry.path,
-      date: entry.timestamp.toIso8601String().split('T').first,
+      date: entry.timestamp.toIso8601String(),
       level: _levelToString(entry.level),
       message: entry.message,
+      stackFrame: frameInfo
     );
 
     return _build(model);
@@ -86,6 +108,9 @@ class TraceFormatter {
         case 'm':
           renderers.add((buf, model) => buf.write(model.message));
           break;
+        case 'f':
+          renderers.add((buf, model) => buf.write(model.stackFrame));
+          break;
         default:
         // Treat unknown specifiers as literal text
           renderers.add((buf, model) => buf.write('%$specifier'));
@@ -109,10 +134,10 @@ class TraceFormatter {
   }
 }
 
-abstract class Trace {
+abstract class TraceSink {
   final TraceFormatter _formatter;
 
-  Trace(dynamic formatter)
+  TraceSink(dynamic formatter)
       : _formatter = (formatter is String)
       ? TraceFormatter(formatter)
       : formatter as TraceFormatter;
@@ -122,7 +147,7 @@ abstract class Trace {
   String format(TraceEntry entry) => _formatter.format(entry);
 }
 
-class ConsoleTrace extends Trace {
+class ConsoleTrace extends TraceSink {
   ConsoleTrace(String messageFormat) : super(TraceFormatter(messageFormat));
 
   @override
@@ -138,15 +163,15 @@ class Tracer {
   final Map<String, TraceLevel> _traceLevels = {};
   final Map<String, TraceLevel> _cachedTraceLevels = {};
   int _modifications = 0;
-  final Trace? _trace;
+  final TraceSink? _trace;
 
-  Tracer._internal({required Trace? trace, required bool isEnabled, Map<String, TraceLevel>? paths})
+  Tracer._internal({required TraceSink? trace, required bool isEnabled, Map<String, TraceLevel>? paths})
       : _trace = trace {
     enabled = isEnabled;
     paths?.forEach(setTraceLevel);
   }
 
-  factory Tracer({Trace? trace, bool isEnabled = true, Map<String, TraceLevel>? paths}) =>
+  factory Tracer({TraceSink? trace, bool isEnabled = true, Map<String, TraceLevel>? paths}) =>
       _instance ??= Tracer._internal(trace: trace, isEnabled: isEnabled, paths: paths);
 
   static Tracer get instance => _instance ??= Tracer();
@@ -155,16 +180,19 @@ class Tracer {
     final instance = Tracer.instance;
     if (!enabled || instance.getTraceLevel(path).index < level.index) return;
 
-    instance.doTrace(path, level, message, args);
+    final trace = Trace.current(1);
+    final frame = trace.frames.isNotEmpty ? trace.frames.first : null;
+
+    instance.doTrace(path, level, message, frame, args);
   }
 
   bool isTraced(String path, TraceLevel level) =>
       enabled && getTraceLevel(path).index >= level.index;
 
-  Future<void> doTrace(String path, TraceLevel level, String message, [dynamic args = const []]) async {
+  Future<void> doTrace(String path, TraceLevel level, String message,  Frame? stackFrame, [dynamic args = const []]) async {
     if (isTraced(path, level)) {
       final formattedMessage = _formatMessage(message, args);
-      _trace?.trace(TraceEntry(path: path, level: level, message: formattedMessage));
+      _trace?.trace(TraceEntry(path: path, level: level, message: formattedMessage,  stackFrame: stackFrame));
     }
   }
 

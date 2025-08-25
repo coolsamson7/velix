@@ -90,7 +90,7 @@ void main() async {
 
   Tracer.enabled = true;
   Tracer(
-      trace: ConsoleTrace("%d [%l] %p: %m"), // d(ate), l(evel), p(ath), m(message)
+      trace: ConsoleTrace("%d [%l] %p: %m [%f]"), // d(ate), l(evel), p(ath), m(message)
       paths: {
         "i18n": TraceLevel.full
       });
@@ -152,22 +152,26 @@ class TODOApp extends StatelessWidget {
           translator: EasyLocalizationTranslator()
         )),
       ],
-      child: CupertinoApp(
-        title: 'TODO',
+      child: Consumer<LocaleManager>(
+        builder: (BuildContext context, LocaleManager value, Widget? child) {
+          return CupertinoApp(
+            title: 'TODO',
 
-        theme: const CupertinoThemeData(
-          brightness: Brightness.light,
-          primaryColor: CupertinoColors.activeBlue,
-        ),
+            theme: const CupertinoThemeData(
+              brightness: Brightness.light,
+              primaryColor: CupertinoColors.activeBlue,
+            ),
 
-        // localization
+            // localization
 
-        localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
-        supportedLocales: localeManager.supportedLocales,
-        locale: localeManager.locale,
+            localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
+            supportedLocales: localeManager.supportedLocales,
+            locale: localeManager.locale,
 
-        home: const MainScreen(),
-      ),
+            home: const MainScreen(),
+          );
+        }
+        )
     );
   }
 }

@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../validation_validation/">validation&#47;validation.dart</a></li>
-    <li><a href="../../validation_validation/AbstractType-class.html">AbstractType<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../validation_validation/AbstractType-class.html">AbstractType<span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B extends AbstractType&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B</span>&gt;</span>&gt;</span></a></li>
     <li class="self-crumb">optional method</li>
   </ol>
   <div class="self-name">optional</div>
@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="../../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
+<span class="returntype">B</span>
 <span class="name ">optional</span>(<wbr>)
 
       
@@ -66,13 +66,14 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">AbstractType&lt;T&gt; optional()  {
+  <pre class="language-dart"><code class="language-dart">B optional()  {
+  nullable = true;
+
   var typeTest = tests[0];
 
-  typeTest.ignore = true;
   typeTest.stop = true;
 
-  return this;
+  return this as B;
 }</code></pre>
 </section>
 
@@ -88,7 +89,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../validation_validation/">validation</a></li>
-    <li><a href="../../validation_validation/AbstractType-class.html">AbstractType<span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></a></li>
+    <li><a href="../../validation_validation/AbstractType-class.html">AbstractType<span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B extends AbstractType&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B</span>&gt;</span>&gt;</span></a></li>
     <li class="self-crumb">optional method</li>
 </ol>
 
@@ -101,7 +102,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

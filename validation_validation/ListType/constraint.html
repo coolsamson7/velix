@@ -59,7 +59,7 @@
         <li>@<a href="https://api.flutter.dev/flutter/dart-core/override-constant.html">override</a></li>
     </ol>
   </div>
-<span class="returntype"><a href="../../validation_validation/AbstractType-class.html">AbstractType</a></span>
+<span class="returntype"><a href="../../validation_validation/ListType-class.html">ListType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
 <span class="name ">constraint</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="constraint-param-input"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">input</span></span></li>
 </ol>)
 
@@ -73,10 +73,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-AbstractType constraint(String input) {
-  super.parse(methods, input);
-
-  return this;
+ListType&lt;T&gt; constraint(String input) {
+  return super.parse(methods, input);
 }</code></pre>
 </section>
 
@@ -105,7 +103,7 @@ AbstractType constraint(String input) {
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

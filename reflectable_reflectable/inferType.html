@@ -54,8 +54,8 @@
 
     <section class="multi-line-signature">
         
-<span class="returntype"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
-<span class="name ">inferType</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span>, </span></li>
+<span class="returntype">dynamic</span>
+<span class="name ">inferType</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">dynamic</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>&gt;</span></span>&gt;</span>?</span> <span class="parameter-name">t</span>, </span></li>
 <li><span class="parameter" id="inferType-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span></span></li>
 </ol>)
 
@@ -71,7 +71,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">AbstractType inferType&lt;T&gt;(AbstractType? t, bool isNullable) {
+  <pre class="language-dart"><code class="language-dart">dynamic inferType&lt;T&gt;(AbstractType&lt;T,AbstractType&gt;? t, bool isNullable) {
   if ( t != null)
     return t;
 
@@ -99,15 +99,15 @@
     if ( type.toString().startsWith(&quot;List&lt;&quot;)) {
       result = ListType(type);
       if ( isNullable )
-        result = result.optional();
+        result = (result as dynamic).optional();
     }
     else {
       result = ObjectType(type);
       if ( isNullable )
-        result = result.optional();
+        result = (result as dynamic).optional();
     }
 
-   return result;
+   return result as dynamic;
 }</code></pre>
 </section>
 
@@ -135,7 +135,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

@@ -65,7 +65,7 @@
   <dd>
     <ul class="gt-separated dark clazz-relationships">
       <li><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></li>
-        <li><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></li>
+        <li><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>, <span class="type-parameter"><a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>&gt;</span></li>
       <li>DoubleType</li>
     </ul>
   </dd>
@@ -108,6 +108,18 @@
 <dd class="inherited">
   The hash code for this object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="nullable" class="property inherited">
+  <span class="name"><a href="../validation_validation/AbstractType/nullable.html">nullable</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  
+  <div class="features"><span class="feature">getter/setter pair</span><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -197,7 +209,7 @@
 
         <dt id="constraint" class="callable">
   <span class="name"><a href="../validation_validation/DoubleType/constraint.html">constraint</a></span><span class="signature">(<wbr><span class="parameter" id="constraint-param-input"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">input</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
+    <span class="returntype parameter">&#8594; <a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>
   </span>
   
 
@@ -319,22 +331,9 @@
 
 </dd>
 
-        <dt id="optional" class="callable">
-  <span class="name"><a href="../validation_validation/DoubleType/optional.html">optional</a></span><span class="signature">(<wbr>)
+        <dt id="optional" class="callable inherited">
+  <span class="name"><a href="../validation_validation/AbstractType/optional.html">optional</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">override</span></div>
-
-</dd>
-
-        <dt id="parse" class="callable inherited">
-  <span class="name"><a href="../validation_validation/AbstractType/parse.html">parse</a></span><span class="signature">(<wbr><span class="parameter" id="parse-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="../validation_validation/MethodSpec-class.html">MethodSpec</a></span>&gt;</span></span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="parse-param-expression"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">expression</span></span>)
-    <span class="returntype parameter">&#8594; void</span>
   </span>
   
 
@@ -345,22 +344,35 @@
 
 </dd>
 
-        <dt id="required" class="callable">
-  <span class="name"><a href="../validation_validation/DoubleType/required.html">required</a></span><span class="signature">(<wbr>)
+        <dt id="parse" class="callable inherited">
+  <span class="name"><a href="../validation_validation/AbstractType/parse.html">parse</a></span><span class="signature">(<wbr><span class="parameter" id="parse-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="../validation_validation/MethodSpec-class.html">MethodSpec</a></span>&gt;</span></span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="parse-param-expression"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">expression</span></span>)
     <span class="returntype parameter">&#8594; <a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>
   </span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   
-  <div class="features"><span class="feature">override</span></div>
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="required" class="callable inherited">
+  <span class="name"><a href="../validation_validation/AbstractType/required.html">required</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  
+  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
         <dt id="test" class="callable inherited">
-  <span class="name"><a href="../validation_validation/AbstractType/test.html">test</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="test-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="test-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="test-param-check"><span>required</span> <span class="type-annotation"><a href="../validation_validation/Check.html">Check</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>&gt;</span></span> <span class="parameter-name">check</span>, </span><span class="parameter" id="test-param-params"><span class="type-annotation">dynamic</span> <span class="parameter-name">params</span> = <span class="default-value">const &lt;String, dynamic&gt;{}</span>, </span><span class="parameter" id="test-param-stop"><span class="type-annotation">dynamic</span> <span class="parameter-name">stop</span> = <span class="default-value">false</span>, </span><span class="parameter" id="test-param-ignore"><span class="type-annotation">dynamic</span> <span class="parameter-name">ignore</span> = <span class="default-value">false</span></span>})
-    <span class="returntype parameter">&#8594; <a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span>
+  <span class="name"><a href="../validation_validation/AbstractType/test.html">test</a></span><span class="signature">&lt;<wbr><span class="type-parameter">S</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="test-param-type"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="test-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="test-param-check"><span>required</span> <span class="type-annotation"><a href="../validation_validation/Check.html">Check</a><span class="signature">&lt;<wbr><span class="type-parameter">S</span>&gt;</span></span> <span class="parameter-name">check</span>, </span><span class="parameter" id="test-param-params"><span class="type-annotation">dynamic</span> <span class="parameter-name">params</span> = <span class="default-value">const &lt;String, dynamic&gt;{}</span>, </span><span class="parameter" id="test-param-stop"><span class="type-annotation">dynamic</span> <span class="parameter-name">stop</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../validation_validation/DoubleType-class.html">DoubleType</a></span>
   </span>
   
 
@@ -483,7 +495,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

@@ -65,11 +65,12 @@
       <h2>Classes</h2>
       <dl>
           <dt id="AbstractType">
-  <span class="name "><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+  <span class="name "><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B extends <a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">B</span>&gt;</span></span>&gt;</span></span> 
 
 </dt>
 <dd>
   Base class for type constraints based on a literal type.
+<code>B</code> the type type :-)
 <code>T</code> the literal type
 </dd>
 
@@ -96,6 +97,14 @@
 </dt>
 <dd>
   wildcard that matches field values given a source and target type.
+</dd>
+
+          <dt id="AssetTranslationLoader">
+  <span class="name "><a href="../i18n_loader_asset_loader/AssetTranslationLoader-class.html">AssetTranslationLoader</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="Attribute">
@@ -179,6 +188,14 @@
   a widget that is associated with commands and will change the cursor or show a spinner while executing commands.
 </dd>
 
+          <dt id="ConsoleTrace">
+  <span class="name "><a href="../util_tracer/ConsoleTrace-class.html">ConsoleTrace</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="ConstantAccessor">
   <span class="name "><a href="../mapper_mapper/ConstantAccessor-class.html">ConstantAccessor</a></span> 
 
@@ -251,12 +268,28 @@
   @internal
 </dd>
 
+          <dt id="CurrencyFormatter">
+  <span class="name "><a href="../i18n_formatter_number_formatter/CurrencyFormatter-class.html">CurrencyFormatter</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="Dataclass">
   <span class="name "><a href="../reflectable_reflectable/Dataclass-class.html">Dataclass</a></span> 
 
 </dt>
 <dd>
   decorator used to mark classes that should emit meta-data
+</dd>
+
+          <dt id="DateFormatter">
+  <span class="name "><a href="../i18n_formatter_date_formatter/DateFormatter-class.html">DateFormatter</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="DateTimeType">
@@ -299,6 +332,14 @@
   
 </dd>
 
+          <dt id="Formatter">
+  <span class="name "><a href="../i18n_i18n/Formatter-class.html">Formatter</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="FormEvent">
   <span class="name "><a href="../databinding_form_mapper/FormEvent-class.html">FormEvent</a></span> 
 
@@ -313,6 +354,22 @@
 </dt>
 <dd>
   A <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a> is used to bind field values to form elements
+</dd>
+
+          <dt id="I18N">
+  <span class="name "><a href="../i18n_i18n/I18N-class.html">I18N</a></span> 
+
+</dt>
+<dd>
+  I18n Core
+</dd>
+
+          <dt id="I18nDelegate">
+  <span class="name "><a href="../i18n_i18n/I18nDelegate-class.html">I18nDelegate</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="IntermediateResultDefinition">
@@ -339,20 +396,20 @@
   Covers the parameters of a command invocation:
 </dd>
 
-          <dt id="JSON">
-  <span class="name "><a href="../mapper_json/JSON-class.html">JSON</a></span> 
-
-</dt>
-<dd>
-  Main class that offers serialize and deserialize methods
-</dd>
-
           <dt id="Json">
   <span class="name "><a href="../mapper_json/Json-class.html">Json</a></span> 
 
 </dt>
 <dd>
   decorator used to influence json serialization for fields
+</dd>
+
+          <dt id="JSON">
+  <span class="name "><a href="../mapper_json/JSON-class.html">JSON</a></span> 
+
+</dt>
+<dd>
+  Main class that offers serialize and deserialize methods
 </dd>
 
           <dt id="JSONAccessor">
@@ -403,12 +460,28 @@
   Type specification for List types
 </dd>
 
+          <dt id="LocaleManager">
+  <span class="name "><a href="../i18n_locale/LocaleManager-class.html">LocaleManager</a></span> 
+
+</dt>
+<dd>
+  A <code>LocaleManager</code>
+</dd>
+
           <dt id="LockCommandInterceptor">
   <span class="name "><a href="../commands_command/LockCommandInterceptor-class.html">LockCommandInterceptor</a></span> 
 
 </dt>
 <dd>
   A <a href="../commands_command/CommandInterceptor-class.html">CommandInterceptor</a> that disables a command while being executed.
+</dd>
+
+          <dt id="LruCache">
+  <span class="name "><a href="../util_collections/LruCache-class.html">LruCache</a><span class="signature">&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="MapAccessor">
@@ -542,11 +615,19 @@
 </dd>
 
           <dt id="NoTranslator">
-  <span class="name "><a href="../i18n_i18n/NoTranslator-class.html">NoTranslator</a></span> 
+  <span class="name "><a href="../i18n_translator/NoTranslator-class.html">NoTranslator</a></span> 
 
 </dt>
 <dd>
   @internal
+</dd>
+
+          <dt id="NumberFormatter">
+  <span class="name "><a href="../i18n_formatter_number_formatter/NumberFormatter-class.html">NumberFormatter</a></span> 
+
+</dt>
+<dd>
+  
 </dd>
 
           <dt id="ObjectType">
@@ -751,6 +832,46 @@ to read values from a source and set the result in the target object
   @internal
 </dd>
 
+          <dt id="TraceEntry">
+  <span class="name "><a href="../util_tracer/TraceEntry-class.html">TraceEntry</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="TraceFormatter">
+  <span class="name "><a href="../util_tracer/TraceFormatter-class.html">TraceFormatter</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="TraceModel">
+  <span class="name "><a href="../util_tracer/TraceModel-class.html">TraceModel</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="Tracer">
+  <span class="name "><a href="../util_tracer/Tracer-class.html">Tracer</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="TraceSink">
+  <span class="name "><a href="../util_tracer/TraceSink-class.html">TraceSink</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="TracingCommandInterceptor">
   <span class="name "><a href="../commands_command/TracingCommandInterceptor-class.html">TracingCommandInterceptor</a></span> 
 
@@ -767,25 +888,33 @@ to read values from a source and set the result in the target object
   <a href="../mapper_transformer/Transformer-class.html">Transformer</a> is a generic class that transforms a source into a target object given a list of <a href="../mapper_transformer/Operation-class.html">Operation</a>s.
 </dd>
 
-          <dt id="TranslationManager">
-  <span class="name "><a href="../i18n_i18n/TranslationManager-class.html">TranslationManager</a></span> 
+          <dt id="TranslationLoader">
+  <span class="name "><a href="../i18n_i18n/TranslationLoader-class.html">TranslationLoader</a></span> 
 
 </dt>
 <dd>
-  Registry for all <a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a>s
+  A <code>TranslationLoader</code> loads translations.
+</dd>
+
+          <dt id="TranslationManager">
+  <span class="name "><a href="../i18n_translator/TranslationManager-class.html">TranslationManager</a></span> 
+
+</dt>
+<dd>
+  Registry for all <a href="../i18n_translator/TranslationProvider-class.html">TranslationProvider</a>s
 </dd>
 
           <dt id="TranslationProvider">
-  <span class="name "><a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+  <span class="name "><a href="../i18n_translator/TranslationProvider-class.html">TranslationProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
 
 </dt>
 <dd>
-  A <a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a> is able to translate a specific object type
+  A <a href="../i18n_translator/TranslationProvider-class.html">TranslationProvider</a> is able to translate a specific object type
 <code>T</code> the object type
 </dd>
 
           <dt id="Translator">
-  <span class="name "><a href="../i18n_i18n/Translator-class.html">Translator</a></span> 
+  <span class="name "><a href="../i18n_translator/Translator-class.html">Translator</a></span> 
 
 </dt>
 <dd>
@@ -936,6 +1065,14 @@ to read values from a source and set the result in the target object
   enum specifying how execution of a command will influence the ui state
 </dd>
 
+          <dt id="TraceLevel">
+  <span class="name "><a href="../util_tracer/TraceLevel.html">TraceLevel</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
       </dl>
     </section>
 
@@ -1007,6 +1144,16 @@ to read values from a source and set the result in the target object
   
 </dd>
 
+          <dt id="I18nStringExtension">
+  <span class="name "><a href="../i18n_i18n/I18nStringExtension.html">I18nStringExtension</a></span>
+  on <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>
+  
+
+</dt>
+<dd>
+  
+</dd>
+
       </dl>
     </section>
 
@@ -1026,8 +1173,8 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="noTranslator" class="constant">
-    <span class="name "><a href="../i18n_i18n/noTranslator-constant.html">noTranslator</a></span>
-  <span class="signature">&#8594; const <a href="../i18n_i18n/Translator-class.html">Translator</a></span>
+    <span class="name "><a href="../i18n_translator/noTranslator-constant.html">noTranslator</a></span>
+  <span class="signature">&#8594; const <a href="../i18n_translator/Translator-class.html">Translator</a></span>
   
 
 </dt>
@@ -1040,6 +1187,23 @@ to read values from a source and set the result in the target object
       </dl>
     </section>
 
+    <section class="summary offset-anchor" id="properties">
+      <h2>Properties</h2>
+      <dl class="properties">
+          <dt id="empty_locales" class="property">
+  <span class="name"><a href="../i18n_locale/empty_locales.html">empty_locales</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
+      </dl>
+    </section>
 
     <section class="summary offset-anchor" id="functions">
       <h2>Functions</h2>
@@ -1058,7 +1222,7 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="field" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/field.html">field</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="field-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="field-param-type"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">V</span>&gt;</span>?</span> <span class="parameter-name">type</span>, </span><span class="parameter" id="field-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span>, </span><span class="parameter" id="field-param-getter"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Getter.html">Getter</a></span> <span class="parameter-name">getter</span>, </span><span class="parameter" id="field-param-setter"><span class="type-annotation"><a href="../reflectable_reflectable/Setter.html">Setter</a>?</span> <span class="parameter-name">setter</span>, </span><span class="parameter" id="field-param-elementType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">elementType</span>, </span><span class="parameter" id="field-param-factoryConstructor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a>?</span> <span class="parameter-name">factoryConstructor</span>, </span><span class="parameter" id="field-param-isFinal"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isFinal</span> = <span class="default-value">false</span>, </span><span class="parameter" id="field-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span></span>})
+  <span class="name"><a href="../reflectable_reflectable/field.html">field</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="field-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="field-param-type"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">V</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">dynamic</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>&gt;</span></span>&gt;</span>?</span> <span class="parameter-name">type</span>, </span><span class="parameter" id="field-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span>, </span><span class="parameter" id="field-param-getter"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Getter.html">Getter</a></span> <span class="parameter-name">getter</span>, </span><span class="parameter" id="field-param-setter"><span class="type-annotation"><a href="../reflectable_reflectable/Setter.html">Setter</a>?</span> <span class="parameter-name">setter</span>, </span><span class="parameter" id="field-param-elementType"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">elementType</span>, </span><span class="parameter" id="field-param-factoryConstructor"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a>?</span> <span class="parameter-name">factoryConstructor</span>, </span><span class="parameter" id="field-param-isFinal"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isFinal</span> = <span class="default-value">false</span>, </span><span class="parameter" id="field-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>
   </span>
   
@@ -1097,8 +1261,8 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="inferType" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/inferType.html">inferType</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a>?</span> <span class="parameter-name">t</span>, </span><span class="parameter" id="inferType-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>
+  <span class="name"><a href="../reflectable_reflectable/inferType.html">inferType</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="inferType-param-t"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">dynamic</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>&gt;</span></span>&gt;</span>?</span> <span class="parameter-name">t</span>, </span><span class="parameter" id="inferType-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
   </span>
   
 
@@ -1339,6 +1503,20 @@ to read values from a source and set the result in the target object
   </dd>
 
           
+  <dt id="I18NFunction" class="callable">
+    <span class="name"><a href="../i18n_i18n/I18NFunction.html">I18NFunction</a></span><span class="signature">
+      <span class="returntype parameter">= <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a> Function<span class="signature">(<span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">args</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
   <dt id="Key" class="">
   <span class="name"><a href="../databinding_valued_widget/Key.html">Key</a></span>
     = (<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span></span>)
@@ -1371,7 +1549,7 @@ to read values from a source and set the result in the target object
           
   <dt id="MethodApplier" class="callable">
     <span class="name"><a href="../validation_validation/MethodApplier.html">MethodApplier</a></span>&lt;<wbr><span class="type-parameter">T</span>&gt;<span class="signature">
-      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>, </span><span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span>)</span></span>
+      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">dynamic</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>&gt;</span></span>&gt;</span></span>, </span><span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span>)</span></span>
     </span>
     
 
@@ -1383,9 +1561,37 @@ to read values from a source and set the result in the target object
   </dd>
 
           
+  <dt id="MissingKeyHandler" class="callable">
+    <span class="name"><a href="../i18n_i18n/MissingKeyHandler.html">MissingKeyHandler</a></span><span class="signature">
+      <span class="returntype parameter">= <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a> Function<span class="signature">(<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
   <dt id="ParseValue" class="callable">
     <span class="name"><a href="../databinding_form_mapper/ParseValue.html">ParseValue</a></span>&lt;<wbr><span class="type-parameter">S</span>, <span class="type-parameter">T</span>&gt;<span class="signature">
       <span class="returntype parameter">= S Function<span class="signature">(<span class="parameter" id="param-text"><span class="type-annotation">T</span> <span class="parameter-name">text</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
+  <dt id="Renderer" class="callable">
+    <span class="name"><a href="../util_tracer/Renderer.html">Renderer</a></span><span class="signature">
+      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-builder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/StringBuffer-class.html">StringBuffer</a></span> <span class="parameter-name">builder</span>, </span><span class="parameter" id="param-model"><span class="type-annotation"><a href="../util_tracer/TraceModel-class.html">TraceModel</a></span> <span class="parameter-name">model</span></span>)</span></span>
     </span>
     
 
@@ -1471,13 +1677,20 @@ to read values from a source and set the result in the target object
       <li><a href="../databinding_widgets_material_switch/">databinding/widgets/material/switch</a></li>
       <li><a href="../databinding_widgets_material_text/">databinding/widgets/material/text</a></li>
       <li><a href="../databinding_widgets_text/">databinding/widgets/text</a></li>
+      <li><a href="../i18n_formatter_date_formatter/">i18n/formatter/date_formatter</a></li>
+      <li><a href="../i18n_formatter_number_formatter/">i18n/formatter/number_formatter</a></li>
       <li><a href="../i18n_i18n/">i18n/i18n</a></li>
+      <li><a href="../i18n_interpolator/">i18n/interpolator</a></li>
+      <li><a href="../i18n_loader_asset_loader/">i18n/loader/asset_loader</a></li>
+      <li><a href="../i18n_locale/">i18n/locale</a></li>
+      <li><a href="../i18n_translator/">i18n/translator</a></li>
       <li><a href="../mapper_json/">mapper/json</a></li>
       <li><a href="../mapper_mapper/">mapper/mapper</a></li>
       <li><a href="../mapper_operation_builder/">mapper/operation_builder</a></li>
       <li><a href="../mapper_transformer/">mapper/transformer</a></li>
       <li><a href="../reflectable_reflectable/">reflectable/reflectable</a></li>
       <li><a href="../util_collections/">util/collections</a></li>
+      <li><a href="../util_tracer/">util/tracer</a></li>
       <li><a href="../validation_validation/">validation/validation</a></li>
       <li><a href="../velix/">velix</a></li>
 </ol>
@@ -1490,7 +1703,7 @@ to read values from a source and set the result in the target object
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

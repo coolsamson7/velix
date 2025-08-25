@@ -68,11 +68,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static DoubleType fromString(String input) {
-  var result = DoubleType();
-
-  result.parse(methods, input);
-
-  return result;
+  return DoubleType().constraint(input);
 }</code></pre>
 </section>
 
@@ -101,7 +97,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

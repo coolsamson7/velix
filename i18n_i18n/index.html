@@ -64,37 +64,36 @@
     <section class="summary offset-anchor" id="classes">
       <h2>Classes</h2>
       <dl>
-          <dt id="NoTranslator">
-  <span class="name "><a href="../i18n_i18n/NoTranslator-class.html">NoTranslator</a></span> 
+          <dt id="Formatter">
+  <span class="name "><a href="../i18n_i18n/Formatter-class.html">Formatter</a></span> 
 
 </dt>
 <dd>
-  @internal
+  
 </dd>
 
-          <dt id="TranslationManager">
-  <span class="name "><a href="../i18n_i18n/TranslationManager-class.html">TranslationManager</a></span> 
+          <dt id="I18N">
+  <span class="name "><a href="../i18n_i18n/I18N-class.html">I18N</a></span> 
 
 </dt>
 <dd>
-  Registry for all <a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a>s
+  I18n Core
 </dd>
 
-          <dt id="TranslationProvider">
-  <span class="name "><a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+          <dt id="I18nDelegate">
+  <span class="name "><a href="../i18n_i18n/I18nDelegate-class.html">I18nDelegate</a></span> 
 
 </dt>
 <dd>
-  A <a href="../i18n_i18n/TranslationProvider-class.html">TranslationProvider</a> is able to translate a specific object type
-<code>T</code> the object type
+  
 </dd>
 
-          <dt id="Translator">
-  <span class="name "><a href="../i18n_i18n/Translator-class.html">Translator</a></span> 
+          <dt id="TranslationLoader">
+  <span class="name "><a href="../i18n_i18n/TranslationLoader-class.html">TranslationLoader</a></span> 
 
 </dt>
 <dd>
-  a simple abstract class to have a common interface for i18n requests.
+  A <code>TranslationLoader</code> loads translations.
 </dd>
 
       </dl>
@@ -103,20 +102,17 @@
 
 
 
-
-    <section class="summary offset-anchor" id="constants">
-      <h2>Constants</h2>
-      <dl class="properties">
-          <dt id="noTranslator" class="constant">
-    <span class="name "><a href="../i18n_i18n/noTranslator-constant.html">noTranslator</a></span>
-  <span class="signature">&#8594; const <a href="../i18n_i18n/Translator-class.html">Translator</a></span>
+    <section class="summary offset-anchor" id="extensions">
+      <h2>Extensions</h2>
+      <dl>
+          <dt id="I18nStringExtension">
+  <span class="name "><a href="../i18n_i18n/I18nStringExtension.html">I18nStringExtension</a></span>
+  on <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>
   
 
 </dt>
 <dd>
   
-  
-
 </dd>
 
       </dl>
@@ -124,6 +120,40 @@
 
 
 
+
+    <section class="summary offset-anchor" id="typedefs">
+      <h2>Typedefs</h2>
+      <dl>
+          
+  <dt id="I18NFunction" class="callable">
+    <span class="name"><a href="../i18n_i18n/I18NFunction.html">I18NFunction</a></span><span class="signature">
+      <span class="returntype parameter">= <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a> Function<span class="signature">(<span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">args</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+          
+  <dt id="MissingKeyHandler" class="callable">
+    <span class="name"><a href="../i18n_i18n/MissingKeyHandler.html">MissingKeyHandler</a></span><span class="signature">
+      <span class="returntype parameter">= <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a> Function<span class="signature">(<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    
+    
+
+  </dd>
+
+      </dl>
+    </section>
 
   </div> <!-- /.main-content -->
   <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
@@ -162,13 +192,20 @@
       <li><a href="../databinding_widgets_material_switch/">databinding/widgets/material/switch</a></li>
       <li><a href="../databinding_widgets_material_text/">databinding/widgets/material/text</a></li>
       <li><a href="../databinding_widgets_text/">databinding/widgets/text</a></li>
+      <li><a href="../i18n_formatter_date_formatter/">i18n/formatter/date_formatter</a></li>
+      <li><a href="../i18n_formatter_number_formatter/">i18n/formatter/number_formatter</a></li>
       <li><a href="../i18n_i18n/">i18n/i18n</a></li>
+      <li><a href="../i18n_interpolator/">i18n/interpolator</a></li>
+      <li><a href="../i18n_loader_asset_loader/">i18n/loader/asset_loader</a></li>
+      <li><a href="../i18n_locale/">i18n/locale</a></li>
+      <li><a href="../i18n_translator/">i18n/translator</a></li>
       <li><a href="../mapper_json/">mapper/json</a></li>
       <li><a href="../mapper_mapper/">mapper/mapper</a></li>
       <li><a href="../mapper_operation_builder/">mapper/operation_builder</a></li>
       <li><a href="../mapper_transformer/">mapper/transformer</a></li>
       <li><a href="../reflectable_reflectable/">reflectable/reflectable</a></li>
       <li><a href="../util_collections/">util/collections</a></li>
+      <li><a href="../util_tracer/">util/tracer</a></li>
       <li><a href="../validation_validation/">validation/validation</a></li>
       <li><a href="../velix/">velix</a></li>
 </ol>
@@ -181,7 +218,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

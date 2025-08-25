@@ -53,7 +53,7 @@
 </h1></div>
     <section class="multi-line-signature">
         <span class="name ">MethodApplier</span>&lt;<wbr><span class="type-parameter">T</span>&gt; =
-     <span class="returntype">void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>, </span><span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span>)</span></span>
+     <span class="returntype">void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a><span class="signature">&lt;<wbr><span class="type-parameter">dynamic</span>, <span class="type-parameter"><a href="../validation_validation/AbstractType-class.html">AbstractType</a></span>&gt;</span></span>&gt;</span></span>, </span><span class="parameter" id="param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span>)</span></span>
 
     </section>
 
@@ -65,7 +65,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">typedef MethodApplier&lt;T&gt; = void Function(AbstractType&lt;T&gt;, List&lt;dynamic&gt; args);</code></pre>
+  <pre class="language-dart"><code class="language-dart">typedef MethodApplier&lt;T&gt; = void Function(AbstractType&lt;T, AbstractType&gt;, List&lt;dynamic&gt; args);</code></pre>
 </section>
 
   </div> <!-- /.main-content -->
@@ -91,7 +91,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.16.1
+      0.17.0
   </span>
   
 </footer>

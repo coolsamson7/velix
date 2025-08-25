@@ -3,8 +3,8 @@
     "string": {
       "type": "Zeichenkette erwartet",
       "minLength": "muss mindestens {minLength} Zeichen haben",
-      "maxLength": "muss maximal {maxLength} Zeichen haben",
-      "length": "muss maximal {length} Zeichen haben",
+      "maxLength": "darf maximal {maxLength} Zeichen haben",
+      "length": "darf maximal {length} Zeichen haben",
       "re": "muss dem Ausdruck {re} entsprechen",
       "nonEmpty": "darf nicht leer sein"
     },

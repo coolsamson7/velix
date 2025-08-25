@@ -65,7 +65,7 @@
 - performance optimization mapper ( factor 4! )
 - example app is a bit prettier
 
-## 0.17
+## 0.17.0
 
 - added LRUCache
 - added Tracer

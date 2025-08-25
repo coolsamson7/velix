@@ -66,8 +66,8 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => ImmutableProduct(name: name, price: price, status: status),
-    fromMapConstructor: (Map<String,dynamic> args) => ImmutableProduct(name: args['name'] as String ?? '', price: args['price'] as Money, status: args['status'] as Status),
-    fromArrayConstructor: (List<dynamic> args) => ImmutableProduct(name: args[0] as String ?? '', price: args[1] as Money, status: args[2] as Status),
+    fromMapConstructor: (Map<String,dynamic> args) => ImmutableProduct(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
+    fromArrayConstructor: (List<dynamic> args) => ImmutableProduct(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<ImmutableProduct,String>('name',
         getter: (obj) => (obj as ImmutableProduct).name,
@@ -104,8 +104,8 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
-    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String ?? '', price: args['price'] as Money, status: args['status'] as Status),
-    fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String ?? '', price: args[1] as Money, status: args[2] as Status),
+    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
+    fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<Product,String>('name',
         getter: (obj) => (obj as Product).name,
@@ -148,8 +148,8 @@ void registerAllDescriptors() {
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
-    fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
-    fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
+    fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String? ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
+    fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String? ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
     fields: [
       field<Mutable,String>('id',
         type: StringType().maxLength(7),
@@ -195,8 +195,8 @@ void registerAllDescriptors() {
       param<int>('number', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', int number = 0}) => Derived(name, number: number),
-    fromMapConstructor: (Map<String,dynamic> args) => Derived(args['name'] as String, number: args['number'] as int ?? 0),
-    fromArrayConstructor: (List<dynamic> args) => Derived(args[0] as String, number: args[1] as int ?? 0),
+    fromMapConstructor: (Map<String,dynamic> args) => Derived(args['name'] as String, number: args['number'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => Derived(args[0] as String, number: args[1] as int? ?? 0),
     fields: [
       field<Derived,int>('number',
         getter: (obj) => (obj as Derived).number,
@@ -213,8 +213,8 @@ void registerAllDescriptors() {
       param<String>('string_var', isNamed: true, isRequired: true)
     ],
     constructor: ({int int_var = 0, double double_var = 0.0, bool bool_var = false, String string_var = ''}) => Types(int_var: int_var, double_var: double_var, bool_var: bool_var, string_var: string_var),
-    fromMapConstructor: (Map<String,dynamic> args) => Types(int_var: args['int_var'] as int ?? 0, double_var: args['double_var'] as double ?? 0.0, bool_var: args['bool_var'] as bool ?? false, string_var: args['string_var'] as String ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => Types(int_var: args[0] as int ?? 0, double_var: args[1] as double ?? 0.0, bool_var: args[2] as bool ?? false, string_var: args[3] as String ?? ''),
+    fromMapConstructor: (Map<String,dynamic> args) => Types(int_var: args['int_var'] as int? ?? 0, double_var: args['double_var'] as double? ?? 0.0, bool_var: args['bool_var'] as bool? ?? false, string_var: args['string_var'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => Types(int_var: args[0] as int? ?? 0, double_var: args[1] as double? ?? 0.0, bool_var: args[2] as bool? ?? false, string_var: args[3] as String? ?? ''),
     fields: [
       field<Types,int>('int_var',
         getter: (obj) => (obj as Types).int_var,
@@ -260,8 +260,8 @@ void registerAllDescriptors() {
       param<int>('priceValue', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', String priceCurrency = '', int priceValue = 0}) => Flat(id: id, priceCurrency: priceCurrency, priceValue: priceValue),
-    fromMapConstructor: (Map<String,dynamic> args) => Flat(id: args['id'] as String ?? '', priceCurrency: args['priceCurrency'] as String ?? '', priceValue: args['priceValue'] as int ?? 0),
-    fromArrayConstructor: (List<dynamic> args) => Flat(id: args[0] as String ?? '', priceCurrency: args[1] as String ?? '', priceValue: args[2] as int ?? 0),
+    fromMapConstructor: (Map<String,dynamic> args) => Flat(id: args['id'] as String? ?? '', priceCurrency: args['priceCurrency'] as String? ?? '', priceValue: args['priceValue'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => Flat(id: args[0] as String? ?? '', priceCurrency: args[1] as String? ?? '', priceValue: args[2] as int? ?? 0),
     fields: [
       field<Flat,String>('id',
         type: StringType().maxLength(7),
@@ -283,8 +283,8 @@ void registerAllDescriptors() {
       param<Money>('price', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price}) => Immutable(id: id, price: price),
-    fromMapConstructor: (Map<String,dynamic> args) => Immutable(id: args['id'] as String ?? '', price: args['price'] as Money),
-    fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String ?? '', price: args[1] as Money),
+    fromMapConstructor: (Map<String,dynamic> args) => Immutable(id: args['id'] as String? ?? '', price: args['price'] as Money),
+    fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String? ?? '', price: args[1] as Money),
     fields: [
       field<Immutable,String>('id',
         type: StringType().maxLength(7),

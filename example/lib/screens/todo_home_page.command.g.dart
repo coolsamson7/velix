@@ -25,9 +25,13 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
       i18n: 'example:main.removeTodo',
       icon: CupertinoIcons.delete,
     );
-    addCommand("toggleTodo", _toggleTodo, i18n: 'main.toggleTodo');
-
-    addCommand("switchLocale", _switchLocale, i18n: 'main.switchLocale', icon: CupertinoIcons.globe);
+    addCommand("toggleTodo", _toggleTodo, i18n: 'example:main.toggleTodo');
+    addCommand(
+      "switchLocale",
+      _switchLocale,
+      i18n: 'example:main.switchLocale',
+      icon: CupertinoIcons.globe,
+    );
   }
 
   // command declarations
@@ -49,5 +53,9 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
 
   void toggleTodo(String id) {
     execute("toggleTodo", []);
+  }
+
+  void switchLocale() {
+    execute("switchLocale", []);
   }
 }

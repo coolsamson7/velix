@@ -469,9 +469,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
           if (defaultValue != "NULL") {
             if ( defaultValue == "null")
-              write(" ?? null");
+              write("? ?? null");
             else
-              write(" ?? $defaultValue");
+              write("? ?? $defaultValue");
           }
         }
 
@@ -490,10 +490,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     // write constructor function
 
     if (firstCtor == null) {
-      tab().writeln("//fromArrayConstructor: () => throw UnsupportedError('No public constructor'),");
+      tab().writeln("fromArrayConstructor: () => throw UnsupportedError('No public constructor'),");
     }
     else {
-      tab().write("//fromArrayConstructor: (List<dynamic> args) => ${element.name}(");
+      tab().write("fromArrayConstructor: (List<dynamic> args) => ${element.name}(");
 
       bool first = true;
       int index = 0;
@@ -541,9 +541,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
             ;//write("required $paramType $paramName, ");
           else {
             if ( defaultValue == "null")
-              write(" ?? null");
+              write("? ?? null");
             else
-              write(" ?? $defaultValue");
+              write("? ?? $defaultValue");
           }
         }
 

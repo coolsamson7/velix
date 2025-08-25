@@ -28,9 +28,7 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
     var typeProperty = mapper.computeProperty(mapper.type, path);
     WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
 
-    var displayValue, parseValue, validate, textInputType, inputFormatters;
-
-    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
+    var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
 
     bool blurred = false;
     SmartFormState? form;

@@ -1,16 +1,17 @@
-
-import 'dart:ui';
-
 import 'package:intl/intl.dart';
 
 import '../i18n.dart';
 
 class NumberFormatter extends Formatter {
+  // constructor
+
+  NumberFormatter() : super("number");
+
   // override
 
   @override
   I18NFunction create(String variable, Map<String, dynamic> formatterArgs) {
-    NumberFormat format = NumberFormat.decimalPattern(locale(formatterArgs));
+    NumberFormat format = NumberFormat.decimalPattern(Formatter.locale(formatterArgs));
 
     if (formatterArgs["maximumFractionDigits"] != null)
       format.maximumFractionDigits = formatterArgs["maximumFractionDigits"];
@@ -23,12 +24,16 @@ class NumberFormatter extends Formatter {
 }
 
 class CurrencyFormatter extends Formatter {
+  // constructor
+
+  CurrencyFormatter() : super("currency");
+
   // override
 
   @override
   I18NFunction create(String variable, Map<String, dynamic> formatterArgs) {
     var format = NumberFormat.currency(
-      locale: locale(formatterArgs),
+      locale: Formatter.locale(formatterArgs),
         name: formatterArgs["name"],
         decimalDigits: formatterArgs["decimalDigits"]
     );

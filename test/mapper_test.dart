@@ -157,7 +157,7 @@ void main() {
       //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
 
-    test('map immutable root', () {
+    test('benchmark', () {
       var mapper = Mapper([
         mapping<Money, Money>()
             //.map(from: "currency", to: "currency"),

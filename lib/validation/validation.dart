@@ -11,10 +11,11 @@ class Test<T> {
   bool stop;
   final Map<String, dynamic> params;
   final Check<T> check;
+  final String? message;
 
   // constructor
 
-  Test({required this.type, required this.name, required this.check,this.params = const <String, dynamic>{}, this.stop = false});
+  Test({required this.type, required this.name, required this.check,this.params = const <String, dynamic>{}, this.stop = false, this.message});
 
   // public
 
@@ -163,7 +164,7 @@ class AbstractType<T, B extends AbstractType<T, B>> {
           params: test.params,
           path: context.path,
           value: object,
-          message: ""//test.message
+          message: test.message ?? ""
         );
 
         if ( test.stop) {
@@ -173,13 +174,14 @@ class AbstractType<T, B extends AbstractType<T, B>> {
     }
   }
 
-  B test<S>({required Type type, required String name, required Check<S> check, params = const <String, dynamic>{}, stop = false}) {
+  B test<S>({required Type type, required String name, required Check<S> check, params = const <String, dynamic>{}, stop = false, String? message}) {
     tests.add(Test<S>(
         type: type,
         name: name,
         params: params,
         check: check,
-        stop: stop
+        stop: stop,
+        message: message
     ));
 
     return this as B;
@@ -633,12 +635,13 @@ class StringType extends AbstractType<String, StringType> {
 
   /// requires the value to match a regular expression
   /// [re] the regular expression
-  StringType re(String re) {
+  StringType re(String re, {String? message}) {
     var reExpr = RegExp(re);
     test<String>(
       type: String,
       name: "re",
       check: (s) => reExpr.hasMatch(s),
+      message: message
     );
 
     return this;
@@ -853,9 +856,11 @@ class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation
   // override
 
   @override
-  String translate(instance) { // TODO
-    return Translator.tr("velix:validation.${instance.type.toString().toLowerCase()}.${instance.name}", args: instance.params.map(
-          (key, value) => MapEntry(key, value.toString()),
+  String translate(instance) {
+    return instance.message.isNotEmpty ?
+        instance.message :
+        Translator.tr("velix:validation.${instance.type.toString().toLowerCase()}.${instance.name}",
+            args: instance.params.map((key, value) => MapEntry(key, value.toString()),
     ));
   }
 }

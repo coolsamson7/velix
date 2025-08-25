@@ -86,12 +86,11 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  //await EasyLocalization.ensureInitialized();
-
   Tracer.enabled = true;
   Tracer(
-      trace: ConsoleTrace("%d [%l] %p: %m [%f]"), // d(ate), l(evel), p(ath), m(message)
+      trace: ConsoleTrace("%d [%l] %p: %m [%f]"), // d(ate), l(evel), p(ath), m(message), f(ile)
       paths: {
+        "": TraceLevel.off,
         "i18n": TraceLevel.full
       });
 
@@ -111,14 +110,6 @@ void main() async {
   // load namespaces
 
   runApp(
-    /*EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('de')],
-      path: '.', // folder path!
-      assetLoader: MultiAssetLoader(paths: [
-        "assets/locales/example",
-        "packages/velix/assets/locales/velix",
-      ]),
-      fallbackLocale: const Locale('en'),*/
     ChangeNotifierProvider.value(
       value: localeManager,
       child: TODOApp(i18n: i18n),

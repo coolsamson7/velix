@@ -10,12 +10,14 @@ abstract class Translator {
   /// [key] the key
   /// [args] and named arguments
   static String tr(String key, {Map<String, String> args = const {}}) {
-    return instance.translate(key,  args:   args);
+    return instance.translate(key,  args: args);
   }
 
   // constructor
 
   const Translator();
+
+  // public
 
   String translate(String key, {Map<String, String> args = const {}});
 }

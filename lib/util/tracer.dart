@@ -157,7 +157,7 @@ class ConsoleTrace extends TraceSink {
 }
 
 class Tracer {
-  static bool enabled = true;
+  static bool enabled = false;
   static Tracer? _instance;
 
   final Map<String, TraceLevel> _traceLevels = {};
@@ -171,7 +171,7 @@ class Tracer {
     paths?.forEach(setTraceLevel);
   }
 
-  factory Tracer({TraceSink? trace, bool isEnabled = true, Map<String, TraceLevel>? paths}) =>
+  factory Tracer({TraceSink? trace, bool isEnabled = false, Map<String, TraceLevel>? paths}) =>
       _instance ??= Tracer._internal(trace: trace, isEnabled: isEnabled, paths: paths);
 
   static Tracer get instance => _instance ??= Tracer();

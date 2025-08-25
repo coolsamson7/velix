@@ -23,7 +23,11 @@ class Interpolator {
 
   // constructor
 
-  Interpolator({int cacheSize = 50}) : _cache = LruCache<String, I18NFunction>(cacheSize);
+  Interpolator({int cacheSize = 50, List<Formatter>? formatters}) : _cache = LruCache<String, I18NFunction>(cacheSize) {
+    if ( formatters != null)
+      for ( var formatter in formatters)
+        _formatter[formatter.name] = formatter;
+  }
 
   // internal
 

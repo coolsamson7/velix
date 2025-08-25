@@ -467,9 +467,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
             }
           }
 
-          if (defaultValue == "NULL")
-            ;//write("required $paramType $paramName, ");
-          else {
+          if (defaultValue != "NULL") {
             if ( defaultValue == "null")
               write(" ?? null");
             else

@@ -9,7 +9,9 @@ typedef I18NFunction = String Function(Map<String, dynamic> args);
 
 
 abstract class Formatter {
-  String locale(Map<String, dynamic> args) {
+  // static
+
+  static String locale(Map<String, dynamic> args) {
     var locale = args["locale"];
     if ( locale is String)
       return locale;
@@ -19,6 +21,14 @@ abstract class Formatter {
 
     else return Intl.defaultLocale ?? "en";
   }
+
+  // instance data
+
+  String name;
+
+  // constructor
+
+  Formatter(this.name);
 
   // abstract
 
@@ -62,9 +72,10 @@ class I18N {
     MissingKeyHandler? missingKeyHandler,
     this.preloadNamespaces,
     this.fallbackLocale,
+    List<Formatter>? formatters,
     int cacheSize = 50
   })
-      :_interpolator = Interpolator(cacheSize: cacheSize),
+      :_interpolator = Interpolator(cacheSize: cacheSize, formatters: formatters),
         _localeManager = localeManager,
         _loader = loader,
         _missingKeyHandler = missingKeyHandler {
@@ -79,22 +90,31 @@ class I18N {
 
   // internal
 
-  List<Locale> buildFallbackLocales(Locale locale, Locale? fallback) {
+  List<Locale> _buildFallbackLocales(Locale locale, Locale? fallback) {
     final fallbackLocales = <Locale>[];
 
+    maybeAdd(Locale locale)  {
+      if (fallbackLocales.contains(locale))
+        fallbackLocales.add(locale);
+    }
+
     // Start with exact locale, e.g. de_DE
+
     fallbackLocales.add(locale);
 
     // Then fallback to language only e.g. de
+
     if (locale.countryCode != null && locale.countryCode!.isNotEmpty) {
-      fallbackLocales.add(Locale(locale.languageCode));
+      maybeAdd(Locale(locale.languageCode));
     }
 
+    // add explicit fallbacks
+
     if ( fallback != null) {
-      fallbackLocales.add(fallback);
+      maybeAdd(fallback);
 
       if (fallback.countryCode != null && fallback.countryCode!.isNotEmpty) {
-        fallbackLocales.add(Locale(fallback.languageCode));
+        maybeAdd(Locale(fallback.languageCode));
       }
     }
 
@@ -117,7 +137,7 @@ class I18N {
     return current is T ? current : defaultValue;
   }
 
-  (String namespace, String path) extractNamespace(String key) {
+  (String namespace, String path) _extractNamespace(String key) {
     final colonIndex = key.indexOf(':');
 
     if (colonIndex > 0) {
@@ -136,7 +156,7 @@ class I18N {
   }
 
   Future<void> _reloadTranslations() async {
-    locales = buildFallbackLocales(locale, fallbackLocale);
+    locales = _buildFallbackLocales(locale, fallbackLocale);
     final futures = _namespaces.keys.map((ns) => _loadTranslations(ns, locales).catchError((e) { /* TODO */}));
 
     await Future.wait(futures);
@@ -167,7 +187,7 @@ class I18N {
   }
 
   String translate(String key, {Map<String, dynamic>? args}) {
-    var (namespace, path) = extractNamespace(key);
+    var (namespace, path) = _extractNamespace(key);
 
     if (!isLoaded(namespace)) {
       _loadTranslations(namespace, locales);
@@ -183,9 +203,8 @@ class I18N {
       return _missingKeyHandler!(key);
   }
 
-  Future<String> translateAsync(String key,
-      {Map<String, dynamic>? args}) async {
-    var (namespace, path) = extractNamespace(key);
+  Future<String> translateAsync(String key, {Map<String, dynamic>? args}) async {
+    var (namespace, path) = _extractNamespace(key);
 
     if (!isLoaded(namespace)) {
       await _loadTranslations(namespace, locales);

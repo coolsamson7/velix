@@ -33,8 +33,8 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
-    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String ?? '', value: args['value'] as int ?? 0),
-    fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String ?? '', value: args[1] as int ?? 0),
+    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
         type: StringType().maxLength(7),

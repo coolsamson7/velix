@@ -18,7 +18,7 @@ void registerAllDescriptors() {
       field<Collections,List<Money>>('prices',
         elementType: Money,
         factoryConstructor: () => <Money>[],
-        getter: (obj) => (obj as Collections).prices,
+        getter: (obj) => obj.prices,
       )
     ]
   );
@@ -34,21 +34,21 @@ void registerAllDescriptors() {
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
     fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
-    fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0], value: args[1]),
     fields: [
       field<Money,String>('currency',
         type: StringType().maxLength(7),
         annotations: [
           Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
         ],
-        getter: (obj) => (obj as Money).currency,
+        getter: (obj) => obj.currency,
       ), 
       field<Money,int>('value',
         type: IntType().greaterThan(0),
         annotations: [
           Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
         ],
-        getter: (obj) => (obj as Money).value,
+        getter: (obj) => obj.value,
       )
     ]
   );
@@ -70,13 +70,13 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => ImmutableProduct(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<ImmutableProduct,String>('name',
-        getter: (obj) => (obj as ImmutableProduct).name,
+        getter: (obj) => obj.name,
       ), 
       field<ImmutableProduct,Money>('price',
-        getter: (obj) => (obj as ImmutableProduct).price,
+        getter: (obj) => obj.price,
       ), 
       field<ImmutableProduct,Status>('status',
-        getter: (obj) => (obj as ImmutableProduct).status,
+        getter: (obj) => obj.status,
       )
     ]
   );
@@ -91,7 +91,7 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => ImmutableRoot(product: args[0] as ImmutableProduct),
     fields: [
       field<ImmutableRoot,ImmutableProduct>('product',
-        getter: (obj) => (obj as ImmutableRoot).product,
+        getter: (obj) => obj.product,
       )
     ]
   );
@@ -105,18 +105,18 @@ void registerAllDescriptors() {
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
     fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
-    fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
+    fromArrayConstructor: (List<dynamic> args) => Product(name: args[0], price: args[1], status: args[2]),
     fields: [
       field<Product,String>('name',
-        getter: (obj) => (obj as Product).name,
+        getter: (obj) => obj.name,
         setter: (obj, value) => (obj as Product).name = value,
       ), 
       field<Product,Money>('price',
-        getter: (obj) => (obj as Product).price,
+        getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Product).price = value,
       ), 
       field<Product,Status>('status',
-        getter: (obj) => (obj as Product).status,
+        getter: (obj) => obj.status,
         setter: (obj, value) => (obj as Product).status = value,
       )
     ]
@@ -132,7 +132,7 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => MutableRoot(product: args[0] as Product),
     fields: [
       field<MutableRoot,Product>('product',
-        getter: (obj) => (obj as MutableRoot).product,
+        getter: (obj) => obj.product,
       )
     ]
   );
@@ -153,11 +153,11 @@ void registerAllDescriptors() {
     fields: [
       field<Mutable,String>('id',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as Mutable).id,
+        getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Mutable).id = value,
       ), 
       field<Mutable,Money>('price',
-        getter: (obj) => (obj as Mutable).price,
+        getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Mutable).price = value,
       ), 
       field<Mutable,DateTime>('dateTime',
@@ -165,7 +165,7 @@ void registerAllDescriptors() {
         annotations: [
           Json(name: "date-time")
         ],
-        getter: (obj) => (obj as Mutable).dateTime,
+        getter: (obj) => obj.dateTime,
         setter: (obj, value) => (obj as Mutable).dateTime = value,
         isNullable: true
       )
@@ -182,7 +182,7 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => Base(args[0] as String),
     fields: [
       field<Base,String>('name',
-        getter: (obj) => (obj as Base).name,
+        getter: (obj) => obj.name,
       )
     ]
   );
@@ -199,7 +199,7 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => Derived(args[0] as String, number: args[1] as int? ?? 0),
     fields: [
       field<Derived,int>('number',
-        getter: (obj) => (obj as Derived).number,
+        getter: (obj) => obj.number,
       )
     ]
   );
@@ -217,16 +217,16 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => Types(int_var: args[0] as int? ?? 0, double_var: args[1] as double? ?? 0.0, bool_var: args[2] as bool? ?? false, string_var: args[3] as String? ?? ''),
     fields: [
       field<Types,int>('int_var',
-        getter: (obj) => (obj as Types).int_var,
+        getter: (obj) => obj.int_var,
       ), 
       field<Types,double>('double_var',
-        getter: (obj) => (obj as Types).double_var,
+        getter: (obj) => obj.double_var,
       ), 
       field<Types,bool>('bool_var',
-        getter: (obj) => (obj as Types).bool_var,
+        getter: (obj) => obj.bool_var,
       ), 
       field<Types,String>('string_var',
-        getter: (obj) => (obj as Types).string_var,
+        getter: (obj) => obj.string_var,
       )
     ]
   );
@@ -239,15 +239,15 @@ void registerAllDescriptors() {
     ],
     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
     fromMapConstructor: (Map<String,dynamic> args) => Invoice(products: args['products'] as List<Product>, date: args['date'] as DateTime),
-    fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
+    fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0], date: args[1]),
     fields: [
       field<Invoice,DateTime>('date',
-        getter: (obj) => (obj as Invoice).date,
+        getter: (obj) => obj.date,
       ), 
       field<Invoice,List<Product>>('products',
         elementType: Product,
         factoryConstructor: () => <Product>[],
-        getter: (obj) => (obj as Invoice).products,
+        getter: (obj) => obj.products,
       )
     ]
   );
@@ -265,13 +265,13 @@ void registerAllDescriptors() {
     fields: [
       field<Flat,String>('id',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as Flat).id,
+        getter: (obj) => obj.id,
       ), 
       field<Flat,String>('priceCurrency',
-        getter: (obj) => (obj as Flat).priceCurrency,
+        getter: (obj) => obj.priceCurrency,
       ), 
       field<Flat,int>('priceValue',
-        getter: (obj) => (obj as Flat).priceValue,
+        getter: (obj) => obj.priceValue,
       )
     ]
   );
@@ -288,10 +288,10 @@ void registerAllDescriptors() {
     fields: [
       field<Immutable,String>('id',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as Immutable).id,
+        getter: (obj) => obj.id,
       ), 
       field<Immutable,Money>('price',
-        getter: (obj) => (obj as Immutable).price,
+        getter: (obj) => obj.price,
       )
     ]
   );

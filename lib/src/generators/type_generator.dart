@@ -383,7 +383,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       tab().writeln("factoryConstructor: () => <$elementTypeName>[],");
     }
 
-    tab().writeln("getter: (obj) => (obj as $className).$name,");
+    tab().writeln("getter: (obj) => obj.$name,"); // (obj as $className).$name
 
     if ( !isFinal) {
       tab().writeln("setter: (obj, value) => (obj as $className).$name = value,");

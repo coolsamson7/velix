@@ -18,14 +18,14 @@ void registerAllDescriptors() {
     fields: [
       field<Details,String>('author',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as Details).author,
+        getter: (obj) => obj.author,
       ), 
       field<Details,int>('priority',
         type: IntType().greaterThan(0),
-        getter: (obj) => (obj as Details).priority,
+        getter: (obj) => obj.priority,
       ), 
       field<Details,DateTime>('date',
-        getter: (obj) => (obj as Details).date,
+        getter: (obj) => obj.date,
       )
     ]
   );
@@ -44,20 +44,20 @@ void registerAllDescriptors() {
     fields: [
       field<Todo,String>('id',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as Todo).id,
+        getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Todo).id = value,
       ), 
       field<Todo,String>('title',
         type: StringType().maxLength(10),
-        getter: (obj) => (obj as Todo).title,
+        getter: (obj) => obj.title,
         setter: (obj, value) => (obj as Todo).title = value,
       ), 
       field<Todo,bool>('completed',
-        getter: (obj) => (obj as Todo).completed,
+        getter: (obj) => obj.completed,
         setter: (obj, value) => (obj as Todo).completed = value,
       ), 
       field<Todo,Details>('details',
-        getter: (obj) => (obj as Todo).details,
+        getter: (obj) => obj.details,
         setter: (obj, value) => (obj as Todo).details = value,
         isNullable: true
       )
@@ -79,25 +79,25 @@ void registerAllDescriptors() {
     fields: [
       field<TestData,String>('string_data',
         type: StringType().maxLength(7),
-        getter: (obj) => (obj as TestData).string_data,
+        getter: (obj) => obj.string_data,
         setter: (obj, value) => (obj as TestData).string_data = value,
       ), 
       field<TestData,int>('int_data',
         type: IntType().greaterThan(0),
-        getter: (obj) => (obj as TestData).int_data,
+        getter: (obj) => obj.int_data,
         setter: (obj, value) => (obj as TestData).int_data = value,
       ), 
       field<TestData,int>('slider_int_data',
         type: IntType().greaterThan(0),
-        getter: (obj) => (obj as TestData).slider_int_data,
+        getter: (obj) => obj.slider_int_data,
         setter: (obj, value) => (obj as TestData).slider_int_data = value,
       ), 
       field<TestData,bool>('bool_data',
-        getter: (obj) => (obj as TestData).bool_data,
+        getter: (obj) => obj.bool_data,
         setter: (obj, value) => (obj as TestData).bool_data = value,
       ), 
       field<TestData,DateTime>('datetime_data',
-        getter: (obj) => (obj as TestData).datetime_data,
+        getter: (obj) => obj.datetime_data,
       )
     ]
   );

@@ -22,7 +22,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
     final DateTime minDate = args['firstDate'] ?? DateTime(1900);
     final DateTime maxDate = args['lastDate'] ?? DateTime(2100);
 
-    return FormField<DateTime>(
+    var result = FormField<DateTime>(
       key: ValueKey(path),
       initialValue: initialValue,
       validator: (date) {
@@ -91,6 +91,14 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
         // if you need to save
       },
     );
+
+    // new mapping
+
+    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this);
+
+    // done
+
+    return result;
   }
 
   @override

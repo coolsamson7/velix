@@ -327,6 +327,10 @@ class FormMapper {
     return ValuedWidget.build(name, context: context, mapper: this, path: path, args: args ?? Keywords.empty);
   }
 
+  T getValue<T>(TypeProperty property) {
+    return property.get(instance, ValuedWidgetContext(mapper: this));
+  }
+
   /// return [True] if the form is valid.
   bool validate() {
     return _formKey.currentState?.validate() ?? false;
@@ -404,15 +408,15 @@ class FormMapper {
       (operation.target as WidgetProperty).dispose();
   }
 
-  void map({required TypeProperty typeProperty, required String path, required Widget widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, DisplayValue<dynamic,dynamic> parseValue=identity}) {
-    var operation = findOperation(path);
+  void map({required TypeProperty property, required Widget widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, DisplayValue<dynamic,dynamic> parseValue=identity}) {
+    var operation = findOperation(property.path);
     if (operation == null) {
       operations.add(Operation(
-          typeProperty,
+          property,
           WidgetProperty(widget: widget, adapter: adapter, displayValue: displayValue, parseValue: parseValue)
       ));
 
-      path2Operation[path] = operations.last;
+      path2Operation[property.path] = operations.last;
     }
     else {
       // just replace
@@ -430,13 +434,19 @@ class FormMapper {
     return findOperation(path)!.source as TypeProperty;
   }
 
-  void notifyChange({required String path, required dynamic value}) {
-    var property = findProperty(path);
+  WidgetProperty? findWidget(String path) {
+    var operation = findOperation(path);
+    if ( operation != null)
+      return operation.target as WidgetProperty;
 
+    return null;
+  }
+
+  void notifyChange({required TypeProperty property, required dynamic value}) {
     changes += 1;
 
     if ( emitOnChange )
-      eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));
+      eventStream.add(FormEvent(isDirty: isDirty, path: property.path, value: value));
 
     property.set(instance, value, ValuedWidgetContext(mapper: this));
   }

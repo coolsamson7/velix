@@ -14,21 +14,17 @@ class SwitchAdapter extends AbstractValuedWidgetAdapter<Switch> {
   // override
 
   @override
-  Switch build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-
-    var initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
-
+  Switch build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     Switch widget = Switch(
-      value: initialValue,
+      value: mapper.getValue(property),
       onChanged: (bool newValue) {
         (context as Element).markNeedsBuild();
 
-        mapper.notifyChange(path: path, value: newValue);
+        mapper.notifyChange(property: property, value: newValue);
       },
     );
 
-    mapper.map(typeProperty: typeProperty, path: path, widget: widget, adapter: this);
+    mapper.map(property: property, widget: widget, adapter: this);
 
     return widget;
   }

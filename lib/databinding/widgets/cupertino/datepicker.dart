@@ -13,22 +13,20 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
   FormField<DateTime> build({
     required BuildContext context,
     required FormMapper mapper,
-    required String path,
+    required TypeProperty property,
     required Keywords args}) {
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-
-    DateTime? initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
+    DateTime? initialValue = mapper.getValue(property);
 
     final DateFormat dateFormat = args['dateFormat'] ?? DateFormat.yMd();
     final DateTime minDate = args['firstDate'] ?? DateTime(1900);
     final DateTime maxDate = args['lastDate'] ?? DateTime(2100);
 
     var result = FormField<DateTime>(
-      key: ValueKey(path),
+      key: ValueKey(property.path),
       initialValue: initialValue,
       validator: (date) {
         try {
-          typeProperty.validate(date);
+          property.validate(date);
           return null;
         }
         catch (e) {
@@ -52,7 +50,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
                 initialDateTime: state.value ?? DateTime.now(),
                 onDateTimeChanged: (DateTime newDate) {
                   state.didChange(newDate);
-                  mapper.notifyChange(path: path, value: newDate);
+                  mapper.notifyChange(property: property, value: newDate);
                 },
               ),
             ),
@@ -96,7 +94,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
 
     // new mapping
 
-    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this);
+    mapper.map(property: property, widget: result, adapter: this);
 
     // done
 

@@ -22,9 +22,8 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
   }
 
   @override
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
+  Widget build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
+    WidgetProperty? widgetProperty = mapper.findWidget(property.path);
 
     DisplayValue<dynamic,dynamic> displayValue;
     ParseValue<dynamic, dynamic> parseValue;
@@ -32,7 +31,7 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
     TextInputType textInputType;
     List<TextInputFormatter> inputFormatters;
 
-    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
+    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(property);
 
     TextEditingController? controller;
     FocusNode? focusNode;
@@ -46,12 +45,12 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
       focusNode = FocusNode();
 
       controller.addListener(() {
-        mapper.notifyChange(path: path, value: parseValue(controller!.text));
+        mapper.notifyChange(property: property, value: parseValue(controller!.text));
       });
     } // else
 
     TextFormField result = TextFormField(
-      key: ValueKey(path),
+      key: ValueKey(property.path),
       controller: controller,
       focusNode: focusNode,
       style: args.get<TextStyle>('style'),
@@ -60,10 +59,10 @@ class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
       inputFormatters: inputFormatters
     );
 
-    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
+    mapper.map(property: property, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
     if ( widgetProperty == null) {
-      widgetProperty = mapper.findOperation(path)?.target as WidgetProperty;
+      widgetProperty = mapper.findWidget(property.path)!;
 
       widgetProperty.args["controller"] = controller;
       widgetProperty.args["focusNode"] = focusNode;

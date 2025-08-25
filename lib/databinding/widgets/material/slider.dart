@@ -14,10 +14,8 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   // override
 
   @override
-  Slider build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-
-    var initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
+  Slider build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
+    var initialValue = mapper.getValue(property);
 
     Slider widget = Slider(
       value:  double.parse(initialValue.toString()),
@@ -27,11 +25,11 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
       onChanged: (newValue) {
         (context as Element).markNeedsBuild();
 
-        mapper.notifyChange(path: path, value: newValue.round());
+        mapper.notifyChange(property: property, value: newValue.round());
       },
     );
 
-    mapper.map(typeProperty: typeProperty, path: path, widget: widget, adapter: this);
+    mapper.map(property: property, widget: widget, adapter: this);
 
     return widget;
   }

@@ -75,9 +75,9 @@ abstract class ValuedWidgetAdapter<T> {
   /// build and bind the corresponding widget
   /// [context] a [FormMapper]
   /// [mapper] the [FormMapper]
-  /// [path] a field path
+  /// [property] a [TypeProperty]
   /// [args] and parameters that will be handled by the adapter
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args});
+  Widget build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args});
 }
 
 /// base class for widget adapters
@@ -150,6 +150,7 @@ class ValuedWidget {
   // public
 
   static Widget build<T>(String name, {required BuildContext context, required FormMapper mapper, required String path, Keywords? args}) {
-    return getAdapter(name).build(context: context, mapper: mapper, path: path, args: args ?? Keywords.empty);
+    var property = mapper.computeProperty(mapper.type, path);
+    return getAdapter(name).build(context: context, mapper: mapper, property: property, args: args ?? Keywords.empty);
   }
 }

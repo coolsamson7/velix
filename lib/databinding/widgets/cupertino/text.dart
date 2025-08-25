@@ -21,14 +21,13 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
   }
 
   @override
-  Widget build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
+  Widget build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     TextEditingController? controller;
     FocusNode? focusNode;
 
-    var typeProperty = mapper.computeProperty(mapper.type, path);
-    WidgetProperty? widgetProperty = mapper.findOperation(path)?.target as WidgetProperty?;
+    WidgetProperty? widgetProperty = mapper.findWidget(property.path);
 
-    var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
+    var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(property);
 
     bool blurred = false;
     SmartFormState? form;
@@ -37,9 +36,8 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
 
     void Function() getFocusListener(FocusNode focusNode) {
       return () {
-        if ( !focusNode.hasFocus && typeProperty.isDirty()) {
+        if ( !focusNode.hasFocus && property.isDirty()) {
           blurred = true;
-          print("$path trigger validation");
           form!.triggerValidation();
           //key.currentState?.validate();
         }
@@ -59,7 +57,7 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
       controller.addListener(() {
         try {
           var value = parseValue(controller!.text);
-          mapper.notifyChange(path: path, value: value);
+          mapper.notifyChange(property: property, value: value);
 
           if (form != null) {
             form!.triggerValidation();
@@ -79,14 +77,14 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
 
         // show only if for is submitted or the user has touched the field
 
-        final showError = hasSubmitted || (typeProperty.isDirty() && blurred);
+        final showError = hasSubmitted || (property.isDirty() && blurred);
 
         return showError ? error : null;
       };
     }
 
     CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
-          key: ValueKey(path), // key
+          key: ValueKey(property.path), // key
           controller: controller,
           focusNode: focusNode,
           prefix: args.get<String>('prefix') != null ? Text(args.get<String>('prefix')!) : null,
@@ -100,13 +98,15 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
 
     //key.currentState?.validate();
 
-    mapper.map(typeProperty: typeProperty, path: path, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
+    // new binding
+
+    mapper.map(property: property, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
     if ( widgetProperty == null) {
-      widgetProperty = mapper.findOperation(path)?.target as WidgetProperty;
+      widgetProperty = mapper.findWidget(property.path);
 
-      widgetProperty.args["controller"] = controller;
-      widgetProperty.args["focusNode"] = focusNode;
+      widgetProperty!.args["controller"] = controller;
+      widgetProperty!.args["focusNode"] = focusNode;
     }
 
     return Builder(

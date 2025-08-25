@@ -77,9 +77,11 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-String translate(instance) { &#47;&#47; TODO
-  return Translator.tr(&quot;velix:validation.${instance.type.toString().toLowerCase()}.${instance.name}&quot;, args: instance.params.map(
-        (key, value) =&gt; MapEntry(key, value.toString()),
+String translate(instance) {
+  return instance.message.isNotEmpty ?
+      instance.message :
+      Translator.tr(&quot;velix:validation.${instance.type.toString().toLowerCase()}.${instance.name}&quot;,
+          args: instance.params.map((key, value) =&gt; MapEntry(key, value.toString()),
   ));
 }</code></pre>
 </section>

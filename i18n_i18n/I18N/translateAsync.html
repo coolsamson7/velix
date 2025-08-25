@@ -68,9 +68,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;String&gt; translateAsync(String key,
-    {Map&lt;String, dynamic&gt;? args}) async {
-  var (namespace, path) = extractNamespace(key);
+  <pre class="language-dart"><code class="language-dart">Future&lt;String&gt; translateAsync(String key, {Map&lt;String, dynamic&gt;? args}) async {
+  var (namespace, path) = _extractNamespace(key);
 
   if (!isLoaded(namespace)) {
     await _loadTranslations(namespace, locales);

@@ -55,8 +55,9 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="../../validation_validation/StringType-class.html">StringType</a></span>
-<span class="name ">re</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="re-param-re"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">re</span></span></li>
-</ol>)
+<span class="name ">re</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="re-param-re"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">re</span>, {</span></li>
+<li><span class="parameter" id="re-param-message"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">message</span>, </span></li>
+</ol>})
 
       
 
@@ -71,12 +72,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">StringType re(String re) {
+  <pre class="language-dart"><code class="language-dart">StringType re(String re, {String? message}) {
   var reExpr = RegExp(re);
   test&lt;String&gt;(
     type: String,
     name: &quot;re&quot;,
     check: (s) =&gt; reExpr.hasMatch(s),
+    message: message
   );
 
   return this;

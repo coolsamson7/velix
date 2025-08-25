@@ -76,7 +76,7 @@
   <pre class="language-dart"><code class="language-dart">@override
 I18NFunction create(String variable, Map&lt;String, dynamic&gt; formatterArgs) {
   var format = NumberFormat.currency(
-    locale: locale(formatterArgs),
+    locale: Formatter.locale(formatterArgs),
       name: formatterArgs[&quot;name&quot;],
       decimalDigits: formatterArgs[&quot;decimalDigits&quot;]
   );

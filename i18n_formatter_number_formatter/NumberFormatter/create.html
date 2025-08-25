@@ -75,7 +75,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 I18NFunction create(String variable, Map&lt;String, dynamic&gt; formatterArgs) {
-  NumberFormat format = NumberFormat.decimalPattern(locale(formatterArgs));
+  NumberFormat format = NumberFormat.decimalPattern(Formatter.locale(formatterArgs));
 
   if (formatterArgs[&quot;maximumFractionDigits&quot;] != null)
     format.maximumFractionDigits = formatterArgs[&quot;maximumFractionDigits&quot;];

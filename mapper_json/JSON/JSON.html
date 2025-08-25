@@ -70,8 +70,8 @@
 
   &#47;&#47; ugly... we need a type descriptor
 
-  var fromMapConstructor = (Map&lt;String,dynamic&gt; args) =&gt; Map&lt;String,dynamic&gt;() ;
-  var fromArrayConstructor = (List&lt;dynamic&gt; args) =&gt; Map&lt;String,dynamic&gt;() ;&#47;&#47; TODO
+  var fromMapConstructor = (Map&lt;String,dynamic&gt; args) =&gt; HashMap&lt;String,dynamic&gt;() ;
+  var fromArrayConstructor = (List&lt;dynamic&gt; args) =&gt; HashMap&lt;String,dynamic&gt;() ;&#47;&#47; TODO
 
   TypeDescriptor&lt;Map&lt;String, dynamic&gt;&gt;(name: &quot;json&quot; , annotations: [], fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, constructor: ()=&gt;HashMap&lt;String,dynamic&gt;(), constructorParameters: [], fields: []);
 }</code></pre>

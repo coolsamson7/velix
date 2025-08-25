@@ -77,7 +77,7 @@
 I18NFunction create(String variable, Map&lt;String, dynamic&gt; formatterArgs) {
   var format = DateFormat(
       formatterArgs[&quot;pattern&quot;],
-      locale(formatterArgs)
+      Formatter.locale(formatterArgs)
   );
 
   return (Map&lt;String, dynamic&gt; args) =&gt; format.format(args[variable]);

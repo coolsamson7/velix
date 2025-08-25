@@ -59,6 +59,7 @@
 <li><span class="parameter" id="-param-missingKeyHandler"><span class="type-annotation"><a href="../../i18n_i18n/MissingKeyHandler.html">MissingKeyHandler</a>?</span> <span class="parameter-name">missingKeyHandler</span>, </span></li>
 <li><span class="parameter" id="-param-preloadNamespaces"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">preloadNamespaces</span>, </span></li>
 <li><span class="parameter" id="-param-fallbackLocale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a>?</span> <span class="parameter-name">fallbackLocale</span>, </span></li>
+<li><span class="parameter" id="-param-formatters"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../i18n_i18n/Formatter-class.html">Formatter</a></span>&gt;</span>?</span> <span class="parameter-name">formatters</span>, </span></li>
 <li><span class="parameter" id="-param-cacheSize"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">cacheSize</span> = <span class="default-value">50</span>, </span></li>
 </ol>})
     </section>
@@ -74,9 +75,10 @@
   MissingKeyHandler? missingKeyHandler,
   this.preloadNamespaces,
   this.fallbackLocale,
+  List&lt;Formatter&gt;? formatters,
   int cacheSize = 50
 })
-    :_interpolator = Interpolator(cacheSize: cacheSize),
+    :_interpolator = Interpolator(cacheSize: cacheSize, formatters: formatters),
       _localeManager = localeManager,
       _loader = loader,
       _missingKeyHandler = missingKeyHandler {

@@ -94,7 +94,7 @@ class I18N {
     final fallbackLocales = <Locale>[];
 
     maybeAdd(Locale locale)  {
-      if (fallbackLocales.contains(locale))
+      if (!fallbackLocales.contains(locale))
         fallbackLocales.add(locale);
     }
 

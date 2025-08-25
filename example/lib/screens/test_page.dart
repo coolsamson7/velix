@@ -203,6 +203,16 @@ class TestPageState extends State<TestPage>
                     ),
 
                     CupertinoFormRow(
+                      prefix: Text('Date'),
+                      child: mapper.date(
+                        path: "datetime_data",
+                        context: context,
+                        //min: 0,
+                        //max: 10,
+                      ),
+                    ),
+
+                    CupertinoFormRow(
                       prefix: Text('Bool'),
                       child: mapper.Switch(path: "bool_data", context: context),
                     ),

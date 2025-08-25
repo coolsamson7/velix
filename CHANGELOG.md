@@ -64,3 +64,9 @@
 
 - performance optimization mapper ( factor 4! )
 - example app is a bit prettier
+
+## 0.17
+
+- added LRUCache
+- added Tracer
+- added own i18n solution

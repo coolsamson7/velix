@@ -12,7 +12,7 @@ typedef Validator = String? Function(String value);
 abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<T> {
   // constructor
 
-  AbstractTextWidgetAdapter(super.name, super.platform);
+  AbstractTextWidgetAdapter(super.name, super.theme);
 
   // protected
 

@@ -408,7 +408,7 @@ class FormMapper {
       (operation.target as WidgetProperty).dispose();
   }
 
-  void map({required TypeProperty property, required Widget widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, DisplayValue<dynamic,dynamic> parseValue=identity}) {
+  void map({required TypeProperty property, required Widget widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, ParseValue<dynamic,dynamic> parseValue=identity}) {
     var operation = findOperation(property.path);
     if (operation == null) {
       operations.add(Operation(

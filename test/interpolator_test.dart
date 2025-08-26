@@ -32,6 +32,19 @@ void main() {
       func = interpolator.parse("hello {andi}, you are worth {price:currency(name: \$symbol, decimalDigits: 2)}!");
       result = func({"andi": "andi", "price": 100.123, "symbol": "EUR"});
 
+      var loops = 100000;
+      var stopwatch = Stopwatch()..start();
+
+      for (int i = 0; i < loops; i++) {
+        result = func({"andi": "andi", "price": 100.123, "symbol": "EUR"});
+      }
+
+      stopwatch.stop();
+      print('interpolated $loops, time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
+
+
+
+
       expect(result, "hello andi, you are worth EUR100.12!");
 
       // date

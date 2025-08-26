@@ -103,10 +103,10 @@ class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldR
     mapper.map(property: property, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
     if ( widgetProperty == null) {
-      widgetProperty = mapper.findWidget(property.path);
+      widgetProperty = mapper.findWidget(property.path)!;
 
-      widgetProperty!.args["controller"] = controller;
-      widgetProperty!.args["focusNode"] = focusNode;
+      widgetProperty.setArg("controller", controller);
+      widgetProperty.setArg("focusNode", focusNode);
     }
 
     return Builder(

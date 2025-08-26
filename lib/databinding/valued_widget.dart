@@ -30,6 +30,10 @@ class WidgetProperty extends Property<ValuedWidgetContext> {
     return args[key] as T;
   }
 
+  void setArg<T>(String key, T value) {
+    args[key] = value;
+  }
+
   void dispose() {
     adapter.dispose(this);
   }
@@ -54,7 +58,7 @@ abstract class ValuedWidgetAdapter<T> {
   Type getType();
 
   /// return the platform name
-  String getPlatform();
+  String getTheme();
 
   /// return the element name
   String getName();
@@ -87,11 +91,11 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
 
   final String name;
   final Type type;
-  final String platform;
+  final String theme;
 
   // constructor
 
-  AbstractValuedWidgetAdapter(this.name, this.platform) : type = T {
+  AbstractValuedWidgetAdapter(this.name, this.theme) : type = T {
     ValuedWidget.register(this);
   }
 
@@ -103,8 +107,8 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   }
 
   @override
-  String getPlatform() {
-    return platform;
+  String getTheme() {
+    return theme;
   }
 
   @override
@@ -151,6 +155,7 @@ class ValuedWidget {
 
   static Widget build<T>(String name, {required BuildContext context, required FormMapper mapper, required String path, Keywords? args}) {
     var property = mapper.computeProperty(mapper.type, path);
+
     return getAdapter(name).build(context: context, mapper: mapper, property: property, args: args ?? Keywords.empty);
   }
 }

@@ -18,8 +18,6 @@ class SwitchAdapter extends AbstractValuedWidgetAdapter<CupertinoSwitch> {
     CupertinoSwitch widget = CupertinoSwitch(
       value: mapper.getValue(property),
       onChanged: (bool newValue) {
-        (context as Element).markNeedsBuild();
-
         mapper.notifyChange(property: property, value: newValue);
       },
     );

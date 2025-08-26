@@ -18,8 +18,6 @@ class CheckboxAdapter extends AbstractValuedWidgetAdapter<Checkbox> {
     Checkbox widget = Checkbox.adaptive(
       value: mapper.getValue(property),
       onChanged: (newValue) {
-        (context as Element).markNeedsBuild();
-
         mapper.notifyChange(property: property, value: newValue);
       },
     );

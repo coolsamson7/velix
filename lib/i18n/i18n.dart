@@ -142,8 +142,8 @@ class I18N {
 
     if (colonIndex > 0) {
       return (
-      key.substring(0, colonIndex),
-      key.substring(colonIndex + 1),
+        key.substring(0, colonIndex),
+        key.substring(colonIndex + 1),
       );
     }
     else {

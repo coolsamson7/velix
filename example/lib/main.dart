@@ -100,11 +100,11 @@ void main() async {
       localeManager: localeManager,
       loader: AssetTranslationLoader(
         namespacePackageMap: {
-          "velix": "velix"
+          "validation": "velix"
         }
       ),
       missingKeyHandler: (key) => '##$key##',
-      preloadNamespaces: ["velix", "example"]
+      preloadNamespaces: ["validation", "example"]
   );
 
   // load namespaces

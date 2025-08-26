@@ -1,0 +1,34 @@
+{
+  "string": {
+    "type": "expected a string",
+    "minLength": "must have a minimum of {minLength} characters",
+    "maxLength": "must have a maximum of {maxLength} characters",
+    "length": "must have a maximum of {length} characters",
+    "re": "must comply with a regular expression {re}",
+    "nonEmpty": "must be non empty"
+  },
+  "int": {
+    "type": "expected an integer",
+    "greaterThan": "must be greater than {greaterThan}",
+    "greaterThanEquals": "must be greater or equal to {greaterThanEquals}",
+    "lessThan": "must be less than {lessThan}",
+    "lessThanEquals": "must be less or equal to {lessThanEquals}"
+  },
+  "double": {
+    "type": "expected a double",
+    "greaterThan": "must be greater than {greaterThan}",
+    "greaterThanEquals": "be have greater or equal to {greaterThanEquals}",
+    "lessThan": "must be less than {lessThan}",
+    "lessThanEquals": "must be less or equal to {lessThanEquals}"
+  },
+  "bool": {
+    "type": "expected a bool"
+  },
+  "datetime": {
+    "type": "expcted a date"
+  },
+
+  "currency": {
+    "type": "expected {currency:currency(symbol: $symbol)}!"
+  }
+}

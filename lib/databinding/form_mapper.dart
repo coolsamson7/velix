@@ -375,6 +375,8 @@ class FormMapper {
     for ( Operation operation in operations)
       (operation.source as TypeProperty).commit(context);
 
+    changes = 0;
+
     return instance as T;
   }
 

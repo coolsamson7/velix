@@ -859,7 +859,7 @@ class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation
   String translate(instance) {
     return instance.message.isNotEmpty ?
         instance.message :
-        Translator.tr("velix:validation.${instance.type.toString().toLowerCase()}.${instance.name}",
+        Translator.tr("validation:${instance.type.toString().toLowerCase()}.${instance.name}",
             args: instance.params.map((key, value) => MapEntry(key, value.toString()),
     ));
   }

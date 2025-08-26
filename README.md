@@ -24,7 +24,7 @@ Check out some articles on Medium:
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
 
-Detailed infromation can be foun din the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
+Detailed infromation can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
 
 Lets get a quick overview on the topics
 

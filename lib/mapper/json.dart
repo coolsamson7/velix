@@ -426,11 +426,14 @@ class Enum2StringFactory<T extends Enum> extends EnumConvertFactory<T, String> {
     var result = converters[sourceType];
     if ( result == null) {
       var typeDescriptor = TypeDescriptor.forType(sourceType);
-      List values = typeDescriptor.enumValues!;
+      Map<String,T> mappings = HashMap<String,T>();
+
+      for ( T e in typeDescriptor.enumValues!)
+        mappings[e.name] = e;
+
       result = Convert<T, String>(
               (value) => (value as Enum).name,
-            convertTarget: (str) =>
-            values.firstWhere((c) => (c as Enum).name == str),
+            convertTarget: (str) => mappings[str]!,
             sourceType: sourceType,
             targetType: String
       );

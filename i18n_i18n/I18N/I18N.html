@@ -57,13 +57,23 @@
       <span class="name ">I18N</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-localeManager"><span>required</span> <span class="type-annotation"><a href="../../i18n_locale/LocaleManager-class.html">LocaleManager</a></span> <span class="parameter-name">localeManager</span>, </span></li>
 <li><span class="parameter" id="-param-loader"><span>required</span> <span class="type-annotation"><a href="../../i18n_i18n/TranslationLoader-class.html">TranslationLoader</a></span> <span class="parameter-name">loader</span>, </span></li>
 <li><span class="parameter" id="-param-missingKeyHandler"><span class="type-annotation"><a href="../../i18n_i18n/MissingKeyHandler.html">MissingKeyHandler</a>?</span> <span class="parameter-name">missingKeyHandler</span>, </span></li>
-<li><span class="parameter" id="-param-preloadNamespaces"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">preloadNamespaces</span>, </span></li>
 <li><span class="parameter" id="-param-fallbackLocale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a>?</span> <span class="parameter-name">fallbackLocale</span>, </span></li>
+<li><span class="parameter" id="-param-preloadNamespaces"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">preloadNamespaces</span>, </span></li>
 <li><span class="parameter" id="-param-formatters"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../i18n_i18n/Formatter-class.html">Formatter</a></span>&gt;</span>?</span> <span class="parameter-name">formatters</span>, </span></li>
 <li><span class="parameter" id="-param-cacheSize"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">cacheSize</span> = <span class="default-value">50</span>, </span></li>
 </ol>})
     </section>
     
+<section class="desc markdown">
+  <p>Create a new <a href="../../i18n_i18n/I18N-class.html">I18N</a>
+<code>localeManager</code> the <a href="../../i18n_locale/LocaleManager-class.html">LocaleManager</a> the tracks the current locale
+<code>loader</code> a <a href="../../i18n_i18n/TranslationLoader-class.html">TranslationLoader</a> instance used for loading localizations
+<code>missingKeyHandler</code> a function that will return a localization result in case of missing data
+<code>fallbackLocale</code> a optional <a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a> that is used to retrieve results in cases of a miss using the main locale
+<code>preloadNamespaces</code> optional list of namespaces that should be preloaded on application startup
+<code>formatters</code> optional list of additional <a href="../../i18n_i18n/Formatter-class.html">Formatter</a>s that can be used for interpolating placeholders
+<code>cacheSize</code> size of the interpolator cache, remembering computed interpolation functions.</p>
+</section>
 
 
     
@@ -73,8 +83,8 @@
   required LocaleManager localeManager,
   required TranslationLoader loader,
   MissingKeyHandler? missingKeyHandler,
-  this.preloadNamespaces,
   this.fallbackLocale,
+  List&lt;String&gt;? preloadNamespaces,
   List&lt;Formatter&gt;? formatters,
   int cacheSize = 50
 })
@@ -87,7 +97,7 @@
   &#47;&#47; remember preload namespaces
 
   if ( preloadNamespaces != null)
-    for ( var preload in  preloadNamespaces!)
+    for ( var preload in  preloadNamespaces)
       _namespaces[preload] = {};
 }</code></pre>
 </section>
@@ -117,7 +127,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.0
+      0.17.1
   </span>
   
 </footer>

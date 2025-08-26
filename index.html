@@ -56,6 +56,7 @@
 <li>general purpose mapping framework</li>
 <li>json mapper</li>
 <li>model-based two-way form data-binding</li>
+<li>i18n</li>
 <li>command pattern for ui actions</li>
 </ul>
 <p>Check out some articles on Medium:</p>
@@ -165,6 +166,144 @@ var result = JSON.deserialize&lt;Money&gt;(json);
     setCommandEnabled("save",  _controller.text.isNotEmpty);
   }
 }
+</code></pre>
+<h1 id="i18n">I18N</h1>
+<p>An i18n is implemented with more or less the same scope and api as popular libraries like <code>i18next</code>. but some additional features i haven't found anywhere else.
+The solution is made up of two distinct elements.</p>
+<p>A <code>LocaleManager</code> is reposonsible to keep track of the current locale.</p>
+<p>It is constructed via</p>
+<pre class="language-Dart"><code class="language-Dart">LocaleManager(this._currentLocale, {List&lt;Locale&gt;? supportedLocales })
+</code></pre>
+<p>and can return the current locale via the <code>locale</code> property.
+Being a <code>ChangeNotifier</code> - it can inform listeners about any changes of this property,</p>
+<p><code>I18N</code> is a class that is used to configure the setup. The constructor accepts the parameters:</p>
+<ul>
+<li><code> LocaleManager localeManager</code> the locale manager</li>
+<li><code> TranslationLoader loader</code> a loader that is used to load localizations</li>
+<li><code>Locale? fallbackLocale</code> a fallback locale that will be used for missing keys in the main locale.</li>
+<li><code>List&lt;String&gt;? preloadNamespaces</code> list of namespaces to preload</li>
+<li><code>List&lt;Formatter&gt;? formatters</code> list of additional fromatter that can be used in the interpolatin process.</li>
+<li><code>int cacheSize = 50</code> cache size fro prcomputed interpolation fucntions in a LRU cache</li>
+</ul>
+<p>After initialization a string extension</p>
+<pre class="language-Dart"><code class="language-Dart">tr([Map&lt;String,dynamic&gt;? args])
+</code></pre>
+<p>can be used to translate keys that consist of a - ":" separated .- namespace and path and optional args.</p>
+<p><strong>Example</strong></p>
+<pre class="language-Dart"><code class="language-Dart">"app:main.title".tr()
+</code></pre>
+<pre class="language-Dart"><code class="language-Dart">"app:main.greeting".tr({"user": "Andi"})
+</code></pre>
+<p>Let's look at the different concepts.</p>
+<h2 id="translationloader">TranslationLoader</h2>
+<p>The class <code>TranslationLoader</code> is used to load translations.</p>
+<pre class="language-Dart"><code class="language-Dart">abstract class TranslationLoader {
+  /// load translations given a namespace and a list of locales
+  /// [locales] list of [Locale]s that determine the overall result. Starting with the first locale, teh resulting map is computed, the following locales will act as fallbacks, in case of missing keys.
+  Future&lt;Map&lt;String, dynamic&gt;&gt; load(List&lt;Locale&gt; locales, String namespace);
+}
+</code></pre>
+<p>The result is a - possibly recursive - map contaning the localizations.</p>
+<p>The argument is a list of locales, since we wan't to have a fallback mechanism in case of missing localization values in the main locale.
+This list is computed with the following logic:</p>
+<ul>
+<li>start with the main locale</li>
+<li>if the locale has a country code, continue wioth the language code</li>
+<li>continue with a possible fallback locale</li>
+<li>if the fallback locale has a country code, continue with it's language code</li>
+</ul>
+<p><strong>Example</strong>: Locale is "de_DE", fallback "en_US"</p>
+<p>will result in: <code>["de_DE", "de", "en_US", "en"]</code></p>
+<p>Loaders should merge an overall result, starting in the order of the list by only adding values in case of missing entries.</p>
+<p><strong>AssetTranslationOrder</strong></p>
+<p>The class <code>AssetTranslationOrder</code> is used to load localizations from assets.</p>
+<p>Arguments are:</p>
+<ul>
+<li><code>this.basePath = 'assets/locales'</code> base path for assets</li>
+<li><code>Map&lt;String, String&gt;? namespacePackageMap</code> optional map that assigns package names to namespaces</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre class="language-Dart"><code class="language-Dart">{
+  "validation": "velix"
+}
+</code></pre>
+<p>tells the loader, that the namespace "validation" is stored in the assets of teh package "velix".</p>
+<p>Translations are stored in json files under the locale dir.</p>
+<p><strong>Example</strong></p>
+<pre class="language-Dart"><code class="language-Dart">assets/
+   de/
+      validation.json
+</code></pre>
+<h2 id="interpolation">Interpolation</h2>
+<p>Translations can contain placeholders that will be replaced by supplied values. Different  possibilities exist:</p>
+<p><strong>variable</strong></p>
+<p>"hello {world}!" with arguments <code>{"world": "world"}</code> will result in "hello world!".</p>
+<p><strong>variable with format</strong></p>
+<p>"{value:number}"</p>
+<p>will format numbers given the current locale ( influencing "," or "." in floating point numbers )</p>
+<p><strong>variable with format and arguments</strong></p>
+<p>"{price:currency(name: 'EUR')}"</p>
+<p>Different formatters allow different parameters, with all formatters typically supporting <code>String laccle</code> as a locale code.</p>
+<p>Implemented formatters are:</p>
+<p><strong>number</strong></p>
+<ul>
+<li><code>String locale</code></li>
+<li><code>int minimumFractionDigits</code> minimum number of digits</li>
+<li><code>int maximumFractionDigits</code> maximum number of digits</li>
+</ul>
+<p><strong>currency</strong></p>
+<ul>
+<li><code>String locale</code></li>
+<li><code>String name</code> name of the currency</li>
+</ul>
+<p><strong>date</strong></p>
+<ul>
+<li><code>String locale</code></li>
+<li><code>String pattern</code> pattern accoring to the used formatting class <code>DateFormat</code>, e.g. <code>yMMMd</code></li>
+</ul>
+<p>Unil now, the parameters where part of the template itself. In order to be more flexible, they can also relate to dynamic parameters by prefixing the with "$".</p>
+<p><strong>Example</strong>:</p>
+<p>Template is: "{price:currency(name: $currencyName)"</p>
+<p>and is called with the args <code>{"price": 100, "currencyName": "EUR"}</code></p>
+<h2 id="setup">Setup</h2>
+<p>A typical setup requires to initialize the main elements:</p>
+<pre class="language-Dart"><code class="language-Dart"> var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
+  var i18n = I18N(
+      fallbackLocale: Locale("en", "EN"),
+      localeManager: localeManager,
+      loader: AssetTranslationLoader(
+        namespacePackageMap: {
+          "validation": "velix"
+        }
+      ),
+      missingKeyHandler: (key) =&gt; '##$key##',
+      preloadNamespaces: ["validation", "example"]
+  );
+
+  // load namespaces
+
+  runApp(
+    ChangeNotifierProvider.value(
+      value: localeManager,
+      child: TODOApp(i18n: i18n),
+    ),
+  );
+</code></pre>
+<p>and an application running as a locale consumer including some localizationDelegates:</p>
+<pre class="language-Dart"><code class="language-Dart"> ...
+ child: Consumer&lt;LocaleManager&gt;(
+        builder: (BuildContext context, LocaleManager localeManager, Widget? child) {
+          return CupertinoApp(
+            ...
+
+            // localization
+
+            localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],
+            supportedLocales: localeManager.supportedLocales,
+            locale: localeManager.locale
+          );
+        }
+        )
 </code></pre>
 <h1 id="model-base-form-data-binding">Model-base form data-binding</h1>
 <h2 id="motivation">Motivation</h2>

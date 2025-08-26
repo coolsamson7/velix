@@ -7,7 +7,7 @@ import 'locale.dart';
 
 typedef I18NFunction = String Function(Map<String, dynamic> args);
 
-
+/// a [Formatter] is used to format placeholders.
 abstract class Formatter {
   // static
 
@@ -28,26 +28,34 @@ abstract class Formatter {
 
   // constructor
 
+  /// create a new [Formatter]
+  /// [name] the name
   Formatter(this.name);
 
   // abstract
 
+  /// create the [I18NFunction] that will execute the formatting.
+  /// [variable] the placeholder variable which will be formatted
   I18NFunction create(String variable, Map<String, dynamic> args);
 }
 
+/// function used to compute a localization in case of missing i18n data
 typedef MissingKeyHandler = String Function(String key);
 
 
 /// A `TranslationLoader` loads translations.
 
 abstract class TranslationLoader {
+  /// load translations given a namespace and a list of locales
+  /// [locales] list of [Locale]s that determine the overall result. Starting with the first locale, teh resulting map is computed, the following locales will act as fallbacks, in case of missing keys.
   Future<Map<String, dynamic>> load(List<Locale> locales, String namespace);
 }
 
-///  I18n Core
+///  I18n is a central singleton that controls the overall localization process.
 class I18N {
   // static data
 
+  /// the singleton instance
   static late I18N instance;
 
   // instance data
@@ -57,7 +65,6 @@ class I18N {
   final MissingKeyHandler? _missingKeyHandler;
   final Map<String, Map<String, dynamic>> _namespaces = {};
   final Interpolator _interpolator;
-  final List<String>? preloadNamespaces;
   final Locale? fallbackLocale;
 
   List<Locale> locales = [];
@@ -66,12 +73,20 @@ class I18N {
 
   // constructor
 
+  /// Create a new [I18N]
+  /// [localeManager] the [LocaleManager] the tracks the current locale
+  /// [loader] a [TranslationLoader] instance used for loading localizations
+  /// [missingKeyHandler] a function that will return a localization result in case of missing data
+  /// [fallbackLocale] a optional [Locale] that is used to retrieve results in cases of a miss using the main locale
+  /// [preloadNamespaces] optional list of namespaces that should be preloaded on application startup
+  /// [formatters] optional list of additional [Formatter]s that can be used for interpolating placeholders
+  /// [cacheSize] size of the interpolator cache, remembering computed interpolation functions.
   I18N({
     required LocaleManager localeManager,
     required TranslationLoader loader,
     MissingKeyHandler? missingKeyHandler,
-    this.preloadNamespaces,
     this.fallbackLocale,
+    List<String>? preloadNamespaces,
     List<Formatter>? formatters,
     int cacheSize = 50
   })
@@ -84,7 +99,7 @@ class I18N {
     // remember preload namespaces
 
     if ( preloadNamespaces != null)
-      for ( var preload in  preloadNamespaces!)
+      for ( var preload in  preloadNamespaces)
         _namespaces[preload] = {};
   }
 
@@ -151,6 +166,8 @@ class I18N {
     }
   }
 
+  /// return [true] if a specified namespace is already loaded
+  /// [namespace] a namespace
   bool isLoaded(String namespace) {
     return _namespaces[namespace] != null;
   }
@@ -172,6 +189,7 @@ class I18N {
 
   // public
 
+  /// return the list of supported locales
   List<Locale> supportedLocales() {
     return _localeManager.supportedLocales;
   }
@@ -186,6 +204,9 @@ class I18N {
     await Future.wait(futures);
   }
 
+  /// translate a key
+  /// [key] a key
+  /// [args] any parameters that may be used for interpolation
   String translate(String key, {Map<String, dynamic>? args}) {
     var (namespace, path) = _extractNamespace(key);
 
@@ -203,6 +224,9 @@ class I18N {
       return _missingKeyHandler!(key);
   }
 
+  /// translate a key async and wait for the result in case of missing namespaces
+  /// [key] a key
+  /// [args] any parameters that may be used for interpolation
   Future<String> translateAsync(String key, {Map<String, dynamic>? args}) async {
     var (namespace, path) = _extractNamespace(key);
 
@@ -220,7 +244,7 @@ class I18N {
   }
 }
 
-// delegate
+/// A specialized [LocalizationsDelegate] that will load all necessary localizations
 class I18nDelegate extends LocalizationsDelegate<I18N> {
   // instance data
 
@@ -228,6 +252,8 @@ class I18nDelegate extends LocalizationsDelegate<I18N> {
 
   // constructor
 
+  /// Create a new [I18nDelegate]
+  /// [i18n] the [I18N] instance
   I18nDelegate({required this.i18n});
 
   // override
@@ -248,6 +274,7 @@ class I18nDelegate extends LocalizationsDelegate<I18N> {
 
 // extension
 
+/// extension on string sm which allows a `tr()` function call
 extension I18nStringExtension on String {
   String tr([Map<String, dynamic>? args]) {
     return I18N.instance.translate(this, args: args);

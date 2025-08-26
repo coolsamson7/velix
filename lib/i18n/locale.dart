@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../util/tracer.dart';
 
-/// A `LocaleManager`
+/// A [LocaleManager] keeps track of the current locale abd can notify listeners about changes,.
 class LocaleManager extends ChangeNotifier {
   // instance data
 
@@ -13,6 +13,9 @@ class LocaleManager extends ChangeNotifier {
 
   // constructor
 
+  /// Create a new [LocaleManager]
+  /// [_currentLocale] the initial locale
+  /// [supportedLocales] optional list of supported locales
   LocaleManager(this._currentLocale, {List<Locale>? supportedLocales }) : supportedLocales = supportedLocales ?? [] {
     Intl.defaultLocale = _currentLocale.toString();
 }

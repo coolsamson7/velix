@@ -70,3 +70,7 @@
 - added LRUCache
 - added Tracer
 - added own i18n solution
+
+## 0.17.1
+
+- docstrings

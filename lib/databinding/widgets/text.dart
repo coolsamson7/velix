@@ -36,7 +36,7 @@ abstract class AbstractTextWidgetAdapter<T> extends AbstractValuedWidgetAdapter<
 
     String? validate(dynamic value) {
       try {
-        late var propValue;
+        late dynamic propValue;
 
         try {
           propValue = parseValue(value);

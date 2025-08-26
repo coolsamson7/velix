@@ -4,6 +4,8 @@ import 'formatter/date_formatter.dart';
 import 'formatter/number_formatter.dart';
 import 'i18n.dart';
 
+/// An [Interpolator] is used to interpolate template strings given additional arguments
+///
 class Interpolator {
   // instance data
 

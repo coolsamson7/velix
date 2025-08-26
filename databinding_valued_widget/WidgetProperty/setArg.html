@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the commit method from the FormMapper class, for the Dart programming language.">
-  <title>commit method - FormMapper class - form_mapper library - Dart API</title>
+  <meta name="description" content="API docs for the setArg method from the WidgetProperty class, for the Dart programming language.">
+  <title>setArg method - WidgetProperty class - valued_widget library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">velix</a></li>
-    <li><a href="../../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
-    <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li><a href="../../databinding_valued_widget/">databinding&#47;valued_widget.dart</a></li>
+    <li><a href="../../databinding_valued_widget/WidgetProperty-class.html">WidgetProperty</a></li>
+    <li class="self-crumb">setArg&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
   </ol>
-  <div class="self-name">commit</div>
+  <div class="self-name">setArg</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,37 +46,30 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="databinding_form_mapper&#47;FormMapper-class-sidebar.html"
+    data-above-sidebar="databinding_valued_widget&#47;WidgetProperty-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">commit&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
+<h1><span class="kind-method">setArg&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype">T</span>
-<span class="name ">commit</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>)
+<span class="returntype">void</span>
+<span class="name ">setArg</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="setArg-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span></li>
+<li><span class="parameter" id="setArg-param-value"><span class="type-annotation">T</span> <span class="parameter-name">value</span></span></li>
+</ol>)
 
       
 
     </section>
     
-<section class="desc markdown">
-  <p>commit all pending changes to the instance and return it</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T commit&lt;T&gt;() {
-  ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
-  for ( Operation operation in operations)
-    (operation.source as TypeProperty).commit(context);
-
-  changes = 0;
-
-  return instance as T;
+  <pre class="language-dart"><code class="language-dart">void setArg&lt;T&gt;(String key, T value) {
+  args[key] = value;
 }</code></pre>
 </section>
 
@@ -91,12 +84,12 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">velix</a></li>
-    <li><a href="../../databinding_form_mapper/">form_mapper</a></li>
-    <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li><a href="../../databinding_valued_widget/">valued_widget</a></li>
+    <li><a href="../../databinding_valued_widget/WidgetProperty-class.html">WidgetProperty</a></li>
+    <li class="self-crumb">setArg&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
 </ol>
 
-    <h5>FormMapper class</h5>
+    <h5>WidgetProperty class</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

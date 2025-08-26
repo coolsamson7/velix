@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">notifyChange</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="notifyChange-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
+<span class="name ">notifyChange</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="notifyChange-param-property"><span>required</span> <span class="type-annotation"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span> <span class="parameter-name">property</span>, </span></li>
 <li><span class="parameter" id="notifyChange-param-value"><span>required</span> <span class="type-annotation">dynamic</span> <span class="parameter-name">value</span>, </span></li>
 </ol>})
 
@@ -68,13 +68,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void notifyChange({required String path, required dynamic value}) {
-  var property = findProperty(path);
-
+  <pre class="language-dart"><code class="language-dart">void notifyChange({required TypeProperty property, required dynamic value}) {
   changes += 1;
 
   if ( emitOnChange )
-    eventStream.add(FormEvent(isDirty: isDirty, path: path, value: value));
+    eventStream.add(FormEvent(isDirty: isDirty, path: property.path, value: value));
 
   property.set(instance, value, ValuedWidgetContext(mapper: this));
 }</code></pre>

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the commit method from the FormMapper class, for the Dart programming language.">
-  <title>commit method - FormMapper class - form_mapper library - Dart API</title>
+  <meta name="description" content="API docs for the getValue method from the FormMapper class, for the Dart programming language.">
+  <title>getValue method - FormMapper class - form_mapper library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">databinding&#47;form_mapper.dart</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li class="self-crumb">getValue&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
   </ol>
-  <div class="self-name">commit</div>
+  <div class="self-name">getValue</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,34 +49,26 @@
     data-above-sidebar="databinding_form_mapper&#47;FormMapper-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">commit&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
+<h1><span class="kind-method">getValue&lt;<wbr><span class="type-parameter">T</span>&gt;</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype">T</span>
-<span class="name ">commit</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>)
+<span class="name ">getValue</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getValue-param-property"><span class="type-annotation"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span> <span class="parameter-name">property</span></span></li>
+</ol>)
 
       
 
     </section>
     
-<section class="desc markdown">
-  <p>commit all pending changes to the instance and return it</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T commit&lt;T&gt;() {
-  ValuedWidgetContext context = ValuedWidgetContext(mapper: this);
-  for ( Operation operation in operations)
-    (operation.source as TypeProperty).commit(context);
-
-  changes = 0;
-
-  return instance as T;
+  <pre class="language-dart"><code class="language-dart">T getValue&lt;T&gt;(TypeProperty property) {
+  return property.get(instance, ValuedWidgetContext(mapper: this));
 }</code></pre>
 </section>
 
@@ -93,7 +85,7 @@
     <li><a href="../../index.html">velix</a></li>
     <li><a href="../../databinding_form_mapper/">form_mapper</a></li>
     <li><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></li>
-    <li class="self-crumb">commit&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
+    <li class="self-crumb">getValue&lt;<wbr><span class="type-parameter">T</span>&gt; method</li>
 </ol>
 
     <h5>FormMapper class</h5>

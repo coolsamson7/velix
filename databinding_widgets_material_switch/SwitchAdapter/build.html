@@ -62,7 +62,7 @@
 <span class="returntype"><a href="https://api.flutter.dev/flutter/material/Switch-class.html">Switch</a></span>
 <span class="name ">build</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="build-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
 <li><span class="parameter" id="build-param-mapper"><span>required</span> <span class="type-annotation"><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></span> <span class="parameter-name">mapper</span>, </span></li>
-<li><span class="parameter" id="build-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
+<li><span class="parameter" id="build-param-property"><span>required</span> <span class="type-annotation"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span> <span class="parameter-name">property</span>, </span></li>
 <li><span class="parameter" id="build-param-args"><span>required</span> <span class="type-annotation"><a href="../../util_collections/Keywords-class.html">Keywords</a></span> <span class="parameter-name">args</span>, </span></li>
 </ol>})
 
@@ -74,7 +74,7 @@
   <p>build and bind the corresponding widget
 <code>context</code> a <a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
 <code>mapper</code> the <a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
-<code>path</code> a field path
+<code>property</code> a <a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>
 <code>args</code> and parameters that will be handled by the adapter</p>
 </section>
 
@@ -83,21 +83,17 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-Switch build({required BuildContext context, required FormMapper mapper, required String path, required Keywords args}) {
-  var typeProperty = mapper.computeProperty(mapper.type, path);
-
-  var initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
-
+Switch build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
   Switch widget = Switch(
-    value: initialValue,
+    value: mapper.getValue(property),
     onChanged: (bool newValue) {
       (context as Element).markNeedsBuild();
 
-      mapper.notifyChange(path: path, value: newValue);
+      mapper.notifyChange(property: property, value: newValue);
     },
   );
 
-  mapper.map(typeProperty: typeProperty, path: path, widget: widget, adapter: this);
+  mapper.map(property: property, widget: widget, adapter: this);
 
   return widget;
 }</code></pre>

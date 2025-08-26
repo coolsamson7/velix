@@ -93,7 +93,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">set locale(Locale value) {
   if ( value != _currentLocale) {
-    Tracer.trace(&quot;i18n&quot;, TraceLevel.high, &quot;set locale $value&quot;);
+    if ( Tracer.enabled)
+      Tracer.trace(&quot;i18n&quot;, TraceLevel.high, &quot;set locale $value&quot;);
 
     _currentLocale = value;
 

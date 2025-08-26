@@ -72,7 +72,9 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Widget build&lt;T&gt;(String name, {required BuildContext context, required FormMapper mapper, required String path, Keywords? args}) {
-  return getAdapter(name).build(context: context, mapper: mapper, path: path, args: args ?? Keywords.empty);
+  var property = mapper.computeProperty(mapper.type, path);
+
+  return getAdapter(name).build(context: context, mapper: mapper, property: property, args: args ?? Keywords.empty);
 }</code></pre>
 </section>
 

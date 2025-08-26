@@ -82,10 +82,10 @@
               <li><a href="../databinding_widgets_material_checkbox/CheckboxAdapter-class.html">CheckboxAdapter</a></li>
               <li><a href="../databinding_widgets_cupertino_datepicker/DatePickerAdapter-class.html">DatePickerAdapter</a></li>
               <li><a href="../databinding_widgets_material_datepicker/DatePickerAdapter-class.html">DatePickerAdapter</a></li>
-              <li><a href="../databinding_widgets_cupertino_slider/SliderAdapter-class.html">SliderAdapter</a></li>
               <li><a href="../databinding_widgets_material_slider/SliderAdapter-class.html">SliderAdapter</a></li>
-              <li><a href="../databinding_widgets_cupertino_switch/SwitchAdapter-class.html">SwitchAdapter</a></li>
+              <li><a href="../databinding_widgets_cupertino_slider/SliderAdapter-class.html">SliderAdapter</a></li>
               <li><a href="../databinding_widgets_material_switch/SwitchAdapter-class.html">SwitchAdapter</a></li>
+              <li><a href="../databinding_widgets_cupertino_switch/SwitchAdapter-class.html">SwitchAdapter</a></li>
           </ul></dd>
 
         
@@ -100,7 +100,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="AbstractValuedWidgetAdapter.new" class="callable">
-          <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/AbstractValuedWidgetAdapter.html">AbstractValuedWidgetAdapter.new</a></span><span class="signature">(<span class="parameter" id="-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="-param-platform"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">platform</span></span>)</span>
+          <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/AbstractValuedWidgetAdapter.html">AbstractValuedWidgetAdapter.new</a></span><span class="signature">(<span class="parameter" id="-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="-param-theme"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">theme</span></span>)</span>
         </dt>
         <dd>
           
@@ -137,18 +137,6 @@
 
 </dd>
 
-        <dt id="platform" class="property">
-  <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/platform.html">platform</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
         <dt id="runtimeType" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
@@ -158,6 +146,18 @@
 <dd class="inherited">
   A representation of the runtime type of the object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="theme" class="property">
+  <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/theme.html">theme</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 
@@ -183,7 +183,7 @@
     <h2>Methods</h2>
     <dl class="callables">
         <dt id="build" class="callable inherited">
-  <span class="name"><a href="../databinding_valued_widget/ValuedWidgetAdapter/build.html">build</a></span><span class="signature">(<wbr>{<span class="parameter" id="build-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="build-param-mapper"><span>required</span> <span class="type-annotation"><a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a></span> <span class="parameter-name">mapper</span>, </span><span class="parameter" id="build-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="build-param-args"><span>required</span> <span class="type-annotation"><a href="../util_collections/Keywords-class.html">Keywords</a></span> <span class="parameter-name">args</span></span>})
+  <span class="name"><a href="../databinding_valued_widget/ValuedWidgetAdapter/build.html">build</a></span><span class="signature">(<wbr>{<span class="parameter" id="build-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="build-param-mapper"><span>required</span> <span class="type-annotation"><a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a></span> <span class="parameter-name">mapper</span>, </span><span class="parameter" id="build-param-property"><span>required</span> <span class="type-annotation"><a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span> <span class="parameter-name">property</span>, </span><span class="parameter" id="build-param-args"><span>required</span> <span class="type-annotation"><a href="../util_collections/Keywords-class.html">Keywords</a></span> <span class="parameter-name">args</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
   
@@ -193,7 +193,7 @@
   build and bind the corresponding widget
 <code>context</code> a <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
 <code>mapper</code> the <a href="../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
-<code>path</code> a field path
+<code>property</code> a <a href="../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>
 <code>args</code> and parameters that will be handled by the adapter
   <div class="features"><span class="feature">inherited</span></div>
 
@@ -225,8 +225,8 @@
 
 </dd>
 
-        <dt id="getPlatform" class="callable">
-  <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/getPlatform.html">getPlatform</a></span><span class="signature">(<wbr>)
+        <dt id="getTheme" class="callable">
+  <span class="name"><a href="../databinding_valued_widget/AbstractValuedWidgetAdapter/getTheme.html">getTheme</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
   </span>
   

@@ -62,7 +62,7 @@
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/FormField-class.html">FormField</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/DateTime-class.html">DateTime</a></span>&gt;</span></span>
 <span class="name ">build</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="build-param-context"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span></li>
 <li><span class="parameter" id="build-param-mapper"><span>required</span> <span class="type-annotation"><a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a></span> <span class="parameter-name">mapper</span>, </span></li>
-<li><span class="parameter" id="build-param-path"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
+<li><span class="parameter" id="build-param-property"><span>required</span> <span class="type-annotation"><a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a></span> <span class="parameter-name">property</span>, </span></li>
 <li><span class="parameter" id="build-param-args"><span>required</span> <span class="type-annotation"><a href="../../util_collections/Keywords-class.html">Keywords</a></span> <span class="parameter-name">args</span>, </span></li>
 </ol>})
 
@@ -74,7 +74,7 @@
   <p>build and bind the corresponding widget
 <code>context</code> a <a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
 <code>mapper</code> the <a href="../../databinding_form_mapper/FormMapper-class.html">FormMapper</a>
-<code>path</code> a field path
+<code>property</code> a <a href="../../databinding_form_mapper/TypeProperty-class.html">TypeProperty</a>
 <code>args</code> and parameters that will be handled by the adapter</p>
 </section>
 
@@ -86,23 +86,23 @@
 FormField&lt;DateTime&gt; build({
   required BuildContext context,
   required FormMapper mapper,
-  required String path,
+  required TypeProperty property,
   required Keywords args}) {
-  var typeProperty = mapper.computeProperty(mapper.type, path);
-  DateTime? initialValue = typeProperty.get(mapper.instance, ValuedWidgetContext(mapper: mapper));
+  DateTime? initialValue = mapper.getValue(property);
 
   final DateFormat dateFormat = args[&#39;dateFormat&#39;] ?? DateFormat.yMd();
   final DateTime minDate = args[&#39;firstDate&#39;] ?? DateTime(1900);
   final DateTime maxDate = args[&#39;lastDate&#39;] ?? DateTime(2100);
 
-  return FormField&lt;DateTime&gt;(
-    key: ValueKey(path),
+  var result = FormField&lt;DateTime&gt;(
+    key: ValueKey(property.path),
     initialValue: initialValue,
     validator: (date) {
       try {
-        typeProperty.validate(date);
+        property.validate(date);
         return null;
-      } catch (e) {
+      }
+      catch (e) {
         return e.toString();
       }
     },
@@ -123,7 +123,7 @@ FormField&lt;DateTime&gt; build({
               initialDateTime: state.value ?? DateTime.now(),
               onDateTimeChanged: (DateTime newDate) {
                 state.didChange(newDate);
-                mapper.notifyChange(path: path, value: newDate);
+                mapper.notifyChange(property: property, value: newDate);
               },
             ),
           ),
@@ -164,6 +164,14 @@ FormField&lt;DateTime&gt; build({
       &#47;&#47; if you need to save
     },
   );
+
+  &#47;&#47; new mapping
+
+  mapper.map(property: property, widget: result, adapter: this);
+
+  &#47;&#47; done
+
+  return result;
 }</code></pre>
 </section>
 

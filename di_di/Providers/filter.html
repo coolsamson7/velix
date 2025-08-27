@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the filter method from the Providers class, for the Dart programming language.">
+  <title>filter method - Providers class - di library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">velix</a></li>
+    <li><a href="../../di_di/">di&#47;di.dart</a></li>
+    <li><a href="../../di_di/Providers-class.html">Providers</a></li>
+    <li class="self-crumb">filter static method</li>
+  </ol>
+  <div class="self-name">filter</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="di_di&#47;Providers-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">filter</span> static method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="../../di_di/EnvironmentInstanceProvider-class.html">EnvironmentInstanceProvider</a></span>&gt;</span></span>
+<span class="name ">filter</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="filter-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span></li>
+<li><span class="parameter" id="filter-param-providerFilter"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">providerFilter</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="../../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a></span></span></li>
+</ol>)</span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Filter providers based on the given environment and provider filter</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static Map&lt;Type, EnvironmentInstanceProvider&gt; filter(Environment environment, bool Function(AbstractInstanceProvider) providerFilter) {
+  final Map&lt;Type, AbstractInstanceProvider&gt; cache = {};
+
+  &#47;&#47; local helper: check if a provider applies
+
+  bool providerApplies(AbstractInstanceProvider provider) {
+    if (!providerFilter(provider)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  &#47;&#47; local helper: find matching provider for a type
+  AbstractInstanceProvider? filterType(Type clazz) {
+    AbstractInstanceProvider? result;
+
+    final candidates = _providers[clazz];
+    if (candidates != null) {
+      for (final provider in candidates) {
+        if (providerApplies(provider)) {
+          if (result != null) {
+            ;&#47;&#47; TODO throw DIRegistrationException(&#39;type ${clazz.toString()} already registered&#39;);
+          }
+
+          result = provider;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  &#47;&#47; local helper: check if a type is injectable
+
+  bool isInjectable(Type type) {
+    if (type == Object) return false;
+    if (type == AbstractInstanceProvider) return false; &#47;&#47; Similar to ABC in Python
+    return true; &#47;&#47; No direct equivalent of inspect.isabstract
+  }
+
+  &#47;&#47; local helper: cache provider for type (and its superclasses)
+  void cacheProviderForType(AbstractInstanceProvider provider, Type type) {
+    final existingProvider = cache[type];
+
+    if (existingProvider == null) {
+      cache[type] = provider;
+    }
+    else {
+      if (type == provider.type) {
+        throw DIRegistrationException(&#39;type ${type.toString()} already registered&#39;);
+      }
+
+      if (existingProvider.type != type) {
+        if (existingProvider is AmbiguousProvider) {
+          existingProvider.addProvider(provider);
+        }
+        else {
+          cache[type] = AmbiguousProvider(type: type, providers: [existingProvider, provider]);
+        }
+      }
+    }
+
+    &#47;* TODO Recursion for base classes (Dart doesn&#39;t have `__bases__`, so use reflection or manual hierarchy)
+    final superClasses = TypeDescriptor.forType(type).getSuperTypes();
+    for (final superClass in superClasses) {
+      if (isInjectable(superClass)) {
+        cacheProviderForType(provider, superClass);
+      }
+    }*&#47;
+  }
+
+  &#47;&#47; filter conditional providers and fill base classes as well
+
+  for (final entry in _providers.entries) {
+    final matchingProvider = filterType(entry.key);
+    if (matchingProvider != null) {
+      cacheProviderForType(matchingProvider, entry.key);
+    }
+  }
+
+  &#47;&#47; Replace by EnvironmentInstanceProvider
+
+  final Map&lt;AbstractInstanceProvider, EnvironmentInstanceProvider&gt; mapped = {};
+  final Map&lt;Type, EnvironmentInstanceProvider&gt; result = {};
+
+  for (final entry in cache.entries) {
+    var environmentProvider = mapped[entry.value];
+    if (environmentProvider == null) {
+      environmentProvider = EnvironmentInstanceProvider(environment: environment, provider: entry.value);
+      mapped[entry.value] = environmentProvider;
+    }
+
+    result[entry.key] = environmentProvider;
+  }
+
+  &#47;&#47; Merge parent providers
+
+  var providers = result;
+  if (environment.parent != null) {
+    for ( var entry in environment.parent!.providers.entries)
+      if ( entry.value is EnvironmentInstanceProvider)  &#47;&#47; TODO
+        providers[entry.key] = entry.value as EnvironmentInstanceProvider;&#47;&#47;TODO addAll(environment.parent!.providers);
+  }
+
+  &#47;&#47; Resolve providers
+
+  final providerContext = ResolveContext(providers);
+  for (final provider in mapped.values) {
+    provider.resolve(providerContext);
+  }
+
+  return result;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">velix</a></li>
+    <li><a href="../../di_di/">di</a></li>
+    <li><a href="../../di_di/Providers-class.html">Providers</a></li>
+    <li class="self-crumb">filter static method</li>
+</ol>
+
+    <h5>Providers class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    velix
+      0.17.1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

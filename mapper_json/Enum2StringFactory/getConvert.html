@@ -77,11 +77,14 @@ Convert&lt;T,String&gt; getConvert(Type sourceType) {
   var result = converters[sourceType];
   if ( result == null) {
     var typeDescriptor = TypeDescriptor.forType(sourceType);
-    List values = typeDescriptor.enumValues!;
+    Map&lt;String,T&gt; mappings = HashMap&lt;String,T&gt;();
+
+    for ( T e in typeDescriptor.enumValues!)
+      mappings[e.name] = e;
+
     result = Convert&lt;T, String&gt;(
             (value) =&gt; (value as Enum).name,
-          convertTarget: (str) =&gt;
-          values.firstWhere((c) =&gt; (c as Enum).name == str),
+          convertTarget: (str) =&gt; mappings[str]!,
           sourceType: sourceType,
           targetType: String
     );

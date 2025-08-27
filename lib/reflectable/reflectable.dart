@@ -126,7 +126,7 @@ class TypeDescriptor<T> {
 
   static void register<T>(TypeDescriptor<T> typeDescriptor) {
     _byType[typeDescriptor.type] = typeDescriptor;
-    _byName[typeDescriptor.name] = typeDescriptor;
+    _byName[typeDescriptor.location] = typeDescriptor;
   }
 
   /// Return a new or cached 'TypeDescriptor' given a type.
@@ -213,7 +213,7 @@ class TypeDescriptor<T> {
 
   // instance data
 
-  final String name;
+  final String location;
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
   final Constructor<T> constructor;
@@ -229,7 +229,7 @@ class TypeDescriptor<T> {
   // constructor
 
   TypeDescriptor({
-    required this.name,
+    required this.location,
     required this.constructor,
     required this.fromMapConstructor,
     required this.fromArrayConstructor,
@@ -273,13 +273,40 @@ class TypeDescriptor<T> {
 
   // internal
 
-  //name: 'asset:velix/test/main.dart.Collections',
-  // TODO: line number, column
-  // rename to location
+  //'asset:velix/test/main.dart:1:1:Collections',
 
-  String getModule() {
-    int index = name.lastIndexOf('/');
-    return index == -1 ? name : name.substring(0, index);
+  String get name {
+    int index = location.lastIndexOf(':');
+
+    return location.substring(index + 1);
+  }
+
+  String get file {
+    int index = location.lastIndexOf('/');
+
+    return location.substring(index + 1, location.indexOf(":", index));
+  }
+
+  int get line {
+    int index = location.indexOf(':');
+    index = location.indexOf(':', index + 1);
+    var end = location.indexOf(':', index + 1);
+
+    return int.parse(location.substring(index + 1,  end));
+  }
+
+  int get col {
+    int index = location.indexOf(':');
+    index = location.indexOf(':', index + 1);
+    index = location.indexOf(':', index + 1);
+    var end = location.indexOf(':', index + 1);
+
+    return int.parse(location.substring(index + 1,  end));
+  }
+
+  String get module {
+    int index = location.lastIndexOf('/');
+    return index == -1 ? location : location.substring(0, index);
   }
 
   FieldDescriptor _getField(String name) {
@@ -373,7 +400,7 @@ class TypeDescriptor<T> {
 // some convenience functions for the generator
 
 TypeDescriptor<T> type<T>({
-  required String name,
+  required String location,
   required Constructor<T> constructor,
   required FromMapConstructor<T> fromMapConstructor,
   required FromArrayConstructor<T> fromArrayConstructor,
@@ -382,7 +409,7 @@ TypeDescriptor<T> type<T>({
   TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  return TypeDescriptor<T>(name: name, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
+  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({
@@ -392,7 +419,7 @@ TypeDescriptor<T> enumeration<T extends Enum>({
 }) {
   var fromMapConstructor = (Map<String,dynamic> args) => null  as T; // TODO!!!!!
   var fromArrayConstructor = (List<dynamic> args) => null  as T; //
-  return TypeDescriptor<T>(name: name, constructor: () => null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  return TypeDescriptor<T>(location: name, constructor: () => null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
 ConstructorParameter param<T>(String name, {

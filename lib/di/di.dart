@@ -459,8 +459,8 @@ class Environment {
       }
     }
     else {
-      //providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-      //providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
+      providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
+      providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
       providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
     }
 
@@ -470,7 +470,7 @@ class Environment {
     // filter by module prefix
 
     bool filterProvider(AbstractInstanceProvider provider) {
-      final hostModule = TypeDescriptor.forType(provider.host).getModule();
+      final hostModule = TypeDescriptor.forType(provider.host).module;
       for (final prefix in prefixList) {
         if (hostModule.startsWith(prefix))
           return true;
@@ -500,7 +500,7 @@ class Environment {
 
         // Determine package prefix
 
-        final packageName = mod.getModule();
+        final packageName = mod.module;
         if (packageName.isNotEmpty) {
           prefixList.add(packageName);
         }
@@ -806,7 +806,7 @@ class Boot {
 
     if (!TypeDescriptor.hasType(Boot))
       type<Boot>(
-          name: 'package:velix/di/di.dart.Boot',
+          location: 'package:velix/di/di.dart.Boot',
           params: [],
           annotations: [
             Module(imports: [])

@@ -1,6 +1,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/di/di.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/util/tracer.dart';
 
 import 'main.dart';
@@ -11,6 +12,8 @@ void main() {
     // register types
 
     registerAllDescriptors();
+
+    var d = TypeDescriptor.forType(Foo);
 
     Tracer(
         isEnabled: true,

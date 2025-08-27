@@ -4,8 +4,9 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 
-import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
+
+import 'package:source_gen/source_gen.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
@@ -659,14 +660,21 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     final className = element.name;
     final uri = element.library.uri.toString(); // e.g., package:example/models/foo.dart
-    final qualifiedName = '$uri.${element.name}';
+
+
+    // i want:  package:example/models/foo.dart:1:1:Foo
+
+    int line = 0;
+    int col = 0;
+
+    final qualifiedName = '$uri:$line:$col:${element.name}';
 
     tab();
     if ( variable )
       write("var ${className}Descriptor = ");
 
     writeln("type<$className>(").indent(1);
-    tab().writeln("name: '$qualifiedName',");
+    tab().writeln("location: '$qualifiedName',");
 
     var superClass = getSuperclass(element);
     if ( superClass != null) {
@@ -793,7 +801,6 @@ class TypeBuilder implements Builder {
 
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
-
 
       const dataclassChecker = TypeChecker.fromRuntime(Dataclass);
       const injectableChecker = TypeChecker.fromRuntime(Injectable);

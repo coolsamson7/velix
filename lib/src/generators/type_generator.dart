@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
 
+import '../../di/di.dart';
 import '../../util/collections.dart';
 
 
@@ -28,6 +29,17 @@ bool isDataclass(InterfaceElement element) {
     return value.type?.getDisplayString() == 'Dataclass';
   });
 }
+
+bool isInjectable(InterfaceElement element) {
+  return element.metadata.annotations.any((annotation) {
+    final value = annotation.computeConstantValue();
+    if (value == null)
+      return false;
+
+    return value.type?.getDisplayString() == 'Injectable';
+  });
+}
+
 
 abstract class GeneratorElement<T extends InterfaceElement> {
   // instance data
@@ -781,9 +793,24 @@ class TypeBuilder implements Builder {
 
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
-      for (final element in LibraryReader(library).annotatedWith(TypeChecker.fromRuntime(Dataclass))) {
-        if ( element.element is ClassElement)
-          checkElement(element.element as ClassElement);
+
+
+      const dataclassChecker = TypeChecker.fromRuntime(Dataclass);
+      const injectableChecker = TypeChecker.fromRuntime(Injectable);
+      const moduleChecker = TypeChecker.fromRuntime(Module);
+
+      // TODO -> configure
+
+      final annotatedClasses = library.classes.where((cls) {
+        return dataclassChecker.hasAnnotationOf(cls) ||
+            injectableChecker.hasAnnotationOf(cls) ||
+            moduleChecker.hasAnnotationOf(cls);
+      }).toList();
+
+      // TODO Sort by file position (nameOffset)
+
+      for (final element in annotatedClasses) {
+          checkElement(element);
       } // for
     }
 

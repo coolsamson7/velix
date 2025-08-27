@@ -48,3 +48,7 @@ export './i18n/formatter/date_formatter.dart';
 
 export './util/collections.dart';
 export './util/tracer.dart';
+
+// di
+
+export './di/di.dart';

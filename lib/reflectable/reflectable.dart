@@ -114,6 +114,10 @@ typedef FromArrayConstructor<T> = T Function(List<dynamic> args);
 class TypeDescriptor<T> {
   // class methods
 
+  static Iterable<TypeDescriptor> types() {
+    return _byType.values;
+  }
+
   static void register<T>(TypeDescriptor<T> typeDescriptor) {
     _byType[typeDescriptor.type] = typeDescriptor;
     _byName[typeDescriptor.name] = typeDescriptor;
@@ -252,6 +256,11 @@ class TypeDescriptor<T> {
   }
 
   // internal
+
+  String getModule() {
+    int index = name.lastIndexOf('/');
+    return index == -1 ? name : name.substring(0, index);
+  }
 
   FieldDescriptor _getField(String name) {
     final field = _fields[name];

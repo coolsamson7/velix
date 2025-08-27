@@ -93,7 +93,7 @@ class RequestScope extends Scope {
 class SingletonScopeInstanceProvider extends InstanceProvider<SingletonScope> {
   // constructor
 
-  SingletonScopeInstanceProvider() : super(type: SingletonScope, eager: false, scope: "singleton");
+  SingletonScopeInstanceProvider() : super(type: SingletonScope, eager: false, scope: "request");
 
   // override
 
@@ -263,7 +263,7 @@ class Providers {
         for (final provider in candidates) {
           if (providerApplies(provider)) {
             if (result != null) {
-              throw DIRegistrationException('type ${clazz.toString()} already registered');
+              ;// TODO throw DIRegistrationException('type ${clazz.toString()} already registered');
             }
 
             result = provider;
@@ -341,7 +341,9 @@ class Providers {
 
     var providers = result;
     if (environment.parent != null) {
-      providers.addAll(environment.parent!.providers);
+      for ( var entry in environment.parent!.providers.entries)
+        if ( entry.value is EnvironmentInstanceProvider)  // TODO
+          providers[entry.key] = entry.value as EnvironmentInstanceProvider;//TODO addAll(environment.parent!.providers);
     }
 
     // Resolve providers
@@ -360,7 +362,7 @@ class Environment {
   // instance data
 
   Environment? parent;
-  final Map<Type, EnvironmentInstanceProvider> providers = {};
+  final Map<Type, AbstractInstanceProvider> providers = {};
   final List<String> features = [];
   final List<dynamic> instances  = [];
   final List<LifecycleProcessor> lifecycleProcessors  = [];
@@ -386,12 +388,16 @@ class Environment {
 
     // inherit parent providers
 
+    // TODO
+    providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
+    providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
+
     if (parent != null) {
       parent!.providers.forEach((providerType, inheritedProvider) {
         var provider = inheritedProvider;
         if (inheritedProvider.scope == 'environment') {
-          provider = EnvironmentInstanceProvider(environment: this, provider: inheritedProvider.provider);
-          provider.dependencies = [];
+          provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
+          (provider as EnvironmentInstanceProvider).dependencies = [];
         }
         addProvider(providerType, provider);
       });
@@ -408,41 +414,40 @@ class Environment {
       }
     }
     else {
-      providers[SingletonScope] = EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-      providers[RequestScope] = EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
-      providers[EnvironmentScope] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
+      //providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
+      //providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
+      providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
     }
 
-    final Set<Type> loadedEnvironments = {};
+    final Set<Type> loadedModules = {};
     final List<String> prefixList = [];
 
-    // Helper: get package/module name (best-effort)
-    // TODO
+    // TODO: Type -> TypeDescriptor
     String getTypePackage(Type type) {
-      // Dart does not have __module__, __package__; use library metadata if available
-      // Fallback: use type.toString() as identifier
-      return type.toString().split('.').first;
+      return TypeDescriptor.forType(type).getModule();
     }
 
-    // Helper: filter provider by prefix
-    // TODO?????
+    // filter by module prefix
+
     bool filterProvider(AbstractInstanceProvider provider) {
-      final hostModule = provider.host.toString();
+      final hostModule = TypeDescriptor.forType(provider.host).getModule();
       for (final prefix in prefixList) {
-        if (hostModule.startsWith(prefix)) return true;
+        if (hostModule.startsWith(prefix))
+          return true;
       }
+
       return false;
     }
 
     // Recursively load environment and its dependencies
-    void loadEnvironment(Type envType) {
-      if (!loadedEnvironments.contains(envType)) {
+    void loadModule(Type mod) {
+      if (!loadedModules.contains(mod)) {
         //Environment.logger.debug('load environment $envType');
-        loadedEnvironments.add(envType);
+        loadedModules.add(mod);
 
-        final decorator = TypeDescriptor.forType(envType).find_annotation<Module>();
+        final decorator = TypeDescriptor.forType(mod).find_annotation<Module>();
         if (decorator == null) {
-          throw DIRegistrationException('$envType is not an module class');
+          throw DIRegistrationException('$mod is not an module class');
         }
 
         // Load dependencies recursively
@@ -454,15 +459,14 @@ class Environment {
 
         // Determine package prefix
 
-        final packageName = getTypePackage(envType);
+        final packageName = getTypePackage(mod);
         if (packageName.isNotEmpty) {
           prefixList.add(packageName);
-          // In Dart, there’s no dynamic import at runtime, so skip `import_package`
         }
       }
     }
 
-    loadEnvironment(module);
+    loadModule(module);
 
     // filter providers according to prefix list
 
@@ -488,10 +492,7 @@ class Environment {
   
   void _scan(Type module) {
     var descriptor = TypeDescriptor.forType(module);
-    var name = descriptor.name;
-
-    int index = name.lastIndexOf('/');
-    var prefix = index == -1 ? name : name.substring(0, index);
+    var prefix = descriptor.getModule();
 
     // register module
 
@@ -510,9 +511,9 @@ class Environment {
   }
 
   T get<T>(Type t) {
-    final provider = providers[T];
+    final provider = providers[t];
     if (provider == null) {
-      throw DIRuntimeException('$T is not supported');
+      throw DIRuntimeException('$t is not supported');
     }
 
     return provider.create(this) as T;
@@ -621,7 +622,8 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    return scopeInstance.get<T>(provider, environment,  () => dependencies!.map((dependency) => dependency.create(environment)).toList(growable: false));
+    print("create a ${provider.type}, dependencies: $dependencies");
+    return scopeInstance.get<T>(provider, environment,  () => (dependencies ?? []).map((dependency) => dependency.create(environment)).toList(growable: false));
   }
 
   @override

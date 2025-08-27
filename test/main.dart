@@ -1,5 +1,26 @@
 import 'package:velix/velix.dart';
 
+// NEW
+
+@Module(imports:[])
+class TestModule {
+}
+
+@Injectable(scope: "singleton", eager: true)
+class Bar {
+  const Bar();
+}
+
+@Injectable(scope: "singleton", eager: true)
+class Foo {
+  // instance data
+
+  final Bar bar;
+
+  const Foo({required this.bar});
+}
+
+// NEW
 @Dataclass()
 class Collections {
   // instance data

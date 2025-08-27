@@ -1,17 +1,40 @@
 
 // annotations
 
-import '../reflectable/reflectable.dart';
+import 'package:stack_trace/stack_trace.dart';
 
-class Injectable {
+import '../reflectable/reflectable.dart';
+import '../util/tracer.dart';
+
+class Injectable extends ClassAnnotation {
   final bool eager;
   final String scope;
+
+  // constructor
+
   const Injectable({this.eager = true, this.scope = 'singleton'});
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type) {
+    Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
+  }
 }
 
-class Module {
+class Module extends ClassAnnotation {
   final List<Type> imports;
+
+  // constructor
+
   const Module({required this.imports});
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type) {
+    Providers.register(ClassInstanceProvider(type.type, eager: true));
+  }
 }
 
 class OnInit {
@@ -22,11 +45,23 @@ class OnDestroy {
   const OnDestroy();
 }
 
-class scope {
+class scope extends ClassAnnotation {
   final String name;
   final bool register;
 
+  // constructor
+
   const scope({required this.name, this.register = false});
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type) {
+    Scopes.register(name, type.type);
+
+    if (register)
+      Providers.register(ClassInstanceProvider(type.type, eager: true, scope: "request"));
+  }
 }
 
 
@@ -373,14 +408,15 @@ class Environment {
     if ( parent == null && module != Boot)
       parent = Boot.getEnvironment();
 
-    _scan(module);
-
     final Stopwatch stopwatch = Stopwatch()..start();
 
-    //Environment.logger.debug('create environment for class $type');
+    if ( Tracer.enabled )
+      Tracer.trace('di', TraceLevel.low, 'create environment for module $module');
 
     void addProvider(Type type, AbstractInstanceProvider provider) {
-      //Environment.logger.debug('\tadd provider $provider for $type');
+      if ( Tracer.enabled )
+        Tracer.trace('di', TraceLevel.high, 'add provider $provider for $type');
+
       providers[type] = provider is EnvironmentInstanceProvider
           ? provider
           : EnvironmentInstanceProvider(environment: this, provider: provider);
@@ -442,7 +478,9 @@ class Environment {
     // Recursively load environment and its dependencies
     void loadModule(Type mod) {
       if (!loadedModules.contains(mod)) {
-        //Environment.logger.debug('load environment $envType');
+        if ( Tracer.enabled )
+          Tracer.trace('di', TraceLevel.low, 'load environment $mod');
+
         loadedModules.add(mod);
 
         final decorator = TypeDescriptor.forType(mod).find_annotation<Module>();
@@ -486,28 +524,9 @@ class Environment {
     //}
 
     stopwatch.stop();
-    //Environment.logger.info(
-    //    'created environment for class $type in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
-  }
-  
-  void _scan(Type module) {
-    var descriptor = TypeDescriptor.forType(module);
-    var prefix = descriptor.getModule();
 
-    // register module
-
-    Providers.register(ClassInstanceProvider(module));
-
-    // scan everything under it
-
-    for ( var type in TypeDescriptor.types()) {
-      if ( type != descriptor && type.name.startsWith(prefix)) {
-        var annotation = type.find_annotation<Injectable>();
-        if ( annotation != null) {
-          Providers.register(ClassInstanceProvider(type.type, eager: annotation.eager, scope: annotation.scope));
-        }
-      }
-    }
+    if ( Tracer.enabled )
+      Tracer.trace('di', TraceLevel.high, 'created environment for class $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
   }
 
   T get<T>(Type t) {
@@ -520,7 +539,27 @@ class Environment {
   }
 
   T created<T>(T instance) {
-    return instance; // TODO
+    // remember lifecycle processors
+
+    if (instance is LifecycleProcessor)
+      lifecycleProcessors.add(instance);
+
+    // sort immediately
+
+    //TODO lifecycleProcessors.sort(key=lambda processor: processor.order);
+
+    // remember instance
+
+    instances.add(instance);
+
+    // execute processors
+
+    //TODO executeProcessors(Lifecycle.onInject, instance);
+    //executeProcessors(Lifecycle.onInit, instance);
+
+    // done
+
+    return instance;
   }
 
   void initialize() {
@@ -622,7 +661,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    print("create a ${provider.type}, dependencies: $dependencies");
+    //TODO print("create a ${provider.type}, dependencies: $dependencies");
     return scopeInstance.get<T>(provider, environment,  () => (dependencies ?? []).map((dependency) => dependency.create(environment)).toList(growable: false));
   }
 

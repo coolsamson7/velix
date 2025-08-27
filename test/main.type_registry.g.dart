@@ -10,7 +10,7 @@ void registerAllDescriptors() {
   // TODO
 
   type<Boot>(
-      name: 'asset:velix/test/main.dart.Collections',
+      name: 'package:velix/di/di.dart.Boot',
       params: [
       ],
       annotations: [

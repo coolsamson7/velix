@@ -3,6 +3,12 @@ import '../validation/validation.dart';
 
 Type nonNullableOf<T>() => T;
 
+class ClassAnnotation {
+  const ClassAnnotation();
+
+  void apply(TypeDescriptor type){}
+}
+
 /// decorator used to mark classes that should emit meta-data
 class Dataclass {
   const Dataclass();
@@ -253,6 +259,12 @@ class TypeDescriptor<T> {
     // automatically register
 
     TypeDescriptor.register(this);
+
+    // run annotations
+
+    for ( var annotation in annotations)
+      if ( annotation is ClassAnnotation)
+        annotation.apply(this);
   }
 
   // internal

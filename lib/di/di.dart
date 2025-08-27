@@ -64,17 +64,14 @@ class scope extends ClassAnnotation {
 
 
 class Scopes {
-  static Map<String, Type> scopes = {
-    "request": RequestScope,
-    "singleton": SingletonScope,
-  };
+  static Map<String, Type> scopes = {};
 
   static void register(String name, Type scope) {
     scopes[name] = scope;
   }
 
   static Scope get(String name, Environment environment) {
-    return environment.get<Scope>(scopes[name]!);
+    return environment.get(scopes[name]!);
   }
 }
 
@@ -144,7 +141,7 @@ class SingletonScopeInstanceProvider extends InstanceProvider<SingletonScope> {
 class RequestScopeInstanceProvider extends InstanceProvider<RequestScope> {
   // constructor
 
-  RequestScopeInstanceProvider() : super(type: RequestScope, eager: false, scope: "request");
+  RequestScopeInstanceProvider() : super(type: RequestScope, eager: false, scope: "singleton");
 
   // override
 
@@ -210,7 +207,7 @@ abstract class LifecycleProcessor {
 class ResolveContext {
   // instance data
 
-  final Map<Type, EnvironmentInstanceProvider> providers;
+  final Map<Type, AbstractInstanceProvider> providers;
   final List<EnvironmentInstanceProvider> _path = [];
 
   // constructor
@@ -240,10 +237,10 @@ class ResolveContext {
     }
 
     if (_path.contains(provider)) {
-      throw DIRegistrationException(cycleReport(provider));
+      throw DIRegistrationException(cycleReport(provider as EnvironmentInstanceProvider));
     }
 
-    return provider;
+    return provider as EnvironmentInstanceProvider;
   }
 
   // report a cycle in the dependency graph
@@ -292,7 +289,7 @@ class Providers {
   }
 
   /// Filter providers based on the given environment and provider filter
-  static Map<Type, EnvironmentInstanceProvider> filter(Environment environment, bool Function(AbstractInstanceProvider) providerFilter) {
+  static Map<Type, AbstractInstanceProvider> filter(Environment environment, bool Function(AbstractInstanceProvider) providerFilter) {
     final Map<Type, AbstractInstanceProvider> cache = {};
 
     // local helper: check if a provider applies
@@ -367,8 +364,8 @@ class Providers {
 
     // replace by EnvironmentInstanceProvider
 
-    final Map<AbstractInstanceProvider, EnvironmentInstanceProvider> mapped = {};
-    final Map<Type, EnvironmentInstanceProvider> result = {};
+    final Map<AbstractInstanceProvider, AbstractInstanceProvider> mapped = {};
+    final Map<Type, AbstractInstanceProvider> result = {};
 
     for (final entry in cache.entries) {
       var environmentProvider = mapped[entry.value];
@@ -384,12 +381,10 @@ class Providers {
 
     var providers = result;
     if (environment.parent != null) {
-      for ( var entry in environment.parent!.providers.entries)
-        if ( entry.value is EnvironmentInstanceProvider)  // TODO
-          providers[entry.key] = entry.value as EnvironmentInstanceProvider;//TODO addAll(environment.parent!.providers);
+      providers.addAll(environment.parent!.providers);
     }
 
-    // Resolve providers
+    // resolve providers
 
     final providerContext = ResolveContext(providers);
     for (final provider in mapped.values) {
@@ -433,9 +428,11 @@ class Environment {
 
     // inherit parent providers
 
-    // TODO
-    providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-    providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
+    // slight bootstrap problem
+
+    providers[SingletonScope]   = SingletonScopeInstanceProvider();
+    providers[RequestScope]     = RequestScopeInstanceProvider();
+    providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
 
     if (parent != null) {
       parent!.providers.forEach((providerType, inheritedProvider) {
@@ -443,8 +440,9 @@ class Environment {
         if (inheritedProvider.scope == 'environment') {
           provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
           (provider as EnvironmentInstanceProvider).dependencies = [];
+          addProvider(providerType, provider);
         }
-        addProvider(providerType, provider);
+        //addProvider(providerType, provider);
       });
 
       // inherit lifecycle processors
@@ -459,9 +457,10 @@ class Environment {
       }
     }
     else {
-      providers[SingletonScope] = SingletonScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-      providers[RequestScope] = RequestScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
-      providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
+      // add bootstrap provider for Boot
+      //providers[SingletonScope] = SingletonScopeInstanceProvider();
+      //providers[RequestScope] = RequestScopeInstanceProvider();
+      //providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
     }
 
     final Set<TypeDescriptor> loadedModules = {};
@@ -479,17 +478,18 @@ class Environment {
       return false;
     }
 
-    // Recursively load environment and its dependencies
-    void loadModule(TypeDescriptor mod) {
-      if (!loadedModules.contains(mod)) {
+    // recursively load environment and its dependencies
+
+    void loadModule(TypeDescriptor moduleDescriptor) {
+      if (!loadedModules.contains(moduleDescriptor)) {
         if ( Tracer.enabled )
-          Tracer.trace('di', TraceLevel.low, 'load environment $mod');
+          Tracer.trace('di', TraceLevel.low, 'load environment $moduleDescriptor');
 
-        loadedModules.add(mod);
+        loadedModules.add(moduleDescriptor);
 
-        final decorator = mod.findAnnotation<Module>();
+        final decorator = moduleDescriptor.findAnnotation<Module>();
         if (decorator == null) {
-          throw DIRegistrationException('$mod is not an module class');
+          throw DIRegistrationException('$moduleDescriptor is not an module class');
         }
 
         // load dependencies recursively
@@ -500,7 +500,7 @@ class Environment {
 
         // Determine package prefix
 
-        final packageName = mod.module;
+        final packageName = moduleDescriptor.module;
         if (packageName.isNotEmpty) {
           prefixList.add(packageName);
         }
@@ -557,7 +557,7 @@ class Environment {
 
     // sort immediately
 
-    //TODO lifecycleProcessors.sort(key=lambda processor: processor.order);
+    lifecycleProcessors.sort((a, b) => a.order.compareTo(b.order));
 
     // remember instance
 
@@ -605,11 +605,11 @@ abstract class AbstractInstanceProvider<T> {
      throw UnimplementedError();
   }
 
+  void resolve(ResolveContext context){}
+
   String report() => toString();
 
-  String location() {
-    return "location?"; // TODO
-  }
+  String get location => "location?";
 }
 
  abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
@@ -686,7 +686,10 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
     if ( Tracer.enabled)
       Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
 
-    return scopeInstance.get<T>(provider, environment,  () => (dependencies ?? []).map((dependency) => dependency.create(environment)).toList(growable: false));
+    if ( dependencies == null)
+      print("?");
+
+    return scopeInstance.get<T>(provider, environment,  () => (dependencies!).map((dependency) => dependency.create(environment)).toList(growable: false));
   }
 
   @override
@@ -697,6 +700,9 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   Type get type => provider.type;
+
+  @override
+  String get location => provider.location;
 
   @override
   String report() => provider.report();
@@ -777,6 +783,8 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
     return (types, params);
   }
 
+  String get location => descriptor.location;
+
   /// Creates an instance of the type using the environment
 
   @override
@@ -804,7 +812,43 @@ class Boot {
   static Environment getEnvironment() {
     // add meta-data
 
-    if (!TypeDescriptor.hasType(Boot))
+    if (!TypeDescriptor.hasType(Boot)) {
+      type<SingletonScope>(
+          location: 'package:velix/di/di.dart.SingletonScope',
+          params: [],
+          annotations: [
+            scope(name: "singleton", register: false)
+          ],
+          constructor: () => SingletonScope(),
+          fromMapConstructor: (Map<String, dynamic> args) => SingletonScope(),
+          fromArrayConstructor: (List<dynamic> args) => SingletonScope(),
+          fields: []
+      );
+
+      type<EnvironmentScope>(
+          location: 'package:velix/di/di.dart.EnvironmentScope',
+          params: [],
+          annotations: [
+            scope(name: "environment", register: false)
+          ],
+          constructor: () => EnvironmentScope(),
+          fromMapConstructor: (Map<String, dynamic> args) => EnvironmentScope(),
+          fromArrayConstructor: (List<dynamic> args) => EnvironmentScope(),
+          fields: []
+      );
+
+      type<RequestScope>(
+          location: 'package:velix/di/di.dart.RequestScope',
+          params: [],
+          annotations: [
+            scope(name: "request", register: false)
+          ],
+          constructor: () => RequestScope(),
+          fromMapConstructor: (Map<String, dynamic> args) => RequestScope(),
+          fromArrayConstructor: (List<dynamic> args) => RequestScope(),
+          fields: []
+      );
+
       type<Boot>(
           location: 'package:velix/di/di.dart.Boot',
           params: [],
@@ -812,10 +856,11 @@ class Boot {
             Module(imports: [])
           ],
           constructor: () => Boot(),
-          fromMapConstructor: (Map<String,dynamic> args) => Boot(),
+          fromMapConstructor: (Map<String, dynamic> args) => Boot(),
           fromArrayConstructor: (List<dynamic> args) => Boot(),
           fields: []
       );
+    } // if
     
     environment ??= Environment(Boot);
 

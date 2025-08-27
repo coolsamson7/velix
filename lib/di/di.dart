@@ -313,7 +313,7 @@ class Providers {
         for (final provider in candidates) {
           if (providerApplies(provider)) {
             if (result != null) {
-              ;// TODO throw DIRegistrationException('type ${clazz.toString()} already registered');
+              throw DIRegistrationException('type ${clazz.toString()} already registered');
             }
 
             result = provider;

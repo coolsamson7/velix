@@ -136,6 +136,11 @@ class SingletonScopeInstanceProvider extends InstanceProvider<SingletonScope> {
   SingletonScope create(Environment environment, [List args = const []]) {
     return SingletonScope();
   }
+
+  // override Object
+
+  @override
+  String toString() => "SingletonScopeInstanceProvider";
 }
 
 class RequestScopeInstanceProvider extends InstanceProvider<RequestScope> {
@@ -149,6 +154,11 @@ class RequestScopeInstanceProvider extends InstanceProvider<RequestScope> {
   RequestScope create(Environment environment, [List args = const []]) {
     return RequestScope();
   }
+
+  // override Object
+
+  @override
+  String toString() => "RequestScopeInstanceProvider";
 }
 
 class EnvironmentScopeInstanceProvider extends InstanceProvider<EnvironmentScope> {
@@ -162,6 +172,11 @@ class EnvironmentScopeInstanceProvider extends InstanceProvider<EnvironmentScope
   EnvironmentScope create(Environment environment, [List args = const []]) {
     return EnvironmentScope();
   }
+
+  // override Object
+
+  @override
+  String toString() => "EnvironmentScopeInstanceProvider";
 }
 
 class DIException implements Exception {
@@ -396,6 +411,7 @@ class Providers {
 class Environment {
   // instance data
 
+  Type module;
   Environment? parent;
   final Map<Type, AbstractInstanceProvider> providers = {};
   final List<String> features = [];
@@ -404,7 +420,7 @@ class Environment {
 
   // constructor
 
-  Environment(Type module, {this.parent})  {
+  Environment(this.module, {this.parent})  {
     if ( parent == null && module != Boot)
       parent = Boot.getEnvironment();
 
@@ -526,7 +542,7 @@ class Environment {
     stopwatch.stop();
 
     if ( Tracer.enabled )
-      Tracer.trace('di', TraceLevel.high, 'created environment for class $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
+      Tracer.trace('di', TraceLevel.high, 'created environment for module $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
   }
 
   T get<T>(Type t) {
@@ -569,6 +585,11 @@ class Environment {
       }
     }
   }
+
+  // override Object
+
+  @override
+  String toString() => "Environment(${module})";
 }
 
 abstract class AbstractInstanceProvider<T> {
@@ -661,7 +682,9 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    //TODO print("create a ${provider.type}, dependencies: $dependencies");
+    if ( Tracer.enabled)
+      Tracer.trace("di", TraceLevel.full, "create ${provider.type} in ${environment}");
+
     return scopeInstance.get<T>(provider, environment,  () => (dependencies ?? []).map((dependency) => dependency.create(environment)).toList(growable: false));
   }
 
@@ -673,6 +696,11 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   Type get type => provider.type;
+
+  // override Object
+
+  @override
+  String toString() => "EnvironmentProvider(${provider})";
 }
 
 class AmbiguousProvider<T> extends InstanceProvider<T> {
@@ -689,6 +717,11 @@ class AmbiguousProvider<T> extends InstanceProvider<T> {
   void addProvider(AbstractInstanceProvider<T> provider) {
     providers.add(provider);
   }
+
+  // override Object
+
+  @override
+  String toString() => "AmbiguousProvider(${type.runtimeType})";
 }
 
 class ClassInstanceProvider<T> extends InstanceProvider<T> {
@@ -704,7 +737,8 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   // override
 
   /// Returns the list of dependency types and the number of constructor parameters
-   @override
+
+  @override
   (List<Type>,int) getDependencies() {
     final List<Type> types = [];
     int params = 0;
@@ -735,13 +769,18 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   }
 
   /// Creates an instance of the type using the environment
-  ///
+
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
     final instance = descriptor.fromArrayConstructor(args);
 
     return environment.created(instance);
-    }
+   }
+
+   // override Object
+
+  @override
+  String toString() => "ClassProvider(${_type})";
 }
 
 // boot

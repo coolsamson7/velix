@@ -492,12 +492,11 @@ class Environment {
           throw DIRegistrationException('$mod is not an module class');
         }
 
-        // Load dependencies recursively
+        // load dependencies recursively
 
-        //TODO final importEnvironments = decorator.args.isNotEmpty ? decorator.args[0] as List<Type> : [];
-        //for (final importEnv in importEnvironments) {
-        //  loadEnvironment(importEnv);
-        //}
+        for (final import in  decorator.imports) {
+          loadModule(TypeDescriptor.forType(import));
+        }
 
         // Determine package prefix
 
@@ -514,7 +513,7 @@ class Environment {
 
     providers.addAll(Providers.filter(this, filterProvider));
 
-    // Construct eager objects for local providers
+    // construct eager objects for local providers
 
     for (final provider in providers.values.toSet()) {
       if (provider.eager) {
@@ -522,10 +521,11 @@ class Environment {
       }
     }
 
-    // TODO Run ON_RUNNING lifecycle callbacks
-    //for (final instance in instances) {
-    //  executeProcessors(Lifecycle.ON_RUNNING, instance);
-    //}
+    // run lifecycle callbacks
+
+    for (final instance in instances) {
+      executeProcessors(Lifecycle.onRunning, instance);
+    }
 
     stopwatch.stop();
 
@@ -565,8 +565,8 @@ class Environment {
 
     // execute processors
 
-    //TODO executeProcessors(Lifecycle.onInject, instance);
-    //executeProcessors(Lifecycle.onInit, instance);
+    executeProcessors(Lifecycle.onInject, instance);
+    executeProcessors(Lifecycle.onInit, instance);
 
     // done
 

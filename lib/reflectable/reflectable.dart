@@ -273,6 +273,10 @@ class TypeDescriptor<T> {
 
   // internal
 
+  //name: 'asset:velix/test/main.dart.Collections',
+  // TODO: line number, column
+  // rename to location
+
   String getModule() {
     int index = name.lastIndexOf('/');
     return index == -1 ? name : name.substring(0, index);

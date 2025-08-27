@@ -305,7 +305,6 @@ class Providers {
       return true;
     }
 
-    // local helper: find matching provider for a type
     AbstractInstanceProvider? filterType(Type clazz) {
       AbstractInstanceProvider? result;
 
@@ -325,15 +324,10 @@ class Providers {
       return result;
     }
 
-    // local helper: check if a type is injectable
-
-    bool isInjectable(Type type) {
-      if (type == Object) return false;
-      if (type == AbstractInstanceProvider) return false; // Similar to ABC in Python
-      return true; // No direct equivalent of inspect.isabstract
+    bool isInjectable(TypeDescriptor type) {
+      return type.findAnnotation<Injectable>() != null;
     }
 
-    // local helper: cache provider for type (and its superclasses)
     void cacheProviderForType(AbstractInstanceProvider provider, Type type) {
       final existingProvider = cache[type];
 
@@ -342,7 +336,7 @@ class Providers {
       }
       else {
         if (type == provider.type) {
-          throw DIRegistrationException('type ${type.toString()} already registered');
+          throw DIRegistrationException('type $type already registered');
         }
 
         if (existingProvider.type != type) {
@@ -355,25 +349,23 @@ class Providers {
         }
       }
 
-      /* TODO Recursion for base classes (Dart doesn't have `__bases__`, so use reflection or manual hierarchy)
-      final superClasses = TypeDescriptor.forType(type).getSuperTypes();
-      for (final superClass in superClasses) {
-        if (isInjectable(superClass)) {
-          cacheProviderForType(provider, superClass);
+      final superClass = TypeDescriptor.forType(type).superClass;
+        if (superClass != null && isInjectable(superClass)) {
+          cacheProviderForType(provider, superClass.type);
         }
-      }*/
     }
 
     // filter conditional providers and fill base classes as well
 
     for (final entry in _providers.entries) {
       final matchingProvider = filterType(entry.key);
+
       if (matchingProvider != null) {
         cacheProviderForType(matchingProvider, entry.key);
       }
     }
 
-    // Replace by EnvironmentInstanceProvider
+    // replace by EnvironmentInstanceProvider
 
     final Map<AbstractInstanceProvider, EnvironmentInstanceProvider> mapped = {};
     final Map<Type, EnvironmentInstanceProvider> result = {};
@@ -388,7 +380,7 @@ class Providers {
       result[entry.key] = environmentProvider;
     }
 
-    // Merge parent providers
+    // merge parent providers
 
     var providers = result;
     if (environment.parent != null) {

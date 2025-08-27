@@ -6,7 +6,7 @@ import 'package:velix/reflectable/reflectable.dart';
 
 void registerAllDescriptors() {
   type<Details>(
-    location: 'package:sample/models/todo.dart.Details',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('author', isNamed: true, isRequired: true), 
       param<int>('priority', isNamed: true, isRequired: true), 
@@ -31,7 +31,7 @@ void registerAllDescriptors() {
   );
 
   type<Todo>(
-      location: 'package:sample/models/todo.dart.Todo',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('title', isNamed: true, isRequired: true), 
@@ -65,7 +65,7 @@ void registerAllDescriptors() {
   );
 
   type<TestData>(
-      location: 'package:sample/models/todo.dart.TestData',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('string_data', isNamed: true, isRequired: true), 
       param<int>('int_data', isNamed: true, isRequired: true), 

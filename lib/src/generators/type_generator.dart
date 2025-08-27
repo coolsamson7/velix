@@ -578,7 +578,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       tab().writeln("constructor: () => throw UnsupportedError('No public constructor'),");
     }
     else {
-      tab().write("constructor: ({");
+      tab().write("constructor: (");
+
+      if ( firstCtor.formalParameters.isNotEmpty)
+        write("{");
 
       final paramsBuffer = StringBuffer();
 
@@ -619,7 +622,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           else
             paramsBuffer.write("$paramType $paramName = $defaultValue, ");
         }
-      }
+      } // for
 
       // Remove trailing comma and space, if any
 
@@ -628,7 +631,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         paramsStr = paramsStr.substring(0, paramsStr.length - 1);
       }
 
-      write(paramsStr).write("}) => ${element.name}(");
+      write(paramsStr);
+      if ( paramsStr.isNotEmpty)
+        write("}");
+
+      write(") => ${element.name}(");
 
       // Pass parameters to actual constructor, named if necessary
 
@@ -649,7 +656,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       final args = <String>[...positionalArgs, ...namedArgs];
 
       write(args.join(", ")).writeln("),");
-    }
+    } // else
   }
 
   // override
@@ -661,13 +668,12 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final className = element.name;
     final uri = element.library.uri.toString(); // e.g., package:example/models/foo.dart
 
-
     // i want:  package:example/models/foo.dart:1:1:Foo
 
     int line = 0;
     int col = 0;
 
-    final qualifiedName = '$uri:$line:$col:${element.name}';
+    final qualifiedName = '$uri:$line:$col';
 
     tab();
     if ( variable )

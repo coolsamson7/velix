@@ -276,9 +276,7 @@ class TypeDescriptor<T> {
   //'asset:velix/test/main.dart:1:1:Collections',
 
   String get name {
-    int index = location.lastIndexOf(':');
-
-    return location.substring(index + 1);
+    return type.toString();
   }
 
   String get file {

@@ -542,6 +542,13 @@ class Environment {
     return provider.create(this) as T;
   }
 
+  void report() {
+    for ( var provider in providers.values) {
+      if ( provider is EnvironmentInstanceProvider)
+        provider.printTree();
+    }
+  }
+
   T executeProcessors<T>(Lifecycle lifecycle, T instance) {
     for ( var processor in lifecycleProcessors)
       processor.processLifecycle(lifecycle, instance, this);
@@ -658,6 +665,20 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   // internal
 
+  void printTree([String prefix = ""]) {
+    final children = dependencies!;
+    final lastIndex = children.length - 1;
+
+    print('$prefix+- ${report()}');
+
+    for (var i = 0; i < children.length; i++) {
+      final child = children[i];
+      final childPrefix = (i == lastIndex) ? '$prefix   ' : '$prefix|  ';
+      child.printTree(childPrefix);
+    }
+  }
+
+  @override
   void resolve(ResolveContext context) {
     if (dependencies == null) {
       dependencies = [];
@@ -686,10 +707,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
     if ( Tracer.enabled)
       Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
 
-    if ( dependencies == null)
-      print("?");
-
-    return scopeInstance.get<T>(provider, environment,  () => (dependencies!).map((dependency) => dependency.create(environment)).toList(growable: false));
+    return scopeInstance.get<T>(provider, environment,  () => dependencies!.map((dependency) => dependency.create(environment)).toList(growable: false));
   }
 
   @override

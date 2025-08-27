@@ -26,6 +26,8 @@ void main() {
     test('di', () {
       var environment = Environment(TestModule);
 
+      environment.report();
+
       var foo = environment.get<Foo>(Foo);
 
       expect(foo, isNotNull);

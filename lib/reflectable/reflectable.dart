@@ -140,6 +140,10 @@ class TypeDescriptor<T> {
     return descriptor;
   }
 
+  static bool hasType(Type type) {
+    return _byType[type] != null;
+  }
+
   static TypeDescriptor forName(String type) {
     final descriptor = _byName[type];
     if (descriptor == null) {
@@ -292,7 +296,7 @@ class TypeDescriptor<T> {
     return enumValues != null;
   }
 
-  A? find_annotation<A>() {
+  A? findAnnotation<A>() {
     return findElement(annotations, (annotation) => annotation is A) as A?;
   }
 

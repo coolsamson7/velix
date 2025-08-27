@@ -198,7 +198,7 @@ class JSONMapper {
       var typeMapping = MappingDefinition<dynamic,Map<String, dynamic>>(sourceClass: type, targetClass: Map<String, dynamic>);
       var typeDescriptor = TypeDescriptor.forType(type);
 
-      var jsonSerializable = typeDescriptor.find_annotation<JsonSerializable>() ?? JsonSerializable();
+      var jsonSerializable = typeDescriptor.findAnnotation<JsonSerializable>() ?? JsonSerializable();
 
       mappings[type] = typeMapping;
 
@@ -287,7 +287,7 @@ class JSONMapper {
 
       var typeDescriptor = TypeDescriptor.forType(type);
 
-      var jsonSerializable = typeDescriptor.find_annotation<JsonSerializable>() ?? JsonSerializable();
+      var jsonSerializable = typeDescriptor.findAnnotation<JsonSerializable>() ?? JsonSerializable();
 
       mappings[type] = typeMapping;
 

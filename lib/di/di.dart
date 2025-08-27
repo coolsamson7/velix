@@ -1,8 +1,6 @@
 
 // annotations
 
-import 'package:stack_trace/stack_trace.dart';
-
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 
@@ -204,7 +202,7 @@ enum Lifecycle {
 
 abstract class LifecycleProcessor {
   int get order;
-  void processLifecycle(Lifecycle lifecycle, Object instance, Environment environment);
+  void processLifecycle(Lifecycle lifecycle, dynamic instance, Environment environment);
 }
 
 /// The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
@@ -253,11 +251,14 @@ class ResolveContext {
     final buffer = StringBuffer();
 
     for (var i = 0; i < _path.length; i++) {
-      if (i > 0) buffer.write(' -> ');
-        ;//buffer.write(_path[i].report());
+      if (i > 0)
+        buffer.write(' -> ');
+
+      buffer.write(_path[i].report());
     }
 
-    //buffer.write(' <> ${provider.report()}');
+    buffer.write(' <> ${provider.report()}');
+
     return buffer.toString();
   }
 }
@@ -471,13 +472,8 @@ class Environment {
       providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();//EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
     }
 
-    final Set<Type> loadedModules = {};
+    final Set<TypeDescriptor> loadedModules = {};
     final List<String> prefixList = [];
-
-    // TODO: Type -> TypeDescriptor
-    String getTypePackage(Type type) {
-      return TypeDescriptor.forType(type).getModule();
-    }
 
     // filter by module prefix
 
@@ -492,14 +488,14 @@ class Environment {
     }
 
     // Recursively load environment and its dependencies
-    void loadModule(Type mod) {
+    void loadModule(TypeDescriptor mod) {
       if (!loadedModules.contains(mod)) {
         if ( Tracer.enabled )
           Tracer.trace('di', TraceLevel.low, 'load environment $mod');
 
         loadedModules.add(mod);
 
-        final decorator = TypeDescriptor.forType(mod).find_annotation<Module>();
+        final decorator = mod.findAnnotation<Module>();
         if (decorator == null) {
           throw DIRegistrationException('$mod is not an module class');
         }
@@ -513,14 +509,14 @@ class Environment {
 
         // Determine package prefix
 
-        final packageName = getTypePackage(mod);
+        final packageName = mod.getModule();
         if (packageName.isNotEmpty) {
           prefixList.add(packageName);
         }
       }
     }
 
-    loadModule(module);
+    loadModule(TypeDescriptor.forType(module));
 
     // filter providers according to prefix list
 
@@ -552,6 +548,13 @@ class Environment {
     }
 
     return provider.create(this) as T;
+  }
+
+  T executeProcessors<T>(Lifecycle lifecycle, T instance) {
+    for ( var processor in lifecycleProcessors)
+      processor.processLifecycle(lifecycle, instance, this);
+
+    return instance;
   }
 
   T created<T>(T instance) {
@@ -589,7 +592,7 @@ class Environment {
   // override Object
 
   @override
-  String toString() => "Environment(${module})";
+  String toString() => "Environment($module)";
 }
 
 abstract class AbstractInstanceProvider<T> {
@@ -608,6 +611,12 @@ abstract class AbstractInstanceProvider<T> {
 
   T create(Environment environment, [List<dynamic> args = const []]) {
      throw UnimplementedError();
+  }
+
+  String report() => toString();
+
+  String location() {
+    return "location?"; // TODO
   }
 }
 
@@ -683,7 +692,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
     if ( Tracer.enabled)
-      Tracer.trace("di", TraceLevel.full, "create ${provider.type} in ${environment}");
+      Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
 
     return scopeInstance.get<T>(provider, environment,  () => (dependencies ?? []).map((dependency) => dependency.create(environment)).toList(growable: false));
   }
@@ -697,10 +706,13 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   @override
   Type get type => provider.type;
 
+  @override
+  String report() => provider.report();
+
   // override Object
 
   @override
-  String toString() => "EnvironmentProvider(${provider})";
+  String toString() => "EnvironmentProvider($provider)";
 }
 
 class AmbiguousProvider<T> extends InstanceProvider<T> {
@@ -717,6 +729,11 @@ class AmbiguousProvider<T> extends InstanceProvider<T> {
   void addProvider(AbstractInstanceProvider<T> provider) {
     providers.add(provider);
   }
+
+  // override
+
+  @override
+  String report() => "ambiguous: ${providers.map((provider) => provider.report()).join(',')}";
 
   // override Object
 
@@ -775,12 +792,15 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
     final instance = descriptor.fromArrayConstructor(args);
 
     return environment.created(instance);
-   }
+  }
+
+  @override
+  String report() => "$host(...)";
 
    // override Object
 
   @override
-  String toString() => "ClassProvider(${_type})";
+  String toString() => "ClassProvider($_type)";
 }
 
 // boot
@@ -790,6 +810,21 @@ class Boot {
   static Environment? environment;
 
   static Environment getEnvironment() {
+    // add meta-data
+
+    if (!TypeDescriptor.hasType(Boot))
+      type<Boot>(
+          name: 'package:velix/di/di.dart.Boot',
+          params: [],
+          annotations: [
+            Module(imports: [])
+          ],
+          constructor: () => Boot(),
+          fromMapConstructor: (Map<String,dynamic> args) => Boot(),
+          fromArrayConstructor: (List<dynamic> args) => Boot(),
+          fields: []
+      );
+    
     environment ??= Environment(Boot);
 
     return environment!;

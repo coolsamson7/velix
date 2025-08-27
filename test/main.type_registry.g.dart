@@ -7,21 +7,6 @@ import 'package:velix/mapper/json.dart';
 import 'package:velix/di/di.dart';
 
 void registerAllDescriptors() {
-  // TODO
-
-  type<Boot>(
-      name: 'package:velix/di/di.dart.Boot',
-      params: [
-      ],
-      annotations: [
-        Module(imports: [])
-      ],
-      constructor: ({required List<Money> prices}) => Boot(),
-      fromMapConstructor: (Map<String,dynamic> args) => Boot(),
-      fromArrayConstructor: (List<dynamic> args) => Boot(),
-      fields: []
-  );
-
   type<Collections>(
     name: 'asset:velix/test/main.dart.Collections',
     params: [

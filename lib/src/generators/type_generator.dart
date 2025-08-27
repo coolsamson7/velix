@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:async';
+import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
@@ -70,7 +72,7 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   // abstract
 
-  void generateCode(StringBuffer buffer, bool variable);
+  void generateCode(StringBuffer buffer, bool variable, TypeBuilder builder);
 
   // public
 
@@ -97,7 +99,7 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
       // generate
 
-      generateCode(buffer, generateVariable);
+      generateCode(buffer, generateVariable, builder);
     }
   }
 }
@@ -153,8 +155,8 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
   }
 
   @override
-  generateCode(StringBuffer buffer, bool variable) {
-    generator.generate(buffer, element, variable);
+  generateCode(StringBuffer buffer, bool variable, TypeBuilder builder) {
+    generator.generate(buffer, element, variable, builder);
   }
 }
 
@@ -168,8 +170,8 @@ class EnumGeneratorElement extends GeneratorElement<EnumElement2> {
   // override
 
   @override
-  generateCode(StringBuffer buffer, bool variable) {
-    generator.generate(buffer, element, variable);
+  generateCode(StringBuffer buffer, bool variable, TypeBuilder builder) {
+    generator.generate(buffer, element, variable, builder);
   }
 }
 
@@ -243,7 +245,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
   // abstract
 
-  void generate(StringBuffer buffer, T element, bool variable);
+  void generate(StringBuffer buffer, T element, bool variable, TypeBuilder builder);
 }
 
 class ClassCodeGenerator extends CodeGenerator<ClassElement> {
@@ -662,7 +664,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, ClassElement element, bool variable) {
+  void generate(StringBuffer buffer, ClassElement element, bool variable, TypeBuilder builder) {
     start(buffer);
 
     final className = element.name;
@@ -670,8 +672,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     // i want:  package:example/models/foo.dart:1:1:Foo
 
-    int line = 0;
-    int col = 0;
+
+    final (line, col) = builder.elementLocations[element] ?? (0, 0);
 
     final qualifiedName = '$uri:$line:$col';
 
@@ -702,7 +704,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, EnumElement element, bool variable) {
+  void generate(StringBuffer buffer, EnumElement element, bool variable, TypeBuilder builder) {
     start(buffer);
 
     final className = element.name;
@@ -728,6 +730,48 @@ class TypeBuilder implements Builder {
   Set<Uri> imports = <Uri>{};
 
   // Outputs a fixed file in /lib; adjust as needed.
+
+  Map<InterfaceElement, (int line, int column)> elementLocations = {};
+
+  // Method to extract line/column during library processing
+  Future<void> processLibraryForLocations(LibraryElement library, AssetId assetId, BuildStep buildStep) async {
+    try {
+      final resolver = buildStep.resolver;
+
+      // Get the compilation unit (AST) for this specific file
+
+      final compilationUnit = await resolver.compilationUnitFor(assetId);
+
+      // Process each declaration in the compilation unit
+
+      for (final declaration in compilationUnit.declarations) {
+        if (declaration is ClassDeclaration) {
+          final className = declaration.name.lexeme;
+          // Find the corresponding ClassElement in the library
+          final classElement = library.classes.where((c) => c.name == className).firstOrNull;
+          if (classElement != null) {
+            final lineInfo = compilationUnit.lineInfo;
+            final location = lineInfo.getLocation(declaration.name.offset);
+            elementLocations[classElement] = (location.lineNumber, location.columnNumber);
+          }
+        }
+        else if (declaration is EnumDeclaration) {
+          final enumName = declaration.name.lexeme;
+          // Find the corresponding EnumElement in the library
+          final enumElement = library.enums.where((e) => e.name == enumName).firstOrNull;
+          if (enumElement != null) {
+            final lineInfo = compilationUnit.lineInfo;
+            final location = lineInfo.getLocation(declaration.name.offset);
+            elementLocations[enumElement] = (location.lineNumber, location.columnNumber);
+          }
+        }
+      }
+    }
+    catch (e) {
+      // If we can't get locations, they'll remain (0, 0)
+      print('Error getting locations for ${assetId.path}: $e');
+    }
+  }
 
   @override
   final buildExtensions = const {
@@ -807,6 +851,8 @@ class TypeBuilder implements Builder {
 
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
+
+      await processLibraryForLocations(library, input, buildStep);
 
       const dataclassChecker = TypeChecker.fromRuntime(Dataclass);
       const injectableChecker = TypeChecker.fromRuntime(Injectable);

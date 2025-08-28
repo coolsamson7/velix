@@ -649,7 +649,7 @@ class TargetNode {
       var descriptor = TypeDescriptor.forType(targetTree.type);
 
       if (descriptor.isImmutable() || !descriptor.hasDefaultConstructor()) {
-        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromArrayConstructor, children.length, MappingResultValueReceiver());
+        resultDefinition = definition.addIntermediateResultDefinition(TypeDescriptor.forType(type), descriptor.fromArrayConstructor!, children.length, MappingResultValueReceiver());
       }
 
       // recursion
@@ -667,7 +667,7 @@ class TargetNode {
 
       // done
 
-      resultDefinition = definition.addIntermediateResultDefinition(descriptor, constructor, children.length, valueReceiver);
+      resultDefinition = definition.addIntermediateResultDefinition(descriptor, constructor!, children.length, valueReceiver);
 
       // recursion
 
@@ -817,7 +817,7 @@ class OperationBuilder {
       constructor = targetTree.root.resultDefinition!.constructor;
     }
     else {
-      constructor = TypeDescriptor.forType(definition.targetClass).constructor; // hmmm
+      constructor = TypeDescriptor.forType(definition.targetClass).constructor!; // hmmm
     }
 
     return OperationResult(operations: operations, constructor: constructor, stackSize: sourceTree.stackSize);

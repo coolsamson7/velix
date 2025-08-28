@@ -144,7 +144,7 @@ class TODOApp extends StatelessWidget {
   // instance data
 
   final I18N i18n;
-  final Environment environment = Environment(ServiceModule);
+  final Environment environment = Environment(module: ServiceModule);
   
   // constructor
   

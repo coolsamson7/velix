@@ -257,9 +257,9 @@ class TypeDescriptor<T> {
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
   final Map<String, MethodDescriptor> _methods = {};
-  final Constructor<T> constructor;
-  final FromMapConstructor<T> fromMapConstructor;
-  final FromArrayConstructor<T> fromArrayConstructor;
+  final Constructor<T>? constructor;
+  final FromMapConstructor<T>? fromMapConstructor;
+  final FromArrayConstructor<T>? fromArrayConstructor;
   final List<ParameterDescriptor> constructorParameters;
   final List<Object> annotations;
   final List<T>? enumValues;
@@ -467,9 +467,9 @@ class TypeDescriptor<T> {
 
 TypeDescriptor<T> type<T>({
   required String location,
-  required Constructor<T> constructor,
-  required FromMapConstructor<T> fromMapConstructor,
-  required FromArrayConstructor<T> fromArrayConstructor,
+  Constructor<T>? constructor,
+  FromMapConstructor<T>? fromMapConstructor,
+  FromArrayConstructor<T>? fromArrayConstructor,
   List<ParameterDescriptor>? params,
   List<FieldDescriptor>? fields,
   List<MethodDescriptor>? methods,

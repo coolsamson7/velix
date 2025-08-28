@@ -122,7 +122,7 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
     if (superType != null && !superType.isDartCoreObject) {
       final superElement = superType.element;
 
-      if (isDataclass(superElement)) {
+      if (isDataclass(superElement) || isInjectable(superElement)) {
         var element = builder.checkElement(superElement);
 
         element.generateVariable = true;
@@ -268,7 +268,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if (superType != null && !superType.isDartCoreObject) {
       final superElement = superType.element;
 
-      if (isDataclass(superElement)) {
+      if (isDataclass(superElement) || isInjectable(superElement)) {
         return superElement.name;
       }
     }
@@ -788,7 +788,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     start(buffer);
 
     final className = element.name;
-    final uri = element.library.uri.toString(); // e.g., package:example/models/foo.dart
+    final uri = element.library.uri
+        .toString(); // e.g., package:example/models/foo.dart
 
     // i want:  package:example/models/foo.dart:1:1:Foo
 
@@ -798,22 +799,27 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final qualifiedName = '$uri:$line:$col';
 
     tab();
-    if ( variable )
+    if (variable)
       write("var ${className}Descriptor = ");
 
     writeln("type<$className>(").indent(1);
     tab().writeln("location: '$qualifiedName',");
 
     var superClass = getSuperclass(element);
-    if ( superClass != null) {
+    if (superClass != null) {
       tab().writeln("superClass: ${superClass}Descriptor,");
     }
 
-    if ( element.metadata.annotations.isNotEmpty) generateAnnotations(element.metadata.annotations);
-    generateConstructorParams(element);
-    generateConstructor(element);
-    generateFromMapConstructor(element);
-    generateFromArrayConstructor(element);
+    if (element.metadata.annotations.isNotEmpty) generateAnnotations(
+        element.metadata.annotations);
+
+    if (!element.isAbstract) {
+      generateConstructorParams(element);
+      generateConstructor(element);
+      generateFromMapConstructor(element);
+      generateFromArrayConstructor(element);
+    }
+
     if ( element.fields.isNotEmpty) generateFields(element);
     generateMethods(element);
 

@@ -50,9 +50,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleManager>();
 
-    environment ??= Environment(ScreensModule, parent: EnvironmentProvider.of(context));
+    environment ??= Environment(module: ScreensModule, parent: EnvironmentProvider.of(context));
 
-    environment?.get<TodoService>(TodoService);
+    environment?.get<TodoService>();
 
     return EnvironmentProvider(
       environment: environment!,

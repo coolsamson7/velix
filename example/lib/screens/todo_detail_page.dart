@@ -94,13 +94,13 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
   @override
   Widget build(BuildContext context) {
-    environment ??= Environment(ScreensModule, parent: EnvironmentProvider.of(context));
+    environment ??= Environment(module: ScreensModule, parent: EnvironmentProvider.of(context));
 
     // test
 
-    environment?.get(TodoService);
-    environment?.get(Foo);
-    environment?.get(Bar);
+    environment?.get<TodoService>();
+    environment?.get<Foo>();
+    environment?.get<Bar>();
 
     // update command state
 
@@ -117,13 +117,13 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
           padding: EdgeInsets.symmetric(horizontal: 16),
           color: Colors.transparent,
           disabledColor: CupertinoColors.white,
+          onPressed: isCommandEnabled("save") ? save : null,
           child: Text('Save', style: TextStyle(
             fontSize: 17,
             color: isCommandEnabled("save")
                 ? CupertinoColors.activeBlue
                 : CupertinoColors.inactiveGray, // grey text when disabled
           )),
-          onPressed: isCommandEnabled("save") ? save : null,
         ),
 
         // trailing
@@ -132,13 +132,13 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
           minSize: 0,
           padding: EdgeInsets.symmetric(horizontal: 16),
           color: Colors.transparent,
+          onPressed: isCommandEnabled("cancel") ? cancel : null,
           child: Text('Cancel', style: TextStyle(
             fontSize: 17,
             color: isCommandEnabled("cancel")
                 ? CupertinoColors.activeBlue
                 : CupertinoColors.inactiveGray, // grey text when disabled
           ),),
-          onPressed: isCommandEnabled("cancel") ? cancel : null,
         ),
 
         middle: Text(widget.todo.title,

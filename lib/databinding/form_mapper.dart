@@ -147,7 +147,7 @@ class TypeProperty extends Property<ValuedWidgetContext> {
       }
     }
 
-    return Function.apply(typeDescriptor.constructor, [], args);
+    return Function.apply(typeDescriptor.constructor!, [], args);
   }
 
   void callSetter(dynamic instance, dynamic value, ValuedWidgetContext context) {
@@ -254,7 +254,7 @@ class RootProperty extends TypeProperty {
       }
     }
 
-    return Function.apply(typeDescriptor.constructor, [], args);
+    return Function.apply(typeDescriptor.constructor!, [], args);
   }
 }
 

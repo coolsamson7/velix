@@ -7,17 +7,17 @@ import '../util/tracer.dart';
 class Injectable extends ClassAnnotation {
   final bool eager;
   final String scope;
-  final bool ignore;
+  final bool factory;
 
   // constructor
 
-  const Injectable({this.ignore = false, this.eager = true, this.scope = 'singleton'});
+  const Injectable({this.factory = true, this.eager = true, this.scope = 'singleton'});
 
   // override
 
   @override
   void apply(TypeDescriptor type) {
-    if (!ignore)
+    if (factory)
       Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
   }
 }
@@ -120,7 +120,8 @@ class Scopes {
   }
 
   static Scope get(String name, Environment environment) {
-    return environment.get(scopes[name]!);
+    Type type = scopes[name]!;
+    return environment.get(type: type);
   }
 }
 
@@ -273,7 +274,7 @@ class MethodCall {
   // public
 
   void execute(dynamic instance, Environment environment) {
-    method.invoker!([instance, ...method.parameters.map((param) => environment.get(param.type))]);
+    method.invoker!([instance, ...method.parameters.map((param) => environment.get(type: param.type))]);
   }
 }
 
@@ -613,7 +614,7 @@ class Providers {
 class Environment {
   // instance data
 
-  Type module;
+  Type? module;
   Environment? parent;
   final Map<Type, AbstractInstanceProvider> providers = {};
   final List<String> features = [];
@@ -622,7 +623,7 @@ class Environment {
 
   // constructor
 
-  Environment(this.module, {this.parent})  {
+  Environment({this.module, this.parent})  {
     if ( parent == null )
       if ( module == Boot) {
         lifecycleProcessors.add(OnInitCallableProcessor());
@@ -648,21 +649,15 @@ class Environment {
 
     // inherit parent providers
 
-    // slight bootstrap problem
-
-    providers[SingletonScope]   = SingletonScopeInstanceProvider();
-    providers[RequestScope]     = RequestScopeInstanceProvider();
-    providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
-
     if (parent != null) {
       parent!.providers.forEach((providerType, inheritedProvider) {
         var provider = inheritedProvider;
         if (inheritedProvider.scope == 'environment') {
           provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
-          (provider as EnvironmentInstanceProvider).dependencies = [];
-          addProvider(providerType, provider);
+          (provider as EnvironmentInstanceProvider).dependencies = (inheritedProvider as EnvironmentInstanceProvider).dependencies;
+          providers[providerType] = provider;
         }
-        //addProvider(providerType, provider);
+        else providers[providerType] = provider;
       });
 
       // inherit lifecycle processors
@@ -672,15 +667,16 @@ class Environment {
           lifecycleProcessors.add(processor);
         }
         else {
-          get(processor.runtimeType); // automatically appends
+          get(type: processor.runtimeType); // automatically appends
         }
       }
     }
     else {
       // add bootstrap provider for Boot
-      //providers[SingletonScope] = SingletonScopeInstanceProvider();
-      //providers[RequestScope] = RequestScopeInstanceProvider();
-      //providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
+
+      providers[SingletonScope]   = SingletonScopeInstanceProvider();
+      providers[RequestScope]     = RequestScopeInstanceProvider();
+      providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
     }
 
     providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
@@ -729,19 +725,21 @@ class Environment {
       }
     }
 
-    loadModule(TypeDescriptor.forType(module));
+    if ( module != null) {
+      loadModule(TypeDescriptor.forType(module));
 
-    // filter providers according to prefix list
+      // filter providers according to prefix list
 
-    providers.addAll(Providers.filter(this, filterProvider));
+      providers.addAll(Providers.filter(this, filterProvider));
 
-    // construct eager objects for local providers
+      // construct eager objects for local providers
 
-    for (final provider in providers.values.toSet()) {
-      if (provider.eager) {
-        provider.create(this);
+      for (final provider in providers.values.toSet()) {
+        if (provider.eager) {
+          provider.create(this);
+        }
       }
-    }
+    } // if
 
     // run lifecycle callbacks
 
@@ -755,10 +753,11 @@ class Environment {
       Tracer.trace('di', TraceLevel.high, 'created environment for module $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
   }
 
-  T get<T>(Type t) {
-    final provider = providers[t];
+  T get<T>({Type? type}) {
+    final lookup = type ?? T;
+    final provider = providers[lookup];
     if (provider == null) {
-      throw DIRuntimeException('$t is not supported');
+      throw DIRuntimeException('$lookup is not supported');
     }
 
     return provider.create(this) as T;
@@ -1054,7 +1053,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    final instance = descriptor.fromArrayConstructor(args);
+    final instance = descriptor.fromArrayConstructor!(args);
 
     return environment.created(instance);
   }
@@ -1166,7 +1165,7 @@ class Boot {
       );
     } // if
     
-    environment ??= Environment(Boot);
+    environment ??= Environment(module: Boot);
 
     return environment!;
   }

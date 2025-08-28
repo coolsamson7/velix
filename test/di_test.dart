@@ -1,7 +1,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/di/di.dart';
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/util/tracer.dart';
 
 import 'main.dart';
@@ -22,38 +21,59 @@ void main() {
         });
 
     test('injectable', () {
-      var environment = Environment(TestModule);
+      var environment = Environment(module: TestModule);
 
       environment.report();
 
-      var foo = environment.get<Foo>(Foo);
+      var foo = environment.get<Foo>();
 
       expect(foo, isNotNull);
       expect(foo.bar, isNotNull);
 
-      var otherFoo = environment.get<Foo>(Foo);
+      var otherFoo = environment.get<Foo>();
 
       expect(foo, equals(otherFoo));
     });
 
     test('factory', () {
-      var environment = Environment(TestModule);
+      var environment = Environment(module: TestModule);
 
       environment.report();
 
-      var baz = environment.get<Baz>(Baz);
+      var baz = environment.get<Baz>();
 
       expect(baz, isNotNull);
     });
 
-    test('lifecycle', () {
-      var environment = Environment(TestModule);
+    test('inheritance', () {
+      var environment = Environment(module: TestModule);
 
       environment.report();
 
-      var baz = environment.get<Baz>(Baz);
+      var result = environment.get<RootType>();
 
-      expect(baz, isNotNull);
+      expect(result is DerivedType, isTrue);
+    });
+
+    test('inherited environments', () {
+      var environment = Environment(module: TestModule);
+
+      environment.report();
+
+      var foo = environment.get<Foo>();
+      var bar =  environment.get<Bar>();
+
+      expect(foo, isNotNull);
+
+      // sub environment
+
+      var childEnvironment = Environment(parent: environment);
+
+      var bar1 = childEnvironment.get<Bar>();
+      var foo1 = childEnvironment.get<Foo>();
+
+      expect(bar, equals(bar1));
+      expect(foo, isNot(foo1));
     });
   });
 }

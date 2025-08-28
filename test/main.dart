@@ -11,12 +11,12 @@ class Bar {
   const Bar();
 }
 
-@Injectable(ignore: true) // the function will override! hopefully
+@Injectable(factory: false)
 class Baz {
   const Baz();
 }
 
-@Injectable(scope: "singleton", eager: true)
+@Injectable(scope: "environment")
 class Foo {
   // instance data
 
@@ -31,7 +31,7 @@ class Factory {
 
   @OnInit()
   void onInit(Environment environment) {
-    print("onInit" + environment.toString());
+    print("onInit $environment");
   }
 
   @OnDestroy()
@@ -127,6 +127,16 @@ class Derived extends Base {
   final int number;
 
   Derived(super.name, {required this.number});
+}
+
+@Injectable(factory: false)
+abstract class RootType {
+  RootType();
+}
+
+@Injectable()
+class DerivedType extends RootType {
+  DerivedType();
 }
 
 @Dataclass()

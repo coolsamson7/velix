@@ -67,6 +67,52 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Environment getEnvironment() {
+  &#47;&#47; add meta-data
+
+  if (!TypeDescriptor.hasType(Boot)) {
+    &#47;&#47;Providers.register(EnvironmentProvider());
+
+    type&lt;SingletonScope&gt;(
+        location: &#39;package:velix&#47;di&#47;di.dart.SingletonScope&#39;,
+        annotations: [
+          scope(name: &quot;singleton&quot;, register: false)
+        ],
+        constructor: () =&gt; SingletonScope(),
+        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; SingletonScope(),
+        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; SingletonScope()
+    );
+
+    type&lt;EnvironmentScope&gt;(
+        location: &#39;package:velix&#47;di&#47;di.dart.EnvironmentScope&#39;,
+        annotations: [
+          scope(name: &quot;environment&quot;, register: false)
+        ],
+        constructor: () =&gt; EnvironmentScope(),
+        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; EnvironmentScope(),
+        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; EnvironmentScope()
+    );
+
+    type&lt;RequestScope&gt;(
+        location: &#39;package:velix&#47;di&#47;di.dart.RequestScope&#39;,
+        annotations: [
+          scope(name: &quot;request&quot;, register: false)
+        ],
+        constructor: () =&gt; RequestScope(),
+        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; RequestScope(),
+        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; RequestScope(),
+    );
+
+    type&lt;Boot&gt;(
+        location: &#39;package:velix&#47;di&#47;di.dart.Boot&#39;,
+        annotations: [
+          Module(imports: [])
+        ],
+        constructor: () =&gt; Boot(),
+        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; Boot(),
+        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; Boot(),
+    );
+  } &#47;&#47; if
+
   environment ??= Environment(Boot);
 
   return environment!;

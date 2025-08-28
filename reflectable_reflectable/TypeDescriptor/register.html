@@ -69,7 +69,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static void register&lt;T&gt;(TypeDescriptor&lt;T&gt; typeDescriptor) {
   _byType[typeDescriptor.type] = typeDescriptor;
-  _byName[typeDescriptor.name] = typeDescriptor;
+  _byName[typeDescriptor.location] = typeDescriptor;
 }</code></pre>
 </section>
 

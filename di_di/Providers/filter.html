@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="../../di_di/EnvironmentInstanceProvider-class.html">EnvironmentInstanceProvider</a></span>&gt;</span></span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="../../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a></span>&gt;</span></span>
 <span class="name ">filter</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="filter-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span></li>
 <li><span class="parameter" id="filter-param-providerFilter"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">providerFilter</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="../../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a></span></span></li>
 </ol>)</span></li>
@@ -72,7 +72,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Map&lt;Type, EnvironmentInstanceProvider&gt; filter(Environment environment, bool Function(AbstractInstanceProvider) providerFilter) {
+  <pre class="language-dart"><code class="language-dart">static Map&lt;Type, AbstractInstanceProvider&gt; filter(Environment environment, bool Function(AbstractInstanceProvider) providerFilter) {
   final Map&lt;Type, AbstractInstanceProvider&gt; cache = {};
 
   &#47;&#47; local helper: check if a provider applies
@@ -85,7 +85,6 @@
     return true;
   }
 
-  &#47;&#47; local helper: find matching provider for a type
   AbstractInstanceProvider? filterType(Type clazz) {
     AbstractInstanceProvider? result;
 
@@ -94,7 +93,7 @@
       for (final provider in candidates) {
         if (providerApplies(provider)) {
           if (result != null) {
-            ;&#47;&#47; TODO throw DIRegistrationException(&#39;type ${clazz.toString()} already registered&#39;);
+            throw DIRegistrationException(&#39;type ${clazz.toString()} already registered&#39;);
           }
 
           result = provider;
@@ -105,15 +104,10 @@
     return result;
   }
 
-  &#47;&#47; local helper: check if a type is injectable
-
-  bool isInjectable(Type type) {
-    if (type == Object) return false;
-    if (type == AbstractInstanceProvider) return false; &#47;&#47; Similar to ABC in Python
-    return true; &#47;&#47; No direct equivalent of inspect.isabstract
+  bool isInjectable(TypeDescriptor type) {
+    return type.findAnnotation&lt;Injectable&gt;() != null;
   }
 
-  &#47;&#47; local helper: cache provider for type (and its superclasses)
   void cacheProviderForType(AbstractInstanceProvider provider, Type type) {
     final existingProvider = cache[type];
 
@@ -122,7 +116,7 @@
     }
     else {
       if (type == provider.type) {
-        throw DIRegistrationException(&#39;type ${type.toString()} already registered&#39;);
+        throw DIRegistrationException(&#39;type $type already registered&#39;);
       }
 
       if (existingProvider.type != type) {
@@ -135,28 +129,26 @@
       }
     }
 
-    &#47;* TODO Recursion for base classes (Dart doesn&#39;t have `__bases__`, so use reflection or manual hierarchy)
-    final superClasses = TypeDescriptor.forType(type).getSuperTypes();
-    for (final superClass in superClasses) {
-      if (isInjectable(superClass)) {
-        cacheProviderForType(provider, superClass);
+    final superClass = TypeDescriptor.forType(type).superClass;
+      if (superClass != null &amp;&amp; isInjectable(superClass)) {
+        cacheProviderForType(provider, superClass.type);
       }
-    }*&#47;
   }
 
   &#47;&#47; filter conditional providers and fill base classes as well
 
   for (final entry in _providers.entries) {
     final matchingProvider = filterType(entry.key);
+
     if (matchingProvider != null) {
       cacheProviderForType(matchingProvider, entry.key);
     }
   }
 
-  &#47;&#47; Replace by EnvironmentInstanceProvider
+  &#47;&#47; replace by EnvironmentInstanceProvider
 
-  final Map&lt;AbstractInstanceProvider, EnvironmentInstanceProvider&gt; mapped = {};
-  final Map&lt;Type, EnvironmentInstanceProvider&gt; result = {};
+  final Map&lt;AbstractInstanceProvider, AbstractInstanceProvider&gt; mapped = {};
+  final Map&lt;Type, AbstractInstanceProvider&gt; result = {};
 
   for (final entry in cache.entries) {
     var environmentProvider = mapped[entry.value];
@@ -168,16 +160,14 @@
     result[entry.key] = environmentProvider;
   }
 
-  &#47;&#47; Merge parent providers
+  &#47;&#47; merge parent providers
 
   var providers = result;
   if (environment.parent != null) {
-    for ( var entry in environment.parent!.providers.entries)
-      if ( entry.value is EnvironmentInstanceProvider)  &#47;&#47; TODO
-        providers[entry.key] = entry.value as EnvironmentInstanceProvider;&#47;&#47;TODO addAll(environment.parent!.providers);
+    providers.addAll(environment.parent!.providers);
   }
 
-  &#47;&#47; Resolve providers
+  &#47;&#47; resolve providers
 
   final providerContext = ResolveContext(providers);
   for (final provider in mapped.values) {

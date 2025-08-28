@@ -80,7 +80,7 @@
 
     var typeDescriptor = TypeDescriptor.forType(type);
 
-    var jsonSerializable = typeDescriptor.find_annotation&lt;JsonSerializable&gt;() ?? JsonSerializable();
+    var jsonSerializable = typeDescriptor.findAnnotation&lt;JsonSerializable&gt;() ?? JsonSerializable();
 
     mappings[type] = typeMapping;
 

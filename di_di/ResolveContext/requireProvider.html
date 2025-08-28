@@ -75,10 +75,10 @@
   }
 
   if (_path.contains(provider)) {
-    throw DIRegistrationException(cycleReport(provider));
+    throw DIRegistrationException(cycleReport(provider as EnvironmentInstanceProvider));
   }
 
-  return provider;
+  return provider as EnvironmentInstanceProvider;
 }</code></pre>
 </section>
 

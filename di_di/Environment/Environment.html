@@ -64,18 +64,25 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Environment(Type module, {this.parent})  {
-  if ( parent == null &amp;&amp; module != Boot)
-    parent = Boot.getEnvironment();
-
-  _scan(module);
+  <pre class="language-dart"><code class="language-dart">Environment(this.module, {this.parent})  {
+  if ( parent == null )
+    if ( module == Boot) {
+      lifecycleProcessors.add(OnInitCallableProcessor());
+      lifecycleProcessors.add(OnInjectCallableProcessor());
+      lifecycleProcessors.add(OnRunningCallableProcessor());
+      lifecycleProcessors.add(OnDestroyCallableProcessor());
+    }
+    else parent = Boot.getEnvironment();
 
   final Stopwatch stopwatch = Stopwatch()..start();
 
-  &#47;&#47;Environment.logger.debug(&#39;create environment for class $type&#39;);
+  if ( Tracer.enabled )
+    Tracer.trace(&#39;di&#39;, TraceLevel.low, &#39;create environment for module $module&#39;);
 
   void addProvider(Type type, AbstractInstanceProvider provider) {
-    &#47;&#47;Environment.logger.debug(&#39;\tadd provider $provider for $type&#39;);
+    if ( Tracer.enabled )
+      Tracer.trace(&#39;di&#39;, TraceLevel.high, &#39;add provider $provider for $type&#39;);
+
     providers[type] = provider is EnvironmentInstanceProvider
         ? provider
         : EnvironmentInstanceProvider(environment: this, provider: provider);
@@ -83,9 +90,11 @@
 
   &#47;&#47; inherit parent providers
 
-  &#47;&#47; TODO
-  providers[SingletonScope] = SingletonScopeInstanceProvider();&#47;&#47;EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-  providers[RequestScope] = RequestScopeInstanceProvider();&#47;&#47;EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
+  &#47;&#47; slight bootstrap problem
+
+  providers[SingletonScope]   = SingletonScopeInstanceProvider();
+  providers[RequestScope]     = RequestScopeInstanceProvider();
+  providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
 
   if (parent != null) {
     parent!.providers.forEach((providerType, inheritedProvider) {
@@ -93,8 +102,9 @@
       if (inheritedProvider.scope == &#39;environment&#39;) {
         provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
         (provider as EnvironmentInstanceProvider).dependencies = [];
+        addProvider(providerType, provider);
       }
-      addProvider(providerType, provider);
+      &#47;&#47;addProvider(providerType, provider);
     });
 
     &#47;&#47; inherit lifecycle processors
@@ -109,23 +119,21 @@
     }
   }
   else {
-    &#47;&#47;providers[SingletonScope] = SingletonScopeInstanceProvider();&#47;&#47;EnvironmentInstanceProvider(environment: this, provider: SingletonScopeInstanceProvider());
-    &#47;&#47;providers[RequestScope] = RequestScopeInstanceProvider();&#47;&#47;EnvironmentInstanceProvider(environment: this, provider: RequestScopeInstanceProvider());
-    providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();&#47;&#47;EnvironmentInstanceProvider(environment: this, provider: EnvironmentScopeInstanceProvider());
+    &#47;&#47; add bootstrap provider for Boot
+    &#47;&#47;providers[SingletonScope] = SingletonScopeInstanceProvider();
+    &#47;&#47;providers[RequestScope] = RequestScopeInstanceProvider();
+    &#47;&#47;providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
   }
 
-  final Set&lt;Type&gt; loadedModules = {};
+  providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
+
+  final Set&lt;TypeDescriptor&gt; loadedModules = {};
   final List&lt;String&gt; prefixList = [];
-
-  &#47;&#47; TODO: Type -&gt; TypeDescriptor
-  String getTypePackage(Type type) {
-    return TypeDescriptor.forType(type).getModule();
-  }
 
   &#47;&#47; filter by module prefix
 
   bool filterProvider(AbstractInstanceProvider provider) {
-    final hostModule = TypeDescriptor.forType(provider.host).getModule();
+    final hostModule = TypeDescriptor.forType(provider.host).module;
     for (final prefix in prefixList) {
       if (hostModule.startsWith(prefix))
         return true;
@@ -134,40 +142,42 @@
     return false;
   }
 
-  &#47;&#47; Recursively load environment and its dependencies
-  void loadModule(Type mod) {
-    if (!loadedModules.contains(mod)) {
-      &#47;&#47;Environment.logger.debug(&#39;load environment $envType&#39;);
-      loadedModules.add(mod);
+  &#47;&#47; recursively load environment and its dependencies
 
-      final decorator = TypeDescriptor.forType(mod).find_annotation&lt;Module&gt;();
+  void loadModule(TypeDescriptor moduleDescriptor) {
+    if (!loadedModules.contains(moduleDescriptor)) {
+      if ( Tracer.enabled )
+        Tracer.trace(&#39;di&#39;, TraceLevel.low, &#39;load environment $moduleDescriptor&#39;);
+
+      loadedModules.add(moduleDescriptor);
+
+      final decorator = moduleDescriptor.findAnnotation&lt;Module&gt;();
       if (decorator == null) {
-        throw DIRegistrationException(&#39;$mod is not an module class&#39;);
+        throw DIRegistrationException(&#39;$moduleDescriptor is not an module class&#39;);
       }
 
-      &#47;&#47; Load dependencies recursively
+      &#47;&#47; load dependencies recursively
 
-      &#47;&#47;TODO final importEnvironments = decorator.args.isNotEmpty ? decorator.args[0] as List&lt;Type&gt; : [];
-      &#47;&#47;for (final importEnv in importEnvironments) {
-      &#47;&#47;  loadEnvironment(importEnv);
-      &#47;&#47;}
+      for (final import in  decorator.imports) {
+        loadModule(TypeDescriptor.forType(import));
+      }
 
       &#47;&#47; Determine package prefix
 
-      final packageName = getTypePackage(mod);
+      final packageName = moduleDescriptor.module;
       if (packageName.isNotEmpty) {
         prefixList.add(packageName);
       }
     }
   }
 
-  loadModule(module);
+  loadModule(TypeDescriptor.forType(module));
 
   &#47;&#47; filter providers according to prefix list
 
   providers.addAll(Providers.filter(this, filterProvider));
 
-  &#47;&#47; Construct eager objects for local providers
+  &#47;&#47; construct eager objects for local providers
 
   for (final provider in providers.values.toSet()) {
     if (provider.eager) {
@@ -175,14 +185,16 @@
     }
   }
 
-  &#47;&#47; TODO Run ON_RUNNING lifecycle callbacks
-  &#47;&#47;for (final instance in instances) {
-  &#47;&#47;  executeProcessors(Lifecycle.ON_RUNNING, instance);
-  &#47;&#47;}
+  &#47;&#47; run lifecycle callbacks
+
+  for (final instance in instances) {
+    executeProcessors(Lifecycle.onRunning, instance);
+  }
 
   stopwatch.stop();
-  &#47;&#47;Environment.logger.info(
-  &#47;&#47;    &#39;created environment for class $type in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances&#39;);
+
+  if ( Tracer.enabled )
+    Tracer.trace(&#39;di&#39;, TraceLevel.high, &#39;created environment for module $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances&#39;);
 }</code></pre>
 </section>
 

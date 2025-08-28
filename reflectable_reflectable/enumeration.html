@@ -75,8 +75,9 @@
   List&lt;Object&gt;? annotations,
 }) {
   var fromMapConstructor = (Map&lt;String,dynamic&gt; args) =&gt; null  as T; &#47;&#47; TODO!!!!!
-  var fromArrayConstructor = (List&lt;dynamic&gt; args) =&gt; null  as T; &#47;&#47;
-  return TypeDescriptor&lt;T&gt;(name: name, constructor: () =&gt; null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  var fromArrayConstructor = (List&lt;dynamic&gt; args) =&gt; null  as T;
+
+  return TypeDescriptor&lt;T&gt;(location: name, constructor: () =&gt; null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }</code></pre>
 </section>
 

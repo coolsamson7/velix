@@ -86,20 +86,20 @@
   params = descriptor.constructorParameters.length;
   types.addAll(constructorParams.map((param) =&gt; param.type));
 
-  &#47;* TODO Check methods annotated with @inject
+  &#47;&#47; check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-  for (final method in TypeDescriptor.forType(type).getMethods()) {
-    if (method.hasDecorator(inject)) {
-    for (final param in method.paramTypes) {
-      if (!Providers.isRegistered(param)) {
-        throw DIRegistrationException(
-        &#39;${type.toString()}.${method.method.name} declares an unknown parameter type ${param.toString()}&#39;);
-      }
-      types.add(param);
-      }
+  for (final method in descriptor.getMethods()) {
+    if (method.hasAnnotation&lt;Inject&gt;() || method.hasAnnotation&lt;OnInit&gt;() || method.hasAnnotation&lt;OnRunning&gt;()) {
+      for (final param in method.parameters) {
+        if (!Providers.isRegistered(param.type) &amp;&amp; param.type != Environment) {
+          throw DIRegistrationException(
+          &#39;${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}&#39;);
+        }
+
+        types.add(param.type);
+        } &#47;&#47; for
     } &#47;&#47; if
   } &#47;&#47; for
-  *&#47;
 
   return (types, params);
 }</code></pre>

@@ -72,16 +72,16 @@
   decorator used to add meta-data to properties
 </dd>
 
-          <dt id="ConstructorDescriptor">
-  <span class="name "><a href="../reflectable_reflectable/ConstructorDescriptor-class.html">ConstructorDescriptor</a></span> 
+          <dt id="ClassAnnotation">
+  <span class="name "><a href="../reflectable_reflectable/ClassAnnotation-class.html">ClassAnnotation</a></span> 
 
 </dt>
 <dd>
   
 </dd>
 
-          <dt id="ConstructorParameter">
-  <span class="name "><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span> 
+          <dt id="ConstructorDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/ConstructorDescriptor-class.html">ConstructorDescriptor</a></span> 
 
 </dt>
 <dd>
@@ -98,6 +98,30 @@
 
           <dt id="FieldDescriptor">
   <span class="name "><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="MethodAnnotation">
+  <span class="name "><a href="../reflectable_reflectable/MethodAnnotation-class.html">MethodAnnotation</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="MethodDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="ParameterDescriptor">
+  <span class="name "><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span> 
 
 </dt>
 <dd>
@@ -164,6 +188,19 @@
 
 </dd>
 
+          <dt id="method" class="callable">
+  <span class="name"><a href="../reflectable_reflectable/method.html">method</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">R</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="method-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="method-param-parameters"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">parameters</span>, </span><span class="parameter" id="method-param-isAsync"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isAsync</span> = <span class="default-value">false</span>, </span><span class="parameter" id="method-param-isStatic"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isStatic</span> = <span class="default-value">false</span>, </span><span class="parameter" id="method-param-annotations"><span class="type-annotation">dynamic</span> <span class="parameter-name">annotations</span> = <span class="default-value">const []</span>, </span><span class="parameter" id="method-param-invoker"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Function-class.html">Function</a></span> <span class="parameter-name">invoker</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
           <dt id="nonNullableOf" class="callable">
   <span class="name"><a href="../reflectable_reflectable/nonNullableOf.html">nonNullableOf</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
@@ -179,7 +216,7 @@
 
           <dt id="param" class="callable">
   <span class="name"><a href="../reflectable_reflectable/param.html">param</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="param-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="param-param-isNamed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNamed</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-isRequired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isRequired</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span>, </span><span class="parameter" id="param-param-defaultValue"><span class="type-annotation">dynamic</span> <span class="parameter-name">defaultValue</span></span>})
-    <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>
+    <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>
   </span>
   
 
@@ -191,7 +228,7 @@
 </dd>
 
           <dt id="type" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromMapConstructor</span>, </span><span class="parameter" id="type-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromArrayConstructor</span>, </span><span class="parameter" id="type-param-params"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ConstructorParameter-class.html">ConstructorParameter</a></span>&gt;</span></span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span></span>})
+  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-location"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">location</span>, </span><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromMapConstructor</span>, </span><span class="parameter" id="type-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromArrayConstructor</span>, </span><span class="parameter" id="type-param-params"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span></span>})
     <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
   </span>
   

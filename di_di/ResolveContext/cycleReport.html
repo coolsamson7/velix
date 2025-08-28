@@ -71,11 +71,14 @@
   final buffer = StringBuffer();
 
   for (var i = 0; i &lt; _path.length; i++) {
-    if (i &gt; 0) buffer.write(&#39; -&gt; &#39;);
-      ;&#47;&#47;buffer.write(_path[i].report());
+    if (i &gt; 0)
+      buffer.write(&#39; -&gt; &#39;);
+
+    buffer.write(_path[i].report());
   }
 
-  &#47;&#47;buffer.write(&#39; &lt;&gt; ${provider.report()}&#39;);
+  buffer.write(&#39; &lt;&gt; ${provider.report()}&#39;);
+
   return buffer.toString();
 }</code></pre>
 </section>

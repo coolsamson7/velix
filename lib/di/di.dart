@@ -1,8 +1,6 @@
 
 // annotations
 
-import 'package:flutter/material.dart';
-
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 
@@ -61,6 +59,17 @@ class OnInit extends MethodAnnotation {
   }
 }
 
+class OnRunning extends MethodAnnotation {
+  const OnRunning();
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, MethodDescriptor method) {
+    OnRunningCallableProcessor.register(type, method);
+  }
+}
+
 class Inject extends MethodAnnotation {
   const Inject();
 
@@ -68,7 +77,7 @@ class Inject extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    //TODO OnInitCallableProcessor.register(type, method);
+    OnInjectCallableProcessor.register(type, method);
   }
 }
 
@@ -252,38 +261,19 @@ abstract class LifecycleProcessor {
   void processLifecycle(dynamic instance, Environment environment);
 }
 
-class LifecycleMethod {
-  // instance data
-
-  Lifecycle lifecycle;
-  dynamic annotation;
-
-  // constructor
-
-  LifecycleMethod({required this.lifecycle, required this.annotation});
-
-  // protected
-
-  List<dynamic> getArguments() {
-    return [];
-  }
-}
-
 class MethodCall {
   // instance data
 
-  final dynamic annotation;
   final MethodDescriptor method;
-  final LifecycleMethod lifecycleMethod;
 
   // constructor
 
-  MethodCall({required this.annotation, required this.method, required this.lifecycleMethod});
+  MethodCall({required this.method});
 
   // public
 
   void execute(dynamic instance, Environment environment) {
-    method.invoker!([instance, ...lifecycleMethod.getArguments()]);
+    method.invoker!([instance, ...method.parameters.map((param) => environment.get(param.type))]);
   }
 }
 
@@ -298,10 +288,10 @@ class MethodCall {
   // TODO: implement order
   int get order => 1;
 
-  void execute(List<MethodDescriptor>? methods, instance, environment) {
+  void execute(List<MethodCall>? methods, instance, environment) {
     if ( methods != null)
       for ( var method in methods)
-        method.invoker!([instance]); // TODO args...
+        method.execute(instance, environment);
   }
 }
 
@@ -325,28 +315,76 @@ abstract class PostProcessor extends LifecycleProcessor {
   }
 }
 
-//@Injectable()
-//class OnInjectCallableProcessor extends AbstractCallableProcessor {
-//  OnInjectCallableProcessor(): super(lifecycle: Lifecycle.onInject);
-//}
+class OnInjectCallableProcessor extends AbstractCallableProcessor {
+  // static
+
+  static Map<Type, List<MethodCall>> methods = {};
+
+  static void register(TypeDescriptor type, MethodDescriptor method) {
+    var list = methods[type.type];
+    if ( list == null)
+      methods[type.type] = [MethodCall(method: method)];
+    else
+      methods[type.type]!.add(MethodCall(method: method));
+  }
+
+  // constructor
+
+  OnInjectCallableProcessor(): super(lifecycle: Lifecycle.onInject);
+
+  // override
+
+  @override
+  void processLifecycle(instance, Environment environment) {
+    execute(methods[instance.runtimeType], instance, environment);
+  }
+}
 
 @Injectable()
 class OnInitCallableProcessor extends AbstractCallableProcessor {
   // static
 
-  static Map<Type, List<MethodDescriptor>> methods = {};
+  static Map<Type, List<MethodCall>> methods = {};
 
   static void register(TypeDescriptor type, MethodDescriptor method) {
     var list = methods[type.type];
     if ( list == null)
-      methods[type.type] = [method];
+      methods[type.type] = [MethodCall(method: method)];
     else
-      methods[type.type]!.add(method);
+      methods[type.type]!.add(MethodCall(method: method));
   }
 
   // constructor
 
   OnInitCallableProcessor(): super(lifecycle: Lifecycle.onInit);
+
+  // override
+
+  @override
+  void processLifecycle(instance, Environment environment) {
+    execute(methods[instance.runtimeType], instance, environment);
+  }
+}
+
+@Injectable()
+class OnRunningCallableProcessor extends AbstractCallableProcessor {
+  // static
+
+  static Map<Type, List<MethodCall>> methods = {};
+
+  static void register(TypeDescriptor type, MethodDescriptor method) {
+    var list = methods[type.type];
+    if ( list == null)
+      methods[type.type] = [MethodCall(method: method)];
+    else
+      methods[type.type]!.add(MethodCall(method: method));
+  }
+
+  // constructor
+
+  OnRunningCallableProcessor(): super(lifecycle: Lifecycle.onRunning);
+
+  // override
 
   @override
   void processLifecycle(instance, Environment environment) {
@@ -358,14 +396,14 @@ class OnInitCallableProcessor extends AbstractCallableProcessor {
 class OnDestroyCallableProcessor extends AbstractCallableProcessor {
   // static
 
-  static Map<Type, List<MethodDescriptor>> methods = {};
+  static Map<Type, List<MethodCall>> methods = {};
 
   static void register(TypeDescriptor type, MethodDescriptor method) {
     var list = methods[type.type];
     if ( list == null)
-      methods[type.type] = [method];
+      methods[type.type] = [MethodCall(method: method)];
     else
-      methods[type.type]!.add(method);
+      methods[type.type]!.add(MethodCall(method: method));
   }
 
   // constructor
@@ -588,6 +626,8 @@ class Environment {
     if ( parent == null )
       if ( module == Boot) {
         lifecycleProcessors.add(OnInitCallableProcessor());
+        lifecycleProcessors.add(OnInjectCallableProcessor());
+        lifecycleProcessors.add(OnRunningCallableProcessor());
         lifecycleProcessors.add(OnDestroyCallableProcessor());
       }
       else parent = Boot.getEnvironment();
@@ -727,6 +767,13 @@ class Environment {
       if ( provider is EnvironmentInstanceProvider)
         provider.printTree();
     }
+  }
+
+  void destroy() {
+    for ( var instance in instances)
+      executeProcessors(Lifecycle.onDestroy, instance);
+
+    instances.clear();
   }
 
   T executeProcessors<T>(Lifecycle lifecycle, T instance) {
@@ -964,18 +1011,18 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
     params = descriptor.constructorParameters.length;
     types.addAll(constructorParams.map((param) => param.type));
 
-    // Check methods annotated with @inject
+    // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
     for (final method in descriptor.getMethods()) {
-      if (method.hasAnnotation<Inject>()) {
-      for (final param in method.parameters) {
-        if (!Providers.isRegistered(param.type)) {
-          throw DIRegistrationException(
-          '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
-        }
+      if (method.hasAnnotation<Inject>() || method.hasAnnotation<OnInit>() || method.hasAnnotation<OnRunning>()) {
+        for (final param in method.parameters) {
+          if (!Providers.isRegistered(param.type)) {
+            throw DIRegistrationException(
+            '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
+          }
 
-        types.add(param.type);
-        } // for
+          types.add(param.type);
+          } // for
       } // if
     } // for
 

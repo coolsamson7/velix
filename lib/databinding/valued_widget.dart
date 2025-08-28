@@ -126,13 +126,13 @@ class ValuedWidgetContext {
   ValuedWidgetContext({required this.mapper});
 }
 
-typedef Key = (String, String);
+typedef AdapterKey = (String, String);
 
 /// A registry for [ValuedWidgetAdapter]s
 class ValuedWidget {
   // properties
 
-  static final Map<Key, ValuedWidgetAdapter> _adapters = {};
+  static final Map<AdapterKey, ValuedWidgetAdapter> _adapters = {};
 
   static String platform = "iOS";
 

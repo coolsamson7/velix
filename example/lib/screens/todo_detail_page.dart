@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sample/screens/screens.module.dart';
+import 'package:sample/services/services.dart';
 
-import 'package:velix/velix.dart';
+import 'package:velix/velix.dart' hide EnvironmentProvider;
 
+import '../main.dart';
 import '../models/todo.dart';
 import '../providers/todo_provider.dart';
 
@@ -23,6 +26,8 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
   late FormMapper mapper;
   late TodoProvider todoProvider;
+
+  Environment? environment;
 
   // commands
 
@@ -83,10 +88,20 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
     super.dispose();
 
     mapper.dispose();
+
+    environment?.destroy();
   }
 
   @override
   Widget build(BuildContext context) {
+    environment ??= Environment(ScreensModule, parent: EnvironmentProvider.of(context));
+
+    // test
+
+    environment?.get(TodoService);
+    environment?.get(Foo);
+    environment?.get(Bar);
+
     // update command state
 
     updateCommandState();

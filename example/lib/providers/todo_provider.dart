@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:velix/di/di.dart';
 import '../models/todo.dart';
 
 class TodoProvider with ChangeNotifier {

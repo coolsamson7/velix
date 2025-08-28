@@ -3,6 +3,9 @@
 import 'package:velix/velix.dart';
 import 'package:sample/models/todo.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:sample/screens/screens.module.dart';
+import 'package:velix/di/di.dart';
+import 'package:sample/services/services.dart';
 
 void registerAllDescriptors() {
   type<Details>(
@@ -100,5 +103,117 @@ void registerAllDescriptors() {
         getter: (obj) => obj.datetime_data,
       )
     ]
+  );
+
+  type<ScreensModule>(
+    location: 'package:sample/screens/screens.module.dart:4:7',
+    annotations: [
+      Module(imports: [])
+    ],
+    params: [
+    ],
+    constructor: () => ScreensModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => ScreensModule(),
+    fromArrayConstructor: (List<dynamic> args) => ScreensModule(),
+    methods: [
+      method<ScreensModule,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ScreensModule).onDestroy()
+      )
+    ],
+  );
+
+  type<Foo>(
+    location: 'package:sample/screens/screens.module.dart:12:7',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+    ],
+    constructor: () => Foo(),
+    fromMapConstructor: (Map<String,dynamic> args) => Foo(),
+    fromArrayConstructor: (List<dynamic> args) => Foo(),
+    methods: [
+      method<Foo,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Foo).onDestroy()
+      )
+    ],
+  );
+
+  type<Bar>(
+    location: 'package:sample/screens/screens.module.dart:22:7',
+    annotations: [
+      Injectable(scope: "environment")
+    ],
+    params: [
+    ],
+    constructor: () => Bar(),
+    fromMapConstructor: (Map<String,dynamic> args) => Bar(),
+    fromArrayConstructor: (List<dynamic> args) => Bar(),
+    methods: [
+      method<Bar,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Bar).onDestroy()
+      )
+    ],
+  );
+
+  type<TodoService>(
+    location: 'package:sample/services/services.dart:4:7',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+    ],
+    constructor: () => TodoService(),
+    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
+    fromArrayConstructor: (List<dynamic> args) => TodoService(),
+    methods: [
+      method<TodoService,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
+      ), 
+      method<TodoService,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TodoService).onDestroy()
+      )
+    ],
+  );
+
+  type<ServiceModule>(
+    location: 'package:sample/services/services.dart:19:7',
+    annotations: [
+      Module(imports: [])
+    ],
+    params: [
+    ],
+    constructor: () => ServiceModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => ServiceModule(),
+    fromArrayConstructor: (List<dynamic> args) => ServiceModule(),
+    methods: [
+      method<ServiceModule,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ServiceModule).onInit()
+      ), 
+      method<ServiceModule,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ServiceModule).onDestroy()
+      )
+    ],
   );
 }

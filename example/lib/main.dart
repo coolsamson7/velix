@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sample/services/services.dart';
 import 'package:velix/velix.dart';
 
 import 'package:provider/provider.dart';
@@ -70,6 +71,27 @@ class MultiAssetLoader extends AssetLoader {
   }
 }
 
+class EnvironmentProvider extends InheritedWidget {
+  final Environment environment;
+
+  const EnvironmentProvider({
+    Key? key,
+    required this.environment,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  static Environment of(BuildContext context) {
+    final provider = context.dependOnInheritedWidgetOfExactType<EnvironmentProvider>();
+    return provider!.environment;
+  }
+
+  @override
+  bool updateShouldNotify(EnvironmentProvider oldWidget) {
+    return environment != oldWidget.environment;
+  }
+}
+
+
 
 void main() async {
   // configure json stuff
@@ -86,12 +108,13 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  Tracer.enabled = true;
   Tracer(
+      isEnabled: true,
       trace: ConsoleTrace("%d [%l] %p: %m [%f]"), // d(ate), l(evel), p(ath), m(message), f(ile)
       paths: {
         "": TraceLevel.off,
-        "i18n": TraceLevel.full
+        "i18n": TraceLevel.full,
+        "di": TraceLevel.full
       });
 
   var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
@@ -121,10 +144,11 @@ class TODOApp extends StatelessWidget {
   // instance data
 
   final I18N i18n;
+  final Environment environment = Environment(ServiceModule);
   
   // constructor
   
-  const TODOApp({super.key, required this.i18n});
+   TODOApp({super.key, required this.i18n});
   
   // override
 
@@ -132,37 +156,40 @@ class TODOApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeManager = context.watch<LocaleManager>();
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TodoProvider()),
-        Provider<CommandManager>(create: (_) => CommandManager(
-          interceptors: [
-            LockCommandInterceptor(),
-            TracingCommandInterceptor()
+    return EnvironmentProvider(
+        environment: environment,
+        child:  MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => TodoProvider()),
+            Provider<CommandManager>(create: (_) => CommandManager(
+                interceptors: [
+                  LockCommandInterceptor(),
+                  TracingCommandInterceptor()
+                ],
+                translator: EasyLocalizationTranslator()
+            )),
           ],
-          translator: EasyLocalizationTranslator()
-        )),
-      ],
-      child: Consumer<LocaleManager>(
-        builder: (BuildContext context, LocaleManager value, Widget? child) {
-          return CupertinoApp(
-            title: 'TODO',
+          child: Consumer<LocaleManager>(
+              builder: (BuildContext context, LocaleManager value, Widget? child) {
+                return CupertinoApp(
+                  title: 'TODO',
 
-            theme: const CupertinoThemeData(
-              brightness: Brightness.light,
-              primaryColor: CupertinoColors.activeBlue,
-            ),
+                  theme: const CupertinoThemeData(
+                    brightness: Brightness.light,
+                    primaryColor: CupertinoColors.activeBlue,
+                  ),
 
-            // localization
+                  // localization
 
-            localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
-            supportedLocales: localeManager.supportedLocales,
-            locale: localeManager.locale,
+                  localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
+                  supportedLocales: localeManager.supportedLocales,
+                  locale: localeManager.locale,
 
-            home: const MainScreen(),
-          );
-        }
-        )
+                  home: const MainScreen(),
+                );
+              }
+          )
+      )
     );
   }
 }

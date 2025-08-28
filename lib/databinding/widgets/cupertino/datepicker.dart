@@ -36,7 +36,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
       builder: (FormFieldState<DateTime> state) {
         String displayText = state.value != null ? dateFormat.format(state.value!) : 'Tap to select date';
 
-        void _showCupertinoDatePicker() {
+        void showCupertinoDatePicker() {
           showCupertinoModalPopup(
             context: context,
             builder: (_) => Container(
@@ -61,7 +61,7 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
           onTap: () {
             // Dismiss keyboard if visible
             FocusScope.of(context).requestFocus(FocusNode());
-            _showCupertinoDatePicker();
+            showCupertinoDatePicker();
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),

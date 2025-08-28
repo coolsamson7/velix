@@ -21,7 +21,7 @@ void main() {
         });
 
     test('injectable', () {
-      var environment = Environment(module: TestModule);
+      var environment = Environment(forModule: TestModule);
 
       environment.report();
 
@@ -36,7 +36,7 @@ void main() {
     });
 
     test('factory', () {
-      var environment = Environment(module: TestModule);
+      var environment = Environment(forModule: TestModule);
 
       environment.report();
 
@@ -46,7 +46,7 @@ void main() {
     });
 
     test('inheritance', () {
-      var environment = Environment(module: TestModule);
+      var environment = Environment(forModule: TestModule);
 
       environment.report();
 
@@ -56,7 +56,7 @@ void main() {
     });
 
     test('inherited environments', () {
-      var environment = Environment(module: TestModule);
+      var environment = Environment(forModule: TestModule);
 
       environment.report();
 

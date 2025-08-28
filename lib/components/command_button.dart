@@ -72,7 +72,6 @@ class _CommandButtonState extends State<CommandButton> {
       // Icon only button with no background like iOS style
       return CupertinoButton(
         padding: EdgeInsets.zero,
-        minSize: 0,
         onPressed: isEnabled ? () => widget.command.execute(widget.args ?? []) : null,
         child: Icon(
           icon,

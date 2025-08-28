@@ -22,8 +22,8 @@ class Injectable extends ClassAnnotation {
   }
 }
 
-class create extends MethodAnnotation {
-  const create();
+class Create extends MethodAnnotation {
+  const Create();
 
   // override
 
@@ -38,7 +38,7 @@ class Module extends ClassAnnotation {
 
   // constructor
 
-  const Module({required this.imports});
+  const Module({List<Type>? imports}) : imports = imports ?? const [];
 
   // override
 
@@ -92,13 +92,13 @@ class OnDestroy extends MethodAnnotation {
   }
 }
 
-class scope extends ClassAnnotation {
+class Scope extends ClassAnnotation {
   final String name;
   final bool register;
 
   // constructor
 
-  const scope({required this.name, this.register = false});
+  const Scope({required this.name, this.register = false});
 
   // override
 
@@ -119,7 +119,7 @@ class Scopes {
     scopes[name] = scope;
   }
 
-  static Scope get(String name, Environment environment) {
+  static AbstractScope get(String name, Environment environment) {
     Type type = scopes[name]!;
     return environment.get(type: type);
   }
@@ -127,12 +127,12 @@ class Scopes {
 
 typedef ArgumentsProvider = List<dynamic> Function();
 
-abstract class Scope {
+abstract class AbstractScope {
   T get<T>(AbstractInstanceProvider<T> provider, Environment environment, ArgumentsProvider argumentProvider);
 }
 
-@scope(name: "singleton", register: false)
-class SingletonScope extends Scope {
+@Scope(name: "singleton", register: false)
+class SingletonScope extends AbstractScope {
   // instance data
 
   dynamic value;
@@ -151,15 +151,15 @@ class SingletonScope extends Scope {
   }
 }
 
-@scope(name: "environment", register: false)
+@Scope(name: "environment", register: false)
 class EnvironmentScope extends SingletonScope {
   // constructor
 
   EnvironmentScope();
 }
 
-@scope(name: "request", register: false)
-class RequestScope extends Scope {
+@Scope(name: "request", register: false)
+class RequestScope extends AbstractScope {
   // implement
 
   @override
@@ -623,7 +623,7 @@ class Environment {
 
   // constructor
 
-  Environment({this.module, this.parent})  {
+  Environment({Type? forModule, this.parent})  : module = forModule {
     if ( parent == null )
       if ( module == Boot) {
         lifecycleProcessors.add(OnInitCallableProcessor());
@@ -638,15 +638,6 @@ class Environment {
     if ( Tracer.enabled )
       Tracer.trace('di', TraceLevel.low, 'create environment for module $module');
 
-    void addProvider(Type type, AbstractInstanceProvider provider) {
-      if ( Tracer.enabled )
-        Tracer.trace('di', TraceLevel.high, 'add provider $provider for $type');
-
-      providers[type] = provider is EnvironmentInstanceProvider
-          ? provider
-          : EnvironmentInstanceProvider(environment: this, provider: provider);
-    }
-
     // inherit parent providers
 
     if (parent != null) {
@@ -654,7 +645,7 @@ class Environment {
         var provider = inheritedProvider;
         if (inheritedProvider.scope == 'environment') {
           provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
-          (provider as EnvironmentInstanceProvider).dependencies = (inheritedProvider as EnvironmentInstanceProvider).dependencies;
+          (provider as EnvironmentInstanceProvider).dependencies = inheritedProvider.dependencies;
           providers[providerType] = provider;
         }
         else providers[providerType] = provider;
@@ -901,7 +892,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   final AbstractInstanceProvider<T> provider;
 
   List<EnvironmentInstanceProvider>? dependencies;
-  Scope scopeInstance;
+  AbstractScope scopeInstance;
 
   // constructor
 
@@ -1092,7 +1083,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
     if ( Tracer.enabled)
-      Tracer.trace("di", TraceLevel.full, "$this create class ${_type}");
+      Tracer.trace("di", TraceLevel.full, "$this create class $_type");
 
     final instance = method.invoker!(args); // args[0] = self
 
@@ -1102,13 +1093,13 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
   @override
   String report() {
     final paramNames = method.parameters.map((t) => t.toString()).join(', ');
-    return "${host.toString()}.${method.name}($paramNames) -> ${_type}";
+    return "${host.toString()}.${method.name}($paramNames) -> $_type";
   }
 
   @override
   String toString() {
     final paramNames = method.parameters.map((t) => t.toString()).join(', ');
-    return "FunctionInstanceProvider(${host}.${method.name}($paramNames) -> ${_type})";
+    return "FunctionInstanceProvider($host.${method.name}($paramNames) -> $_type)";
   }
 }
 
@@ -1121,51 +1112,30 @@ class Boot {
   static Environment getEnvironment() {
     // add meta-data
 
-    if (!TypeDescriptor.hasType(Boot)) {
-      //Providers.register(EnvironmentProvider());
-
+    if (environment == null) {
       type<SingletonScope>(
-          location: 'package:velix/di/di.dart.SingletonScope',
-          annotations: [
-            scope(name: "singleton", register: false)
-          ],
-          constructor: () => SingletonScope(),
-          fromMapConstructor: (Map<String, dynamic> args) => SingletonScope(),
-          fromArrayConstructor: (List<dynamic> args) => SingletonScope()
+          location: 'package:velix/di/di.dart:0:0',
+          annotations: [Scope(name: "singleton", register: false)],
       );
 
       type<EnvironmentScope>(
-          location: 'package:velix/di/di.dart.EnvironmentScope',
-          annotations: [
-            scope(name: "environment", register: false)
-          ],
-          constructor: () => EnvironmentScope(),
-          fromMapConstructor: (Map<String, dynamic> args) => EnvironmentScope(),
-          fromArrayConstructor: (List<dynamic> args) => EnvironmentScope()
+          location: 'package:velix/di/di.dart:0:0',
+          annotations: [Scope(name: "environment", register: false)],
       );
 
       type<RequestScope>(
-          location: 'package:velix/di/di.dart.RequestScope',
-          annotations: [
-            scope(name: "request", register: false)
-          ],
-          constructor: () => RequestScope(),
-          fromMapConstructor: (Map<String, dynamic> args) => RequestScope(),
-          fromArrayConstructor: (List<dynamic> args) => RequestScope(),
+          location: 'package:velix/di/di.dart:0:0',
+          annotations: [Scope(name: "request", register: false)],
       );
 
       type<Boot>(
-          location: 'package:velix/di/di.dart.Boot',
-          annotations: [
-            Module(imports: [])
-          ],
-          constructor: () => Boot(),
-          fromMapConstructor: (Map<String, dynamic> args) => Boot(),
+          location: 'package:velix/di/di.dart:0:0',
+          annotations: [Module(imports: [])],
           fromArrayConstructor: (List<dynamic> args) => Boot(),
       );
+
+      environment = Environment(forModule: Boot);
     } // if
-    
-    environment ??= Environment(module: Boot);
 
     return environment!;
   }

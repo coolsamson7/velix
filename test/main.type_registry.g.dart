@@ -98,7 +98,7 @@ void registerAllDescriptors() {
       ), 
       method<Factory,Baz>('createBaz',
         annotations: [
-          create()
+          Create()
         ],
         parameters: [
           param<Bar>('bar', isRequired: true)

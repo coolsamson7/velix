@@ -1,7 +1,5 @@
 import 'package:velix/velix.dart';
 
-// NEW
-
 @Module(imports:[])
 class TestModule {
 }
@@ -44,14 +42,13 @@ class Factory {
     print(foo);
   }
 
-  @create()
+  @Create()
   Baz createBaz(Bar bar) {
     return Baz();
   }
 
 }
 
-// NEW
 @Dataclass()
 class Collections {
   // instance data

@@ -1,6 +1,8 @@
 
 // annotations
 
+import 'package:flutter/material.dart';
+
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 
@@ -48,16 +50,37 @@ class Module extends ClassAnnotation {
   }
 }
 
-class OnInit {
+class OnInit extends MethodAnnotation {
   const OnInit();
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, MethodDescriptor method) {
+    OnInitCallableProcessor.register(type, method);
+  }
 }
 
-class Inject {
+class Inject extends MethodAnnotation {
   const Inject();
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, MethodDescriptor method) {
+    //TODO OnInitCallableProcessor.register(type, method);
+  }
 }
 
-class OnDestroy {
+class OnDestroy extends MethodAnnotation {
   const OnDestroy();
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, MethodDescriptor method) {
+    OnDestroyCallableProcessor.register(type, method);
+  }
 }
 
 class scope extends ClassAnnotation {
@@ -215,8 +238,144 @@ enum Lifecycle {
 }
 
 abstract class LifecycleProcessor {
+  // instance data
+
   int get order;
-  void processLifecycle(Lifecycle lifecycle, dynamic instance, Environment environment);
+  final Lifecycle lifecycle;
+
+  // constructor
+
+  LifecycleProcessor({required this.lifecycle});
+
+  // public
+
+  void processLifecycle(dynamic instance, Environment environment);
+}
+
+class LifecycleMethod {
+  // instance data
+
+  Lifecycle lifecycle;
+  dynamic annotation;
+
+  // constructor
+
+  LifecycleMethod({required this.lifecycle, required this.annotation});
+
+  // protected
+
+  List<dynamic> getArguments() {
+    return [];
+  }
+}
+
+class MethodCall {
+  // instance data
+
+  final dynamic annotation;
+  final MethodDescriptor method;
+  final LifecycleMethod lifecycleMethod;
+
+  // constructor
+
+  MethodCall({required this.annotation, required this.method, required this.lifecycleMethod});
+
+  // public
+
+  void execute(dynamic instance, Environment environment) {
+    method.invoker!([instance, ...lifecycleMethod.getArguments()]);
+  }
+}
+
+ abstract class AbstractCallableProcessor extends LifecycleProcessor {
+  // constructor
+
+  AbstractCallableProcessor({required super.lifecycle});
+
+  // override
+
+  @override
+  // TODO: implement order
+  int get order => 1;
+
+  void execute(List<MethodDescriptor>? methods, instance, environment) {
+    if ( methods != null)
+      for ( var method in methods)
+        method.invoker!([instance]); // TODO args...
+  }
+}
+
+/// base class for post processors
+abstract class PostProcessor extends LifecycleProcessor {
+  @override
+  // TODO: implement order
+  int get order => 1;
+
+  void process(dynamic instance, Environment environment);
+
+  // constructor
+
+  PostProcessor():super(lifecycle: Lifecycle.onInit);
+
+  // override
+
+  @override
+  void processLifecycle(instance, Environment environment) {
+    process(instance, environment);
+  }
+}
+
+//@Injectable()
+//class OnInjectCallableProcessor extends AbstractCallableProcessor {
+//  OnInjectCallableProcessor(): super(lifecycle: Lifecycle.onInject);
+//}
+
+@Injectable()
+class OnInitCallableProcessor extends AbstractCallableProcessor {
+  // static
+
+  static Map<Type, List<MethodDescriptor>> methods = {};
+
+  static void register(TypeDescriptor type, MethodDescriptor method) {
+    var list = methods[type.type];
+    if ( list == null)
+      methods[type.type] = [method];
+    else
+      methods[type.type]!.add(method);
+  }
+
+  // constructor
+
+  OnInitCallableProcessor(): super(lifecycle: Lifecycle.onInit);
+
+  @override
+  void processLifecycle(instance, Environment environment) {
+    execute(methods[instance.runtimeType], instance, environment);
+  }
+}
+
+@Injectable()
+class OnDestroyCallableProcessor extends AbstractCallableProcessor {
+  // static
+
+  static Map<Type, List<MethodDescriptor>> methods = {};
+
+  static void register(TypeDescriptor type, MethodDescriptor method) {
+    var list = methods[type.type];
+    if ( list == null)
+      methods[type.type] = [method];
+    else
+      methods[type.type]!.add(method);
+  }
+
+  // constructor
+
+  OnDestroyCallableProcessor(): super(lifecycle: Lifecycle.onDestroy);
+
+  @override
+  void processLifecycle(instance, Environment environment) {
+    execute(methods[instance.runtimeType], instance, environment);
+  }
 }
 
 /// The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
@@ -426,8 +585,12 @@ class Environment {
   // constructor
 
   Environment(this.module, {this.parent})  {
-    if ( parent == null && module != Boot)
-      parent = Boot.getEnvironment();
+    if ( parent == null )
+      if ( module == Boot) {
+        lifecycleProcessors.add(OnInitCallableProcessor());
+        lifecycleProcessors.add(OnDestroyCallableProcessor());
+      }
+      else parent = Boot.getEnvironment();
 
     final Stopwatch stopwatch = Stopwatch()..start();
 
@@ -568,7 +731,8 @@ class Environment {
 
   T executeProcessors<T>(Lifecycle lifecycle, T instance) {
     for ( var processor in lifecycleProcessors)
-      processor.processLifecycle(lifecycle, instance, this);
+      if ( processor.lifecycle == lifecycle)
+        processor.processLifecycle(instance, this);
 
     return instance;
   }

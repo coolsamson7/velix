@@ -30,10 +30,14 @@ class Factory {
   const Factory();
 
   @OnInit()
-  void onInit() {}
+  void onInit() {
+    print("onInit");
+  }
 
-  @OnInit()
-  void onDestroy() {}
+  @OnDestroy()
+  void onDestroy() {
+    print("onDestroy");
+  }
 
   @Inject()
   void setFoo(Foo foo) {

@@ -91,7 +91,18 @@ class EnvironmentProvider extends InheritedWidget {
   }
 }
 
+@Module(imports: [])
+class ApplicationModule {
+  @OnInit()
+  void onInit() {
+    print("ServiceModule.onInit()");
+  }
 
+  @OnDestroy()
+  void onDestroy() {
+    print("ServiceModule.onDestroy()");
+  }
+}
 
 void main() async {
   // configure json stuff
@@ -144,7 +155,7 @@ class TODOApp extends StatelessWidget {
   // instance data
 
   final I18N i18n;
-  final Environment environment = Environment(module: ServiceModule);
+  final Environment environment = Environment(module: ApplicationModule);
   
   // constructor
   
@@ -160,7 +171,7 @@ class TODOApp extends StatelessWidget {
         environment: environment,
         child:  MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => TodoProvider()),
+            ChangeNotifierProvider(create: (_) => environment.get<TodoProvider>()),
             Provider<CommandManager>(create: (_) => CommandManager(
                 interceptors: [
                   LockCommandInterceptor(),

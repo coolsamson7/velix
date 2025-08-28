@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sample/screens/screens.module.dart';
 import 'package:sample/services/services.dart';
 
 import 'package:velix/velix.dart' hide EnvironmentProvider;
@@ -94,13 +93,11 @@ class _TodoDetailPageState extends State<TodoDetailPage> with CommandController<
 
   @override
   Widget build(BuildContext context) {
-    environment ??= Environment(module: ScreensModule, parent: EnvironmentProvider.of(context));
+    environment ??= Environment(parent: EnvironmentProvider.of(context));
 
     // test
 
-    environment?.get<TodoService>();
-    environment?.get<Foo>();
-    environment?.get<Bar>();
+    environment?.get<PerWidgetState>();
 
     // update command state
 

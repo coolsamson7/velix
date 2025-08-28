@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:sample/services/services.dart';
 import 'package:velix/di/di.dart';
 import '../models/todo.dart';
 
+@Injectable()
 class TodoProvider with ChangeNotifier {
-  final List<Todo> _todos = [];
+  // instance data
 
-  TodoProvider();
+  final TodoService todoService;
+  final List<Todo> todos = [];
+  //TODO List<Todo> get todos => _todos;
 
-  List<Todo> get todos => _todos;
+  // constructor
+
+  TodoProvider({required this.todoService});
+
+  // public
 
   Future<Todo> addTodo(String title) async {
     Todo todo = Todo(id: DateTime.now().toString(), details: Details(author: "Andreas", priority: 1, date: DateTime.now()), title: title);
 
-    _todos.add(todo);
+    todos.add(todo);
 
     await Future.delayed(const Duration(milliseconds: 1000)); // just a test
 
@@ -28,14 +36,14 @@ class TodoProvider with ChangeNotifier {
   }
 
   void toggleTodo(String id) {
-    final todo = _todos.firstWhere((t) => t.id == id);
+    final todo = todos.firstWhere((t) => t.id == id);
     todo.completed = !todo.completed;
 
     notifyListeners();
   }
 
   void removeTodo(String id) {
-    _todos.removeWhere((t) => t.id == id);
+    todos.removeWhere((t) => t.id == id);
 
     notifyListeners();
   }

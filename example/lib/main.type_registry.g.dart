@@ -1,13 +1,64 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
+import 'package:sample/providers/todo_provider.dart';
+import 'package:velix/di/di.dart';
 import 'package:sample/models/todo.dart';
 import 'package:velix/reflectable/reflectable.dart';
-import 'package:sample/screens/screens.module.dart';
-import 'package:velix/di/di.dart';
+import 'package:sample/main.dart';
 import 'package:sample/services/services.dart';
 
 void registerAllDescriptors() {
+  type<TodoService>(
+    location: 'package:sample/services/services.dart:4:7',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+    ],
+    constructor: () => TodoService(),
+    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
+    fromArrayConstructor: (List<dynamic> args) => TodoService(),
+    methods: [
+      method<TodoService,void>('onInit',
+          annotations: [
+            OnInit()
+          ],
+          invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
+      ),
+      method<TodoService,void>('onDestroy',
+          annotations: [
+            OnDestroy()
+          ],
+          invoker: (List<dynamic> args)=> (args[0] as TodoService).onDestroy()
+      )
+    ],
+  );
+
+  type<TodoProvider>(
+    location: 'package:sample/providers/todo_provider.dart:7:7',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TodoService>('todoService', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TodoService todoService}) => TodoProvider(todoService: todoService),
+    fromMapConstructor: (Map<String,dynamic> args) => TodoProvider(todoService: args['todoService'] as TodoService),
+    fromArrayConstructor: (List<dynamic> args) => TodoProvider(todoService: args[0] as TodoService),
+    fields: [
+      field<TodoProvider,TodoService>('todoService',
+        getter: (obj) => obj.todoService,
+      ), 
+      field<TodoProvider,List<Todo>>('todos',
+        elementType: Todo,
+        factoryConstructor: () => <Todo>[],
+        getter: (obj) => obj.todos,
+        //setter: (obj, value) => (obj as TodoProvider).todos = value,
+      )
+    ]
+  );
+
   type<Details>(
     location: 'package:sample/models/todo.dart:4:7',
     params: [
@@ -105,114 +156,54 @@ void registerAllDescriptors() {
     ]
   );
 
-  type<ScreensModule>(
-    location: 'package:sample/screens/screens.module.dart:4:7',
+  type<ApplicationModule>(
+    location: 'package:sample/main.dart:95:7',
     annotations: [
       Module(imports: [])
     ],
     params: [
     ],
-    constructor: () => ScreensModule(),
-    fromMapConstructor: (Map<String,dynamic> args) => ScreensModule(),
-    fromArrayConstructor: (List<dynamic> args) => ScreensModule(),
+    constructor: () => ApplicationModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => ApplicationModule(),
+    fromArrayConstructor: (List<dynamic> args) => ApplicationModule(),
     methods: [
-      method<ScreensModule,void>('onDestroy',
+      method<ApplicationModule,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ApplicationModule).onInit()
+      ), 
+      method<ApplicationModule,void>('onDestroy',
         annotations: [
           OnDestroy()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as ScreensModule).onDestroy()
+        invoker: (List<dynamic> args)=> (args[0] as ApplicationModule).onDestroy()
       )
     ],
   );
 
-  type<Foo>(
-    location: 'package:sample/screens/screens.module.dart:12:7',
-    annotations: [
-      Injectable()
-    ],
-    params: [
-    ],
-    constructor: () => Foo(),
-    fromMapConstructor: (Map<String,dynamic> args) => Foo(),
-    fromArrayConstructor: (List<dynamic> args) => Foo(),
-    methods: [
-      method<Foo,void>('onDestroy',
-        annotations: [
-          OnDestroy()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Foo).onDestroy()
-      )
-    ],
-  );
-
-  type<Bar>(
-    location: 'package:sample/screens/screens.module.dart:22:7',
+  type<PerWidgetState>(
+    location: 'package:sample/services/services.dart:20:7',
     annotations: [
       Injectable(scope: "environment")
     ],
     params: [
     ],
-    constructor: () => Bar(),
-    fromMapConstructor: (Map<String,dynamic> args) => Bar(),
-    fromArrayConstructor: (List<dynamic> args) => Bar(),
+    constructor: () => PerWidgetState(),
+    fromMapConstructor: (Map<String,dynamic> args) => PerWidgetState(),
+    fromArrayConstructor: (List<dynamic> args) => PerWidgetState(),
     methods: [
-      method<Bar,void>('onDestroy',
-        annotations: [
-          OnDestroy()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Bar).onDestroy()
-      )
-    ],
-  );
-
-  type<TodoService>(
-    location: 'package:sample/services/services.dart:4:7',
-    annotations: [
-      Injectable()
-    ],
-    params: [
-    ],
-    constructor: () => TodoService(),
-    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
-    fromArrayConstructor: (List<dynamic> args) => TodoService(),
-    methods: [
-      method<TodoService,void>('onInit',
+      method<PerWidgetState,void>('onInit',
         annotations: [
           OnInit()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
+        invoker: (List<dynamic> args)=> (args[0] as PerWidgetState).onInit()
       ), 
-      method<TodoService,void>('onDestroy',
+      method<PerWidgetState,void>('onDestroy',
         annotations: [
           OnDestroy()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as TodoService).onDestroy()
-      )
-    ],
-  );
-
-  type<ServiceModule>(
-    location: 'package:sample/services/services.dart:19:7',
-    annotations: [
-      Module(imports: [])
-    ],
-    params: [
-    ],
-    constructor: () => ServiceModule(),
-    fromMapConstructor: (Map<String,dynamic> args) => ServiceModule(),
-    fromArrayConstructor: (List<dynamic> args) => ServiceModule(),
-    methods: [
-      method<ServiceModule,void>('onInit',
-        annotations: [
-          OnInit()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ServiceModule).onInit()
-      ), 
-      method<ServiceModule,void>('onDestroy',
-        annotations: [
-          OnDestroy()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ServiceModule).onDestroy()
+        invoker: (List<dynamic> args)=> (args[0] as PerWidgetState).onDestroy()
       )
     ],
   );

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:sample/screens/screens.module.dart';
 import 'package:sample/services/services.dart';
 import 'package:velix/di/di.dart' hide EnvironmentProvider;
 import 'package:velix/i18n/i18n.dart';
@@ -18,9 +17,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  // static
 
-  static final List<Widget> _pages = <Widget>[TodoHomePage(), TestPage()];
+  static final List<Widget> _pages = <Widget>[
+    TodoHomePage(),
+    TestPage()
+  ];
+
+  // instance data
+
+  int _selectedIndex = 0;
+  Environment? environment;
+
+  // public
 
   void _onItemTapped(int index) {
     setState(() {
@@ -28,16 +37,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  Environment? environment;
-
   // override
-
-  @override
-  void initState() {
-    super.initState();
-
-
-  }
 
   @override
   void dispose() {
@@ -50,9 +50,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleManager>();
 
-    environment ??= Environment(module: ScreensModule, parent: EnvironmentProvider.of(context));
+    environment ??= Environment(parent: EnvironmentProvider.of(context));
 
-    environment?.get<TodoService>();
+    environment?.get<PerWidgetState>();
 
     return EnvironmentProvider(
       environment: environment!,

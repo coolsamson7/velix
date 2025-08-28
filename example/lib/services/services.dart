@@ -15,16 +15,19 @@ class TodoService {
   }
 }
 
-@Module(imports: [])
-class ServiceModule {
+/// sample for an object that will be recreated on every level
+@Injectable(scope: "environment")
+class PerWidgetState {
+  PerWidgetState();
+
   @OnInit()
   void onInit() {
-    print("ServiceModule.onInit()");
+    print("PerWidgetState.onInit()");
   }
 
   @OnDestroy()
   void onDestroy() {
-    print("ServiceModule.onDestroy()");
+    print("PerWidgetState.onDestroy()");
   }
 }
 

@@ -11,7 +11,7 @@ class Bar {
   const Bar();
 }
 
-//@Injectable(scope: "singleton", eager: true)
+@Injectable(ignore: true) // the function will override! hopefully
 class Baz {
   const Baz();
 }
@@ -34,6 +34,11 @@ class Factory {
 
   @OnInit()
   void onDestroy() {}
+
+  @Inject()
+  void setFoo(Foo foo) {
+    print(foo);
+  }
 
   @create()
   Baz createBaz(Bar bar) {

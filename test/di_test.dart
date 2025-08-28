@@ -23,7 +23,7 @@ void main() {
           "di": TraceLevel.full
         });
 
-    test('di', () {
+    test('injectable', () {
       var environment = Environment(TestModule);
 
       environment.report();
@@ -36,6 +36,16 @@ void main() {
       var otherFoo = environment.get<Foo>(Foo);
 
       expect(foo, equals(otherFoo));
+    });
+
+    test('factory', () {
+      var environment = Environment(TestModule);
+
+      environment.report();
+
+      var baz = environment.get<Baz>(Baz);
+
+      expect(baz, isNotNull);
     });
   });
 }

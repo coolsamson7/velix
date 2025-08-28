@@ -7,21 +7,30 @@ import '../util/tracer.dart';
 class Injectable extends ClassAnnotation {
   final bool eager;
   final String scope;
+  final bool ignore;
 
   // constructor
 
-  const Injectable({this.eager = true, this.scope = 'singleton'});
+  const Injectable({this.ignore = false, this.eager = true, this.scope = 'singleton'});
 
   // override
 
   @override
   void apply(TypeDescriptor type) {
-    Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
+    if (!ignore)
+      Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
   }
 }
 
-class create {
+class create extends MethodAnnotation {
   const create();
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, MethodDescriptor method) {
+    Providers.register(FunctionInstanceProvider(type.type, method));
+  }
 }
 
 class Module extends ClassAnnotation {
@@ -41,6 +50,10 @@ class Module extends ClassAnnotation {
 
 class OnInit {
   const OnInit();
+}
+
+class Inject {
+  const Inject();
 }
 
 class OnDestroy {
@@ -787,24 +800,25 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
     params = descriptor.constructorParameters.length;
     types.addAll(constructorParams.map((param) => param.type));
 
-    /* TODO Check methods annotated with @inject
+    // Check methods annotated with @inject
 
-    for (final method in TypeDescriptor.forType(type).getMethods()) {
-      if (method.hasDecorator(inject)) {
-      for (final param in method.paramTypes) {
-        if (!Providers.isRegistered(param)) {
+    for (final method in descriptor.getMethods()) {
+      if (method.hasAnnotation<Inject>()) {
+      for (final param in method.parameters) {
+        if (!Providers.isRegistered(param.type)) {
           throw DIRegistrationException(
-          '${type.toString()}.${method.method.name} declares an unknown parameter type ${param.toString()}');
+          '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
         }
-        types.add(param);
-        }
+
+        types.add(param.type);
+        } // for
       } // if
     } // for
-    */
 
     return (types, params);
   }
 
+  @override
   String get location => descriptor.location;
 
   /// Creates an instance of the type using the environment
@@ -825,6 +839,51 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   String toString() => "ClassProvider($_type)";
 }
 
+/// A FunctionInstanceProvider is able to create instances of type T by calling specific methods annotated with 'create'.
+class FunctionInstanceProvider<T> extends InstanceProvider<T> {
+  // instance data
+
+  final MethodDescriptor method;
+
+  // constructor
+
+  FunctionInstanceProvider(
+      Type clazz,
+      this.method, {
+        bool eager = true,
+        String scope = "singleton",
+      }) : super(type: method.returnType, host: clazz, eager: eager, scope: scope);
+
+  // override
+
+  @override
+  (List<Type>, int) getDependencies() {
+    return ([_host, ...method.parameters.map((param) => param.type)], method.parameters.length);
+  }
+
+  @override
+  T create(Environment environment, [List<dynamic> args = const []]) {
+    if ( Tracer.enabled)
+      Tracer.trace("di", TraceLevel.full, "$this create class ${_type}");
+
+    final instance = method.invoker!(args); // args[0] = self
+
+    return environment.created<T>(instance);
+  }
+
+  @override
+  String report() {
+    final paramNames = method.parameters.map((t) => t.toString()).join(', ');
+    return "${host.toString()}.${method.name}($paramNames) -> ${_type}";
+  }
+
+  @override
+  String toString() {
+    final paramNames = method.parameters.map((t) => t.toString()).join(', ');
+    return "FunctionInstanceProvider(${host}.${method.name}($paramNames) -> ${_type})";
+  }
+}
+
 // boot
 
 @Module(imports: [])
@@ -837,50 +896,42 @@ class Boot {
     if (!TypeDescriptor.hasType(Boot)) {
       type<SingletonScope>(
           location: 'package:velix/di/di.dart.SingletonScope',
-          params: [],
           annotations: [
             scope(name: "singleton", register: false)
           ],
           constructor: () => SingletonScope(),
           fromMapConstructor: (Map<String, dynamic> args) => SingletonScope(),
-          fromArrayConstructor: (List<dynamic> args) => SingletonScope(),
-          fields: []
+          fromArrayConstructor: (List<dynamic> args) => SingletonScope()
       );
 
       type<EnvironmentScope>(
           location: 'package:velix/di/di.dart.EnvironmentScope',
-          params: [],
           annotations: [
             scope(name: "environment", register: false)
           ],
           constructor: () => EnvironmentScope(),
           fromMapConstructor: (Map<String, dynamic> args) => EnvironmentScope(),
-          fromArrayConstructor: (List<dynamic> args) => EnvironmentScope(),
-          fields: []
+          fromArrayConstructor: (List<dynamic> args) => EnvironmentScope()
       );
 
       type<RequestScope>(
           location: 'package:velix/di/di.dart.RequestScope',
-          params: [],
           annotations: [
             scope(name: "request", register: false)
           ],
           constructor: () => RequestScope(),
           fromMapConstructor: (Map<String, dynamic> args) => RequestScope(),
           fromArrayConstructor: (List<dynamic> args) => RequestScope(),
-          fields: []
       );
 
       type<Boot>(
           location: 'package:velix/di/di.dart.Boot',
-          params: [],
           annotations: [
             Module(imports: [])
           ],
           constructor: () => Boot(),
           fromMapConstructor: (Map<String, dynamic> args) => Boot(),
           fromArrayConstructor: (List<dynamic> args) => Boot(),
-          fields: []
       );
     } // if
     

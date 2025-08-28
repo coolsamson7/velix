@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:async';
-import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -340,7 +339,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           if (value == null)
             return false;
           final typeName = value.type?.getDisplayString();
-          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'create';
+          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'create' || typeName == 'Inject';
         })
     ).toList();
 
@@ -420,14 +419,14 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if (isAsync)
       tab().writeln("isAsync: $isAsync,");
 
-    tab().write("invoker: (instance, List<dynamic> args)");
+    tab().write("invoker: (List<dynamic> args)");
 
     if (isAsync) {
       write("async ");
     }
 
     write("=> ");
-    write("(instance as $className).$methodName(");
+    write("(args[0] as $className).$methodName(");
 
     // Generate parameter passing for injection methods
     if (method.formalParameters.isNotEmpty) {
@@ -436,10 +435,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
         if (i > 0)
           write(", ");
+
         if ( parameter.isNamed)
           write(parameter.displayName).write(": ");
 
-        write("args[$i]");
+        write("args[${i +1 } ]");
       }
     }
 

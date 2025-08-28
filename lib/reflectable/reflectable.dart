@@ -9,6 +9,12 @@ class ClassAnnotation {
   void apply(TypeDescriptor type){}
 }
 
+class MethodAnnotation {
+  const MethodAnnotation();
+
+  void apply(TypeDescriptor type, MethodDescriptor method){}
+}
+
 /// decorator used to mark classes that should emit meta-data
 class Dataclass {
   const Dataclass();
@@ -301,6 +307,12 @@ class TypeDescriptor<T> {
       for (var method in methods) {
         //TODO method.typeDescriptor = this; // marker for a local method
         _methods[method.name] = method;
+
+        // run annotations
+
+        for ( var annotation in method.annotations)
+          if ( annotation is MethodAnnotation)
+            annotation.apply(this, method);
       } // for
 
 
@@ -315,7 +327,7 @@ class TypeDescriptor<T> {
 
     TypeDescriptor.register(this);
 
-    // run annotations
+    // run class annotations
 
     for ( var annotation in annotations)
       if ( annotation is ClassAnnotation)
@@ -458,13 +470,13 @@ TypeDescriptor<T> type<T>({
   required Constructor<T> constructor,
   required FromMapConstructor<T> fromMapConstructor,
   required FromArrayConstructor<T> fromArrayConstructor,
-  required List<ParameterDescriptor> params,
+  List<ParameterDescriptor>? params,
   List<FieldDescriptor>? fields,
   List<MethodDescriptor>? methods,
   TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields ?? [], methods: methods, superClass: superClass);
+  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({

@@ -20,6 +20,10 @@ class Injectable extends ClassAnnotation {
   }
 }
 
+class create {
+  const create();
+}
+
 class Module extends ClassAnnotation {
   final List<Type> imports;
 

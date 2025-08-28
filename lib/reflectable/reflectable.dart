@@ -54,6 +54,7 @@ class FieldDescriptor<T, V> {
     this.isNullable = false,
   });
 
+
   // public
 
   A? find_annotation<A>() {
@@ -65,7 +66,40 @@ class FieldDescriptor<T, V> {
   }
 }
 
-class ConstructorParameter {
+class MethodDescriptor {
+  // instance data
+
+  final String name;
+  final Type returnType;
+  final List<ParameterDescriptor> parameters;
+  final bool isAsync;
+  final bool isStatic;
+  final List<dynamic> annotations;
+  final Function? invoker;
+  //late TypeDescriptor typeDescriptor;
+
+  // constructor
+
+  const MethodDescriptor({
+    required this.name,
+    required this.returnType,
+    required this.parameters,
+    this.isAsync = false,
+    this.isStatic = false,
+    this.annotations = const [],
+    this.invoker,
+  });
+
+  bool hasAnnotation<T>() {
+    return annotations.any((a) => a.runtimeType == T);
+  }
+
+  T? findAnnotation<T>() {
+    return annotations.whereType<T>().firstOrNull;
+  }
+}
+
+class ParameterDescriptor {
   // instance data
 
   final String name;
@@ -77,7 +111,7 @@ class ConstructorParameter {
 
   // constructor
 
-  ConstructorParameter({
+  ParameterDescriptor({
     required this.name,
     required this.type,
     this.isNamed = false,
@@ -100,7 +134,7 @@ class ConstructorParameter {
 
 class ConstructorDescriptor {
   final String? name; // null for default constructor
-  final List<ConstructorParameter> parameters;
+  final List<ParameterDescriptor> parameters;
   final Function factory;
 
   ConstructorDescriptor({
@@ -216,10 +250,11 @@ class TypeDescriptor<T> {
   final String location;
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
+  final Map<String, MethodDescriptor> _methods = {};
   final Constructor<T> constructor;
   final FromMapConstructor<T> fromMapConstructor;
   final FromArrayConstructor<T> fromArrayConstructor;
-  final List<ConstructorParameter> constructorParameters;
+  final List<ParameterDescriptor> constructorParameters;
   final List<Object> annotations;
   final List<T>? enumValues;
 
@@ -235,6 +270,7 @@ class TypeDescriptor<T> {
     required this.fromArrayConstructor,
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
+    List<MethodDescriptor>? methods,
     required this.annotations,
     this.superClass,
     this.enumValues
@@ -251,7 +287,22 @@ class TypeDescriptor<T> {
       for ( var inheritedField in superClass!.getFields()) {
         _fields[inheritedField.name] = inheritedField;
       }
+
+      // inherit methods
+
+      for ( var inheritedMethod in superClass!.getMethods()) {
+        _methods[inheritedMethod.name] = inheritedMethod;
+      }
     }
+
+    // own methods
+
+    if ( methods != null)
+      for (var method in methods) {
+        //TODO method.typeDescriptor = this; // marker for a local method
+        _methods[method.name] = method;
+      } // for
+
 
     // own fields
 
@@ -369,6 +420,11 @@ class TypeDescriptor<T> {
     return _fields.values;
   }
 
+  /// return all fields
+  Iterable<MethodDescriptor> getMethods() {
+    return _methods.values;
+  }
+
   /// return the getter function of a specific field
   Getter getter(String field) {
     return _getField(field).getter;
@@ -402,12 +458,13 @@ TypeDescriptor<T> type<T>({
   required Constructor<T> constructor,
   required FromMapConstructor<T> fromMapConstructor,
   required FromArrayConstructor<T> fromArrayConstructor,
-  required List<ConstructorParameter> params,
-  required List<FieldDescriptor> fields,
+  required List<ParameterDescriptor> params,
+  List<FieldDescriptor>? fields,
+  List<MethodDescriptor>? methods,
   TypeDescriptor? superClass,
   List<Object>? annotations,
 }) {
-  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields, superClass: superClass);
+  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params, fields: fields ?? [], methods: methods, superClass: superClass);
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({
@@ -416,16 +473,17 @@ TypeDescriptor<T> enumeration<T extends Enum>({
   List<Object>? annotations,
 }) {
   var fromMapConstructor = (Map<String,dynamic> args) => null  as T; // TODO!!!!!
-  var fromArrayConstructor = (List<dynamic> args) => null  as T; //
+  var fromArrayConstructor = (List<dynamic> args) => null  as T;
+
   return TypeDescriptor<T>(location: name, constructor: () => null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
-ConstructorParameter param<T>(String name, {
+ParameterDescriptor param<T>(String name, {
   bool isNamed = false,
   bool isRequired = false,
   bool isNullable = false,
   dynamic defaultValue}) {
-  return ConstructorParameter(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue);
+  return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue);
 }
 
 /// @internal
@@ -466,6 +524,13 @@ dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
     }
 
    return result as dynamic;
+}
+
+MethodDescriptor method<T,R>(String name, {List<ParameterDescriptor>? parameters, bool isAsync = false,
+  bool isStatic = false,
+  annotations = const [],
+  required Function invoker}) {
+  return MethodDescriptor(name: name, returnType: R, parameters: parameters ?? [], annotations: annotations, invoker: invoker);
 }
 
 FieldDescriptor field<T,V>(String name, {

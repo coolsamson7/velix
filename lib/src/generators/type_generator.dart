@@ -331,6 +331,126 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
+  //
+
+  void generateMethods(ClassElement element) {
+    final methods = element.methods.where((method) =>
+        method.metadata.annotations.any((annotation) {
+          final value = annotation.computeConstantValue();
+          if (value == null)
+            return false;
+          final typeName = value.type?.getDisplayString();
+          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'create';
+        })
+    ).toList();
+
+    if (methods.isEmpty)
+      return;
+
+    tab().writeln("methods: [").indent(1);
+
+    int len = methods.length;
+    int i = 0;
+    for (final method in methods) {
+      generateMethod(element.name!, method, i == len - 1);
+      i++;
+    }
+
+    indent(-1).tab().writeln("],");
+  }
+
+  void generateParameters(List<FormalParameterElement> parameters) {
+    tab().writeln("parameters: [").indent(1);
+    int i = 0;
+    int len = parameters.length;
+
+    for ( var param in parameters) {
+      final name = param.name;
+      final typeStr = param.type.getDisplayString(withNullability: false);
+      final isNamed = param.isNamed;
+      final isRequired = param.isRequiredNamed || param.isRequiredPositional;
+      final isNullable = param.isOptional || param.isOptionalNamed;
+      final defaultValue = param.defaultValueCode ?? "null";
+
+      tab().write("param<$typeStr>('$name'");
+
+      if (isNamed)
+        write(", isNamed: $isNamed");
+
+      if (isRequired)
+        write(", isRequired: $isRequired");
+
+      if (isNullable)
+        write(", isNullable: $isNullable");
+
+      if (!isRequired)
+        write(", defaultValue: $defaultValue");
+
+      write(")").writeln(i < len - 1 ? ", " : "");
+
+      i++;
+    }
+
+    indent(-1).tab().writeln("],");
+  }
+
+  void generateMethod(String className, MethodElement method, bool last) {
+    final methodName = method.name;
+    final returnType = method.returnType;
+    final isAsync = method.returnType.isDartAsyncFuture;
+
+    // Find the lifecycle annotation
+
+    for (final annotation in method.metadata.annotations) {
+      final value = annotation.computeConstantValue();
+      if (value != null) {
+        final typeName = value.type?.getDisplayString();
+        if (typeName == 'OnInit' || typeName == 'OnDestroy' ||
+            typeName == 'Create') {
+          break;
+        }
+      }
+    }
+
+    tab().writeln("method<$className,$returnType>('$methodName',").indent(1);
+
+    generateAnnotations(method.metadata.annotations);
+    if (method.formalParameters.isNotEmpty) generateParameters(method.formalParameters);
+
+    if (isAsync)
+      tab().writeln("isAsync: $isAsync,");
+
+    tab().write("invoker: (instance, List<dynamic> args)");
+
+    if (isAsync) {
+      write("async ");
+    }
+
+    write("=> ");
+    write("(instance as $className).$methodName(");
+
+    // Generate parameter passing for injection methods
+    if (method.formalParameters.isNotEmpty) {
+      for (int i = 0; i < method.formalParameters.length; i++) {
+        var parameter =  method.formalParameters[i];
+
+        if (i > 0)
+          write(", ");
+        if ( parameter.isNamed)
+          write(parameter.displayName).write(": ");
+
+        write("args[$i]");
+      }
+    }
+
+    write(")");
+    writeln("");
+
+    indent(-1).tab().write(')').writeln(last ? "" : ", ");
+  }
+
+  //
+
   void generateConstructorParams(ClassElement element) {
     tab().write("params: ");
 
@@ -689,12 +809,13 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       tab().writeln("superClass: ${superClass}Descriptor,");
     }
 
-    generateAnnotations(element.metadata.annotations);
+    if ( element.metadata.annotations.isNotEmpty) generateAnnotations(element.metadata.annotations);
     generateConstructorParams(element);
     generateConstructor(element);
     generateFromMapConstructor(element);
     generateFromArrayConstructor(element);
-    generateFields(element);
+    if ( element.fields.isNotEmpty) generateFields(element);
+    generateMethods(element);
 
     indent(-1).tab().writeln(");");
   }

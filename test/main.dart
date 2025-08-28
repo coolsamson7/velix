@@ -11,6 +11,11 @@ class Bar {
   const Bar();
 }
 
+//@Injectable(scope: "singleton", eager: true)
+class Baz {
+  const Baz();
+}
+
 @Injectable(scope: "singleton", eager: true)
 class Foo {
   // instance data
@@ -18,6 +23,23 @@ class Foo {
   final Bar bar;
 
   const Foo({required this.bar});
+}
+
+@Injectable(scope: "singleton", eager: true)
+class Factory {
+  const Factory();
+
+  @OnInit()
+  void onInit() {}
+
+  @OnInit()
+  void onDestroy() {}
+
+  @create()
+  Baz createBaz(Bar bar) {
+    return Baz();
+  }
+
 }
 
 // NEW

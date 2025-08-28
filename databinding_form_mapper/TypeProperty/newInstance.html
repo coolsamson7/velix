@@ -90,7 +90,7 @@
     }
   }
 
-  return Function.apply(typeDescriptor.constructor, [], args);
+  return Function.apply(typeDescriptor.constructor!, [], args);
 }</code></pre>
 </section>
 

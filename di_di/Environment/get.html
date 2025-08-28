@@ -55,8 +55,8 @@
     <section class="multi-line-signature">
       
 <span class="returntype">T</span>
-<span class="name ">get</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="get-param-t"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">t</span></span></li>
-</ol>)
+<span class="name ">get</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="get-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">type</span>, </span></li>
+</ol>})
 
       
 
@@ -67,10 +67,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T get&lt;T&gt;(Type t) {
-  final provider = providers[t];
+  <pre class="language-dart"><code class="language-dart">T get&lt;T&gt;({Type? type}) {
+  final lookup = type ?? T;
+  final provider = providers[lookup];
   if (provider == null) {
-    throw DIRuntimeException(&#39;$t is not supported&#39;);
+    throw DIRuntimeException(&#39;$lookup is not supported&#39;);
   }
 
   return provider.create(this) as T;

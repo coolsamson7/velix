@@ -69,51 +69,30 @@
   <pre class="language-dart"><code class="language-dart">static Environment getEnvironment() {
   &#47;&#47; add meta-data
 
-  if (!TypeDescriptor.hasType(Boot)) {
-    &#47;&#47;Providers.register(EnvironmentProvider());
-
+  if (environment == null) {
     type&lt;SingletonScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart.SingletonScope&#39;,
-        annotations: [
-          scope(name: &quot;singleton&quot;, register: false)
-        ],
-        constructor: () =&gt; SingletonScope(),
-        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; SingletonScope(),
-        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; SingletonScope()
+        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
+        annotations: [Scope(name: &quot;singleton&quot;, register: false)],
     );
 
     type&lt;EnvironmentScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart.EnvironmentScope&#39;,
-        annotations: [
-          scope(name: &quot;environment&quot;, register: false)
-        ],
-        constructor: () =&gt; EnvironmentScope(),
-        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; EnvironmentScope(),
-        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; EnvironmentScope()
+        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
+        annotations: [Scope(name: &quot;environment&quot;, register: false)],
     );
 
     type&lt;RequestScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart.RequestScope&#39;,
-        annotations: [
-          scope(name: &quot;request&quot;, register: false)
-        ],
-        constructor: () =&gt; RequestScope(),
-        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; RequestScope(),
-        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; RequestScope(),
+        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
+        annotations: [Scope(name: &quot;request&quot;, register: false)],
     );
 
     type&lt;Boot&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart.Boot&#39;,
-        annotations: [
-          Module(imports: [])
-        ],
-        constructor: () =&gt; Boot(),
-        fromMapConstructor: (Map&lt;String, dynamic&gt; args) =&gt; Boot(),
+        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
+        annotations: [Module(imports: [])],
         fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; Boot(),
     );
-  } &#47;&#47; if
 
-  environment ??= Environment(Boot);
+    environment = Environment(forModule: Boot);
+  } &#47;&#47; if
 
   return environment!;
 }</code></pre>

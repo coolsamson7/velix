@@ -78,7 +78,7 @@
     constructor = targetTree.root.resultDefinition!.constructor;
   }
   else {
-    constructor = TypeDescriptor.forType(definition.targetClass).constructor; &#47;&#47; hmmm
+    constructor = TypeDescriptor.forType(definition.targetClass).constructor!; &#47;&#47; hmmm
   }
 
   return OperationResult(operations: operations, constructor: constructor, stackSize: sourceTree.stackSize);

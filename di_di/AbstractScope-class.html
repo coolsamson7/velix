@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the scope class from the di library, for the Dart programming language.">
-  <title>scope class - di library - Dart API</title>
+  <meta name="description" content="API docs for the AbstractScope class from the di library, for the Dart programming language.">
+  <title>AbstractScope class - di library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">velix</a></li>
     <li><a href="../di_di/">di&#47;di.dart</a></li>
-    <li class="self-crumb">scope class</li>
+    <li class="self-crumb">AbstractScope class</li>
   </ol>
-  <div class="self-name">scope</div>
+  <div class="self-name">AbstractScope</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,9 +46,10 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="di_di&#47;di_di-library-sidebar.html"
-    data-below-sidebar="di_di&#47;scope-class-sidebar.html">
+    data-below-sidebar="di_di&#47;AbstractScope-class-sidebar.html">
     <div>
-<h1><span class="kind-class">scope</span> class 
+<h1><span class="kind-class">AbstractScope</span> class 
+    <a href="https://dart.dev/language/class-modifiers#abstract" class="feature feature-abstract" title="This type can not be directly constructed.">abstract</a>
  
 </h1></div>
 
@@ -58,18 +59,15 @@
     <section>
       <dl class="dl-horizontal">
         
-  <dt>Inheritance</dt>
-  <dd>
-    <ul class="gt-separated dark clazz-relationships">
-      <li><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></li>
-        <li><a href="../reflectable_reflectable/ClassAnnotation-class.html">ClassAnnotation</a></li>
-      <li>scope</li>
-    </ul>
-  </dd>
 
         
         
 
+          <dt>Implementers</dt>
+          <dd><ul class="comma-separated clazz-relationships">
+              <li><a href="../di_di/RequestScope-class.html">RequestScope</a></li>
+              <li><a href="../di_di/SingletonScope-class.html">SingletonScope</a></li>
+          </ul></dd>
 
         
         
@@ -82,18 +80,17 @@
   <section class="summary offset-anchor" id="constructors">
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
-        <dt id="scope.new" class="callable">
-          <span class="name"><a href="../di_di/scope/scope.html">scope.new</a></span><span class="signature">({<span class="parameter" id="-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="-param-register"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">register</span> = <span class="default-value">false</span></span>})</span>
+        <dt id="AbstractScope.new" class="callable">
+          <span class="name"><a href="../di_di/AbstractScope/AbstractScope.html">AbstractScope.new</a></span><span class="signature">()</span>
         </dt>
         <dd>
           
-            <div class="constructor-modifier features">const</div>
         </dd>
     </dl>
   </section>
     
   <section
-      class="summary offset-anchor"
+      class="summary offset-anchor inherited"
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
@@ -106,30 +103,6 @@
 <dd class="inherited">
   The hash code for this object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="name" class="property">
-  <span class="name"><a href="../di_di/scope/name.html">name</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
-        <dt id="register" class="property">
-  <span class="name"><a href="../di_di/scope/register.html">register</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 
@@ -154,16 +127,16 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
-        <dt id="apply" class="callable">
-  <span class="name"><a href="../di_di/scope/apply.html">apply</a></span><span class="signature">(<wbr><span class="parameter" id="apply-param-type"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a></span> <span class="parameter-name">type</span></span>)
-    <span class="returntype parameter">&#8594; void</span>
+        <dt id="get" class="callable">
+  <span class="name"><a href="../di_di/AbstractScope/get.html">get</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="get-param-provider"><span class="type-annotation"><a href="../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">provider</span>, </span><span class="parameter" id="get-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span><span class="parameter" id="get-param-argumentProvider"><span class="type-annotation"><a href="../di_di/ArgumentsProvider.html">ArgumentsProvider</a></span> <span class="parameter-name">argumentProvider</span></span>)
+    <span class="returntype parameter">&#8594; T</span>
   </span>
   
 
 </dt>
 <dd>
   
-  <div class="features"><span class="feature">override</span></div>
+  
 
 </dd>
 
@@ -231,7 +204,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">velix</a></li>
     <li><a href="../di_di/">di</a></li>
-    <li class="self-crumb">scope class</li>
+    <li class="self-crumb">AbstractScope class</li>
 </ol>
 
     <h5>di library</h5>

@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">Environment</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="-param-module"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span> <span class="parameter-name">module</span>, {</span></li>
+      <span class="name ">Environment</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-forModule"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">forModule</span>, </span></li>
 <li><span class="parameter" id="-param-parent"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a>?</span> <span class="parameter-name">parent</span>, </span></li>
 </ol>})
     </section>
@@ -64,7 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Environment(this.module, {this.parent})  {
+  <pre class="language-dart"><code class="language-dart">Environment({Type? forModule, this.parent})  : module = forModule {
   if ( parent == null )
     if ( module == Boot) {
       lifecycleProcessors.add(OnInitCallableProcessor());
@@ -79,32 +79,17 @@
   if ( Tracer.enabled )
     Tracer.trace(&#39;di&#39;, TraceLevel.low, &#39;create environment for module $module&#39;);
 
-  void addProvider(Type type, AbstractInstanceProvider provider) {
-    if ( Tracer.enabled )
-      Tracer.trace(&#39;di&#39;, TraceLevel.high, &#39;add provider $provider for $type&#39;);
-
-    providers[type] = provider is EnvironmentInstanceProvider
-        ? provider
-        : EnvironmentInstanceProvider(environment: this, provider: provider);
-  }
-
   &#47;&#47; inherit parent providers
-
-  &#47;&#47; slight bootstrap problem
-
-  providers[SingletonScope]   = SingletonScopeInstanceProvider();
-  providers[RequestScope]     = RequestScopeInstanceProvider();
-  providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
 
   if (parent != null) {
     parent!.providers.forEach((providerType, inheritedProvider) {
       var provider = inheritedProvider;
       if (inheritedProvider.scope == &#39;environment&#39;) {
         provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
-        (provider as EnvironmentInstanceProvider).dependencies = [];
-        addProvider(providerType, provider);
+        (provider as EnvironmentInstanceProvider).dependencies = inheritedProvider.dependencies;
+        providers[providerType] = provider;
       }
-      &#47;&#47;addProvider(providerType, provider);
+      else providers[providerType] = provider;
     });
 
     &#47;&#47; inherit lifecycle processors
@@ -114,15 +99,16 @@
         lifecycleProcessors.add(processor);
       }
       else {
-        get(processor.runtimeType); &#47;&#47; automatically appends
+        get(type: processor.runtimeType); &#47;&#47; automatically appends
       }
     }
   }
   else {
     &#47;&#47; add bootstrap provider for Boot
-    &#47;&#47;providers[SingletonScope] = SingletonScopeInstanceProvider();
-    &#47;&#47;providers[RequestScope] = RequestScopeInstanceProvider();
-    &#47;&#47;providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
+
+    providers[SingletonScope]   = SingletonScopeInstanceProvider();
+    providers[RequestScope]     = RequestScopeInstanceProvider();
+    providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
   }
 
   providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
@@ -171,19 +157,21 @@
     }
   }
 
-  loadModule(TypeDescriptor.forType(module));
+  if ( module != null) {
+    loadModule(TypeDescriptor.forType(module));
 
-  &#47;&#47; filter providers according to prefix list
+    &#47;&#47; filter providers according to prefix list
 
-  providers.addAll(Providers.filter(this, filterProvider));
+    providers.addAll(Providers.filter(this, filterProvider));
 
-  &#47;&#47; construct eager objects for local providers
+    &#47;&#47; construct eager objects for local providers
 
-  for (final provider in providers.values.toSet()) {
-    if (provider.eager) {
-      provider.create(this);
+    for (final provider in providers.values.toSet()) {
+      if (provider.eager) {
+        provider.create(this);
+      }
     }
-  }
+  } &#47;&#47; if
 
   &#47;&#47; run lifecycle callbacks
 

@@ -74,7 +74,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void apply(TypeDescriptor type) {
-  if (!ignore)
+  if (factory)
     Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
 }</code></pre>
 </section>

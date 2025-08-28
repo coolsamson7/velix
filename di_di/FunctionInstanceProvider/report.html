@@ -74,7 +74,7 @@
   <pre class="language-dart"><code class="language-dart">@override
 String report() {
   final paramNames = method.parameters.map((t) =&gt; t.toString()).join(&#39;, &#39;);
-  return &quot;${host.toString()}.${method.name}($paramNames) -&gt; ${_type}&quot;;
+  return &quot;${host.toString()}.${method.name}($paramNames) -&gt; $_type&quot;;
 }</code></pre>
 </section>
 

@@ -56,9 +56,9 @@
         
 <span class="returntype"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
 <span class="name ">type</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="type-param-location"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">location</span>, </span></li>
-<li><span class="parameter" id="type-param-constructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">constructor</span>, </span></li>
-<li><span class="parameter" id="type-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromMapConstructor</span>, </span></li>
-<li><span class="parameter" id="type-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">fromArrayConstructor</span>, </span></li>
+<li><span class="parameter" id="type-param-constructor"><span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">constructor</span>, </span></li>
+<li><span class="parameter" id="type-param-fromMapConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromMapConstructor</span>, </span></li>
+<li><span class="parameter" id="type-param-fromArrayConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromArrayConstructor</span>, </span></li>
 <li><span class="parameter" id="type-param-params"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">params</span>, </span></li>
 <li><span class="parameter" id="type-param-fields"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">fields</span>, </span></li>
 <li><span class="parameter" id="type-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
@@ -77,9 +77,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">TypeDescriptor&lt;T&gt; type&lt;T&gt;({
   required String location,
-  required Constructor&lt;T&gt; constructor,
-  required FromMapConstructor&lt;T&gt; fromMapConstructor,
-  required FromArrayConstructor&lt;T&gt; fromArrayConstructor,
+  Constructor&lt;T&gt;? constructor,
+  FromMapConstructor&lt;T&gt;? fromMapConstructor,
+  FromArrayConstructor&lt;T&gt;? fromArrayConstructor,
   List&lt;ParameterDescriptor&gt;? params,
   List&lt;FieldDescriptor&gt;? fields,
   List&lt;MethodDescriptor&gt;? methods,

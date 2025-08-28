@@ -109,7 +109,7 @@ FormField&lt;DateTime&gt; build({
     builder: (FormFieldState&lt;DateTime&gt; state) {
       String displayText = state.value != null ? dateFormat.format(state.value!) : &#39;Tap to select date&#39;;
 
-      void _showCupertinoDatePicker() {
+      void showCupertinoDatePicker() {
         showCupertinoModalPopup(
           context: context,
           builder: (_) =&gt; Container(
@@ -134,7 +134,7 @@ FormField&lt;DateTime&gt; build({
         onTap: () {
           &#47;&#47; Dismiss keyboard if visible
           FocusScope.of(context).requestFocus(FocusNode());
-          _showCupertinoDatePicker();
+          showCupertinoDatePicker();
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),

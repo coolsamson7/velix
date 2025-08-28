@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       const
-      <span class="name ">Module</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-imports"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span> <span class="parameter-name">imports</span>, </span></li>
+      <span class="name ">Module</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-imports"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span>?</span> <span class="parameter-name">imports</span>, </span></li>
 </ol>})
     </section>
     
@@ -63,7 +63,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const Module({required this.imports});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const Module({List&lt;Type&gt;? imports}) : imports = imports ?? const [];</code></pre>
 </section>
 
 

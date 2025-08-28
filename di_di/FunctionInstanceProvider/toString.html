@@ -86,7 +86,7 @@ mainly for debugging or logging.</p>
   <pre class="language-dart"><code class="language-dart">@override
 String toString() {
   final paramNames = method.parameters.map((t) =&gt; t.toString()).join(&#39;, &#39;);
-  return &quot;FunctionInstanceProvider(${host}.${method.name}($paramNames) -&gt; ${_type})&quot;;
+  return &quot;FunctionInstanceProvider($host.${method.name}($paramNames) -&gt; $_type)&quot;;
 }</code></pre>
 </section>
 

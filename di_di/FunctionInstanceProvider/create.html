@@ -76,7 +76,7 @@
   <pre class="language-dart"><code class="language-dart">@override
 T create(Environment environment, [List&lt;dynamic&gt; args = const []]) {
   if ( Tracer.enabled)
-    Tracer.trace(&quot;di&quot;, TraceLevel.full, &quot;$this create class ${_type}&quot;);
+    Tracer.trace(&quot;di&quot;, TraceLevel.full, &quot;$this create class $_type&quot;);
 
   final instance = method.invoker!(args); &#47;&#47; args[0] = self
 

@@ -76,11 +76,14 @@ void registerAllDescriptors() {
         annotations: [
           OnInit()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).onInit()
+        parameters: [
+          param<Environment>('environment', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).onInit(args[1 ])
       ), 
       method<Factory,void>('onDestroy',
         annotations: [
-          OnInit()
+          OnDestroy()
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).onDestroy()
       ), 
@@ -106,7 +109,7 @@ void registerAllDescriptors() {
   );
 
   type<Collections>(
-    location: 'asset:velix/test/main.dart:52:7',
+    location: 'asset:velix/test/main.dart:56:7',
     params: [
       param<List<Money>>('prices', isNamed: true, isRequired: true)
     ],
@@ -123,7 +126,7 @@ void registerAllDescriptors() {
   );
 
   type<Money>(
-    location: 'asset:velix/test/main.dart:83:7',
+    location: 'asset:velix/test/main.dart:87:7',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -158,7 +161,7 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableProduct>(
-    location: 'asset:velix/test/main.dart:145:7',
+    location: 'asset:velix/test/main.dart:149:7',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
@@ -181,7 +184,7 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableRoot>(
-    location: 'asset:velix/test/main.dart:62:7',
+    location: 'asset:velix/test/main.dart:66:7',
     params: [
       param<ImmutableProduct>('product', isNamed: true, isRequired: true)
     ],
@@ -196,7 +199,7 @@ void registerAllDescriptors() {
   );
 
   type<Product>(
-    location: 'asset:velix/test/main.dart:154:7',
+    location: 'asset:velix/test/main.dart:158:7',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
@@ -222,7 +225,7 @@ void registerAllDescriptors() {
   );
 
   type<MutableRoot>(
-    location: 'asset:velix/test/main.dart:72:7',
+    location: 'asset:velix/test/main.dart:76:7',
     params: [
       param<Product>('product', isNamed: true, isRequired: true)
     ],
@@ -237,7 +240,7 @@ void registerAllDescriptors() {
   );
 
   type<Mutable>(
-    location: 'asset:velix/test/main.dart:98:7',
+    location: 'asset:velix/test/main.dart:102:7',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -272,7 +275,7 @@ void registerAllDescriptors() {
   );
 
   var BaseDescriptor = type<Base>(
-    location: 'asset:velix/test/main.dart:115:7',
+    location: 'asset:velix/test/main.dart:119:7',
     params: [
       param<String>('name', isRequired: true)
     ],
@@ -287,7 +290,7 @@ void registerAllDescriptors() {
   );
 
   type<Derived>(
-    location: 'asset:velix/test/main.dart:122:7',
+    location: 'asset:velix/test/main.dart:126:7',
     superClass: BaseDescriptor,
     params: [
       param<String>('name', isRequired: true), 
@@ -304,7 +307,7 @@ void registerAllDescriptors() {
   );
 
   type<Types>(
-    location: 'asset:velix/test/main.dart:129:7',
+    location: 'asset:velix/test/main.dart:133:7',
     params: [
       param<int>('int_var', isNamed: true, isRequired: true), 
       param<double>('double_var', isNamed: true, isRequired: true), 
@@ -331,7 +334,7 @@ void registerAllDescriptors() {
   );
 
   type<Invoice>(
-    location: 'asset:velix/test/main.dart:163:7',
+    location: 'asset:velix/test/main.dart:167:7',
     params: [
       param<List<Product>>('products', isNamed: true, isRequired: true), 
       param<DateTime>('date', isNamed: true, isRequired: true)
@@ -352,7 +355,7 @@ void registerAllDescriptors() {
   );
 
   type<Flat>(
-    location: 'asset:velix/test/main.dart:171:7',
+    location: 'asset:velix/test/main.dart:175:7',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('priceCurrency', isNamed: true, isRequired: true), 
@@ -376,7 +379,7 @@ void registerAllDescriptors() {
   );
 
   type<Immutable>(
-    location: 'asset:velix/test/main.dart:187:7',
+    location: 'asset:velix/test/main.dart:191:7',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true)

@@ -683,6 +683,8 @@ class Environment {
       //providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
     }
 
+    providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
+
     final Set<TypeDescriptor> loadedModules = {};
     final List<String> prefixList = [];
 
@@ -847,7 +849,22 @@ abstract class AbstractInstanceProvider<T> {
   String get location => "location?";
 }
 
- abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
+class EnvironmentProvider extends AbstractInstanceProvider<Environment> {
+  @override
+  bool get eager => false;
+
+  @override
+  String get scope => "singleton";
+
+  @override
+  Type get type => Environment;
+
+  @override
+  Environment create(Environment environment, [List<dynamic> args = const []]) {
+    return environment;
+  }
+}
+abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   // instance data
 
   late Type _host;
@@ -876,6 +893,7 @@ abstract class AbstractInstanceProvider<T> {
   @override
   Type get host => _host;
 }
+
 
 class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   // instance data
@@ -1016,7 +1034,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
     for (final method in descriptor.getMethods()) {
       if (method.hasAnnotation<Inject>() || method.hasAnnotation<OnInit>() || method.hasAnnotation<OnRunning>()) {
         for (final param in method.parameters) {
-          if (!Providers.isRegistered(param.type)) {
+          if (!Providers.isRegistered(param.type) && param.type != Environment) {
             throw DIRegistrationException(
             '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
           }
@@ -1105,6 +1123,8 @@ class Boot {
     // add meta-data
 
     if (!TypeDescriptor.hasType(Boot)) {
+      //Providers.register(EnvironmentProvider());
+
       type<SingletonScope>(
           location: 'package:velix/di/di.dart.SingletonScope',
           annotations: [

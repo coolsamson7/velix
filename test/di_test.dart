@@ -13,8 +13,6 @@ void main() {
 
     registerAllDescriptors();
 
-    var d = TypeDescriptor.forType(Foo);
-
     Tracer(
         isEnabled: true,
         trace: ConsoleTrace("%d [%l] %p: %m"), // d(ate), l(evel), p(ath), m(message)
@@ -39,6 +37,16 @@ void main() {
     });
 
     test('factory', () {
+      var environment = Environment(TestModule);
+
+      environment.report();
+
+      var baz = environment.get<Baz>(Baz);
+
+      expect(baz, isNotNull);
+    });
+
+    test('lifecycle', () {
       var environment = Environment(TestModule);
 
       environment.report();

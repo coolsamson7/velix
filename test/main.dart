@@ -30,8 +30,8 @@ class Factory {
   const Factory();
 
   @OnInit()
-  void onInit() {
-    print("onInit");
+  void onInit(Environment environment) {
+    print("onInit" + environment.toString());
   }
 
   @OnDestroy()

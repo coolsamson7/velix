@@ -38,7 +38,7 @@ class Factory {
   }
 
   @Inject()
-  void setFoo(Foo foo) {
+  void setFoo(@Value(key: "foo") Foo foo) {
     print(foo);
   }
 

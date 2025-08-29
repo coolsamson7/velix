@@ -8,7 +8,7 @@ import 'package:velix/mapper/json.dart';
 
 void registerAllDescriptors() {
   type<TestModule>(
-    location: 'asset:velix/test/main.dart:6:7',
+    location: 'asset:velix/test/main.dart:4:7',
     annotations: [
       Module(imports: [])
     ],
@@ -20,7 +20,7 @@ void registerAllDescriptors() {
   );
 
   type<Bar>(
-    location: 'asset:velix/test/main.dart:10:7',
+    location: 'asset:velix/test/main.dart:8:7',
     annotations: [
       Injectable(scope: "singleton", eager: true)
     ],
@@ -32,7 +32,7 @@ void registerAllDescriptors() {
   );
 
   type<Baz>(
-    location: 'asset:velix/test/main.dart:15:7',
+    location: 'asset:velix/test/main.dart:13:7',
     annotations: [
       Injectable(factory: false)
     ],
@@ -44,7 +44,7 @@ void registerAllDescriptors() {
   );
 
   type<Foo>(
-    location: 'asset:velix/test/main.dart:20:7',
+    location: 'asset:velix/test/main.dart:18:7',
     annotations: [
       Injectable(scope: "environment")
     ],
@@ -62,7 +62,7 @@ void registerAllDescriptors() {
   );
 
   type<Factory>(
-    location: 'asset:velix/test/main.dart:29:7',
+    location: 'asset:velix/test/main.dart:27:7',
     annotations: [
       Injectable(scope: "singleton", eager: true)
     ],
@@ -92,24 +92,19 @@ void registerAllDescriptors() {
           Inject()
         ],
         parameters: [
-          param<Foo>('foo', isRequired: true)
+          param<Foo>('foo', isRequired: true,
+                    annotations: [
+            Value(key: "foo")
+          ],
+)
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).setFoo(args[1 ])
-      ), 
-      method<Factory,Baz>('createBaz',
-        annotations: [
-          Create()
-        ],
-        parameters: [
-          param<Bar>('bar', isRequired: true)
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).createBaz(args[1 ])
       )
     ],
   );
 
   type<Collections>(
-    location: 'asset:velix/test/main.dart:56:7',
+    location: 'asset:velix/test/main.dart:53:7',
     params: [
       param<List<Money>>('prices', isNamed: true, isRequired: true)
     ],
@@ -126,7 +121,7 @@ void registerAllDescriptors() {
   );
 
   type<Money>(
-    location: 'asset:velix/test/main.dart:87:7',
+    location: 'asset:velix/test/main.dart:84:7',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -161,7 +156,7 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableProduct>(
-    location: 'asset:velix/test/main.dart:159:7',
+    location: 'asset:velix/test/main.dart:156:7',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
@@ -184,7 +179,7 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableRoot>(
-    location: 'asset:velix/test/main.dart:66:7',
+    location: 'asset:velix/test/main.dart:63:7',
     params: [
       param<ImmutableProduct>('product', isNamed: true, isRequired: true)
     ],
@@ -199,7 +194,7 @@ void registerAllDescriptors() {
   );
 
   type<Product>(
-    location: 'asset:velix/test/main.dart:168:7',
+    location: 'asset:velix/test/main.dart:165:7',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
@@ -225,7 +220,7 @@ void registerAllDescriptors() {
   );
 
   type<MutableRoot>(
-    location: 'asset:velix/test/main.dart:76:7',
+    location: 'asset:velix/test/main.dart:73:7',
     params: [
       param<Product>('product', isNamed: true, isRequired: true)
     ],
@@ -240,7 +235,7 @@ void registerAllDescriptors() {
   );
 
   type<Mutable>(
-    location: 'asset:velix/test/main.dart:102:7',
+    location: 'asset:velix/test/main.dart:99:7',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -275,7 +270,7 @@ void registerAllDescriptors() {
   );
 
   var BaseDescriptor = type<Base>(
-    location: 'asset:velix/test/main.dart:119:7',
+    location: 'asset:velix/test/main.dart:116:7',
     params: [
       param<String>('name', isRequired: true)
     ],
@@ -290,7 +285,7 @@ void registerAllDescriptors() {
   );
 
   type<Derived>(
-    location: 'asset:velix/test/main.dart:126:7',
+    location: 'asset:velix/test/main.dart:123:7',
     superClass: BaseDescriptor,
     params: [
       param<String>('name', isRequired: true), 
@@ -307,14 +302,14 @@ void registerAllDescriptors() {
   );
 
   var RootTypeDescriptor = type<RootType>(
-    location: 'asset:velix/test/main.dart:133:16',
+    location: 'asset:velix/test/main.dart:130:16',
     annotations: [
       Injectable(factory: false)
     ],
   );
 
   type<DerivedType>(
-    location: 'asset:velix/test/main.dart:138:7',
+    location: 'asset:velix/test/main.dart:135:7',
     superClass: RootTypeDescriptor,
     annotations: [
       Injectable()
@@ -327,7 +322,7 @@ void registerAllDescriptors() {
   );
 
   type<Types>(
-    location: 'asset:velix/test/main.dart:143:7',
+    location: 'asset:velix/test/main.dart:140:7',
     params: [
       param<int>('int_var', isNamed: true, isRequired: true), 
       param<double>('double_var', isNamed: true, isRequired: true), 
@@ -354,7 +349,7 @@ void registerAllDescriptors() {
   );
 
   type<Invoice>(
-    location: 'asset:velix/test/main.dart:177:7',
+    location: 'asset:velix/test/main.dart:174:7',
     params: [
       param<List<Product>>('products', isNamed: true, isRequired: true), 
       param<DateTime>('date', isNamed: true, isRequired: true)
@@ -375,7 +370,7 @@ void registerAllDescriptors() {
   );
 
   type<Flat>(
-    location: 'asset:velix/test/main.dart:185:7',
+    location: 'asset:velix/test/main.dart:182:7',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('priceCurrency', isNamed: true, isRequired: true), 
@@ -399,7 +394,7 @@ void registerAllDescriptors() {
   );
 
   type<Immutable>(
-    location: 'asset:velix/test/main.dart:201:7',
+    location: 'asset:velix/test/main.dart:198:7',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true)

@@ -385,6 +385,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       if (!isRequired)
         write(", defaultValue: $defaultValue");
 
+      if (param.metadata.annotations.isNotEmpty) {
+        writeln(",").tab();
+        generateAnnotations(param.metadata.annotations);
+      }
+
       write(")").writeln(i < len - 1 ? ", " : "");
 
       i++;
@@ -483,6 +488,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
           if ( !isRequired)
             write(", defaultValue: $defaultValue");
+
+          if (param.metadata.annotations.isNotEmpty) {
+            writeln(",").tab();
+            generateAnnotations(param.metadata.annotations);
+          }
 
           write(")").writeln(i < len-1 ? ", " : "");
 
@@ -810,8 +820,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       tab().writeln("superClass: ${superClass}Descriptor,");
     }
 
-    if (element.metadata.annotations.isNotEmpty) generateAnnotations(
-        element.metadata.annotations);
+    if (element.metadata.annotations.isNotEmpty) {
+      //writeln(",").tab();
+      generateAnnotations(element.metadata.annotations);
+    }
 
     if (!element.isAbstract) {
       generateConstructorParams(element);

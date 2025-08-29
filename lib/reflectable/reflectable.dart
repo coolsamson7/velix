@@ -114,12 +114,14 @@ class ParameterDescriptor {
   final bool isRequired;
   final bool isNullable;
   late dynamic defaultValue;
+  final List<dynamic> annotations;
 
   // constructor
 
   ParameterDescriptor({
     required this.name,
     required this.type,
+    required this.annotations,
     this.isNamed = false,
     this.isRequired = true,
     this.isNullable = false,
@@ -494,8 +496,9 @@ ParameterDescriptor param<T>(String name, {
   bool isNamed = false,
   bool isRequired = false,
   bool isNullable = false,
+  List<dynamic>? annotations,
   dynamic defaultValue}) {
-  return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue);
+  return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue, annotations: annotations ?? []);
 }
 
 /// @internal

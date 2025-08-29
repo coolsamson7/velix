@@ -284,16 +284,7 @@ class MethodCall {
   }
 
   void execute(dynamic instance, Environment environment) {
-    List<dynamic> args = [];
-
-    try {
-      args =  ArgumentResolver.createReceiverArgs(instance, environment, resolvers);
-    }
-    catch(e) {
-      print(e);
-    }
-
-    method.invoker!(args);
+    method.invoker!(ArgumentResolver.createReceiverArgs(environment, instance, resolvers));
   }
 }
 

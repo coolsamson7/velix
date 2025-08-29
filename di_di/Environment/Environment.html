@@ -85,9 +85,7 @@
     parent!.providers.forEach((providerType, inheritedProvider) {
       var provider = inheritedProvider;
       if (inheritedProvider.scope == &#39;environment&#39;) {
-        provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
-        (provider as EnvironmentInstanceProvider).dependencies = inheritedProvider.dependencies;
-        providers[providerType] = provider;
+        providers[providerType] = (inheritedProvider as EnvironmentInstanceProvider).copy(this);
       }
       else providers[providerType] = provider;
     });
@@ -110,8 +108,6 @@
     providers[RequestScope]     = RequestScopeInstanceProvider();
     providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
   }
-
-  providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
 
   final Set&lt;TypeDescriptor&gt; loadedModules = {};
   final List&lt;String&gt; prefixList = [];

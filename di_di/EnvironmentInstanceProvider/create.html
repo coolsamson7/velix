@@ -78,7 +78,7 @@ T create(Environment environment, [List&lt;dynamic&gt; args = const []]) {
   if ( Tracer.enabled)
     Tracer.trace(&quot;di&quot;, TraceLevel.full, &quot;create ${provider.type} in $environment&quot;);
 
-  return scopeInstance.get&lt;T&gt;(provider, environment,  () =&gt; dependencies!.map((dependency) =&gt; dependency.create(environment)).toList(growable: false));
+  return scopeInstance.get&lt;T&gt;(provider, environment,  () =&gt; ArgumentResolver.createArgs(environment, resolvers));
 }</code></pre>
 </section>
 

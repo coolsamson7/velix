@@ -59,8 +59,9 @@
         <li>@<a href="https://api.flutter.dev/flutter/dart-core/override-constant.html">override</a></li>
     </ol>
   </div>
-<span class="returntype">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>
-<span class="name ">getDependencies</span>(<wbr>)
+<span class="returntype">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../di_di/ParameterResolver-class.html">ParameterResolver</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>
+<span class="name ">getDependencies</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getDependencies-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span></li>
+</ol>)
 
       <div class="features"><span class="feature">override</span></div>
 
@@ -72,8 +73,22 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-(List&lt;Type&gt;, int) getDependencies() {
-  return ([_host, ...method.parameters.map((param) =&gt; param.type)], method.parameters.length);
+(List&lt;ParameterResolver&gt;, Set&lt;Type&gt;, int) getDependencies(Environment environment) {
+  List&lt;ParameterResolver&gt; resolvers = [];
+  Set&lt;Type&gt; dependencies = {};
+
+  resolvers.add(TypeParameterResolver(type: _host));
+  dependencies.add(_host);
+
+  for ( var parameter in method.parameters) {
+    var resolver = ParameterResolverFactory.createResolver(environment, parameter);
+
+    resolvers.add(resolver);
+
+    dependencies.addAll(resolver.requires());
+  }
+
+  return (resolvers, dependencies, method.parameters.length);
 }</code></pre>
 </section>
 

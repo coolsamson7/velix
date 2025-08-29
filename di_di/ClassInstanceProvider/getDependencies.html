@@ -59,8 +59,9 @@
         <li>@<a href="https://api.flutter.dev/flutter/dart-core/override-constant.html">override</a></li>
     </ol>
   </div>
-<span class="returntype">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>
-<span class="name ">getDependencies</span>(<wbr>)
+<span class="returntype">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../di_di/ParameterResolver-class.html">ParameterResolver</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>
+<span class="name ">getDependencies</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getDependencies-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span></li>
+</ol>)
 
       <div class="features"><span class="feature">override</span></div>
 
@@ -75,33 +76,38 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-(List&lt;Type&gt;,int) getDependencies() {
-  final List&lt;Type&gt; types = [];
-  int params = 0;
+(List&lt;ParameterResolver&gt;,Set&lt;Type&gt;,int) getDependencies(Environment environment) {
+  final types = &lt;Type&gt;{};
 
-  &#47;&#47; Check constructor parameters
+  &#47;&#47; compute resolvers
 
-  final constructorParams = descriptor.constructorParameters;
+  for ( var parameter in descriptor.constructorParameters) {
+    var resolver = ParameterResolverFactory.createResolver(environment, parameter);
 
-  params = descriptor.constructorParameters.length;
-  types.addAll(constructorParams.map((param) =&gt; param.type));
+    resolvers.add(resolver);
+
+    types.addAll(resolver.requires());
+  }
+
+  int params = descriptor.constructorParameters.length;
 
   &#47;&#47; check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-  for (final method in descriptor.getMethods()) {
-    if (method.hasAnnotation&lt;Inject&gt;() || method.hasAnnotation&lt;OnInit&gt;() || method.hasAnnotation&lt;OnRunning&gt;()) {
-      for (final param in method.parameters) {
-        if (!Providers.isRegistered(param.type) &amp;&amp; param.type != Environment) {
-          throw DIRegistrationException(
-          &#39;${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}&#39;);
-        }
+  for ( var method in OnInitCallableProcessor.methods[host] ?? [])
+    method.resolve(environment, types);
 
-        types.add(param.type);
-        } &#47;&#47; for
-    } &#47;&#47; if
-  } &#47;&#47; for
+  for ( var method in OnDestroyCallableProcessor.methods[host] ?? [])
+    method.resolve(environment, types);
 
-  return (types, params);
+  for ( var method in OnRunningCallableProcessor.methods[host] ?? [])
+    method.resolve(environment, types);
+
+  for ( var method in OnInjectCallableProcessor.methods[host] ?? [])
+    method.resolve(environment, types);
+
+  &#47;&#47; done
+
+  return (resolvers, types, params);
 }</code></pre>
 </section>
 

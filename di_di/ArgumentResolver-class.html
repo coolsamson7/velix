@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the EnvironmentProvider class from the di library, for the Dart programming language.">
-  <title>EnvironmentProvider class - di library - Dart API</title>
+  <meta name="description" content="API docs for the ArgumentResolver class from the di library, for the Dart programming language.">
+  <title>ArgumentResolver class - di library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">velix</a></li>
     <li><a href="../di_di/">di&#47;di.dart</a></li>
-    <li class="self-crumb">EnvironmentProvider class</li>
+    <li class="self-crumb">ArgumentResolver class</li>
   </ol>
-  <div class="self-name">EnvironmentProvider</div>
+  <div class="self-name">ArgumentResolver</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,9 +46,10 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="di_di&#47;di_di-library-sidebar.html"
-    data-below-sidebar="di_di&#47;EnvironmentProvider-class-sidebar.html">
+    data-below-sidebar="di_di&#47;ArgumentResolver-class-sidebar.html">
     <div>
-<h1><span class="kind-class">EnvironmentProvider</span> class 
+<h1><span class="kind-class">ArgumentResolver</span> class 
+    <a href="https://dart.dev/language/class-modifiers#abstract" class="feature feature-abstract" title="This type can not be directly constructed.">abstract</a>
  
 </h1></div>
 
@@ -58,18 +59,14 @@
     <section>
       <dl class="dl-horizontal">
         
-  <dt>Inheritance</dt>
-  <dd>
-    <ul class="gt-separated dark clazz-relationships">
-      <li><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></li>
-        <li><a href="../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/Environment-class.html">Environment</a></span>&gt;</span></li>
-      <li>EnvironmentProvider</li>
-    </ul>
-  </dd>
 
         
         
 
+          <dt>Implementers</dt>
+          <dd><ul class="comma-separated clazz-relationships">
+              <li><a href="../di_di/ParameterResolver-class.html">ParameterResolver</a></li>
+          </ul></dd>
 
         
         
@@ -82,8 +79,8 @@
   <section class="summary offset-anchor" id="constructors">
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
-        <dt id="EnvironmentProvider.new" class="callable">
-          <span class="name"><a href="../di_di/EnvironmentProvider/EnvironmentProvider.html">EnvironmentProvider.new</a></span><span class="signature">()</span>
+        <dt id="ArgumentResolver.new" class="callable">
+          <span class="name"><a href="../di_di/ArgumentResolver/ArgumentResolver.html">ArgumentResolver.new</a></span><span class="signature">()</span>
         </dt>
         <dd>
           
@@ -92,22 +89,10 @@
   </section>
     
   <section
-      class="summary offset-anchor"
+      class="summary offset-anchor inherited"
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="eager" class="property">
-  <span class="name"><a href="../di_di/EnvironmentProvider/eager.html">eager</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
-
-</dd>
-
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -116,30 +101,6 @@
 </dt>
 <dd class="inherited">
   The hash code for this object.
-  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="host" class="property inherited">
-  <span class="name"><a href="../di_di/AbstractInstanceProvider/host.html">host</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
-  
-
-</dt>
-<dd class="inherited">
-  
-  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="location" class="property inherited">
-  <span class="name"><a href="../di_di/AbstractInstanceProvider/location.html">location</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd class="inherited">
-  
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
 
 </dd>
@@ -156,30 +117,6 @@
 
 </dd>
 
-        <dt id="scope" class="property">
-  <span class="name"><a href="../di_di/EnvironmentProvider/scope.html">scope</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
-
-</dd>
-
-        <dt id="type" class="property">
-  <span class="name"><a href="../di_di/EnvironmentProvider/type.html">type</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
-
-</dd>
-
     </dl>
   </section>
 
@@ -189,32 +126,6 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
-        <dt id="create" class="callable">
-  <span class="name"><a href="../di_di/EnvironmentProvider/create.html">create</a></span><span class="signature">(<wbr><span class="parameter" id="create-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, [</span><span class="parameter" id="create-param-args"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span> = <span class="default-value">const []</span></span>])
-    <span class="returntype parameter">&#8594; <a href="../di_di/Environment-class.html">Environment</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">override</span></div>
-
-</dd>
-
-        <dt id="getDependencies" class="callable inherited">
-  <span class="name"><a href="../di_di/AbstractInstanceProvider/getDependencies.html">getDependencies</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; (<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>
-  </span>
-  
-
-</dt>
-<dd class="inherited">
-  
-  <div class="features"><span class="feature">inherited</span></div>
-
-</dd>
-
         <dt id="noSuchMethod" class="callable inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
     <span class="returntype parameter">&#8594; dynamic</span>
@@ -228,29 +139,16 @@
 
 </dd>
 
-        <dt id="report" class="callable inherited">
-  <span class="name"><a href="../di_di/AbstractInstanceProvider/report.html">report</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+        <dt id="resolve" class="callable">
+  <span class="name"><a href="../di_di/ArgumentResolver/resolve.html">resolve</a></span><span class="signature">(<wbr><span class="parameter" id="resolve-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
   </span>
   
 
 </dt>
-<dd class="inherited">
+<dd>
   
-  <div class="features"><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="resolve" class="callable inherited">
-  <span class="name"><a href="../di_di/AbstractInstanceProvider/resolve.html">resolve</a></span><span class="signature">(<wbr><span class="parameter" id="resolve-param-context"><span class="type-annotation"><a href="../di_di/ResolveContext-class.html">ResolveContext</a></span> <span class="parameter-name">context</span></span>)
-    <span class="returntype parameter">&#8594; void</span>
-  </span>
   
-
-</dt>
-<dd class="inherited">
-  
-  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -292,6 +190,37 @@
   </section>
     
     
+  <section class="summary offset-anchor" id="static-methods">
+    <h2>Static Methods</h2>
+    <dl class="callables">
+        <dt id="createArgs" class="callable">
+  <span class="name"><a href="../di_di/ArgumentResolver/createArgs.html">createArgs</a></span><span class="signature">(<wbr><span class="parameter" id="createArgs-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span><span class="parameter" id="createArgs-param-resolvers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/ArgumentResolver-class.html">ArgumentResolver</a></span>&gt;</span></span> <span class="parameter-name">resolvers</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="createReceiverArgs" class="callable">
+  <span class="name"><a href="../di_di/ArgumentResolver/createReceiverArgs.html">createReceiverArgs</a></span><span class="signature">(<wbr><span class="parameter" id="createReceiverArgs-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span><span class="parameter" id="createReceiverArgs-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="createReceiverArgs-param-resolvers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/ArgumentResolver-class.html">ArgumentResolver</a></span>&gt;</span></span> <span class="parameter-name">resolvers</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+    </dl>
+  </section>
     
 
   </div> <!-- /.main-content -->
@@ -305,7 +234,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">velix</a></li>
     <li><a href="../di_di/">di</a></li>
-    <li class="self-crumb">EnvironmentProvider class</li>
+    <li class="self-crumb">ArgumentResolver class</li>
 </ol>
 
     <h5>di library</h5>

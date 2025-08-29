@@ -59,6 +59,7 @@
 <li><span class="parameter" id="param-param-isNamed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNamed</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="param-param-isRequired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isRequired</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="param-param-isNullable"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isNullable</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="param-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a>?</span> <span class="parameter-name">annotations</span>, </span></li>
 <li><span class="parameter" id="param-param-defaultValue"><span class="type-annotation">dynamic</span> <span class="parameter-name">defaultValue</span>, </span></li>
 </ol>})
 
@@ -75,8 +76,9 @@
   bool isNamed = false,
   bool isRequired = false,
   bool isNullable = false,
+  List&lt;dynamic&gt;? annotations,
   dynamic defaultValue}) {
-  return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue);
+  return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue, annotations: annotations ?? []);
 }</code></pre>
 </section>
 

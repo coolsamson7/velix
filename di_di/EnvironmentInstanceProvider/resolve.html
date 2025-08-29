@@ -79,7 +79,9 @@ void resolve(ResolveContext context) {
 
     context.push(this);
     try {
-      final (types, params) = provider.getDependencies();
+      final (resolvers, types, params) = provider.getDependencies(environment);
+
+      this.resolvers = resolvers;
 
       for (final type in types) {
         final depProvider = context.requireProvider(type);

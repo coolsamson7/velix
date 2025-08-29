@@ -99,6 +99,15 @@ void registerAllDescriptors() {
 )
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).setFoo(args[1 ])
+      ), 
+      method<Factory,Baz>('createBaz',
+        annotations: [
+          Create()
+        ],
+        parameters: [
+          param<Bar>('bar', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).createBaz(args[1 ])
       )
     ],
   );

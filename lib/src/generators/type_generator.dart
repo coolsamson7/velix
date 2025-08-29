@@ -339,7 +339,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           if (value == null)
             return false;
           final typeName = value.type?.getDisplayString();
-          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'create' || typeName == 'Inject';
+          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'OnRunning' || typeName == 'Create' || typeName == 'Inject';
         })
     ).toList();
 
@@ -409,8 +409,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       final value = annotation.computeConstantValue();
       if (value != null) {
         final typeName = value.type?.getDisplayString();
-        if (typeName == 'OnInit' || typeName == 'OnDestroy' ||
-            typeName == 'Create') {
+        if (typeName == 'OnInit' || typeName == 'OnDestroy' ||  typeName == 'Create') {
           break;
         }
       }

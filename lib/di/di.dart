@@ -265,7 +265,7 @@ class MethodCall {
   // instance data
 
   final MethodDescriptor method;
-  final List<ArgumentResolver> resolvers = [];
+  List<ArgumentResolver>? resolvers;
 
   // constructor
 
@@ -274,17 +274,21 @@ class MethodCall {
   // public
 
   void resolve(Environment environment, Set<Type> types) {
-    for ( var parameter in method.parameters) {
-      var resolver = ParameterResolverFactory.createResolver(environment, parameter);
+    if ( resolvers == null) {
+      resolvers = [];
+      for (var parameter in method.parameters) {
+        var resolver = ParameterResolverFactory.createResolver(
+            environment, parameter);
 
-      types.addAll(resolver.requires());
+        types.addAll(resolver.requires());
 
-      resolvers.add(resolver);
+        resolvers!.add(resolver);
+      }
     }
   }
 
   void execute(dynamic instance, Environment environment) {
-    method.invoker!(ArgumentResolver.createReceiverArgs(environment, instance, resolvers));
+    method.invoker!(ArgumentResolver.createReceiverArgs(environment, instance, resolvers!));
   }
 }
 
@@ -1166,16 +1170,16 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
     // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-    for ( var method in OnInitCallableProcessor.methods[descriptor.type] ?? [])
+    for ( var method in OnInitCallableProcessor.methods[host] ?? [])
       method.resolve(environment, types);
 
-    for ( var method in OnDestroyCallableProcessor.methods[descriptor.type] ?? [])
+    for ( var method in OnDestroyCallableProcessor.methods[host] ?? [])
       method.resolve(environment, types);
 
-    for ( var method in OnRunningCallableProcessor.methods[descriptor.type] ?? [])
+    for ( var method in OnRunningCallableProcessor.methods[host] ?? [])
       method.resolve(environment, types);
 
-    for ( var method in OnInjectCallableProcessor.methods[descriptor.type] ?? [])
+    for ( var method in OnInjectCallableProcessor.methods[host] ?? [])
       method.resolve(environment, types);
 
     // done

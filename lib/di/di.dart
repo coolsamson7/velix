@@ -1,10 +1,7 @@
-
-// annotations
-
-import 'package:flutter/gestures.dart';
-
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
+
+// annotations
 
 class Injectable extends ClassAnnotation {
   final bool eager;
@@ -268,6 +265,7 @@ class MethodCall {
   // instance data
 
   final MethodDescriptor method;
+  final List<ArgumentResolver> resolvers = [];
 
   // constructor
 
@@ -275,8 +273,27 @@ class MethodCall {
 
   // public
 
+  void resolve(Environment environment, Set<Type> types) {
+    for ( var parameter in method.parameters) {
+      var resolver = ParameterResolverFactory.createResolver(environment, parameter);
+
+      types.addAll(resolver.requires());
+
+      resolvers.add(resolver);
+    }
+  }
+
   void execute(dynamic instance, Environment environment) {
-    method.invoker!([instance, ...method.parameters.map((param) => environment.get(type: param.type))]); // TODO param
+    List<dynamic> args = [];
+
+    try {
+      args =  ArgumentResolver.createReceiverArgs(instance, environment, resolvers);
+    }
+    catch(e) {
+      print(e);
+    }
+
+    method.invoker!(args);
   }
 }
 
@@ -666,30 +683,45 @@ class TypeParameterResolverFactory extends ParameterResolverFactory {
 
   @override
   ParameterResolver create(Environment environment, ParameterDescriptor parameter) {
-    return TypeParameterResolver(type: parameter.type);
+    if ( parameter.type == Environment)
+      return EnvironmentParameterResolver();
+    else
+     return TypeParameterResolver(type: parameter.type);
   }
 }
 
 abstract class ArgumentResolver {
   // static
 
-  static List<dynamic> createArgs(Environment environment, List<ParameterResolver> resolvers) {
-    var result = List<dynamic>.filled(resolvers.length, null, growable: false);
+  static List<dynamic> createReceiverArgs(Environment environment, dynamic instance, List<ArgumentResolver> resolvers) {
+    var result = List<dynamic>.filled(resolvers.length + 1, null, growable: false);
 
+    result[0] = instance;
     for (var i = 0; i < resolvers.length; i++)
-      result[i] = resolvers[i].resolve(environment);
+      result[i + 1] = resolvers[i].resolve(environment);
 
     return result;
   }
 
+  static List<dynamic> createArgs(Environment environment, List<ArgumentResolver> resolvers) {
+    if (resolvers.isNotEmpty) {
+      var result = List<dynamic>.filled(resolvers.length, null, growable: false);
+
+      for (var i = 0; i < resolvers.length; i++)
+        result[i] = resolvers[i].resolve(environment);
+
+      return result;
+    } // if
+    else return const [];
+  }
+
+  dynamic resolve(Environment environment);
 }
 
 abstract class ParameterResolver extends ArgumentResolver {
   // abstract
 
   List<Type> requires() => [];
-
-  dynamic resolve(Environment environment);
 }
 
 class TypeParameterResolver extends ParameterResolver {
@@ -712,11 +744,24 @@ class TypeParameterResolver extends ParameterResolver {
   }
 }
 
+class EnvironmentParameterResolver extends ParameterResolver {
+  // constructor
+
+  EnvironmentParameterResolver();
+
+  // override
+
+  @override
+  dynamic resolve(Environment environment) {
+    return environment;
+  }
+}
+
 class ConfigurationValueParameterResolver extends ParameterResolver {
   // override
 
   @override
-  List<Type> requires() => []; // ConfiguratiopnManager
+  List<Type> requires() => []; // ConfigurationManager
 
   @override
   resolve(Environment environment) {
@@ -784,8 +829,6 @@ class Environment {
       providers[RequestScope]     = RequestScopeInstanceProvider();
       providers[EnvironmentScope] = EnvironmentScopeInstanceProvider();
     }
-
-    providers[Environment] = EnvironmentInstanceProvider(environment: this, provider: EnvironmentProvider());
 
     final Set<TypeDescriptor> loadedModules = {};
     final List<String> prefixList = [];
@@ -958,21 +1001,6 @@ abstract class AbstractInstanceProvider<T> {
   String get location => "location?";
 }
 
-class EnvironmentProvider extends AbstractInstanceProvider<Environment> {
-  @override
-  bool get eager => false;
-
-  @override
-  String get scope => "singleton";
-
-  @override
-  Type get type => Environment;
-
-  @override
-  Environment create(Environment environment, [List<dynamic> args = const []]) {
-    return environment;
-  }
-}
 abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   // instance data
 
@@ -1147,18 +1175,19 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
     // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-    for (final method in descriptor.getMethods()) {
-      if (method.hasAnnotation<Inject>() || method.hasAnnotation<OnInit>() || method.hasAnnotation<OnRunning>() || method.hasAnnotation<OnDestroy>()) {
-        for (final param in method.parameters) {
-          if (!Providers.isRegistered(param.type) && param.type != Environment) { // TODO param
-            throw DIRegistrationException(
-            '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
-          }
+    for ( var method in OnInitCallableProcessor.methods[descriptor.type] ?? [])
+      method.resolve(environment, types);
 
-          types.add(param.type);
-          } // for
-      } // if
-    } // for
+    for ( var method in OnDestroyCallableProcessor.methods[descriptor.type] ?? [])
+      method.resolve(environment, types);
+
+    for ( var method in OnRunningCallableProcessor.methods[descriptor.type] ?? [])
+      method.resolve(environment, types);
+
+    for ( var method in OnInjectCallableProcessor.methods[descriptor.type] ?? [])
+      method.resolve(environment, types);
+
+    // done
 
     return (resolvers, types, params);
   }

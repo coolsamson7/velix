@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/services/services.dart';
-import 'package:velix/di/di.dart' hide EnvironmentProvider;
+import 'package:velix/di/di.dart';
 import 'package:velix/i18n/i18n.dart';
 import 'package:velix/i18n/locale.dart';
 

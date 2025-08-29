@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/services/services.dart';
 
-import 'package:velix/velix.dart' hide EnvironmentProvider;
+import 'package:velix/velix.dart';
 
 import '../main.dart';
 import '../models/todo.dart';

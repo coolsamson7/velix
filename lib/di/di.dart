@@ -799,9 +799,7 @@ class Environment {
       parent!.providers.forEach((providerType, inheritedProvider) {
         var provider = inheritedProvider;
         if (inheritedProvider.scope == 'environment') {
-          provider = EnvironmentInstanceProvider(environment: this, provider: (inheritedProvider as EnvironmentInstanceProvider).provider);
-          (provider as EnvironmentInstanceProvider).dependencies = inheritedProvider.dependencies;
-          providers[providerType] = provider;
+          providers[providerType] = (inheritedProvider as EnvironmentInstanceProvider).copy(this);
         }
         else providers[providerType] = provider;
       });
@@ -1040,6 +1038,17 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   EnvironmentInstanceProvider({required this.environment, required this.provider})
       : scopeInstance = Scopes.get(provider.scope, environment);
+
+  // public
+
+  EnvironmentInstanceProvider copy(Environment environment) {
+    var result = EnvironmentInstanceProvider(environment: environment, provider: provider);
+
+    result.dependencies = dependencies;
+    result.resolvers = resolvers;
+
+    return result;
+  }
 
   // internal
 

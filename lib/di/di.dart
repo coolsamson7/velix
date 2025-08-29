@@ -1,6 +1,8 @@
 
 // annotations
 
+import 'package:flutter/gestures.dart';
+
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 
@@ -274,7 +276,7 @@ class MethodCall {
   // public
 
   void execute(dynamic instance, Environment environment) {
-    method.invoker!([instance, ...method.parameters.map((param) => environment.get(type: param.type))]);
+    method.invoker!([instance, ...method.parameters.map((param) => environment.get(type: param.type))]); // TODO param
   }
 }
 
@@ -610,6 +612,119 @@ class Providers {
   }
 }
 
+// just a test
+
+class Value extends MethodAnnotation {
+  // instance data
+
+  final String key;
+
+  // constructor
+
+  const Value({required this.key});
+}
+
+abstract class ParameterResolverFactory {
+  // static data
+
+  static List<ParameterResolverFactory> factories = [];
+
+  // static
+
+  static void register(ParameterResolverFactory factory) {
+    factories.add(factory);
+  }
+
+  static ParameterResolver createResolver(Environment environment, ParameterDescriptor parameter) {
+    for ( var factory in factories)
+      if (factory.applies(environment, parameter))
+        return factory.create(environment, parameter);
+
+    throw DIRegistrationException("no resolver for parameter");
+  }
+
+  // abstract
+
+  bool applies(Environment environment, ParameterDescriptor parameter);
+
+  ParameterResolver create(Environment environment, ParameterDescriptor parameter);
+}
+
+class TypeParameterResolverFactory extends ParameterResolverFactory {
+  // constructor
+
+  TypeParameterResolverFactory() {
+    ParameterResolverFactory.register(this);
+  }
+
+  // override
+
+  @override
+  bool applies(Environment environment, ParameterDescriptor parameter) {
+    return true; // ?? environment.hasProvider(parameter.type);
+  }
+
+  @override
+  ParameterResolver create(Environment environment, ParameterDescriptor parameter) {
+    return TypeParameterResolver(type: parameter.type);
+  }
+}
+
+abstract class ArgumentResolver {
+  // static
+
+  static List<dynamic> createArgs(Environment environment, List<ParameterResolver> resolvers) {
+    var result = List<dynamic>.filled(resolvers.length, null, growable: false);
+
+    for (var i = 0; i < resolvers.length; i++)
+      result[i] = resolvers[i].resolve(environment);
+
+    return result;
+  }
+
+}
+
+abstract class ParameterResolver extends ArgumentResolver {
+  // abstract
+
+  List<Type> requires() => [];
+
+  dynamic resolve(Environment environment);
+}
+
+class TypeParameterResolver extends ParameterResolver {
+  // instance data
+
+  final Type type;
+
+  // constructor
+
+  TypeParameterResolver({required this.type});
+
+  // override
+
+  @override
+  List<Type> requires() => [type];
+
+  @override
+  dynamic resolve(Environment environment) {
+    return environment.get(type: type);
+  }
+}
+
+class ConfigurationValueParameterResolver extends ParameterResolver {
+  // override
+
+  @override
+  List<Type> requires() => []; // ConfiguratiopnManager
+
+  @override
+  resolve(Environment environment) {
+    // TODO: implement resolve
+    throw UnimplementedError();
+  }
+}
+
 
 class Environment {
   // instance data
@@ -744,6 +859,10 @@ class Environment {
       Tracer.trace('di', TraceLevel.high, 'created environment for module $module in ${stopwatch.elapsedMilliseconds} ms, created ${instances.length} instances');
   }
 
+  bool hasProvider(Type type) {
+    return providers[type] != null;
+  }
+
   T get<T>({Type? type}) {
     final lookup = type ?? T;
     final provider = providers[lookup];
@@ -824,8 +943,8 @@ abstract class AbstractInstanceProvider<T> {
 
   // abstract
 
-  (List<Type>,int) getDependencies() {
-    return ([], 1);
+  (List<ParameterResolver>,Set<Type>, int) getDependencies(Environment environment) {
+    return ([], {}, 1);
   }
 
   T create(Environment environment, [List<dynamic> args = const []]) {
@@ -884,7 +1003,6 @@ abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   Type get host => _host;
 }
 
-
 class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   // instance data
 
@@ -892,6 +1010,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   final AbstractInstanceProvider<T> provider;
 
   List<EnvironmentInstanceProvider>? dependencies;
+  List<ParameterResolver> resolvers = [];
   AbstractScope scopeInstance;
 
   // constructor
@@ -921,7 +1040,9 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
       context.push(this);
       try {
-        final (types, params) = provider.getDependencies();
+        final (resolvers, types, params) = provider.getDependencies(environment);
+
+        this.resolvers = resolvers;
 
         for (final type in types) {
           final depProvider = context.requireProvider(type);
@@ -943,7 +1064,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
     if ( Tracer.enabled)
       Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
 
-    return scopeInstance.get<T>(provider, environment,  () => dependencies!.map((dependency) => dependency.create(environment)).toList(growable: false));
+    return scopeInstance.get<T>(provider, environment,  () => ArgumentResolver.createArgs(environment, resolvers));
   }
 
   @override
@@ -997,34 +1118,39 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   // instance data
 
   final TypeDescriptor descriptor;
+  List<ParameterResolver> resolvers = [];
 
   // constructor
 
   ClassInstanceProvider(Type type, {bool eager = true, String scope = 'singleton'})
-      : descriptor = TypeDescriptor.forType(type), super(type: type, host: type, eager: eager, scope: scope) ;
+      : descriptor = TypeDescriptor.forType(type), super(type: type, host: type, eager: eager, scope: scope);
 
   // override
 
   /// Returns the list of dependency types and the number of constructor parameters
 
   @override
-  (List<Type>,int) getDependencies() {
-    final List<Type> types = [];
-    int params = 0;
+  (List<ParameterResolver>,Set<Type>,int) getDependencies(Environment environment) {
+    final types = <Type>{};
 
-    // Check constructor parameters
+    // compute resolvers
 
-    final constructorParams = descriptor.constructorParameters;
+    for ( var parameter in descriptor.constructorParameters) {
+      var resolver = ParameterResolverFactory.createResolver(environment, parameter);
 
-    params = descriptor.constructorParameters.length;
-    types.addAll(constructorParams.map((param) => param.type));
+      resolvers.add(resolver);
+
+      types.addAll(resolver.requires());
+    }
+
+    int params = descriptor.constructorParameters.length;
 
     // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
     for (final method in descriptor.getMethods()) {
-      if (method.hasAnnotation<Inject>() || method.hasAnnotation<OnInit>() || method.hasAnnotation<OnRunning>()) {
+      if (method.hasAnnotation<Inject>() || method.hasAnnotation<OnInit>() || method.hasAnnotation<OnRunning>() || method.hasAnnotation<OnDestroy>()) {
         for (final param in method.parameters) {
-          if (!Providers.isRegistered(param.type) && param.type != Environment) {
+          if (!Providers.isRegistered(param.type) && param.type != Environment) { // TODO param
             throw DIRegistrationException(
             '${type.toString()}.${method.name} declares an unknown parameter type ${param.toString()}');
           }
@@ -1034,7 +1160,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
       } // if
     } // for
 
-    return (types, params);
+    return (resolvers, types, params);
   }
 
   @override
@@ -1076,8 +1202,22 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
   // override
 
   @override
-  (List<Type>, int) getDependencies() {
-    return ([_host, ...method.parameters.map((param) => param.type)], method.parameters.length);
+  (List<ParameterResolver>, Set<Type>, int) getDependencies(Environment environment) {
+    List<ParameterResolver> resolvers = [];
+    Set<Type> dependencies = {};
+
+    resolvers.add(TypeParameterResolver(type: _host));
+    dependencies.add(_host);
+
+    for ( var parameter in method.parameters) {
+      var resolver = ParameterResolverFactory.createResolver(environment, parameter);
+
+      resolvers.add(resolver);
+
+      dependencies.addAll(resolver.requires());
+    }
+
+    return (resolvers, dependencies, method.parameters.length);
   }
 
   @override
@@ -1110,6 +1250,10 @@ class Boot {
   static Environment? environment;
 
   static Environment getEnvironment() {
+    // default factory for types
+
+    TypeParameterResolverFactory();
+
     // add meta-data
 
     if (environment == null) {

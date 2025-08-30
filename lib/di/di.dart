@@ -413,12 +413,7 @@ class MethodCall {
 
    @override
    void processLifecycle(instance, Environment environment) {
-     try {
-       execute(methods[instance.runtimeType]![lifecycle.index], instance, environment);
-     }
-     catch (e) {
-       print(e);
-     }
+     execute(methods[instance.runtimeType]![lifecycle.index], instance, environment);
    }
 }
 
@@ -561,11 +556,10 @@ class Providers {
 
       // check conditionals
 
-      var descriptor = TypeDescriptor.forType(provider.type); // TODO host=TEstModule type=ConfigurationManager?
+      var descriptor = TypeDescriptor.forType(provider.type);
 
       Conditional? conditional = descriptor.getAnnotation<Conditional>();
       if ( conditional != null) {
-
         if (!conditional.requires.applies(environment))
           return false;
       }

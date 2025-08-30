@@ -64,6 +64,7 @@
 <li><span class="parameter" id="type-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
 <li><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span></li>
 <li><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span>, </span></li>
+<li><span class="parameter" id="type-param-isAbstract"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isAbstract</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
         
@@ -85,8 +86,9 @@
   List&lt;MethodDescriptor&gt;? methods,
   TypeDescriptor? superClass,
   List&lt;Object&gt;? annotations,
+  bool isAbstract = false
 }) {
-  return TypeDescriptor&lt;T&gt;(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
+  return TypeDescriptor&lt;T&gt;(location: location, isAbstract: isAbstract, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
 }</code></pre>
 </section>
 

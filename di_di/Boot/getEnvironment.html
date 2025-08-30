@@ -74,26 +74,7 @@
   &#47;&#47; add meta-data
 
   if (environment == null) {
-    type&lt;SingletonScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
-        annotations: [Scope(name: &quot;singleton&quot;, register: false)],
-    );
-
-    type&lt;EnvironmentScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
-        annotations: [Scope(name: &quot;environment&quot;, register: false)],
-    );
-
-    type&lt;RequestScope&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
-        annotations: [Scope(name: &quot;request&quot;, register: false)],
-    );
-
-    type&lt;Boot&gt;(
-        location: &#39;package:velix&#47;di&#47;di.dart:0:0&#39;,
-        annotations: [Module(imports: [])],
-        fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; Boot(),
-    );
+    registerAllDescriptors();
 
     environment = Environment(forModule: Boot);
   } &#47;&#47; if

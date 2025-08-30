@@ -82,6 +82,18 @@
       return false;
     }
 
+    &#47;&#47; check conditionals
+
+    var descriptor = TypeDescriptor.forType(provider.type);
+
+    Conditional? conditional = descriptor.getAnnotation&lt;Conditional&gt;();
+    if ( conditional != null) {
+      if (!conditional.requires.applies(environment))
+        return false;
+    }
+
+    &#47;&#47; ok
+
     return true;
   }
 

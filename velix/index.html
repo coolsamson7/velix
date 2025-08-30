@@ -64,16 +64,16 @@
     <section class="summary offset-anchor" id="classes">
       <h2>Classes</h2>
       <dl>
-          <dt id="AbstractCallableProcessor">
-  <span class="name "><a href="../di_di/AbstractCallableProcessor-class.html">AbstractCallableProcessor</a></span> 
+          <dt id="AbstractInstanceProvider">
+  <span class="name "><a href="../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
 
 </dt>
 <dd>
   
 </dd>
 
-          <dt id="AbstractInstanceProvider">
-  <span class="name "><a href="../di_di/AbstractInstanceProvider-class.html">AbstractInstanceProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+          <dt id="AbstractLifecycleMethodProcessor">
+  <span class="name "><a href="../di_di/AbstractLifecycleMethodProcessor-class.html">AbstractLifecycleMethodProcessor</a></span> 
 
 </dt>
 <dd>
@@ -252,12 +252,53 @@
   a widget that is associated with commands and will change the cursor or show a spinner while executing commands.
 </dd>
 
-          <dt id="ConfigurationValueParameterResolver">
-  <span class="name "><a href="../di_di/ConfigurationValueParameterResolver-class.html">ConfigurationValueParameterResolver</a></span> 
+          <dt id="Conditional">
+  <span class="name "><a href="../di_di/Conditional-class.html">Conditional</a></span> 
 
 </dt>
 <dd>
   
+</dd>
+
+          <dt id="ConfigurationManager">
+  <span class="name "><a href="../configuration_configuration/ConfigurationManager-class.html">ConfigurationManager</a></span> 
+
+</dt>
+<dd>
+  ConfigurationManager is responsible for managing different configuration sources
+by merging the different values and offering a uniform API.
+</dd>
+
+          <dt id="ConfigurationSource">
+  <span class="name "><a href="../configuration_configuration/ConfigurationSource-class.html">ConfigurationSource</a></span> 
+
+</dt>
+<dd>
+  Abstract base class for configuration sources
+</dd>
+
+          <dt id="ConfigurationValueParameterResolver">
+  <span class="name "><a href="../configuration_configuration/ConfigurationValueParameterResolver-class.html">ConfigurationValueParameterResolver</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="ConfigurationValueParameterResolverFactory">
+  <span class="name "><a href="../configuration_configuration/ConfigurationValueParameterResolverFactory-class.html">ConfigurationValueParameterResolverFactory</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="ConfigurationValues">
+  <span class="name "><a href="../configuration_configuration/ConfigurationValues-class.html">ConfigurationValues</a></span> 
+
+</dt>
+<dd>
+  In-memory configuration source for testing
 </dd>
 
           <dt id="ConsoleTrace">
@@ -438,6 +479,14 @@ Supported arguments are:
   
 </dd>
 
+          <dt id="feature">
+  <span class="name "><a href="../di_di/feature-class.html">feature</a></span> 
+
+</dt>
+<dd>
+  Condition that checks for a specific feature
+</dd>
+
           <dt id="FieldDescriptor">
   <span class="name "><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">V</span>&gt;</span></span> 
 
@@ -510,6 +559,14 @@ Supported arguments are:
   
 </dd>
 
+          <dt id="InjectValue">
+  <span class="name "><a href="../configuration_configuration/InjectValue-class.html">InjectValue</a></span> 
+
+</dt>
+<dd>
+  InjectValue annotation for configuration value injection
+</dd>
+
           <dt id="InstanceProvider">
   <span class="name "><a href="../di_di/InstanceProvider-class.html">InstanceProvider</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
 
@@ -542,20 +599,20 @@ Supported arguments are:
   Covers the parameters of a command invocation:
 </dd>
 
-          <dt id="Json">
-  <span class="name "><a href="../mapper_json/Json-class.html">Json</a></span> 
-
-</dt>
-<dd>
-  decorator used to influence json serialization for fields
-</dd>
-
           <dt id="JSON">
   <span class="name "><a href="../mapper_json/JSON-class.html">JSON</a></span> 
 
 </dt>
 <dd>
   Main class that offers serialize and deserialize methods
+</dd>
+
+          <dt id="Json">
+  <span class="name "><a href="../mapper_json/Json-class.html">Json</a></span> 
+
+</dt>
+<dd>
+  decorator used to influence json serialization for fields
 </dd>
 
           <dt id="JSONAccessor">
@@ -1349,14 +1406,6 @@ to read values from a source and set the result in the target object
   Exception thrown in case of validation violations.
 </dd>
 
-          <dt id="Value">
-  <span class="name "><a href="../di_di/Value-class.html">Value</a></span> 
-
-</dt>
-<dd>
-  
-</dd>
-
           <dt id="ValuedWidget">
   <span class="name "><a href="../databinding_valued_widget/ValuedWidget-class.html">ValuedWidget</a></span> 
 
@@ -1456,6 +1505,14 @@ to read values from a source and set the result in the target object
 </dt>
 <dd>
   Mixin class that adds the ability to handle commands
+</dd>
+
+          <dt id="Condition">
+  <span class="name "><a href="../di_di/Condition-mixin.html">Condition</a></span> 
+
+</dt>
+<dd>
+  Abstract base class for conditions
 </dd>
 
       </dl>
@@ -1734,7 +1791,7 @@ to read values from a source and set the result in the target object
 </dd>
 
           <dt id="type" class="callable">
-  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-location"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">location</span>, </span><span class="parameter" id="type-param-constructor"><span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-fromMapConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromMapConstructor</span>, </span><span class="parameter" id="type-param-fromArrayConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromArrayConstructor</span>, </span><span class="parameter" id="type-param-params"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span></span>})
+  <span class="name"><a href="../reflectable_reflectable/type.html">type</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="type-param-location"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">location</span>, </span><span class="parameter" id="type-param-constructor"><span class="type-annotation"><a href="../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">constructor</span>, </span><span class="parameter" id="type-param-fromMapConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromMapConstructor</span>, </span><span class="parameter" id="type-param-fromArrayConstructor"><span class="type-annotation"><a href="../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromArrayConstructor</span>, </span><span class="parameter" id="type-param-params"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">params</span>, </span><span class="parameter" id="type-param-fields"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">fields</span>, </span><span class="parameter" id="type-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="type-param-superClass"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span><span class="parameter" id="type-param-annotations"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span>?</span> <span class="parameter-name">annotations</span>, </span><span class="parameter" id="type-param-isAbstract"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isAbstract</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
   </span>
   
@@ -1791,6 +1848,20 @@ to read values from a source and set the result in the target object
   </dt>
   <dd>
     @internal
+    
+
+  </dd>
+
+          
+  <dt id="CoercionFunction" class="callable">
+    <span class="name"><a href="../configuration_configuration/CoercionFunction.html">CoercionFunction</a></span>&lt;<wbr><span class="type-parameter">T</span>&gt;<span class="signature">
+      <span class="returntype parameter">= T Function<span class="signature">(<span class="parameter" id="param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span></span>)</span></span>
+    </span>
+    
+
+  </dt>
+  <dd>
+    Type coercion functions
     
 
   </dd>
@@ -2011,6 +2082,14 @@ to read values from a source and set the result in the target object
   
 </dd>
 
+          <dt id="ConfigurationException">
+  <span class="name "><a href="../configuration_configuration/ConfigurationException-class.html">ConfigurationException</a></span> 
+
+</dt>
+<dd>
+  Exception raised for errors in the configuration logic.
+</dd>
+
           <dt id="DIException">
   <span class="name "><a href="../di_di/DIException-class.html">DIException</a></span> 
 
@@ -2066,6 +2145,8 @@ to read values from a source and set the result in the target object
       <li><a href="../components_command_toolbar/">components/command_toolbar</a></li>
       <li><a href="../components_overlay/">components/overlay</a></li>
       <li><a href="../components_view/">components/view</a></li>
+      <li><a href="../configuration_configuration/">configuration/configuration</a></li>
+      <li><a href="../configuration_source_json_source/">configuration/source/json_source</a></li>
       <li><a href="../databinding_form_mapper/">databinding/form_mapper</a></li>
       <li><a href="../databinding_valued_widget/">databinding/valued_widget</a></li>
       <li><a href="../databinding_widgets/">databinding/widgets</a></li>
@@ -2099,6 +2180,7 @@ to read values from a source and set the result in the target object
       <li><a href="../util_tracer/">util/tracer</a></li>
       <li><a href="../validation_validation/">validation/validation</a></li>
       <li><a href="../velix/">velix</a></li>
+      <li><a href="../velix.type_registry.g/">velix.type_registry.g</a></li>
 </ol>
 
   </div>

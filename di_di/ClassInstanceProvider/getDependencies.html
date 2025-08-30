@@ -93,17 +93,7 @@
 
   &#47;&#47; check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-  for ( var method in OnInitCallableProcessor.methods[host] ?? [])
-    method.resolve(environment, types);
-
-  for ( var method in OnDestroyCallableProcessor.methods[host] ?? [])
-    method.resolve(environment, types);
-
-  for ( var method in OnRunningCallableProcessor.methods[host] ?? [])
-    method.resolve(environment, types);
-
-  for ( var method in OnInjectCallableProcessor.methods[host] ?? [])
-    method.resolve(environment, types);
+  AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(host), types);
 
   &#47;&#47; done
 

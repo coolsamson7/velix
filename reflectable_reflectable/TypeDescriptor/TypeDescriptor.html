@@ -62,6 +62,7 @@
 <li><span class="parameter" id="-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span></li>
 <li><span class="parameter" id="-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
 <li><span class="parameter" id="-param-annotations"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span></span> <span class="parameter-name">annotations</span>, </span></li>
+<li><span class="parameter" id="-param-isAbstract"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isAbstract</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-superClass"><span class="type-annotation"><a href="../../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a>?</span> <span class="parameter-name">superClass</span>, </span></li>
 <li><span class="parameter" id="-param-enumValues"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">enumValues</span>, </span></li>
 </ol>})
@@ -81,6 +82,7 @@
   required List&lt;FieldDescriptor&gt; fields,
   List&lt;MethodDescriptor&gt;? methods,
   required this.annotations,
+  this.isAbstract = false,
   this.superClass,
   this.enumValues
 }) {

@@ -69,8 +69,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">T executeProcessors&lt;T&gt;(Lifecycle lifecycle, T instance) {
-  for ( var processor in lifecycleProcessors)
-    if ( processor.lifecycle == lifecycle)
+  for ( var processor in lifecycleProcessors[lifecycle.index])
       processor.processLifecycle(instance, this);
 
   return instance;

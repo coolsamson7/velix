@@ -75,7 +75,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void apply(TypeDescriptor type, MethodDescriptor method) {
-  OnInjectCallableProcessor.register(type, method);
+  AbstractLifecycleMethodProcessor.register(type, Lifecycle.onInject, method);
 }</code></pre>
 </section>
 

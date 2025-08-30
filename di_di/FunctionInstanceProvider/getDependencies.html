@@ -88,6 +88,12 @@
     dependencies.addAll(resolver.requires());
   }
 
+  &#47;&#47; inherit lifecycle methods
+
+  AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(_type), dependencies);
+
+  &#47;&#47; done
+
   return (resolvers, dependencies, method.parameters.length);
 }</code></pre>
 </section>

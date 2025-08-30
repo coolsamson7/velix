@@ -70,12 +70,13 @@
   <pre class="language-dart"><code class="language-dart">T created&lt;T&gt;(T instance) {
   &#47;&#47; remember lifecycle processors
 
-  if (instance is LifecycleProcessor)
-    lifecycleProcessors.add(instance);
+  if (instance is LifecycleProcessor) {
+    lifecycleProcessors[instance.lifecycle.index].add(instance);
 
-  &#47;&#47; sort immediately
+    &#47;&#47; sort immediately
 
-  lifecycleProcessors.sort((a, b) =&gt; a.order.compareTo(b.order));
+    lifecycleProcessors[instance.lifecycle.index].sort((a, b) =&gt; a.order.compareTo(b.order));
+  }
 
   &#47;&#47; remember instance
 

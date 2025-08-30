@@ -56,6 +56,7 @@
       
       <span class="name ">Environment</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-forModule"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a>?</span> <span class="parameter-name">forModule</span>, </span></li>
 <li><span class="parameter" id="-param-parent"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a>?</span> <span class="parameter-name">parent</span>, </span></li>
+<li><span class="parameter" id="-param-features"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">features</span>, </span></li>
 </ol>})
     </section>
     
@@ -64,13 +65,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Environment({Type? forModule, this.parent})  : module = forModule {
+  <pre class="language-dart"><code class="language-dart">Environment({Type? forModule, this.parent, List&lt;String&gt;? features})  : module = forModule, features = features ?? []{
   if ( parent == null )
     if ( module == Boot) {
-      lifecycleProcessors.add(OnInitCallableProcessor());
-      lifecycleProcessors.add(OnInjectCallableProcessor());
-      lifecycleProcessors.add(OnRunningCallableProcessor());
-      lifecycleProcessors.add(OnDestroyCallableProcessor());
+      lifecycleProcessors[0].add(OnInjectCallableProcessor());
+      lifecycleProcessors[1].add(OnInitCallableProcessor());
+      lifecycleProcessors[2].add(OnRunningCallableProcessor());
+      lifecycleProcessors[3].add(OnDestroyCallableProcessor());
     }
     else parent = Boot.getEnvironment();
 
@@ -92,13 +93,14 @@
 
     &#47;&#47; inherit lifecycle processors
 
-    for (final processor in parent!.lifecycleProcessors) {
-      if (providers[processor.runtimeType]?.scope != &#39;environment&#39;) {
-        lifecycleProcessors.add(processor);
-      }
-      else {
-        get(type: processor.runtimeType); &#47;&#47; automatically appends
-      }
+    for (int lifecycle = 0; lifecycle &lt; 4; lifecycle++)
+      for (final processor in parent!.lifecycleProcessors[lifecycle]) {
+        if (providers[processor.runtimeType]?.scope != &#39;environment&#39;) {
+          lifecycleProcessors[lifecycle].add(processor);
+        }
+        else {
+          get(type: processor.runtimeType); &#47;&#47; automatically appends
+        }
     }
   }
   else {

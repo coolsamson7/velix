@@ -4,42 +4,29 @@ import '../velix.type_registry.g.dart';
 
 // annotations
 
-/// Context for condition evaluation
-class ConditionContext {
-  final bool Function(String) requiresFeature;
-
-  const ConditionContext({
-    required this.requiresFeature,
-  });
-}
-
 /// Abstract base class for conditions
 mixin Condition {
-  bool apply(ConditionContext context);
+  bool applies(Environment environment);
 }
 
 /// Condition that checks for a specific feature
-class FeatureCondition with Condition {
-  final String feature;
+class feature with Condition {
+  final String _feature;
 
-  const FeatureCondition(this.feature);
+  const feature(this._feature);
 
   @override
-  bool apply(ConditionContext context) {
-    return context.requiresFeature(feature);
+  bool applies(Environment environment) {
+    return environment.hasFeature(_feature);
   }
 }
 
-FeatureCondition requiresFeature(String feature) {
-  return FeatureCondition(feature);
-}
-
 class Conditional extends ClassAnnotation {
-  final String feature;
+  final Condition requires;
 
   // constructor
 
-  const Conditional(this. feature);
+  const Conditional({required this.requires});
 
   // override
 
@@ -62,7 +49,7 @@ class Injectable extends ClassAnnotation {
 
   @override
   void apply(TypeDescriptor type) {
-    if (factory)
+    if (factory && !type.isAbstract)
       Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
   }
 }
@@ -100,7 +87,7 @@ class OnInit extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    OnInitCallableProcessor.register(type, method);
+    AbstractLifecycleMethodProcessor.register(type, Lifecycle.onInit, method);
   }
 }
 
@@ -111,7 +98,7 @@ class OnRunning extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    OnRunningCallableProcessor.register(type, method);
+    AbstractLifecycleMethodProcessor.register(type, Lifecycle.onRunning, method);
   }
 }
 
@@ -122,7 +109,7 @@ class Inject extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    OnInjectCallableProcessor.register(type, method);
+    AbstractLifecycleMethodProcessor.register(type, Lifecycle.onInject, method);
   }
 }
 
@@ -133,7 +120,7 @@ class OnDestroy extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    OnDestroyCallableProcessor.register(type, method);
+    AbstractLifecycleMethodProcessor.register(type, Lifecycle.onDestroy, method);
   }
 }
 
@@ -338,22 +325,101 @@ class MethodCall {
   }
 }
 
- abstract class AbstractCallableProcessor extends LifecycleProcessor {
-  // constructor
+ abstract class AbstractLifecycleMethodProcessor extends LifecycleProcessor {
+   // static data
 
-  AbstractCallableProcessor({required super.lifecycle});
+   static Map<Type, List<Set<MethodCall>>> methods = {};
 
-  // override
+   // static methods
 
-  @override
-  // TODO: implement order
-  int get order => 1;
+   static void register(TypeDescriptor type, Lifecycle lifecycle, MethodDescriptor method) {
+     var list = methods[type.type];
+     if ( list == null)
+       methods[type.type] = [{}, {}, {}, {}];
 
-  void execute(List<MethodCall>? methods, instance, environment) {
-    if ( methods != null)
-      for ( var method in methods)
-        method.execute(instance, environment);
-  }
+     methods[type.type]![lifecycle.index].add(MethodCall(method: method));
+   }
+
+   static void resolve(Environment environment, TypeDescriptor type, Set<Type> types) {
+     // make sure that i inherit superclass methods!
+
+     Set<MethodCall> methodList = {};
+
+     for (int lifecycle = 0; lifecycle < 4; lifecycle++) {
+        // local methods
+
+       void checkMethod(Type type, MethodCall method) {
+         methods.putIfAbsent(type, () => [for (int i = 0; i < 4; i++) <MethodCall>{}]);
+
+         methods[type]![lifecycle].add(method);
+       }
+
+       Set<MethodCall> inheritMethods(TypeDescriptor t) {
+         if ( t.superClass != null)
+           for ( var method in inheritMethods(t.superClass!))
+            checkMethod(t.type, method);
+
+         // add own methods
+
+         methods.putIfAbsent(t.type, () => [for (int i = 0; i < 4; i++) <MethodCall>{}]);
+
+         for (MethodCall method in methods[t.type]![lifecycle])
+           methodList.add(method);
+
+         // done
+
+         return methods[t.type]![lifecycle];
+       }
+
+       // make sure, methods are inherited
+
+       inheritMethods(type);
+     } // for
+
+     // resolve matching methods
+
+     for ( var method in methodList )
+       method.resolve(environment, types);
+   }
+
+   // instance data
+
+   bool reverse = false;
+
+   // constructor
+
+   AbstractLifecycleMethodProcessor({required super.lifecycle, this.reverse = false});
+
+   // override
+
+   @override
+   // TODO: implement order
+   int get order => 1;
+
+   void execute(Set<MethodCall>? methods, instance, environment) {
+     if ( methods != null) {
+       if ( reverse ) {
+         var r = methods.toList(); // TODO
+         for (int i = r.length - 1; i >= 0; i--) {
+           r[i]!.execute(instance, environment);
+         }
+       }
+       else {
+         for (var method in methods)
+          method.execute(instance, environment);
+       }
+     }
+   }
+
+   @override
+   void processLifecycle(instance, Environment environment) {
+     try {
+       execute(methods[instance.runtimeType]![lifecycle.index], instance, environment);
+     }
+     catch (e) {
+       print(e);
+     }
+   }
 }
 
 /// base class for post processors
@@ -376,105 +442,24 @@ abstract class PostProcessor extends LifecycleProcessor {
   }
 }
 
-class OnInjectCallableProcessor extends AbstractCallableProcessor {
-  // static
-
-  static Map<Type, List<MethodCall>> methods = {};
-
-  static void register(TypeDescriptor type, MethodDescriptor method) {
-    var list = methods[type.type];
-    if ( list == null)
-      methods[type.type] = [MethodCall(method: method)];
-    else
-      methods[type.type]!.add(MethodCall(method: method));
-  }
-
-  // constructor
-
-  OnInjectCallableProcessor(): super(lifecycle: Lifecycle.onInject);
-
-  // override
-
-  @override
-  void processLifecycle(instance, Environment environment) {
-    execute(methods[instance.runtimeType], instance, environment);
-  }
+@Injectable(eager: false)
+class OnInjectCallableProcessor extends AbstractLifecycleMethodProcessor {
+  OnInjectCallableProcessor() :super(lifecycle: Lifecycle.onInject);
 }
 
-@Injectable()
-class OnInitCallableProcessor extends AbstractCallableProcessor {
-  // static
-
-  static Map<Type, List<MethodCall>> methods = {};
-
-  static void register(TypeDescriptor type, MethodDescriptor method) {
-    var list = methods[type.type];
-    if ( list == null)
-      methods[type.type] = [MethodCall(method: method)];
-    else
-      methods[type.type]!.add(MethodCall(method: method));
-  }
-
-  // constructor
-
-  OnInitCallableProcessor(): super(lifecycle: Lifecycle.onInit);
-
-  // override
-
-  @override
-  void processLifecycle(instance, Environment environment) {
-    execute(methods[instance.runtimeType], instance, environment);
-  }
+@Injectable(eager: false)
+class OnInitCallableProcessor extends AbstractLifecycleMethodProcessor {
+  OnInitCallableProcessor() :super(lifecycle: Lifecycle.onInit);
 }
 
-@Injectable()
-class OnRunningCallableProcessor extends AbstractCallableProcessor {
-  // static
-
-  static Map<Type, List<MethodCall>> methods = {};
-
-  static void register(TypeDescriptor type, MethodDescriptor method) {
-    var list = methods[type.type];
-    if ( list == null)
-      methods[type.type] = [MethodCall(method: method)];
-    else
-      methods[type.type]!.add(MethodCall(method: method));
-  }
-
-  // constructor
-
-  OnRunningCallableProcessor(): super(lifecycle: Lifecycle.onRunning);
-
-  // override
-
-  @override
-  void processLifecycle(instance, Environment environment) {
-    execute(methods[instance.runtimeType], instance, environment);
-  }
+@Injectable(eager: false)
+class OnRunningCallableProcessor extends AbstractLifecycleMethodProcessor {
+  OnRunningCallableProcessor() :super(lifecycle: Lifecycle.onRunning);
 }
 
-@Injectable()
-class OnDestroyCallableProcessor extends AbstractCallableProcessor {
-  // static
-
-  static Map<Type, List<MethodCall>> methods = {};
-
-  static void register(TypeDescriptor type, MethodDescriptor method) {
-    var list = methods[type.type];
-    if ( list == null)
-      methods[type.type] = [MethodCall(method: method)];
-    else
-      methods[type.type]!.add(MethodCall(method: method));
-  }
-
-  // constructor
-
-  OnDestroyCallableProcessor(): super(lifecycle: Lifecycle.onDestroy);
-
-  @override
-  void processLifecycle(instance, Environment environment) {
-    execute(methods[instance.runtimeType], instance, environment);
-  }
+@Injectable(eager: false)
+class OnDestroyCallableProcessor extends AbstractLifecycleMethodProcessor {
+  OnDestroyCallableProcessor() :super(lifecycle: Lifecycle.onDestroy, reverse: true);
 }
 
 /// The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
@@ -576,11 +561,12 @@ class Providers {
 
       // check conditionals
 
-      var descriptor = TypeDescriptor.forType(provider.host);
+      var descriptor = TypeDescriptor.forType(provider.type); // TODO host=TEstModule type=ConfigurationManager?
 
       Conditional? conditional = descriptor.getAnnotation<Conditional>();
       if ( conditional != null) {
-        if (!environment.hasFeature(conditional.feature))
+
+        if (!conditional.requires.applies(environment))
           return false;
       }
 
@@ -807,17 +793,17 @@ class Environment {
   final Map<Type, AbstractInstanceProvider> providers = {};
   final List<String> features;
   final List<dynamic> instances  = [];
-  final List<LifecycleProcessor> lifecycleProcessors  = [];
+  final List<List<LifecycleProcessor>> lifecycleProcessors  = [[], [], [], []];
 
   // constructor
 
   Environment({Type? forModule, this.parent, List<String>? features})  : module = forModule, features = features ?? []{
     if ( parent == null )
       if ( module == Boot) {
-        lifecycleProcessors.add(OnInitCallableProcessor());
-        lifecycleProcessors.add(OnInjectCallableProcessor());
-        lifecycleProcessors.add(OnRunningCallableProcessor());
-        lifecycleProcessors.add(OnDestroyCallableProcessor());
+        lifecycleProcessors[0].add(OnInjectCallableProcessor());
+        lifecycleProcessors[1].add(OnInitCallableProcessor());
+        lifecycleProcessors[2].add(OnRunningCallableProcessor());
+        lifecycleProcessors[3].add(OnDestroyCallableProcessor());
       }
       else parent = Boot.getEnvironment();
 
@@ -839,13 +825,14 @@ class Environment {
 
       // inherit lifecycle processors
 
-      for (final processor in parent!.lifecycleProcessors) {
-        if (providers[processor.runtimeType]?.scope != 'environment') {
-          lifecycleProcessors.add(processor);
-        }
-        else {
-          get(type: processor.runtimeType); // automatically appends
-        }
+      for (int lifecycle = 0; lifecycle < 4; lifecycle++)
+        for (final processor in parent!.lifecycleProcessors[lifecycle]) {
+          if (providers[processor.runtimeType]?.scope != 'environment') {
+            lifecycleProcessors[lifecycle].add(processor);
+          }
+          else {
+            get(type: processor.runtimeType); // automatically appends
+          }
       }
     }
     else {
@@ -961,8 +948,7 @@ class Environment {
   }
 
   T executeProcessors<T>(Lifecycle lifecycle, T instance) {
-    for ( var processor in lifecycleProcessors)
-      if ( processor.lifecycle == lifecycle)
+    for ( var processor in lifecycleProcessors[lifecycle.index])
         processor.processLifecycle(instance, this);
 
     return instance;
@@ -971,12 +957,13 @@ class Environment {
   T created<T>(T instance) {
     // remember lifecycle processors
 
-    if (instance is LifecycleProcessor)
-      lifecycleProcessors.add(instance);
+    if (instance is LifecycleProcessor) {
+      lifecycleProcessors[instance.lifecycle.index].add(instance);
 
-    // sort immediately
+      // sort immediately
 
-    lifecycleProcessors.sort((a, b) => a.order.compareTo(b.order));
+      lifecycleProcessors[instance.lifecycle.index].sort((a, b) => a.order.compareTo(b.order));
+    }
 
     // remember instance
 
@@ -1216,17 +1203,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
     // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-    for ( var method in OnInitCallableProcessor.methods[host] ?? [])
-      method.resolve(environment, types);
-
-    for ( var method in OnDestroyCallableProcessor.methods[host] ?? [])
-      method.resolve(environment, types);
-
-    for ( var method in OnRunningCallableProcessor.methods[host] ?? [])
-      method.resolve(environment, types);
-
-    for ( var method in OnInjectCallableProcessor.methods[host] ?? [])
-      method.resolve(environment, types);
+    AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(host), types);
 
     // done
 
@@ -1286,6 +1263,12 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
       dependencies.addAll(resolver.requires());
     }
+
+    // inherit lifecycle methods
+
+    AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(_type), dependencies);
+
+    // done
 
     return (resolvers, dependencies, method.parameters.length);
   }

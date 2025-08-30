@@ -844,6 +844,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       generateFromMapConstructor(element);
       generateFromArrayConstructor(element);
     }
+    else tab().writeln("isAbstract: false,");
 
     if ( generateProperties && element.fields.isNotEmpty)
       generateFields(element);

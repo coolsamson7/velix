@@ -315,11 +315,11 @@ void registerAllDescriptors() {
   var ConditionalBaseDescriptor = type<ConditionalBase>(
     location: 'asset:velix/test/main.dart:143:7',
     annotations: [
-      Injectable()
+       Injectable(factory: false)
     ],
-    constructor: () => ConditionalBase(),
-    fromMapConstructor: (Map<String,dynamic> args) => ConditionalBase(),
-    fromArrayConstructor: (List<dynamic> args) => ConditionalBase(),
+    //constructor: () => ConditionalBase(),
+    //fromMapConstructor: (Map<String,dynamic> args) => ConditionalBase(),
+    //fromArrayConstructor: (List<dynamic> args) => ConditionalBase(),
   );
 
   type<ConditionalProd>(
@@ -327,7 +327,7 @@ void registerAllDescriptors() {
     superClass: ConditionalBaseDescriptor,
     annotations: [
       Injectable(),
-      Conditional("prod")
+      Conditional(requires: feature("prod"))
     ],
     constructor: () => ConditionalProd(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalProd(),
@@ -339,7 +339,7 @@ void registerAllDescriptors() {
     superClass: ConditionalBaseDescriptor,
     annotations: [
       Injectable(),
-      Conditional("dev")
+      Conditional(requires: feature("dev"))
     ],
     constructor: () => ConditionalDev(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),

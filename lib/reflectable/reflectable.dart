@@ -269,6 +269,7 @@ class TypeDescriptor<T> {
   final List<ParameterDescriptor> constructorParameters;
   final List<Object> annotations;
   final List<T>? enumValues;
+  final bool isAbstract;
 
   TypeDescriptor? superClass;
   List<TypeDescriptor> childClasses = [];
@@ -284,6 +285,7 @@ class TypeDescriptor<T> {
     required List<FieldDescriptor> fields,
     List<MethodDescriptor>? methods,
     required this.annotations,
+    this.isAbstract = false,
     this.superClass,
     this.enumValues
   }) {
@@ -486,8 +488,9 @@ TypeDescriptor<T> type<T>({
   List<MethodDescriptor>? methods,
   TypeDescriptor? superClass,
   List<Object>? annotations,
+  bool isAbstract = false
 }) {
-  return TypeDescriptor<T>(location: location, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
+  return TypeDescriptor<T>(location: location, isAbstract: isAbstract, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({

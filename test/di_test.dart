@@ -30,13 +30,13 @@ void main() {
 
       var conditional = environment.get<ConditionalBase>();
 
-      expect(conditional.runtimeType, equals(ConditionalDev()));
+      expect(conditional.runtimeType, equals(ConditionalDev));
 
       environment = Environment(forModule: TestModule, features: ["prod"]);
 
       conditional = environment.get<ConditionalBase>();
 
-      expect(conditional.runtimeType, equals(ConditionalProd()));
+      expect(conditional.runtimeType, equals(ConditionalProd));
     });
 
     test('injectable', () {

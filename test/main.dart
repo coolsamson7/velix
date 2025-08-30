@@ -1,6 +1,6 @@
 import 'package:velix/velix.dart';
 
-@Module(imports:[])
+@Module()
 class TestModule {
   @Create()
   ConfigurationManager createConfigurationManager() {
@@ -10,7 +10,7 @@ class TestModule {
   @Create()
   ConfigurationValues createConfigurationValues() {
     return ConfigurationValues({
-      "foo": 1
+      "foo": 4711
     });
   }
 
@@ -138,25 +138,24 @@ class Derived extends Base {
   Derived(super.name, {required this.number});
 }
 
-
 @Injectable()
-class ConditionalBase{
+abstract class ConditionalBase{
   ConditionalBase();
 }
 
 @Injectable()
-@Conditional("prod")
+@Conditional(requires: feature("prod"))
 class ConditionalProd extends ConditionalBase {
   ConditionalProd();
 }
 
 @Injectable()
-@Conditional("dev")
+@Conditional(requires: feature("dev"))
 class ConditionalDev extends ConditionalBase {
   ConditionalDev();
 }
 
-@Injectable(factory: false)
+@Injectable()
 abstract class RootType {
   RootType();
 }

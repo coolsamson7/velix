@@ -95,7 +95,7 @@ void registerAllDescriptors() {
   type<OnInitCallableProcessor>(
     location: 'package:velix/di/di.dart:405:7',
     annotations: [
-      Injectable()
+      Injectable(eager: false)
     ],
     constructor: () => OnInitCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnInitCallableProcessor(),
@@ -105,7 +105,7 @@ void registerAllDescriptors() {
   type<OnRunningCallableProcessor>(
     location: 'package:velix/di/di.dart:431:7',
     annotations: [
-      Injectable()
+      Injectable(eager: false)
     ],
     constructor: () => OnRunningCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnRunningCallableProcessor(),
@@ -115,7 +115,7 @@ void registerAllDescriptors() {
   type<OnDestroyCallableProcessor>(
     location: 'package:velix/di/di.dart:457:7',
     annotations: [
-      Injectable()
+      Injectable(eager: false)
     ],
     constructor: () => OnDestroyCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnDestroyCallableProcessor(),

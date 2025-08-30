@@ -28,6 +28,10 @@ export './mapper/json.dart';
 
 export './reflectable/reflectable.dart';
 
+// configuration
+
+export './configuration/configuration.dart';
+
 // validation
 
 export './validation/validation.dart';

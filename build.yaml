@@ -20,4 +20,17 @@ targets:
       velix|type_builder:
         generate_for:
           include:
+            - lib/velix.dart
+          exclude:
+            - lib/**.g.dart
+
+  test:
+    sources:
+      - test/**
+    builders:
+      velix|type_builder:
+        generate_for:
+          include:
             - test/main.dart
+          exclude:
+            - test/**.g.dart

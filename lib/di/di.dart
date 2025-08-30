@@ -1,7 +1,54 @@
+import '../configuration/configuration.dart';
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
+import '../velix.type_registry.g.dart';
 
 // annotations
+
+/// Context for condition evaluation
+class ConditionContext {
+  final bool Function(String) requiresFeature;
+
+  const ConditionContext({
+    required this.requiresFeature,
+  });
+}
+
+/// Abstract base class for conditions
+mixin Condition {
+  bool apply(ConditionContext context);
+}
+
+/// Condition that checks for a specific feature
+class FeatureCondition with Condition {
+  final String feature;
+
+  const FeatureCondition(this.feature);
+
+  @override
+  bool apply(ConditionContext context) {
+    return context.requiresFeature(feature);
+  }
+}
+
+FeatureCondition requiresFeature(String feature) {
+  return FeatureCondition(feature);
+}
+
+class Conditional extends ClassAnnotation {
+  final String feature;
+
+  // constructor
+
+  const Conditional(this. feature);
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type) {
+
+  }
+}
 
 class Injectable extends ClassAnnotation {
   final bool eager;
@@ -528,6 +575,18 @@ class Providers {
         return false;
       }
 
+      // check conditionals
+
+      var descriptor = TypeDescriptor.forType(provider.host);
+
+      Conditional? conditional = descriptor.getAnnotation<Conditional>();
+      if ( conditional != null) {
+        if (!environment.hasFeature(conditional.feature))
+          return false;
+      }
+
+      // ok
+
       return true;
     }
 
@@ -624,18 +683,6 @@ class Providers {
   }
 }
 
-// just a test
-
-class Value extends MethodAnnotation {
-  // instance data
-
-  final String key;
-
-  // constructor
-
-  const Value({required this.key});
-}
-
 abstract class ParameterResolverFactory {
   // static data
 
@@ -684,6 +731,7 @@ class TypeParameterResolverFactory extends ParameterResolverFactory {
      return TypeParameterResolver(type: parameter.type);
   }
 }
+
 
 abstract class ArgumentResolver {
   // static
@@ -752,33 +800,19 @@ class EnvironmentParameterResolver extends ParameterResolver {
   }
 }
 
-class ConfigurationValueParameterResolver extends ParameterResolver {
-  // override
-
-  @override
-  List<Type> requires() => []; // ConfigurationManager
-
-  @override
-  resolve(Environment environment) {
-    // TODO: implement resolve
-    throw UnimplementedError();
-  }
-}
-
-
 class Environment {
   // instance data
 
   Type? module;
   Environment? parent;
   final Map<Type, AbstractInstanceProvider> providers = {};
-  final List<String> features = [];
+  final List<String> features;
   final List<dynamic> instances  = [];
   final List<LifecycleProcessor> lifecycleProcessors  = [];
 
   // constructor
 
-  Environment({Type? forModule, this.parent})  : module = forModule {
+  Environment({Type? forModule, this.parent, List<String>? features})  : module = forModule, features = features ?? []{
     if ( parent == null )
       if ( module == Boot) {
         lifecycleProcessors.add(OnInitCallableProcessor());
@@ -914,6 +948,10 @@ class Environment {
       if ( provider is EnvironmentInstanceProvider)
         provider.printTree();
     }
+  }
+
+  bool hasFeature(String feature) {
+    return features.contains(feature);
   }
 
   void destroy() {
@@ -1290,26 +1328,7 @@ class Boot {
     // add meta-data
 
     if (environment == null) {
-      type<SingletonScope>(
-          location: 'package:velix/di/di.dart:0:0',
-          annotations: [Scope(name: "singleton", register: false)],
-      );
-
-      type<EnvironmentScope>(
-          location: 'package:velix/di/di.dart:0:0',
-          annotations: [Scope(name: "environment", register: false)],
-      );
-
-      type<RequestScope>(
-          location: 'package:velix/di/di.dart:0:0',
-          annotations: [Scope(name: "request", register: false)],
-      );
-
-      type<Boot>(
-          location: 'package:velix/di/di.dart:0:0',
-          annotations: [Module(imports: [])],
-          fromArrayConstructor: (List<dynamic> args) => Boot(),
-      );
+      registerAllDescriptors();
 
       environment = Environment(forModule: Boot);
     } // if

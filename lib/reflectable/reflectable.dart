@@ -138,6 +138,10 @@ class ParameterDescriptor {
   bool hasDefault() {
       return defaultValue != this;
   }
+
+  T? getAnnotation<T>() {
+    return findElement(annotations, (annotation) => annotation.runtimeType == T) as T?;
+  }
 }
 
 class ConstructorDescriptor {
@@ -365,6 +369,11 @@ class TypeDescriptor<T> {
     var end = location.indexOf(':', index + 1);
 
     return int.parse(location.substring(index + 1,  end));
+  }
+
+
+  T? getAnnotation<T>() {
+    return findElement(annotations, (annotation) => annotation.runtimeType == T) as T?;
   }
 
   String get module {

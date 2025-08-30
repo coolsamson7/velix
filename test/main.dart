@@ -27,6 +27,18 @@ class Foo {
 class Factory {
   const Factory();
 
+  @Create()
+  ConfigurationManager createConfigurationManager() {
+    return ConfigurationManager();
+  }
+
+  @Create()
+  ConfigurationValues createConfigurationValues() {
+    return ConfigurationValues({
+      "foo": 1
+    });
+  }
+
   @OnInit()
   void onInit(Environment environment) {
     print("onInit $environment");
@@ -38,7 +50,7 @@ class Factory {
   }
 
   @Inject()
-  void setFoo(@Value(key: "foo") Foo foo) {
+  void setFoo(Foo foo, @InjectValue("foo", defaultValue: 1) int value) {
     print(foo);
   }
 
@@ -124,6 +136,24 @@ class Derived extends Base {
   final int number;
 
   Derived(super.name, {required this.number});
+}
+
+
+@Injectable()
+class ConditionalBase{
+  ConditionalBase();
+}
+
+@Injectable()
+@Conditional("prod")
+class ConditionalProd extends ConditionalBase {
+  ConditionalProd();
+}
+
+@Injectable()
+@Conditional("dev")
+class ConditionalDev extends ConditionalBase {
+  ConditionalDev();
 }
 
 @Injectable(factory: false)

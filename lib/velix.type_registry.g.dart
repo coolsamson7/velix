@@ -15,6 +15,36 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => ConfigurationManager(),
   );
 
+  type<SingletonScope>(
+    location: 'package:velix/di/di.dart:180:7',
+    annotations: [
+      Scope(name: "singleton", register: false)
+    ],
+    constructor: () => SingletonScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => SingletonScope(),
+    fromArrayConstructor: (List<dynamic> args) => SingletonScope(),
+  );
+
+  type<EnvironmentScope>(
+    location: 'package:velix/di/di.dart:200:7',
+    annotations: [
+      Scope(name: "environment", register: false)
+    ],
+    constructor: () => EnvironmentScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => EnvironmentScope(),
+    fromArrayConstructor: (List<dynamic> args) => EnvironmentScope(),
+  );
+
+  type<RequestScope>(
+    location: 'package:velix/di/di.dart:207:7',
+    annotations: [
+      Scope(name: "request", register: false)
+    ],
+    constructor: () => RequestScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => RequestScope(),
+    fromArrayConstructor: (List<dynamic> args) => RequestScope(),
+  );
+
   type<OnInitCallableProcessor>(
     location: 'package:velix/di/di.dart:405:7',
     annotations: [

@@ -1013,11 +1013,12 @@ class TypeBuilder implements Builder {
       const dataclassChecker = TypeChecker.fromRuntime(Dataclass);
       const injectableChecker = TypeChecker.fromRuntime(Injectable);
       const moduleChecker = TypeChecker.fromRuntime(Module);
+      const scopeChecker = TypeChecker.fromRuntime(Scope);
 
       // TODO -> configure
 
       final annotatedClasses = library.classes.where((cls) {
-        return dataclassChecker.hasAnnotationOf(cls) || injectableChecker.hasAnnotationOf(cls) || moduleChecker.hasAnnotationOf(cls);
+        return dataclassChecker.hasAnnotationOf(cls) || injectableChecker.hasAnnotationOf(cls) || moduleChecker.hasAnnotationOf(cls) || scopeChecker.hasAnnotationOf(cls);
       }).toList();
 
       for (final element in annotatedClasses) {

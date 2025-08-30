@@ -15,8 +15,6 @@ void main() {
 
     registerAllDescriptors();
 
-
-
     Tracer(
         isEnabled: true,
         trace: ConsoleTrace("%d [%l] %p: %m"), // d(ate), l(evel), p(ath), m(message)

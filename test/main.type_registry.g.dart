@@ -15,6 +15,20 @@ void registerAllDescriptors() {
     constructor: () => TestModule(),
     fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
+    methods: [
+      method<Factory,ConfigurationManager>('createConfigurationManager',
+          annotations: [
+            Create()
+          ],
+          invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationManager()
+      ),
+      method<Factory,ConfigurationValues>('createConfigurationValues',
+          annotations: [
+            Create()
+          ],
+          invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationValues()
+      ),
+    ]
   );
 
   type<Bar>(
@@ -59,18 +73,6 @@ void registerAllDescriptors() {
     fromMapConstructor: (Map<String,dynamic> args) => Factory(),
     fromArrayConstructor: (List<dynamic> args) => Factory(),
     methods: [
-      method<Factory,ConfigurationManager>('createConfigurationManager',
-        annotations: [
-          Create()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).createConfigurationManager()
-      ), 
-      method<Factory,ConfigurationValues>('createConfigurationValues',
-        annotations: [
-          Create()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).createConfigurationValues()
-      ), 
       method<Factory,void>('onInit',
         annotations: [
           OnInit()

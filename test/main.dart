@@ -2,6 +2,18 @@ import 'package:velix/velix.dart';
 
 @Module(imports:[])
 class TestModule {
+  @Create()
+  ConfigurationManager createConfigurationManager() {
+    return ConfigurationManager();
+  }
+
+  @Create()
+  ConfigurationValues createConfigurationValues() {
+    return ConfigurationValues({
+      "foo": 1
+    });
+  }
+
 }
 
 @Injectable(scope: "singleton", eager: true)
@@ -26,18 +38,6 @@ class Foo {
 @Injectable(scope: "singleton", eager: true)
 class Factory {
   const Factory();
-
-  @Create()
-  ConfigurationManager createConfigurationManager() {
-    return ConfigurationManager();
-  }
-
-  @Create()
-  ConfigurationValues createConfigurationValues() {
-    return ConfigurationValues({
-      "foo": 1
-    });
-  }
 
   @OnInit()
   void onInit(Environment environment) {

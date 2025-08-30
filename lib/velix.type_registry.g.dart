@@ -1,10 +1,43 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
-import 'package:velix/configuration/configuration.dart';
+import 'package:velix/configuration/source/json_source.dart';
 import 'package:velix/di/di.dart';
+import 'package:velix/configuration/configuration.dart';
 
 void registerAllDescriptors() {
+  var ConfigurationSourceDescriptor = type<ConfigurationSource>(
+    location: 'package:velix/configuration/configuration.dart:137:16',
+    annotations: [
+      Injectable(factory: false)
+    ],
+    methods: [
+      method<ConfigurationSource,void>('setManager',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<ConfigurationManager>('manager', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConfigurationSource).setManager(args[1 ])
+      )
+    ],
+  );
+
+  type<JsonFileConfigurationSource>(
+    location: 'package:velix/configuration/source/json_source.dart:8:7',
+    superClass: ConfigurationSourceDescriptor,
+    annotations: [
+      Injectable(factory: false)
+    ],
+    params: [
+      param<String>('filePath', isRequired: true)
+    ],
+    constructor: ({String filePath = ''}) => JsonFileConfigurationSource(filePath),
+    fromMapConstructor: (Map<String,dynamic> args) => JsonFileConfigurationSource(args['filePath'] as String),
+    fromArrayConstructor: (List<dynamic> args) => JsonFileConfigurationSource(args[0] as String),
+  );
+
   type<ConfigurationManager>(
     location: 'package:velix/configuration/configuration.dart:32:7',
     annotations: [
@@ -13,6 +46,20 @@ void registerAllDescriptors() {
     constructor: () => ConfigurationManager(),
     fromMapConstructor: (Map<String,dynamic> args) => ConfigurationManager(),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationManager(),
+  );
+
+  type<ConfigurationValues>(
+    location: 'package:velix/configuration/configuration.dart:150:7',
+    superClass: ConfigurationSourceDescriptor,
+    annotations: [
+      Injectable(factory: false)
+    ],
+    params: [
+      param<Map<String, dynamic>>('values', isRequired: true)
+    ],
+    constructor: ({required Map<String, dynamic> values}) => ConfigurationValues(values),
+    fromMapConstructor: (Map<String,dynamic> args) => ConfigurationValues(args['_config'] as Map<String, dynamic>),
+    fromArrayConstructor: (List<dynamic> args) => ConfigurationValues(args[0] as Map<String, dynamic>),
   );
 
   type<SingletonScope>(

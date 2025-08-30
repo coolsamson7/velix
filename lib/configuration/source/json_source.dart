@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../../di/di.dart';
 import '../configuration.dart';
 
+@Injectable(factory: false)
 class JsonFileConfigurationSource extends ConfigurationSource {
   final String filePath;
 

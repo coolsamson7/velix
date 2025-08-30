@@ -133,7 +133,7 @@ class ConfigurationManager {
 }
 
 /// Abstract base class for configuration sources
-///
+@Injectable(factory: false)
 abstract class ConfigurationSource {
   @Inject()
   void setManager(ConfigurationManager manager) {
@@ -145,10 +145,12 @@ abstract class ConfigurationSource {
 }
 
 /// In-memory configuration source for testing
+
+@Injectable(factory: false)
 class ConfigurationValues extends ConfigurationSource {
   final Map<String, dynamic> _config;
 
-  ConfigurationValues(this._config);
+  ConfigurationValues(Map<String, dynamic> values) : _config = values;
 
   @override
   Map<String, dynamic> load() => Map.from(_config);
@@ -159,10 +161,11 @@ class ConfigurationValueParameterResolver extends ParameterResolver {
   // instance data
 
   InjectValue injectValue;
+  Type type;
 
   // constructor
 
-  ConfigurationValueParameterResolver({required this.injectValue});
+  ConfigurationValueParameterResolver({required this.injectValue, required this.type});
 
   // override
 
@@ -171,7 +174,7 @@ class ConfigurationValueParameterResolver extends ParameterResolver {
 
   @override
   dynamic resolve(Environment environment) {
-    return environment.get<ConfigurationManager>().get(injectValue.key, injectValue.defaultValue);
+    return environment.get<ConfigurationManager>().get(injectValue.key, type, injectValue.defaultValue);
   }
 }
 
@@ -191,6 +194,6 @@ class ConfigurationValueParameterResolverFactory extends ParameterResolverFactor
 
   @override
   ParameterResolver create(Environment environment, ParameterDescriptor parameter) {
-    return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation<InjectValue>()!);
+    return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation<InjectValue>()!, type: parameter.type);
   }
 }

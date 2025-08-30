@@ -1,4 +1,3 @@
-import '../configuration/configuration.dart';
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 import '../velix.type_registry.g.dart';

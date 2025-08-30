@@ -12,8 +12,6 @@ void registerAllDescriptors() {
     annotations: [
       Module(imports: [])
     ],
-    params: [
-    ],
     constructor: () => TestModule(),
     fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
@@ -24,8 +22,6 @@ void registerAllDescriptors() {
     annotations: [
       Injectable(scope: "singleton", eager: true)
     ],
-    params: [
-    ],
     constructor: () => Bar(),
     fromMapConstructor: (Map<String,dynamic> args) => Bar(),
     fromArrayConstructor: (List<dynamic> args) => Bar(),
@@ -35,8 +31,6 @@ void registerAllDescriptors() {
     location: 'asset:velix/test/main.dart:13:7',
     annotations: [
       Injectable(factory: false)
-    ],
-    params: [
     ],
     constructor: () => Baz(),
     fromMapConstructor: (Map<String,dynamic> args) => Baz(),
@@ -54,19 +48,12 @@ void registerAllDescriptors() {
     constructor: ({required Bar bar}) => Foo(bar: bar),
     fromMapConstructor: (Map<String,dynamic> args) => Foo(bar: args['bar'] as Bar),
     fromArrayConstructor: (List<dynamic> args) => Foo(bar: args[0] as Bar),
-    fields: [
-      field<Foo,Bar>('bar',
-        getter: (obj) => obj.bar,
-      )
-    ]
   );
 
   type<Factory>(
     location: 'asset:velix/test/main.dart:27:7',
     annotations: [
       Injectable(scope: "singleton", eager: true)
-    ],
-    params: [
     ],
     constructor: () => Factory(),
     fromMapConstructor: (Map<String,dynamic> args) => Factory(),
@@ -328,8 +315,6 @@ void registerAllDescriptors() {
     annotations: [
       Injectable()
     ],
-    params: [
-    ],
     constructor: () => ConditionalBase(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalBase(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalBase(),
@@ -342,8 +327,6 @@ void registerAllDescriptors() {
       Injectable(),
       Conditional("prod")
     ],
-    params: [
-    ],
     constructor: () => ConditionalProd(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalProd(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalProd(),
@@ -355,8 +338,6 @@ void registerAllDescriptors() {
     annotations: [
       Injectable(),
       Conditional("dev")
-    ],
-    params: [
     ],
     constructor: () => ConditionalDev(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),
@@ -375,8 +356,6 @@ void registerAllDescriptors() {
     superClass: RootTypeDescriptor,
     annotations: [
       Injectable()
-    ],
-    params: [
     ],
     constructor: () => DerivedType(),
     fromMapConstructor: (Map<String,dynamic> args) => DerivedType(),

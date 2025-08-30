@@ -10,13 +10,9 @@ void registerAllDescriptors() {
     annotations: [
       Injectable(factory: false)
     ],
-    params: [
-    ],
     constructor: () => ConfigurationManager(),
     fromMapConstructor: (Map<String,dynamic> args) => ConfigurationManager(),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationManager(),
-    fields: [
-    ]
   );
 
   type<OnInitCallableProcessor>(
@@ -24,13 +20,9 @@ void registerAllDescriptors() {
     annotations: [
       Injectable()
     ],
-    params: [
-    ],
     constructor: () => OnInitCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnInitCallableProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnInitCallableProcessor(),
-    fields: [
-    ]
   );
 
   type<OnRunningCallableProcessor>(
@@ -38,13 +30,9 @@ void registerAllDescriptors() {
     annotations: [
       Injectable()
     ],
-    params: [
-    ],
     constructor: () => OnRunningCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnRunningCallableProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnRunningCallableProcessor(),
-    fields: [
-    ]
   );
 
   type<OnDestroyCallableProcessor>(
@@ -52,13 +40,9 @@ void registerAllDescriptors() {
     annotations: [
       Injectable()
     ],
-    params: [
-    ],
     constructor: () => OnDestroyCallableProcessor(),
     fromMapConstructor: (Map<String,dynamic> args) => OnDestroyCallableProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnDestroyCallableProcessor(),
-    fields: [
-    ]
   );
 
   type<Boot>(
@@ -66,12 +50,8 @@ void registerAllDescriptors() {
     annotations: [
       Module(imports: [])
     ],
-    params: [
-    ],
     constructor: () => Boot(),
     fromMapConstructor: (Map<String,dynamic> args) => Boot(),
     fromArrayConstructor: (List<dynamic> args) => Boot(),
-    fields: [
-    ]
   );
 }

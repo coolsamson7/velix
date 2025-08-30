@@ -9,32 +9,6 @@ import 'package:sample/main.dart';
 import 'package:sample/services/services.dart';
 
 void registerAllDescriptors() {
-  type<TodoService>(
-    location: 'package:sample/services/services.dart:4:7',
-    annotations: [
-      Injectable()
-    ],
-    params: [
-    ],
-    constructor: () => TodoService(),
-    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
-    fromArrayConstructor: (List<dynamic> args) => TodoService(),
-    methods: [
-      method<TodoService,void>('onInit',
-          annotations: [
-            OnInit()
-          ],
-          invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
-      ),
-      method<TodoService,void>('onDestroy',
-          annotations: [
-            OnDestroy()
-          ],
-          invoker: (List<dynamic> args)=> (args[0] as TodoService).onDestroy()
-      )
-    ],
-  );
-
   type<TodoProvider>(
     location: 'package:sample/providers/todo_provider.dart:7:7',
     annotations: [
@@ -46,17 +20,6 @@ void registerAllDescriptors() {
     constructor: ({required TodoService todoService}) => TodoProvider(todoService: todoService),
     fromMapConstructor: (Map<String,dynamic> args) => TodoProvider(todoService: args['todoService'] as TodoService),
     fromArrayConstructor: (List<dynamic> args) => TodoProvider(todoService: args[0] as TodoService),
-    fields: [
-      field<TodoProvider,TodoService>('todoService',
-        getter: (obj) => obj.todoService,
-      ), 
-      field<TodoProvider,List<Todo>>('todos',
-        elementType: Todo,
-        factoryConstructor: () => <Todo>[],
-        getter: (obj) => obj.todos,
-        //setter: (obj, value) => (obj as TodoProvider).todos = value,
-      )
-    ]
   );
 
   type<Details>(
@@ -157,7 +120,7 @@ void registerAllDescriptors() {
   );
 
   type<ApplicationModule>(
-    location: 'package:sample/main.dart:95:7',
+    location: 'package:sample/main.dart:46:7',
     annotations: [
       Module(imports: [])
     ],
@@ -178,6 +141,32 @@ void registerAllDescriptors() {
           OnDestroy()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ApplicationModule).onDestroy()
+      )
+    ],
+  );
+
+  type<TodoService>(
+    location: 'package:sample/services/services.dart:4:7',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+    ],
+    constructor: () => TodoService(),
+    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
+    fromArrayConstructor: (List<dynamic> args) => TodoService(),
+    methods: [
+      method<TodoService,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
+      ), 
+      method<TodoService,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TodoService).onDestroy()
       )
     ],
   );

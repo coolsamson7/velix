@@ -42,6 +42,14 @@ bool isInjectable(InterfaceElement element) {
   });
 }
 
+bool hasAnnotation(ClassElement element, String annotationName) {
+  return element.metadata.annotations.any((annotation) {
+    final value = annotation.computeConstantValue();
+    if (value == null) return false;
+
+    return value.type?.getDisplayString() == annotationName;
+  });
+}
 
 abstract class GeneratorElement<T extends InterfaceElement> {
   // instance data
@@ -108,9 +116,11 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
 
   // instance data
 
+  bool generateProperties;
+
   // constructor
 
-  ClassGeneratorElement({required super.element, required super.builder});
+  ClassGeneratorElement({required super.element, required super.builder, required this.generateProperties});
 
   // override
 
@@ -123,7 +133,7 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
       final superElement = superType.element;
 
       if (isDataclass(superElement) || isInjectable(superElement)) {
-        var element = builder.checkElement(superElement);
+        var element = builder.checkElement(superElement, isDataclass(superElement));
 
         element.generateVariable = true;
 
@@ -139,7 +149,7 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
 
       final fieldTypeElem = field.type.element3;
       if (fieldTypeElem != null && fieldTypeElem is InterfaceElement && fieldTypeElem != element && isDataclass(fieldTypeElem)) {
-        addDependency(builder.checkElement(fieldTypeElem));
+        addDependency(builder.checkElement(fieldTypeElem,  isDataclass(fieldTypeElem)));
       }
     } // for
   }
@@ -155,7 +165,7 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
 
   @override
   generateCode(StringBuffer buffer, bool variable, TypeBuilder builder) {
-    generator.generate(buffer, element, variable, builder);
+    generator.generate(buffer, element, variable, builder, generateProperties);
   }
 }
 
@@ -170,7 +180,7 @@ class EnumGeneratorElement extends GeneratorElement<EnumElement2> {
 
   @override
   generateCode(StringBuffer buffer, bool variable, TypeBuilder builder) {
-    generator.generate(buffer, element, variable, builder);
+    generator.generate(buffer, element, variable, builder, false);
   }
 }
 
@@ -244,7 +254,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
   // abstract
 
-  void generate(StringBuffer buffer, T element, bool variable, TypeBuilder builder);
+  void generate(StringBuffer buffer, T element, bool variable, TypeBuilder builder, bool generateProperties);
 }
 
 class ClassCodeGenerator extends CodeGenerator<ClassElement> {
@@ -456,49 +466,53 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   //
 
   void generateConstructorParams(ClassElement element) {
-    tab().write("params: ");
-
     // collect parameters
 
     for (final ctor in element.constructors) {
       if (!ctor.isFactory && ctor.isPublic) {
-        writeln("[").indent(1);
-
         int len = ctor.formalParameters.length;
-        int i = 0;
-        for (final param in ctor.formalParameters) {
-          final name = param.name;
-          final typeStr = param.type.getDisplayString(withNullability: false);
-          final isNamed = param.isNamed;
-          final isRequired = param.isRequiredNamed || param.isRequiredPositional;
-          final isNullable = param.isOptional || param.isOptionalNamed;
-          final defaultValue = param.defaultValueCode ?? "null";
 
-          tab().write("param<$typeStr>('$name'");
+        if (len > 0) {
+          tab().write("params: ");
 
-          if (isNamed)
-            write(", isNamed: $isNamed");
+          writeln("[").indent(1);
 
-          if (isRequired)
-            write(", isRequired: $isRequired");
+          int i = 0;
+          for (final param in ctor.formalParameters) {
+            final name = param.name;
+            final typeStr = param.type.getDisplayString(withNullability: false);
+            final isNamed = param.isNamed;
+            final isRequired = param.isRequiredNamed ||
+                param.isRequiredPositional;
+            final isNullable = param.isOptional || param.isOptionalNamed;
+            final defaultValue = param.defaultValueCode ?? "null";
 
-          if (isNullable)
-            write(", isNullable: $isNullable");
+            tab().write("param<$typeStr>('$name'");
 
-          if ( !isRequired)
-            write(", defaultValue: $defaultValue");
+            if (isNamed)
+              write(", isNamed: $isNamed");
 
-          if (param.metadata.annotations.isNotEmpty) {
-            writeln(",").tab();
-            generateAnnotations(param.metadata.annotations);
+            if (isRequired)
+              write(", isRequired: $isRequired");
+
+            if (isNullable)
+              write(", isNullable: $isNullable");
+
+            if (!isRequired)
+              write(", defaultValue: $defaultValue");
+
+            if (param.metadata.annotations.isNotEmpty) {
+              writeln(",").tab();
+              generateAnnotations(param.metadata.annotations);
+            }
+
+            write(")").writeln(i < len - 1 ? ", " : "");
+
+            i++;
           }
 
-          write(")").writeln(i < len-1 ? ", " : "");
-
-          i++;
+          indent(-1).tab().writeln("],");
         }
-
-        indent(-1).tab().writeln("],");
       }
     }
   }
@@ -793,7 +807,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, ClassElement element, bool variable, TypeBuilder builder) {
+  void generate(StringBuffer buffer, ClassElement element, bool variable, TypeBuilder builder, bool generateProperties) {
     start(buffer);
 
     final className = element.name;
@@ -831,7 +845,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       generateFromArrayConstructor(element);
     }
 
-    if ( element.fields.isNotEmpty) generateFields(element);
+    if ( generateProperties && element.fields.isNotEmpty)
+      generateFields(element);
+
     generateMethods(element);
 
     indent(-1).tab().writeln(");");
@@ -842,7 +858,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
   // override
 
   @override
-  void generate(StringBuffer buffer, EnumElement element, bool variable, TypeBuilder builder) {
+  void generate(StringBuffer buffer, EnumElement element, bool variable, TypeBuilder builder, bool generateProperties) {
     start(buffer);
 
     final className = element.name;
@@ -923,12 +939,12 @@ class TypeBuilder implements Builder {
     imports.add(value);
   }
 
-  GeneratorElement checkElement(InterfaceElement element) {
+  GeneratorElement checkElement(InterfaceElement element, bool generateProperties) {
     var result = visited[element];
 
     if ( result == null) {
       if (element is ClassElement)
-        elements.add(result = ClassGeneratorElement(element: element, builder: this));
+        elements.add(result = ClassGeneratorElement(element: element, builder: this, generateProperties: generateProperties));
       else if (element is EnumElement)
         elements.add(result = EnumGeneratorElement(element: element, builder: this));
 
@@ -987,6 +1003,8 @@ class TypeBuilder implements Builder {
 
     // Find all Dart files in lib/
 
+    //var annotations = ["Module", "Injectable", "Dataclass"];
+
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
 
@@ -999,15 +1017,11 @@ class TypeBuilder implements Builder {
       // TODO -> configure
 
       final annotatedClasses = library.classes.where((cls) {
-        return dataclassChecker.hasAnnotationOf(cls) ||
-            injectableChecker.hasAnnotationOf(cls) ||
-            moduleChecker.hasAnnotationOf(cls);
+        return dataclassChecker.hasAnnotationOf(cls) || injectableChecker.hasAnnotationOf(cls) || moduleChecker.hasAnnotationOf(cls);
       }).toList();
 
-      // TODO Sort by file position (nameOffset)
-
       for (final element in annotatedClasses) {
-          checkElement(element);
+          checkElement(element, hasAnnotation(element, "Dataclass"));
       } // for
     }
 

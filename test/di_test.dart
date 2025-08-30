@@ -1,5 +1,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/configuration/configuration.dart';
 import 'package:velix/di/di.dart';
 import 'package:velix/util/tracer.dart';
 
@@ -10,7 +11,11 @@ void main() {
   group('di', () {
     // register types
 
+    ConfigurationValueParameterResolverFactory(); // TODO
+
     registerAllDescriptors();
+
+
 
     Tracer(
         isEnabled: true,
@@ -19,6 +24,22 @@ void main() {
           "": TraceLevel.full,
           "di": TraceLevel.full
         });
+
+    test('features', () {
+      var environment = Environment(forModule: TestModule, features: ["dev"]);
+
+      environment.report();
+
+      var conditional = environment.get<ConditionalBase>();
+
+      expect(conditional.runtimeType, equals(ConditionalDev()));
+
+      environment = Environment(forModule: TestModule, features: ["prod"]);
+
+      conditional = environment.get<ConditionalBase>();
+
+      expect(conditional.runtimeType, equals(ConditionalProd()));
+    });
 
     test('injectable', () {
       var environment = Environment(forModule: TestModule);

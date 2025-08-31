@@ -670,7 +670,8 @@ abstract class ParameterResolverFactory {
   // static
 
   static void register(ParameterResolverFactory factory) {
-    factories.add(factory);
+    if ( !factories.contains(factory))
+      factories.add(factory);
   }
 
   static ParameterResolver createResolver(Environment environment, ParameterDescriptor parameter) {
@@ -695,11 +696,20 @@ class TypeParameterResolverFactory extends ParameterResolverFactory {
     ParameterResolverFactory.register(this);
   }
 
+  // internal
+
+  bool isLiteralType(ParameterDescriptor parameter) {
+    if ( parameter.type == int ||  parameter.type == double  ||  parameter.type == String ||  parameter.type == bool)
+      return true;
+
+    return false;
+  }
+
   // override
 
   @override
   bool applies(Environment environment, ParameterDescriptor parameter) {
-    return true; // ?? environment.hasProvider(parameter.type);
+    return !isLiteralType(parameter); // ?? environment.hasProvider(parameter.type);
   }
 
   @override
@@ -1291,7 +1301,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
   String report() {
     //final paramNames = method.parameters.map((t) => t.toString()).join(', ');
 
-    return "$_type: ${host.toString()}.${method.name} ($method.typeDescriptor.location) "; // paramNames
+    return "$_type: ${host.toString()}.${method.name} (${method.typeDescriptor.location}) "; // paramNames
   }
 
   @override

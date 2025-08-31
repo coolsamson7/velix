@@ -39,6 +39,8 @@ class ConfigurationManager {
   // constructor
 
   ConfigurationManager() {
+    //ConfigurationValueParameterResolverFactory();
+
     _coercions = {
       int: (v) => v is int ? v : int.parse(v.toString()),
       double: (v) => v is double ? v : double.parse(v.toString()),
@@ -179,6 +181,8 @@ class ConfigurationValueParameterResolver extends ParameterResolver {
 }
 
 class ConfigurationValueParameterResolverFactory extends ParameterResolverFactory {
+  // static
+
   // constructor
 
   ConfigurationValueParameterResolverFactory() {

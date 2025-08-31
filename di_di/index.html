@@ -69,7 +69,7 @@
 
 </dt>
 <dd>
-  
+  internal class that is able to provide a specific type.
 </dd>
 
           <dt id="AbstractLifecycleMethodProcessor">
@@ -125,7 +125,8 @@
 
 </dt>
 <dd>
-  
+  this annotation is ued to define specific requirements for the appropriate class
+to be managed by an environment
 </dd>
 
           <dt id="Create">
@@ -133,7 +134,8 @@
 
 </dt>
 <dd>
-  
+  Methods annotated with <a href="../di_di/Create-class.html">Create</a> are factories for the return type.
+Any parameters are possible, that will be injected.
 </dd>
 
           <dt id="Environment">
@@ -141,7 +143,8 @@
 
 </dt>
 <dd>
-  
+  This is the DI container which is responsible for the lifecycle of its managed classes
+// and offers the main API to retrieve objects via the <code>get&lt;T&gt;</code> method.
 </dd>
 
           <dt id="EnvironmentInstanceProvider">
@@ -197,7 +200,8 @@
 
 </dt>
 <dd>
-  
+  Methods annotated with  <a href="../di_di/Inject-class.html">Inject</a> are executed after constructor invocation.
+Methods can declare any injectable parameters
 </dd>
 
           <dt id="Injectable">
@@ -205,7 +209,8 @@
 
 </dt>
 <dd>
-  
+  Classes, annotated with <a href="../di_di/Injectable-class.html">Injectable</a> are able to be managed by an environment
+This is also an indicator for the code-generator to emit the meta-data.
 </dd>
 
           <dt id="InstanceProvider">
@@ -237,7 +242,8 @@
 
 </dt>
 <dd>
-  
+  Classes annotated with  <a href="../di_di/Module-class.html">Module</a> determine, which classes are managed by it.
+The rule is that all classes inside or under the library of this class are eligible.
 </dd>
 
           <dt id="OnDestroy">
@@ -245,7 +251,8 @@
 
 </dt>
 <dd>
-  
+  Methods annotated with  <a href="../di_di/OnDestroy-class.html">OnDestroy</a> are executed after environment destruction.
+Methods can declare any injectable parameters
 </dd>
 
           <dt id="OnDestroyProcessor">
@@ -261,7 +268,8 @@
 
 </dt>
 <dd>
-  
+  Methods annotated with  <a href="../di_di/OnInit-class.html">OnInit</a> are executed after constructor invocation and all injections.
+Methods can declare any injectable parameters
 </dd>
 
           <dt id="OnInitProcessor">
@@ -285,7 +293,8 @@
 
 </dt>
 <dd>
-  
+  Methods annotated with  <a href="../di_di/OnRunning-class.html">OnRunning</a> are executed after constructor of all eager environment objects
+Methods can declare any injectable parameters
 </dd>
 
           <dt id="OnRunningProcessor">

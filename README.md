@@ -15,6 +15,7 @@ Velix is Dart/Flutter library implementing some of the core parts required in ev
 - json mapper
 - model-based two-way form data-binding
 - i18n
+- dependency injection container
 - command pattern for ui actions
 
 Check out some articles on Medium:
@@ -40,7 +41,7 @@ type.validate(-1); // meeeh....will throw
 
 # Type Meta-Data
 
-In combination with a custom code generator, classes decorated with `@Dataclass` emit the meta data:
+In combination with a custom code generator, classes decorated with specific annotations - here `@Dataclass`-  emit the meta data:
 
 ```dart
 @Dataclass()
@@ -55,11 +56,112 @@ class Money {
   const Money({required this.currency, required this.value});
 }
 ```
-The information will be used by the mapping framework and a form data-binding.
+The information will be used by a number of mechanisms, such as 
+- dependency injection container
+- the mapping framework
+- form data-binding.
+
+# Dependency Injection
+
+A DI solution similar based on the existing meta-data has been created, that let's a __container__ handle the lifecycle of objects.
+
+**Example**:
+
+```Dart
+// a module defines the set of managed objects according to their library location
+// it can import other modules!
+@Module(imports: [])
+class TestModule {
+  @Create()
+  ConfigurationManager createConfigurationManager() {
+    return ConfigurationManager();
+  }
+
+  // factory method
+  @Create()
+  ConfigurationValues createConfigurationValues() {
+    // will register with the configuration manager via a lifecycle method!
+    return ConfigurationValues({
+      "foo": 4711
+    });
+  }
+}
+
+// singleton is the default, btw.
+@Injectable(scope: "singleton", eager: false)
+class Bar {
+  const Bar();
+}
+
+// environment means that it is a singleton per environment
+@Injectable(scope: "environment")
+class Foo {
+  // instance data
+
+  final Bar bar;
+  
+  // constructor injection
+
+  const Foo({required this.bar});
+}
+
+@Injectable()
+class Factory {
+  const Factory();
+  
+  // some lifecycle callbacks
+
+  // injection of the surrounding environment
+  @OnInit()
+  void onInit(Environment environment) {
+    ...
+  }
+
+  @OnDestroy()
+  void onDestroy() {
+    ...
+  }
+  
+  // config value injection!
+
+  @Inject()
+  void setFoo(Foo foo, @Value("foo", defaultValue: 1) int value) {
+    ...
+  }
+
+  // another method based factory
+  @Create() 
+  Baz createBaz(Bar bar) {
+    return Baz();
+  }
+}
+
+var environment = Environment(forModule: TestModule);
+var foo = environment.get<Foo>();
+
+var inherited = Environment(parent: environment);
+var inheritedFoo = environment.get<Foo>(); // will be another instance, since it has the scope "environment"
+```
+
+Features are:
+
+- constructor and setter injection
+- injection of configuration variables
+- possibility to define custom injections
+- post processors
+- support for factory methods
+- support for eager and lazy construction
+- support for scopes "singleton", "request" and "environment"
+- possibility to add custom scopes
+- conditional registration of classes and factories ( aka profiles in spring )
+- lifecycle events methods `@OnInit`, `@OnDestroy`, `@OnRunning`
+- Automatic discovery and bundling of injectable objects based on their module location, including support for recursive imports
+- Instantiation of one or possible more isolated container instances — called environments — each managing the lifecycle of a related set of objects,
+- Support for hierarchical environments, enabling structured scoping and layered object management.
 
 # Mapping
 
-A general pupose mapping framnework let's you declaratively specify mappings:
+A general purpose mapping framework let's you declaratively specify mappings:
 ```dart
  var mapper = Mapper([
         mapping<Money, Money>()

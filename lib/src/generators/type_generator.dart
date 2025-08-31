@@ -969,10 +969,12 @@ class TypeBuilder implements Builder {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln('// ignore_for_file: unnecessary_import');
     //buffer.writeln("import 'package:velix/reflectable/reflectable.dart';");
-    buffer.writeln("import 'package:velix/velix.dart';");
+
 
     if (partOf.isNotEmpty)
-      buffer.writeln("part of '$partOf;'");
+      buffer.writeln("part of '$partOf';");
+    else
+      buffer.writeln("import 'package:velix/velix.dart';");
   }
 
   // write imports

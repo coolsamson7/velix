@@ -1,9 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
-import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/velix.dart';
 import 'main.dart';
 import 'package:velix/di/di.dart';
-import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/mapper/json.dart';
 

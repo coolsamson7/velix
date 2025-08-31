@@ -56,6 +56,10 @@ class ApplicationModule {
 }
 
 void main() async {
+  // bootstrap library
+
+  Velix.bootstrap;
+
   // configure json stuff
 
   JSON(

@@ -1,6 +1,6 @@
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
-import '../velix.dart';
+//import '../velix.dart';
 
 // annotations
 
@@ -1332,7 +1332,7 @@ class Boot {
     // add meta-data
 
     if (environment == null) {
-      Velix.bootstrap; // load generated types, setup factories
+      //Velix.bootstrap; // load generated types, setup factories
 
       environment = Environment(forModule: Boot);
     } // if

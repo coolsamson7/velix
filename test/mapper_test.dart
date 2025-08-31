@@ -7,6 +7,8 @@ import 'main.type_registry.g.dart';
 
 void main() {
   group('mapper', () {
+    Velix.bootstrap;
+
     registerAllDescriptors();
 
     test('map conversion', () {

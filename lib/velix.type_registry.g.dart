@@ -1,12 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
-part of "velix.dart";
-
-//import 'package:velix/reflectable/reflectable.dart';
-//import 'package:velix/configuration/source/json_source.dart';
-//import 'package:velix/di/di.dart';
-//import 'package:velix/configuration/configuration.dart';
-
+//import 'package:velix/velix.dart';
+part of 'velix.dart';
 
 void registerVelixDescriptors() {
   var ConfigurationSourceDescriptor = type<ConfigurationSource>(
@@ -14,7 +9,7 @@ void registerVelixDescriptors() {
     annotations: [
       Injectable(factory: false)
     ],
-    isAbstract: false,
+    isAbstract: true,
     methods: [
       method<ConfigurationSource,void>('setManager',
         annotations: [
@@ -127,7 +122,7 @@ void registerVelixDescriptors() {
   );
 
   type<Boot>(
-    location: 'package:velix/di/di.dart:1317:7',
+    location: 'package:velix/di/di.dart:1324:7',
     annotations: [
       Module(imports: [])
     ],

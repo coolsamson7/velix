@@ -10,7 +10,7 @@ import 'package:sample/services/services.dart';
 
 void registerAllDescriptors() {
   type<TodoProvider>(
-    location: 'package:sample/providers/todo_provider.dart:7:7',
+    location: 'package:sample/providers/todo_provider.dart:0:0',
     annotations: [
       Injectable()
     ],
@@ -18,19 +18,17 @@ void registerAllDescriptors() {
       param<TodoService>('todoService', isNamed: true, isRequired: true)
     ],
     constructor: ({required TodoService todoService}) => TodoProvider(todoService: todoService),
-    fromMapConstructor: (Map<String,dynamic> args) => TodoProvider(todoService: args['todoService'] as TodoService),
     fromArrayConstructor: (List<dynamic> args) => TodoProvider(todoService: args[0] as TodoService),
   );
 
   type<Details>(
-    location: 'package:sample/models/todo.dart:4:7',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('author', isNamed: true, isRequired: true), 
       param<int>('priority', isNamed: true, isRequired: true), 
       param<DateTime>('date', isNamed: true, isRequired: true)
     ],
     constructor: ({String author = '', int priority = 0, required DateTime date}) => Details(author: author, priority: priority, date: date),
-    fromMapConstructor: (Map<String,dynamic> args) => Details(author: args['author'] as String? ?? '', priority: args['priority'] as int? ?? 0, date: args['date'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Details(author: args[0] as String? ?? '', priority: args[1] as int? ?? 0, date: args[2] as DateTime),
     fields: [
       field<Details,String>('author',
@@ -48,7 +46,7 @@ void registerAllDescriptors() {
   );
 
   type<Todo>(
-    location: 'package:sample/models/todo.dart:18:7',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('title', isNamed: true, isRequired: true), 
@@ -56,7 +54,6 @@ void registerAllDescriptors() {
       param<bool>('completed', isNamed: true, isNullable: true, defaultValue: false)
     ],
     constructor: ({String id = '', String title = '', required Details details, bool completed = false}) => Todo(id: id, title: title, details: details, completed: completed),
-    fromMapConstructor: (Map<String,dynamic> args) => Todo(id: args['id'] as String? ?? '', title: args['title'] as String? ?? '', details: args['details'] as Details, completed: args['completed'] as bool? ?? false),
     fromArrayConstructor: (List<dynamic> args) => Todo(id: args[0] as String? ?? '', title: args[1] as String? ?? '', details: args[2] as Details, completed: args[3] as bool? ?? false),
     fields: [
       field<Todo,String>('id',
@@ -82,7 +79,7 @@ void registerAllDescriptors() {
   );
 
   type<TestData>(
-    location: 'package:sample/models/todo.dart:36:7',
+    location: 'package:sample/models/todo.dart:0:0',
     params: [
       param<String>('string_data', isNamed: true, isRequired: true), 
       param<int>('int_data', isNamed: true, isRequired: true), 
@@ -91,7 +88,6 @@ void registerAllDescriptors() {
       param<DateTime>('datetime_data', isNamed: true, isRequired: true)
     ],
     constructor: ({String string_data = '', int int_data = 0, int slider_int_data = 0, bool bool_data = false, required DateTime datetime_data}) => TestData(string_data: string_data, int_data: int_data, slider_int_data: slider_int_data, bool_data: bool_data, datetime_data: datetime_data),
-    fromMapConstructor: (Map<String,dynamic> args) => TestData(string_data: args['string_data'] as String? ?? '', int_data: args['int_data'] as int? ?? 0, slider_int_data: args['slider_int_data'] as int? ?? 0, bool_data: args['bool_data'] as bool? ?? false, datetime_data: args['datetime_data'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => TestData(string_data: args[0] as String? ?? '', int_data: args[1] as int? ?? 0, slider_int_data: args[2] as int? ?? 0, bool_data: args[3] as bool? ?? false, datetime_data: args[4] as DateTime),
     fields: [
       field<TestData,String>('string_data',
@@ -120,14 +116,11 @@ void registerAllDescriptors() {
   );
 
   type<ApplicationModule>(
-    location: 'package:sample/main.dart:46:7',
+    location: 'package:sample/main.dart:0:0',
     annotations: [
       Module(imports: [])
     ],
-    params: [
-    ],
     constructor: () => ApplicationModule(),
-    fromMapConstructor: (Map<String,dynamic> args) => ApplicationModule(),
     fromArrayConstructor: (List<dynamic> args) => ApplicationModule(),
     methods: [
       method<ApplicationModule,void>('onInit',
@@ -146,14 +139,11 @@ void registerAllDescriptors() {
   );
 
   type<TodoService>(
-    location: 'package:sample/services/services.dart:4:7',
+    location: 'package:sample/services/services.dart:0:0',
     annotations: [
       Injectable()
     ],
-    params: [
-    ],
     constructor: () => TodoService(),
-    fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
     fromArrayConstructor: (List<dynamic> args) => TodoService(),
     methods: [
       method<TodoService,void>('onInit',
@@ -172,14 +162,11 @@ void registerAllDescriptors() {
   );
 
   type<PerWidgetState>(
-    location: 'package:sample/services/services.dart:20:7',
+    location: 'package:sample/services/services.dart:0:0',
     annotations: [
       Injectable(scope: "environment")
     ],
-    params: [
-    ],
     constructor: () => PerWidgetState(),
-    fromMapConstructor: (Map<String,dynamic> args) => PerWidgetState(),
     fromArrayConstructor: (List<dynamic> args) => PerWidgetState(),
     methods: [
       method<PerWidgetState,void>('onInit',

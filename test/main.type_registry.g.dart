@@ -8,51 +8,48 @@ import 'package:velix/mapper/json.dart';
 
 void registerAllDescriptors() {
   type<TestModule>(
-    location: 'asset:velix/test/main.dart:4:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
-      Module(imports: [])
+      Module()
     ],
     constructor: () => TestModule(),
-    fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
     methods: [
-      method<Factory,ConfigurationManager>('createConfigurationManager',
-          annotations: [
-            Create()
-          ],
-          invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationManager()
-      ),
-      method<Factory,ConfigurationValues>('createConfigurationValues',
-          annotations: [
-            Create()
-          ],
-          invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationValues()
-      ),
-    ]
+      method<TestModule,ConfigurationManager>('createConfigurationManager',
+        annotations: [
+          Create()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationManager()
+      ), 
+      method<TestModule,ConfigurationValues>('createConfigurationValues',
+        annotations: [
+          Create()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationValues()
+      )
+    ],
   );
 
   type<Bar>(
-    location: 'asset:velix/test/main.dart:8:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       Injectable(scope: "singleton", eager: true)
     ],
     constructor: () => Bar(),
-    fromMapConstructor: (Map<String,dynamic> args) => Bar(),
     fromArrayConstructor: (List<dynamic> args) => Bar(),
   );
 
   type<Baz>(
-    location: 'asset:velix/test/main.dart:13:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       Injectable(factory: false)
     ],
     constructor: () => Baz(),
-    fromMapConstructor: (Map<String,dynamic> args) => Baz(),
     fromArrayConstructor: (List<dynamic> args) => Baz(),
   );
 
   type<Foo>(
-    location: 'asset:velix/test/main.dart:18:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       Injectable(scope: "environment")
     ],
@@ -60,17 +57,15 @@ void registerAllDescriptors() {
       param<Bar>('bar', isNamed: true, isRequired: true)
     ],
     constructor: ({required Bar bar}) => Foo(bar: bar),
-    fromMapConstructor: (Map<String,dynamic> args) => Foo(bar: args['bar'] as Bar),
     fromArrayConstructor: (List<dynamic> args) => Foo(bar: args[0] as Bar),
   );
 
   type<Factory>(
-    location: 'asset:velix/test/main.dart:27:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       Injectable(scope: "singleton", eager: true)
     ],
     constructor: () => Factory(),
-    fromMapConstructor: (Map<String,dynamic> args) => Factory(),
     fromArrayConstructor: (List<dynamic> args) => Factory(),
     methods: [
       method<Factory,void>('onInit',
@@ -115,12 +110,11 @@ void registerAllDescriptors() {
   );
 
   type<Collections>(
-    location: 'asset:velix/test/main.dart:65:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<List<Money>>('prices', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Money> prices}) => Collections(prices: prices),
-    fromMapConstructor: (Map<String,dynamic> args) => Collections(prices: args['prices'] as List<Money>),
     fromArrayConstructor: (List<dynamic> args) => Collections(prices: args[0] as List<Money>),
     fields: [
       field<Collections,List<Money>>('prices',
@@ -132,7 +126,7 @@ void registerAllDescriptors() {
   );
 
   type<Money>(
-    location: 'asset:velix/test/main.dart:96:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -141,7 +135,6 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
-    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
@@ -167,14 +160,13 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableProduct>(
-    location: 'asset:velix/test/main.dart:186:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => ImmutableProduct(name: name, price: price, status: status),
-    fromMapConstructor: (Map<String,dynamic> args) => ImmutableProduct(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fromArrayConstructor: (List<dynamic> args) => ImmutableProduct(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<ImmutableProduct,String>('name',
@@ -190,12 +182,11 @@ void registerAllDescriptors() {
   );
 
   type<ImmutableRoot>(
-    location: 'asset:velix/test/main.dart:75:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<ImmutableProduct>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required ImmutableProduct product}) => ImmutableRoot(product: product),
-    fromMapConstructor: (Map<String,dynamic> args) => ImmutableRoot(product: args['product'] as ImmutableProduct),
     fromArrayConstructor: (List<dynamic> args) => ImmutableRoot(product: args[0] as ImmutableProduct),
     fields: [
       field<ImmutableRoot,ImmutableProduct>('product',
@@ -205,14 +196,13 @@ void registerAllDescriptors() {
   );
 
   type<Product>(
-    location: 'asset:velix/test/main.dart:195:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true), 
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
-    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<Product,String>('name',
@@ -231,12 +221,11 @@ void registerAllDescriptors() {
   );
 
   type<MutableRoot>(
-    location: 'asset:velix/test/main.dart:85:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<Product>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required Product product}) => MutableRoot(product: product),
-    fromMapConstructor: (Map<String,dynamic> args) => MutableRoot(product: args['product'] as Product),
     fromArrayConstructor: (List<dynamic> args) => MutableRoot(product: args[0] as Product),
     fields: [
       field<MutableRoot,Product>('product',
@@ -246,7 +235,7 @@ void registerAllDescriptors() {
   );
 
   type<Mutable>(
-    location: 'asset:velix/test/main.dart:111:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
       JsonSerializable(includeNull: true)
     ],
@@ -256,7 +245,6 @@ void registerAllDescriptors() {
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
-    fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String? ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String? ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
     fields: [
       field<Mutable,String>('id',
@@ -281,12 +269,11 @@ void registerAllDescriptors() {
   );
 
   var BaseDescriptor = type<Base>(
-    location: 'asset:velix/test/main.dart:128:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<String>('name', isRequired: true)
     ],
     constructor: ({String name = ''}) => Base(name),
-    fromMapConstructor: (Map<String,dynamic> args) => Base(args['name'] as String),
     fromArrayConstructor: (List<dynamic> args) => Base(args[0] as String),
     fields: [
       field<Base,String>('name',
@@ -296,14 +283,13 @@ void registerAllDescriptors() {
   );
 
   type<Derived>(
-    location: 'asset:velix/test/main.dart:135:7',
+    location: 'asset:velix/test/main.dart:0:0',
     superClass: BaseDescriptor,
     params: [
       param<String>('name', isRequired: true), 
       param<int>('number', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', int number = 0}) => Derived(name, number: number),
-    fromMapConstructor: (Map<String,dynamic> args) => Derived(args['name'] as String, number: args['number'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Derived(args[0] as String, number: args[1] as int? ?? 0),
     fields: [
       field<Derived,int>('number',
@@ -313,59 +299,55 @@ void registerAllDescriptors() {
   );
 
   var ConditionalBaseDescriptor = type<ConditionalBase>(
-    location: 'asset:velix/test/main.dart:143:7',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
-       Injectable(factory: false)
+      Injectable()
     ],
-    //constructor: () => ConditionalBase(),
-    //fromMapConstructor: (Map<String,dynamic> args) => ConditionalBase(),
-    //fromArrayConstructor: (List<dynamic> args) => ConditionalBase(),
+    isAbstract: false,
   );
 
   type<ConditionalProd>(
-    location: 'asset:velix/test/main.dart:149:7',
+    location: 'asset:velix/test/main.dart:0:0',
     superClass: ConditionalBaseDescriptor,
     annotations: [
       Injectable(),
       Conditional(requires: feature("prod"))
     ],
     constructor: () => ConditionalProd(),
-    fromMapConstructor: (Map<String,dynamic> args) => ConditionalProd(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalProd(),
   );
 
   type<ConditionalDev>(
-    location: 'asset:velix/test/main.dart:155:7',
+    location: 'asset:velix/test/main.dart:0:0',
     superClass: ConditionalBaseDescriptor,
     annotations: [
       Injectable(),
       Conditional(requires: feature("dev"))
     ],
     constructor: () => ConditionalDev(),
-    fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalDev(),
   );
 
   var RootTypeDescriptor = type<RootType>(
-    location: 'asset:velix/test/main.dart:160:16',
+    location: 'asset:velix/test/main.dart:0:0',
     annotations: [
-      Injectable(factory: false)
+      Injectable()
     ],
+    isAbstract: false,
   );
 
   type<DerivedType>(
-    location: 'asset:velix/test/main.dart:165:7',
+    location: 'asset:velix/test/main.dart:0:0',
     superClass: RootTypeDescriptor,
     annotations: [
       Injectable()
     ],
     constructor: () => DerivedType(),
-    fromMapConstructor: (Map<String,dynamic> args) => DerivedType(),
     fromArrayConstructor: (List<dynamic> args) => DerivedType(),
   );
 
   type<Types>(
-    location: 'asset:velix/test/main.dart:170:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<int>('int_var', isNamed: true, isRequired: true), 
       param<double>('double_var', isNamed: true, isRequired: true), 
@@ -373,7 +355,6 @@ void registerAllDescriptors() {
       param<String>('string_var', isNamed: true, isRequired: true)
     ],
     constructor: ({int int_var = 0, double double_var = 0.0, bool bool_var = false, String string_var = ''}) => Types(int_var: int_var, double_var: double_var, bool_var: bool_var, string_var: string_var),
-    fromMapConstructor: (Map<String,dynamic> args) => Types(int_var: args['int_var'] as int? ?? 0, double_var: args['double_var'] as double? ?? 0.0, bool_var: args['bool_var'] as bool? ?? false, string_var: args['string_var'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => Types(int_var: args[0] as int? ?? 0, double_var: args[1] as double? ?? 0.0, bool_var: args[2] as bool? ?? false, string_var: args[3] as String? ?? ''),
     fields: [
       field<Types,int>('int_var',
@@ -392,13 +373,12 @@ void registerAllDescriptors() {
   );
 
   type<Invoice>(
-    location: 'asset:velix/test/main.dart:204:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<List<Product>>('products', isNamed: true, isRequired: true), 
       param<DateTime>('date', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
-    fromMapConstructor: (Map<String,dynamic> args) => Invoice(products: args['products'] as List<Product>, date: args['date'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
@@ -413,14 +393,13 @@ void registerAllDescriptors() {
   );
 
   type<Flat>(
-    location: 'asset:velix/test/main.dart:212:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('priceCurrency', isNamed: true, isRequired: true), 
       param<int>('priceValue', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', String priceCurrency = '', int priceValue = 0}) => Flat(id: id, priceCurrency: priceCurrency, priceValue: priceValue),
-    fromMapConstructor: (Map<String,dynamic> args) => Flat(id: args['id'] as String? ?? '', priceCurrency: args['priceCurrency'] as String? ?? '', priceValue: args['priceValue'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Flat(id: args[0] as String? ?? '', priceCurrency: args[1] as String? ?? '', priceValue: args[2] as int? ?? 0),
     fields: [
       field<Flat,String>('id',
@@ -437,13 +416,12 @@ void registerAllDescriptors() {
   );
 
   type<Immutable>(
-    location: 'asset:velix/test/main.dart:228:7',
+    location: 'asset:velix/test/main.dart:0:0',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price}) => Immutable(id: id, price: price),
-    fromMapConstructor: (Map<String,dynamic> args) => Immutable(id: args['id'] as String? ?? '', price: args['price'] as Money),
     fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String? ?? '', price: args[1] as Money),
     fields: [
       field<Immutable,String>('id',

@@ -11,11 +11,10 @@ import 'package:source_gen/source_gen.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix/validation/validation.dart';
-
 import '../../di/di.dart';
+import '../../reflectable/reflectable.dart';
 import '../../util/collections.dart';
+import '../../validation/validation.dart';
 
 
 bool isTypeNullable(DartType type) {
@@ -1004,26 +1003,22 @@ class TypeBuilder implements Builder {
 
     // Find all Dart files in lib/
 
-    //var annotations = ["Module", "Injectable", "Dataclass"];
-
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
 
-      await processLibraryForLocations(library, input, buildStep);
+      //await processLibraryForLocations(library, input, buildStep);
 
-      const dataclassChecker = TypeChecker.fromRuntime(Dataclass);
+      const dataclassChecker  = TypeChecker.fromRuntime(Dataclass);
       const injectableChecker = TypeChecker.fromRuntime(Injectable);
-      const moduleChecker = TypeChecker.fromRuntime(Module);
-      const scopeChecker = TypeChecker.fromRuntime(Scope);
-
-      // TODO -> configure
+      const moduleChecker     = TypeChecker.fromRuntime(Module);
+      const scopeChecker      = TypeChecker.fromRuntime(Scope);
 
       final annotatedClasses = library.classes.where((cls) {
         return dataclassChecker.hasAnnotationOf(cls) || injectableChecker.hasAnnotationOf(cls) || moduleChecker.hasAnnotationOf(cls) || scopeChecker.hasAnnotationOf(cls);
       }).toList();
 
       for (final element in annotatedClasses) {
-          checkElement(element, hasAnnotation(element, "Dataclass"));
+        checkElement(element, hasAnnotation(element, "Dataclass"));
       } // for
     }
 

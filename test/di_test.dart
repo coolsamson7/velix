@@ -12,7 +12,7 @@ void main() {
   group('di', () {
     // register types
 
-    //Velix.bootstrap;
+    Velix.bootstrap;
 
     registerAllDescriptors();
 

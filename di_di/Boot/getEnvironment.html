@@ -74,7 +74,7 @@
   &#47;&#47; add meta-data
 
   if (environment == null) {
-    registerAllDescriptors();
+    &#47;&#47;Velix.bootstrap; &#47;&#47; load generated types, setup factories
 
     environment = Environment(forModule: Boot);
   } &#47;&#47; if
@@ -108,7 +108,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

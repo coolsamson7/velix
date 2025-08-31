@@ -75,7 +75,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 bool applies(Environment environment, ParameterDescriptor parameter) {
-  return true; &#47;&#47; ?? environment.hasProvider(parameter.type);
+  return !isLiteralType(parameter); &#47;&#47; ?? environment.hasProvider(parameter.type);
 }</code></pre>
 </section>
 
@@ -104,7 +104,7 @@ bool applies(Environment environment, ParameterDescriptor parameter) {
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

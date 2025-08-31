@@ -74,10 +74,7 @@
   required List&lt;T&gt; values,
   List&lt;Object&gt;? annotations,
 }) {
-  var fromMapConstructor = (Map&lt;String,dynamic&gt; args) =&gt; null  as T; &#47;&#47; TODO!!!!!
-  var fromArrayConstructor = (List&lt;dynamic&gt; args) =&gt; null  as T;
-
-  return TypeDescriptor&lt;T&gt;(location: name, constructor: () =&gt; null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  return TypeDescriptor&lt;T&gt;(location: name, constructor: () =&gt; null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }</code></pre>
 </section>
 
@@ -105,7 +102,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

@@ -78,9 +78,16 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 T create(Environment environment, [List&lt;dynamic&gt; args = const []]) {
-  final instance = descriptor.fromArrayConstructor!(args);
+  try {
+    final instance = descriptor.fromArrayConstructor!(args);
 
-  return environment.created(instance);
+    return environment.created(instance);
+  }
+  catch(e) {
+    print(e);
+
+    return null as T;
+  }
 }</code></pre>
 </section>
 
@@ -109,7 +116,7 @@ T create(Environment environment, [List&lt;dynamic&gt; args = const []]) {
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

@@ -70,11 +70,11 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void execute(Set&lt;MethodCall&gt;? methods, instance, environment) {
-  if ( methods != null) {
+  if ( methods != null &amp;&amp; methods.isNotEmpty) {
     if ( reverse ) {
       var r = methods.toList(); &#47;&#47; TODO
       for (int i = r.length - 1; i &gt;= 0; i--) {
-        r[i]!.execute(instance, environment);
+        r[i].execute(instance, environment);
       }
     }
     else {
@@ -110,7 +110,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

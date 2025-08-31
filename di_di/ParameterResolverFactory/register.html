@@ -68,7 +68,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static void register(ParameterResolverFactory factory) {
-  factories.add(factory);
+  if ( !factories.contains(factory))
+    factories.add(factory);
 }</code></pre>
 </section>
 
@@ -97,7 +98,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

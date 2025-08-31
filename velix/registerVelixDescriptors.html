@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the registerAllDescriptors function from the velix.type_registry.g library, for the Dart programming language.">
-  <title>registerAllDescriptors function - velix.type_registry.g library - Dart API</title>
+  <meta name="description" content="API docs for the registerVelixDescriptors function from the velix library, for the Dart programming language.">
+  <title>registerVelixDescriptors function - velix library - Dart API</title>
 
 
   
@@ -25,10 +25,10 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">velix</a></li>
-    <li><a href="../velix.type_registry.g/">velix.type_registry.g.dart</a></li>
-    <li class="self-crumb">registerAllDescriptors function</li>
+    <li><a href="../velix/">velix.dart</a></li>
+    <li class="self-crumb">registerVelixDescriptors function</li>
   </ol>
-  <div class="self-name">registerAllDescriptors</div>
+  <div class="self-name">registerVelixDescriptors</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -45,17 +45,17 @@
   <div
       id="dartdoc-main-content"
       class="main-content"
-      data-above-sidebar="velix.type_registry.g&#47;velix.type_registry.g-library-sidebar.html"
+      data-above-sidebar="velix&#47;velix-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-function">registerAllDescriptors</span> function 
+<h1><span class="kind-function">registerVelixDescriptors</span> function 
  
 </h1></div>
 
     <section class="multi-line-signature">
         
 <span class="returntype">void</span>
-<span class="name ">registerAllDescriptors</span>(<wbr>)
+<span class="name ">registerVelixDescriptors</span>(<wbr>)
 
         
 
@@ -66,12 +66,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void registerAllDescriptors() {
+  <pre class="language-dart"><code class="language-dart">void registerVelixDescriptors() {
   var ConfigurationSourceDescriptor = type&lt;ConfigurationSource&gt;(
-    location: &#39;package:velix&#47;configuration&#47;configuration.dart:137:16&#39;,
+    location: &#39;package:velix&#47;configuration&#47;configuration.dart:139:16&#39;,
     annotations: [
       Injectable(factory: false)
     ],
+    isAbstract: true,
     methods: [
       method&lt;ConfigurationSource,void&gt;(&#39;setManager&#39;,
         annotations: [
@@ -95,7 +96,6 @@
       param&lt;String&gt;(&#39;filePath&#39;, isRequired: true)
     ],
     constructor: ({String filePath = &#39;&#39;}) =&gt; JsonFileConfigurationSource(filePath),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; JsonFileConfigurationSource(args[&#39;filePath&#39;] as String),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; JsonFileConfigurationSource(args[0] as String),
   );
 
@@ -105,12 +105,11 @@
       Injectable(factory: false)
     ],
     constructor: () =&gt; ConfigurationManager(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; ConfigurationManager(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; ConfigurationManager(),
   );
 
   type&lt;ConfigurationValues&gt;(
-    location: &#39;package:velix&#47;configuration&#47;configuration.dart:150:7&#39;,
+    location: &#39;package:velix&#47;configuration&#47;configuration.dart:152:7&#39;,
     superClass: ConfigurationSourceDescriptor,
     annotations: [
       Injectable(factory: false)
@@ -119,77 +118,78 @@
       param&lt;Map&lt;String, dynamic&gt;&gt;(&#39;values&#39;, isRequired: true)
     ],
     constructor: ({required Map&lt;String, dynamic&gt; values}) =&gt; ConfigurationValues(values),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; ConfigurationValues(args[&#39;_config&#39;] as Map&lt;String, dynamic&gt;),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; ConfigurationValues(args[0] as Map&lt;String, dynamic&gt;),
   );
 
   type&lt;SingletonScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:180:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:167:7&#39;,
     annotations: [
       Scope(name: &quot;singleton&quot;, register: false)
     ],
     constructor: () =&gt; SingletonScope(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; SingletonScope(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; SingletonScope(),
   );
 
   type&lt;EnvironmentScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:200:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:187:7&#39;,
     annotations: [
       Scope(name: &quot;environment&quot;, register: false)
     ],
     constructor: () =&gt; EnvironmentScope(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; EnvironmentScope(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; EnvironmentScope(),
   );
 
   type&lt;RequestScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:207:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:194:7&#39;,
     annotations: [
       Scope(name: &quot;request&quot;, register: false)
     ],
     constructor: () =&gt; RequestScope(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; RequestScope(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; RequestScope(),
   );
 
-  type&lt;OnInitCallableProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:405:7&#39;,
+  type&lt;OnInjectProcessor&gt;(
+    location: &#39;package:velix&#47;di&#47;di.dart:441:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () =&gt; OnInitCallableProcessor(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; OnInitCallableProcessor(),
-    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnInitCallableProcessor(),
+    constructor: () =&gt; OnInjectProcessor(),
+    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnInjectProcessor(),
   );
 
-  type&lt;OnRunningCallableProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:431:7&#39;,
+  type&lt;OnInitProcessor&gt;(
+    location: &#39;package:velix&#47;di&#47;di.dart:446:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () =&gt; OnRunningCallableProcessor(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; OnRunningCallableProcessor(),
-    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnRunningCallableProcessor(),
+    constructor: () =&gt; OnInitProcessor(),
+    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnInitProcessor(),
   );
 
-  type&lt;OnDestroyCallableProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:457:7&#39;,
+  type&lt;OnRunningProcessor&gt;(
+    location: &#39;package:velix&#47;di&#47;di.dart:451:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () =&gt; OnDestroyCallableProcessor(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; OnDestroyCallableProcessor(),
-    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnDestroyCallableProcessor(),
+    constructor: () =&gt; OnRunningProcessor(),
+    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnRunningProcessor(),
+  );
+
+  type&lt;OnDestroyProcessor&gt;(
+    location: &#39;package:velix&#47;di&#47;di.dart:456:7&#39;,
+    annotations: [
+      Injectable(eager: false)
+    ],
+    constructor: () =&gt; OnDestroyProcessor(),
+    fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; OnDestroyProcessor(),
   );
 
   type&lt;Boot&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:1319:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:1324:7&#39;,
     annotations: [
       Module(imports: [])
     ],
     constructor: () =&gt; Boot(),
-    fromMapConstructor: (Map&lt;String,dynamic&gt; args) =&gt; Boot(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; Boot(),
   );
 }</code></pre>
@@ -206,11 +206,11 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">velix</a></li>
-    <li><a href="../velix.type_registry.g/">velix.type_registry.g</a></li>
-    <li class="self-crumb">registerAllDescriptors function</li>
+    <li><a href="../velix/">velix</a></li>
+    <li class="self-crumb">registerVelixDescriptors function</li>
 </ol>
 
-    <h5>velix.type_registry.g library</h5>
+    <h5>velix library</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-left-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
@@ -219,7 +219,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

@@ -56,8 +56,8 @@
       
       <span class="name ">TypeDescriptor&lt;<wbr><span class="type-parameter">T</span>&gt;</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-location"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">location</span>, </span></li>
 <li><span class="parameter" id="-param-constructor"><span>required</span> <span class="type-annotation"><a href="../../reflectable_reflectable/Constructor.html">Constructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">constructor</span>, </span></li>
-<li><span class="parameter" id="-param-fromMapConstructor"><span>required</span> <span class="type-annotation"><a href="../../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromMapConstructor</span>, </span></li>
-<li><span class="parameter" id="-param-fromArrayConstructor"><span>required</span> <span class="type-annotation"><a href="../../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromArrayConstructor</span>, </span></li>
+<li><span class="parameter" id="-param-fromMapConstructor"><span class="type-annotation"><a href="../../reflectable_reflectable/FromMapConstructor.html">FromMapConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromMapConstructor</span>, </span></li>
+<li><span class="parameter" id="-param-fromArrayConstructor"><span class="type-annotation"><a href="../../reflectable_reflectable/FromArrayConstructor.html">FromArrayConstructor</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span>?</span> <span class="parameter-name">fromArrayConstructor</span>, </span></li>
 <li><span class="parameter" id="-param-constructorParameters"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../reflectable_reflectable/ParameterDescriptor-class.html">ParameterDescriptor</a></span>&gt;</span></span> <span class="parameter-name">constructorParameters</span>, </span></li>
 <li><span class="parameter" id="-param-fields"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../reflectable_reflectable/FieldDescriptor-class.html">FieldDescriptor</a></span>&gt;</span></span> <span class="parameter-name">fields</span>, </span></li>
 <li><span class="parameter" id="-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../reflectable_reflectable/MethodDescriptor-class.html">MethodDescriptor</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
@@ -76,12 +76,12 @@
   <pre class="language-dart"><code class="language-dart">TypeDescriptor({
   required this.location,
   required this.constructor,
-  required this.fromMapConstructor,
-  required this.fromArrayConstructor,
+  this.fromMapConstructor,
+  this.fromArrayConstructor,
   required this.constructorParameters,
   required List&lt;FieldDescriptor&gt; fields,
   List&lt;MethodDescriptor&gt;? methods,
-  required this.annotations,
+  required this. annotations,
   this.isAbstract = false,
   this.superClass,
   this.enumValues
@@ -110,7 +110,7 @@
 
   if ( methods != null)
     for (var method in methods) {
-      &#47;&#47;TODO method.typeDescriptor = this; &#47;&#47; marker for a local method
+      method.typeDescriptor = this; &#47;&#47; marker for a local method
       _methods[method.name] = method;
 
       &#47;&#47; run annotations
@@ -165,7 +165,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

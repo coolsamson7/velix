@@ -75,7 +75,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 ParameterResolver create(Environment environment, ParameterDescriptor parameter) {
-  return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation&lt;InjectValue&gt;()!, type: parameter.type);
+  return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation&lt;Value&gt;()!, type: parameter.type);
 }</code></pre>
 </section>
 
@@ -104,7 +104,7 @@ ParameterResolver create(Environment environment, ParameterDescriptor parameter)
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

@@ -73,8 +73,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 String report() {
-  final paramNames = method.parameters.map((t) =&gt; t.toString()).join(&#39;, &#39;);
-  return &quot;${host.toString()}.${method.name}($paramNames) -&gt; $_type&quot;;
+  &#47;&#47;final paramNames = method.parameters.map((t) =&gt; t.toString()).join(&#39;, &#39;);
+
+  return &quot;$_type: ${host.toString()}.${method.name} (${method.typeDescriptor.location}) &quot;; &#47;&#47; paramNames
 }</code></pre>
 </section>
 
@@ -103,7 +104,7 @@ String report() {
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

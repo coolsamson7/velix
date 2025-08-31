@@ -63,6 +63,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">ConfigurationManager() {
+  &#47;&#47;ConfigurationValueParameterResolverFactory();
+
   _coercions = {
     int: (v) =&gt; v is int ? v : int.parse(v.toString()),
     double: (v) =&gt; v is double ? v : double.parse(v.toString()),
@@ -97,7 +99,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

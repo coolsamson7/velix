@@ -76,7 +76,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-String get location =&gt; descriptor.location;</code></pre>
+String get location =&gt; descriptor.location.replaceFirst(&quot;asset:&quot;, &quot;package:&quot;);</code></pre>
 </section>
 
   </section>
@@ -106,7 +106,7 @@ String get location =&gt; descriptor.location;</code></pre>
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

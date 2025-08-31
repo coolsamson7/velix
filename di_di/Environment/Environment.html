@@ -68,10 +68,10 @@
   <pre class="language-dart"><code class="language-dart">Environment({Type? forModule, this.parent, List&lt;String&gt;? features})  : module = forModule, features = features ?? []{
   if ( parent == null )
     if ( module == Boot) {
-      lifecycleProcessors[0].add(OnInjectCallableProcessor());
-      lifecycleProcessors[1].add(OnInitCallableProcessor());
-      lifecycleProcessors[2].add(OnRunningCallableProcessor());
-      lifecycleProcessors[3].add(OnDestroyCallableProcessor());
+      lifecycleProcessors[0].add(OnInjectProcessor());
+      lifecycleProcessors[1].add(OnInitProcessor());
+      lifecycleProcessors[2].add(OnRunningProcessor());
+      lifecycleProcessors[3].add(OnDestroyProcessor());
     }
     else parent = Boot.getEnvironment();
 
@@ -209,7 +209,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

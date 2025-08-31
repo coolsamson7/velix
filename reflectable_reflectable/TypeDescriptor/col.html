@@ -74,9 +74,8 @@
   int index = location.indexOf(&#39;:&#39;);
   index = location.indexOf(&#39;:&#39;, index + 1);
   index = location.indexOf(&#39;:&#39;, index + 1);
-  var end = location.indexOf(&#39;:&#39;, index + 1);
 
-  return int.parse(location.substring(index + 1,  end));
+  return int.parse(location.substring(index + 1));
 }</code></pre>
 </section>
 
@@ -107,7 +106,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.17.1
+      0.18.0
   </span>
   
 </footer>

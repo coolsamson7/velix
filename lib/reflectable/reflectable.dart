@@ -82,11 +82,11 @@ class MethodDescriptor {
   final bool isStatic;
   final List<dynamic> annotations;
   final Function? invoker;
-  //late TypeDescriptor typeDescriptor;
+  late TypeDescriptor typeDescriptor;
 
   // constructor
 
-  const MethodDescriptor({
+  MethodDescriptor({
     required this.name,
     required this.returnType,
     required this.parameters,
@@ -279,12 +279,12 @@ class TypeDescriptor<T> {
   TypeDescriptor({
     required this.location,
     required this.constructor,
-    required this.fromMapConstructor,
-    required this.fromArrayConstructor,
+    this.fromMapConstructor,
+    this.fromArrayConstructor,
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
     List<MethodDescriptor>? methods,
-    required this.annotations,
+    required this. annotations,
     this.isAbstract = false,
     this.superClass,
     this.enumValues
@@ -313,7 +313,7 @@ class TypeDescriptor<T> {
 
     if ( methods != null)
       for (var method in methods) {
-        //TODO method.typeDescriptor = this; // marker for a local method
+        method.typeDescriptor = this; // marker for a local method
         _methods[method.name] = method;
 
         // run annotations
@@ -368,11 +368,9 @@ class TypeDescriptor<T> {
     int index = location.indexOf(':');
     index = location.indexOf(':', index + 1);
     index = location.indexOf(':', index + 1);
-    var end = location.indexOf(':', index + 1);
 
-    return int.parse(location.substring(index + 1,  end));
+    return int.parse(location.substring(index + 1));
   }
-
 
   T? getAnnotation<T>() {
     return findElement(annotations, (annotation) => annotation.runtimeType == T) as T?;
@@ -498,10 +496,7 @@ TypeDescriptor<T> enumeration<T extends Enum>({
   required List<T> values,
   List<Object>? annotations,
 }) {
-  var fromMapConstructor = (Map<String,dynamic> args) => null  as T; // TODO!!!!!
-  var fromArrayConstructor = (List<dynamic> args) => null  as T;
-
-  return TypeDescriptor<T>(location: name, constructor: () => null, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
+  return TypeDescriptor<T>(location: name, constructor: () => null, annotations: annotations ?? [], constructorParameters: [], fields: [], enumValues: values);
 }
 
 ParameterDescriptor param<T>(String name, {

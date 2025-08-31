@@ -15,11 +15,11 @@ class ConfigurationException implements Exception {
 
 
 /// InjectValue annotation for configuration value injection
-class InjectValue {
+class Value {
   final String key;
   final dynamic defaultValue;
 
-  const InjectValue(this.key, {this.defaultValue});
+  const Value(this.key, {this.defaultValue});
 }
 
 
@@ -160,7 +160,7 @@ class ConfigurationValues extends ConfigurationSource {
 class ConfigurationValueParameterResolver extends ParameterResolver {
   // instance data
 
-  InjectValue injectValue;
+  Value injectValue;
   Type type;
 
   // constructor
@@ -189,11 +189,11 @@ class ConfigurationValueParameterResolverFactory extends ParameterResolverFactor
 
   @override
   bool applies(Environment environment, ParameterDescriptor parameter) {
-    return parameter.getAnnotation<InjectValue>() != null;
+    return parameter.getAnnotation<Value>() != null;
   }
 
   @override
   ParameterResolver create(Environment environment, ParameterDescriptor parameter) {
-    return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation<InjectValue>()!, type: parameter.type);
+    return ConfigurationValueParameterResolver(injectValue: parameter.getAnnotation<Value>()!, type: parameter.type);
   }
 }

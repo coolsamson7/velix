@@ -74,3 +74,8 @@
 ## 0.17.1
 
 - docstrings
+
+## 0.18.0
+
+- added DI module
+- added configuration mechanism

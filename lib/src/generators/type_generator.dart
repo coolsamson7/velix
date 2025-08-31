@@ -841,7 +841,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if (!element.isAbstract) {
       generateConstructorParams(element);
       generateConstructor(element);
-      generateFromMapConstructor(element);
+      //generateFromMapConstructor(element); make it connfigurable
       generateFromArrayConstructor(element);
     }
     else tab().writeln("isAbstract: false,");

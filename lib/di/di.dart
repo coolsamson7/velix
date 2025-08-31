@@ -397,11 +397,11 @@ class MethodCall {
    int get order => 1;
 
    void execute(Set<MethodCall>? methods, instance, environment) {
-     if ( methods != null) {
+     if ( methods != null && methods.isNotEmpty) {
        if ( reverse ) {
          var r = methods.toList(); // TODO
          for (int i = r.length - 1; i >= 0; i--) {
-           r[i]!.execute(instance, environment);
+           r[i].execute(instance, environment);
          }
        }
        else {
@@ -438,23 +438,23 @@ abstract class PostProcessor extends LifecycleProcessor {
 }
 
 @Injectable(eager: false)
-class OnInjectCallableProcessor extends AbstractLifecycleMethodProcessor {
-  OnInjectCallableProcessor() :super(lifecycle: Lifecycle.onInject);
+class OnInjectProcessor extends AbstractLifecycleMethodProcessor {
+  OnInjectProcessor() :super(lifecycle: Lifecycle.onInject);
 }
 
 @Injectable(eager: false)
-class OnInitCallableProcessor extends AbstractLifecycleMethodProcessor {
-  OnInitCallableProcessor() :super(lifecycle: Lifecycle.onInit);
+class OnInitProcessor extends AbstractLifecycleMethodProcessor {
+  OnInitProcessor() :super(lifecycle: Lifecycle.onInit);
 }
 
 @Injectable(eager: false)
-class OnRunningCallableProcessor extends AbstractLifecycleMethodProcessor {
-  OnRunningCallableProcessor() :super(lifecycle: Lifecycle.onRunning);
+class OnRunningProcessor extends AbstractLifecycleMethodProcessor {
+  OnRunningProcessor() :super(lifecycle: Lifecycle.onRunning);
 }
 
 @Injectable(eager: false)
-class OnDestroyCallableProcessor extends AbstractLifecycleMethodProcessor {
-  OnDestroyCallableProcessor() :super(lifecycle: Lifecycle.onDestroy, reverse: true);
+class OnDestroyProcessor extends AbstractLifecycleMethodProcessor {
+  OnDestroyProcessor() :super(lifecycle: Lifecycle.onDestroy, reverse: true);
 }
 
 /// The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
@@ -794,10 +794,10 @@ class Environment {
   Environment({Type? forModule, this.parent, List<String>? features})  : module = forModule, features = features ?? []{
     if ( parent == null )
       if ( module == Boot) {
-        lifecycleProcessors[0].add(OnInjectCallableProcessor());
-        lifecycleProcessors[1].add(OnInitCallableProcessor());
-        lifecycleProcessors[2].add(OnRunningCallableProcessor());
-        lifecycleProcessors[3].add(OnDestroyCallableProcessor());
+        lifecycleProcessors[0].add(OnInjectProcessor());
+        lifecycleProcessors[1].add(OnInitProcessor());
+        lifecycleProcessors[2].add(OnRunningProcessor());
+        lifecycleProcessors[3].add(OnDestroyProcessor());
       }
       else parent = Boot.getEnvironment();
 
@@ -1156,6 +1156,11 @@ class AmbiguousProvider<T> extends InstanceProvider<T> {
   // override
 
   @override
+  T create(Environment environment, [List<dynamic> args = const []]) {
+    throw DIRuntimeException("ambiguous providers for $_type");
+  }
+
+  @override
   String report() => "ambiguous: ${providers.map((provider) => provider.report()).join(',')}";
 
   // override Object
@@ -1205,7 +1210,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   }
 
   @override
-  String get location => descriptor.location;
+  String get location => descriptor.location.replaceFirst("asset:", "package:");
 
   /// Creates an instance of the type using the environment
 
@@ -1217,13 +1222,18 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   }
 
   @override
-  String report() => "$host(...)";
+  String report() {
+    StringBuffer buffer = StringBuffer("$_type: $location ");
 
-   // override Object
+    return buffer.toString();
+  }
 
-  @override
-  String toString() => "ClassProvider($_type)";
-}
+    // override Object
+
+    @override
+    String toString() => "ClassProvider($_type)";
+  }
+
 
 /// A FunctionInstanceProvider is able to create instances of type T by calling specific methods annotated with 'create'.
 class FunctionInstanceProvider<T> extends InstanceProvider<T> {
@@ -1279,8 +1289,9 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
   @override
   String report() {
-    final paramNames = method.parameters.map((t) => t.toString()).join(', ');
-    return "${host.toString()}.${method.name}($paramNames) -> $_type";
+    //final paramNames = method.parameters.map((t) => t.toString()).join(', ');
+
+    return "$_type: ${host.toString()}.${method.name} ($method.typeDescriptor.location) "; // paramNames
   }
 
   @override

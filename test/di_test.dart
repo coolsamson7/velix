@@ -17,7 +17,7 @@ void main() {
 
     Tracer(
         isEnabled: true,
-        trace: ConsoleTrace("%d [%l] %p: %m"), // d(ate), l(evel), p(ath), m(message)
+        trace: ConsoleTrace("%d [%l] %p: %m %f"), // d(ate), l(evel), p(ath), m(message)
         paths: {
           "": TraceLevel.full,
           "di": TraceLevel.full

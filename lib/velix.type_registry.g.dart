@@ -92,34 +92,34 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => RequestScope(),
   );
 
-  type<OnInitCallableProcessor>(
+  type<OnInitProcessor>(
     location: 'package:velix/di/di.dart:405:7',
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () => OnInitCallableProcessor(),
-    fromMapConstructor: (Map<String,dynamic> args) => OnInitCallableProcessor(),
-    fromArrayConstructor: (List<dynamic> args) => OnInitCallableProcessor(),
+    constructor: () => OnInitProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnInitProcessor(),
+    fromArrayConstructor: (List<dynamic> args) => OnInitProcessor(),
   );
 
-  type<OnRunningCallableProcessor>(
+  type<OnRunningProcessor>(
     location: 'package:velix/di/di.dart:431:7',
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () => OnRunningCallableProcessor(),
-    fromMapConstructor: (Map<String,dynamic> args) => OnRunningCallableProcessor(),
-    fromArrayConstructor: (List<dynamic> args) => OnRunningCallableProcessor(),
+    constructor: () => OnRunningProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnRunningProcessor(),
+    fromArrayConstructor: (List<dynamic> args) => OnRunningProcessor(),
   );
 
-  type<OnDestroyCallableProcessor>(
+  type<OnDestroyProcessor>(
     location: 'package:velix/di/di.dart:457:7',
     annotations: [
       Injectable(eager: false)
     ],
-    constructor: () => OnDestroyCallableProcessor(),
-    fromMapConstructor: (Map<String,dynamic> args) => OnDestroyCallableProcessor(),
-    fromArrayConstructor: (List<dynamic> args) => OnDestroyCallableProcessor(),
+    constructor: () => OnDestroyProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnDestroyProcessor(),
+    fromArrayConstructor: (List<dynamic> args) => OnDestroyProcessor(),
   );
 
   type<Boot>(

@@ -50,11 +50,11 @@ class Factory {
   }
 
   @Inject()
-  void setFoo(Foo foo, @InjectValue("foo", defaultValue: 1) int value) {
+  void setFoo(Foo foo, @Value("foo", defaultValue: 1) int value) {
     print(foo);
   }
 
-  @Create()
+  @Create() // auch conditional TODO!
   Baz createBaz(Bar bar) {
     return Baz();
   }

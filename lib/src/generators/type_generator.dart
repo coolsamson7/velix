@@ -840,10 +840,10 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     if (!element.isAbstract) {
       generateConstructorParams(element);
       generateConstructor(element);
-      //generateFromMapConstructor(element); make it connfigurable
+      //generateFromMapConstructor(element); make it configurable?
       generateFromArrayConstructor(element);
     }
-    else tab().writeln("isAbstract: false,");
+    else tab().writeln("isAbstract: true,");
 
     if ( generateProperties && element.fields.isNotEmpty)
       generateFields(element);
@@ -886,6 +886,15 @@ class TypeBuilder implements Builder {
   // Outputs a fixed file in /lib; adjust as needed.
 
   Map<InterfaceElement, (int line, int column)> elementLocations = {};
+
+  String functionName;
+  String partOf;
+
+  // constructor
+
+  TypeBuilder({required this.functionName, required this.partOf});
+
+  // public
 
   // Method to extract line/column during library processing
   Future<void> processLibraryForLocations(LibraryElement library, AssetId assetId, BuildStep buildStep) async {
@@ -959,7 +968,11 @@ class TypeBuilder implements Builder {
   void generateHeader(StringBuffer buffer) {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln('// ignore_for_file: unnecessary_import');
+    //buffer.writeln("import 'package:velix/reflectable/reflectable.dart';");
     buffer.writeln("import 'package:velix/velix.dart';");
+
+    if (partOf.isNotEmpty)
+      buffer.writeln("part of '$partOf;'");
   }
 
   // write imports
@@ -977,7 +990,7 @@ class TypeBuilder implements Builder {
 
   void generate(StringBuffer buffer) {
     buffer.writeln();
-    buffer.writeln('void registerAllDescriptors() {');
+    buffer.writeln('void $functionName() {');
 
     bool first = true;
     for ( var element in elements) {
@@ -1006,7 +1019,7 @@ class TypeBuilder implements Builder {
     await for (final input in buildStep.findAssets(Glob('$dir/**.dart'))) {
       final library = await resolver.libraryFor(input, allowSyntaxErrors: true);
 
-      //await processLibraryForLocations(library, input, buildStep);
+      await processLibraryForLocations(library, input, buildStep);
 
       const dataclassChecker  = TypeChecker.fromRuntime(Dataclass);
       const injectableChecker = TypeChecker.fromRuntime(Injectable);
@@ -1027,7 +1040,8 @@ class TypeBuilder implements Builder {
     final buffer = StringBuffer();
 
     generateHeader(buffer);
-    generateImports(buffer);
+    if ( partOf.isEmpty)
+      generateImports(buffer);
     generate(buffer);
 
     final fileName = p.basenameWithoutExtension(buildStep.inputId.path);
@@ -1040,4 +1054,11 @@ class TypeBuilder implements Builder {
   }
 }
 
-Builder typeBuilder(BuilderOptions options) => TypeBuilder();
+Builder typeBuilder(BuilderOptions options) {
+  final config = options.config;
+
+  final functionName = config['function_name'] as String? ?? 'registerAllDescriptors';
+  final partOf = config['part_of'] as String? ?? "";
+
+  return TypeBuilder(functionName: functionName, partOf: partOf);
+}

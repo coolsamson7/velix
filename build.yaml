@@ -13,11 +13,18 @@ builders:
     build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
     auto_apply: root_package
     build_to: source
+    defaults:
+      options:
+        function_name: "registerAllDescriptors"
+        part_of: ""
 
 targets:
   $default:
     builders:
       velix|type_builder:
+        options:
+          function_name: "registerVelixDescriptors"
+          part_of: "velix.dart"
         generate_for:
           include:
             - lib/velix.dart

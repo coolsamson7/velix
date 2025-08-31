@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/configuration/configuration.dart';
 import 'package:velix/di/di.dart';
 import 'package:velix/util/tracer.dart';
+import 'package:velix/velix.dart';
 
 import 'main.dart';
 import 'main.type_registry.g.dart';
@@ -11,7 +12,7 @@ void main() {
   group('di', () {
     // register types
 
-    ConfigurationValueParameterResolverFactory(); // TODO
+    //Velix.bootstrap;
 
     registerAllDescriptors();
 

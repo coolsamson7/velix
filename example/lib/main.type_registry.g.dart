@@ -10,7 +10,7 @@ import 'package:sample/services/services.dart';
 
 void registerAllDescriptors() {
   type<TodoProvider>(
-    location: 'package:sample/providers/todo_provider.dart:0:0',
+    location: 'package:sample/providers/todo_provider.dart:7:7',
     annotations: [
       Injectable()
     ],
@@ -22,7 +22,7 @@ void registerAllDescriptors() {
   );
 
   type<Details>(
-    location: 'package:sample/models/todo.dart:0:0',
+    location: 'package:sample/models/todo.dart:4:7',
     params: [
       param<String>('author', isNamed: true, isRequired: true), 
       param<int>('priority', isNamed: true, isRequired: true), 
@@ -46,7 +46,7 @@ void registerAllDescriptors() {
   );
 
   type<Todo>(
-    location: 'package:sample/models/todo.dart:0:0',
+    location: 'package:sample/models/todo.dart:18:7',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<String>('title', isNamed: true, isRequired: true), 
@@ -79,7 +79,7 @@ void registerAllDescriptors() {
   );
 
   type<TestData>(
-    location: 'package:sample/models/todo.dart:0:0',
+    location: 'package:sample/models/todo.dart:36:7',
     params: [
       param<String>('string_data', isNamed: true, isRequired: true), 
       param<int>('int_data', isNamed: true, isRequired: true), 
@@ -116,7 +116,7 @@ void registerAllDescriptors() {
   );
 
   type<ApplicationModule>(
-    location: 'package:sample/main.dart:0:0',
+    location: 'package:sample/main.dart:46:7',
     annotations: [
       Module(imports: [])
     ],
@@ -139,7 +139,7 @@ void registerAllDescriptors() {
   );
 
   type<TodoService>(
-    location: 'package:sample/services/services.dart:0:0',
+    location: 'package:sample/services/services.dart:4:7',
     annotations: [
       Injectable()
     ],
@@ -162,7 +162,7 @@ void registerAllDescriptors() {
   );
 
   type<PerWidgetState>(
-    location: 'package:sample/services/services.dart:0:0',
+    location: 'package:sample/services/services.dart:20:7',
     annotations: [
       Injectable(scope: "environment")
     ],

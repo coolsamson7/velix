@@ -1,6 +1,6 @@
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
-import '../velix.type_registry.g.dart';
+import '../velix.dart';
 
 // annotations
 
@@ -1226,9 +1226,16 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    final instance = descriptor.fromArrayConstructor!(args);
+    try {
+      final instance = descriptor.fromArrayConstructor!(args);
 
-    return environment.created(instance);
+      return environment.created(instance);
+    }
+    catch(e) {
+      print(e);
+
+      return null as T;
+    }
   }
 
   @override
@@ -1325,7 +1332,7 @@ class Boot {
     // add meta-data
 
     if (environment == null) {
-      registerAllDescriptors();
+      Velix.bootstrap; // load generated types, setup factories
 
       environment = Environment(forModule: Boot);
     } // if

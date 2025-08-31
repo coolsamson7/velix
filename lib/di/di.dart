@@ -1,6 +1,5 @@
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
-//import '../velix.dart';
 
 // annotations
 
@@ -13,6 +12,8 @@ mixin Condition {
 class feature with Condition {
   final String _feature;
 
+  /// create a new [feature]
+  /// [_feature] the required feature
   const feature(this._feature);
 
   @override
@@ -21,11 +22,15 @@ class feature with Condition {
   }
 }
 
+/// this annotation is ued to define specific requirements for the appropriate class
+/// to be managed by an environment
 class Conditional extends ClassAnnotation {
   final Condition requires;
 
   // constructor
 
+  /// Create a new [Conditional]
+  /// [requires] required condition
   const Conditional({required this.requires});
 
   // override
@@ -36,6 +41,8 @@ class Conditional extends ClassAnnotation {
   }
 }
 
+/// Classes, annotated with [Injectable] are able to be managed by an environment
+/// This is also an indicator for the code-generator to emit the meta-data.
 class Injectable extends ClassAnnotation {
   final bool eager;
   final String scope;
@@ -54,6 +61,8 @@ class Injectable extends ClassAnnotation {
   }
 }
 
+/// Methods annotated with [Create] are factories for the return type.
+/// Any parameters are possible, that will be injected.
 class Create extends MethodAnnotation {
   const Create();
 
@@ -65,11 +74,15 @@ class Create extends MethodAnnotation {
   }
 }
 
+/// Classes annotated with  [Module] determine, which classes are managed by it.
+/// The rule is that all classes inside or under the library of this class are eligible.
 class Module extends ClassAnnotation {
   final List<Type> imports;
 
   // constructor
 
+  /// Create a new [Module]
+  /// [imports] possible list of modules which will be recursively imported.
   const Module({List<Type>? imports}) : imports = imports ?? const [];
 
   // override
@@ -80,6 +93,8 @@ class Module extends ClassAnnotation {
   }
 }
 
+/// Methods annotated with  [OnInit] are executed after constructor invocation and all injections.
+/// Methods can declare any injectable parameters
 class OnInit extends MethodAnnotation {
   const OnInit();
 
@@ -91,6 +106,8 @@ class OnInit extends MethodAnnotation {
   }
 }
 
+/// Methods annotated with  [OnRunning] are executed after constructor of all eager environment objects
+/// Methods can declare any injectable parameters
 class OnRunning extends MethodAnnotation {
   const OnRunning();
 
@@ -102,6 +119,8 @@ class OnRunning extends MethodAnnotation {
   }
 }
 
+/// Methods annotated with  [Inject] are executed after constructor invocation.
+/// Methods can declare any injectable parameters
 class Inject extends MethodAnnotation {
   const Inject();
 
@@ -113,6 +132,8 @@ class Inject extends MethodAnnotation {
   }
 }
 
+/// Methods annotated with  [OnDestroy] are executed after environment destruction.
+/// Methods can declare any injectable parameters
 class OnDestroy extends MethodAnnotation {
   const OnDestroy();
 
@@ -789,6 +810,8 @@ class EnvironmentParameterResolver extends ParameterResolver {
   }
 }
 
+/// This is the DI container which is responsible for the lifecycle of its managed classes
+/// // and offers the main API to retrieve objects via the `get<T>` method.
 class Environment {
   // instance data
 
@@ -801,6 +824,10 @@ class Environment {
 
   // constructor
 
+  /// Create a new [Environment]
+  /// [forModule] the module class that determines the classes which will be manged
+  /// [parent] optional parent environment, whose objects will be inherited
+  /// [features] list of feature that this environment defines. See [Conditional]
   Environment({Type? forModule, this.parent, List<String>? features})  : module = forModule, features = features ?? []{
     if ( parent == null )
       if ( module == Boot) {
@@ -923,6 +950,9 @@ class Environment {
     return providers[type] != null;
   }
 
+  ///return an object given the desired type
+  /// [T] the generic type
+  /// [type] optional type for calls where a generic type is not available
   T get<T>({Type? type}) {
     final lookup = type ?? T;
     final provider = providers[lookup];
@@ -933,6 +963,7 @@ class Environment {
     return provider.create(this) as T;
   }
 
+  /// print a report on the console showing the providers and their dependencies
   void report() {
     for ( var provider in providers.values) {
       if ( provider is EnvironmentInstanceProvider)
@@ -944,6 +975,7 @@ class Environment {
     return features.contains(feature);
   }
 
+  /// destroy the environment invoking all [OnDestroy] callbacks.
   void destroy() {
     for ( var instance in instances)
       executeProcessors(Lifecycle.onDestroy, instance);
@@ -997,6 +1029,7 @@ class Environment {
   String toString() => "Environment($module)";
 }
 
+/// internal class that is able to provide a specific type.
 abstract class AbstractInstanceProvider<T> {
   // instance data
 

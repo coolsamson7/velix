@@ -1,8 +1,5 @@
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:velix/configuration/configuration.dart';
-import 'package:velix/di/di.dart';
-import 'package:velix/util/tracer.dart';
 import 'package:velix/velix.dart';
 
 import 'main.dart';

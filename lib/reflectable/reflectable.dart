@@ -3,15 +3,23 @@ import '../validation/validation.dart';
 
 Type nonNullableOf<T>() => T;
 
+/// A `ClassAnnotation` can be used as the base class for type annotations
+/// that will get its `apply` method executed by the infrastructure.
 class ClassAnnotation {
   const ClassAnnotation();
 
+  /// callback executed by the type infrastructure
+  /// [type] the [TypeDescriptor] of the annotated class
   void apply(TypeDescriptor type){}
 }
-
+/// A `MethodAnnotation` can be used as the base class for metzhod annotations
+/// that will get its `apply` method executed by the infrastructure.
 class MethodAnnotation {
   const MethodAnnotation();
 
+  /// callback executed by the type infrastructure
+  /// [type] the [TypeDescriptor] of the annotated class
+  /// [method] the [MethodDescriptor] of the annotated method
   void apply(TypeDescriptor type, MethodDescriptor method){}
 }
 

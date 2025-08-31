@@ -304,7 +304,7 @@ void registerAllDescriptors() {
     annotations: [
       Injectable()
     ],
-    isAbstract: false,
+    isAbstract: true,
   );
 
   type<ConditionalProd>(

@@ -80,7 +80,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void apply(TypeDescriptor type, MethodDescriptor method) {
-  Providers.register(FunctionInstanceProvider(type.type, method));
+  Providers.register(FunctionInstanceProvider(type.type, method, eager: eager, scope: scope));
 }</code></pre>
 </section>
 
@@ -109,7 +109,7 @@ void apply(TypeDescriptor type, MethodDescriptor method) {
 <footer>
   <span class="no-break">
     velix
-      0.18.0
+      0.18.1
   </span>
   
 </footer>

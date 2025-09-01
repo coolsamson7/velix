@@ -54,7 +54,9 @@
 
     <section class="multi-line-signature">
       const
-      <span class="name ">Create</span>(<wbr>)
+      <span class="name ">Create</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-eager"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">eager</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="-param-scope"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">scope</span> = <span class="default-value">&quot;singleton&quot;</span>, </span></li>
+</ol>})
     </section>
     
 
@@ -62,7 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const Create();</code></pre>
+  <pre class="language-dart"><code class="language-dart">const Create({this.eager = true, this.scope = &quot;singleton&quot;});</code></pre>
 </section>
 
 
@@ -90,7 +92,7 @@
 <footer>
   <span class="no-break">
     velix
-      0.18.0
+      0.18.1
   </span>
   
 </footer>

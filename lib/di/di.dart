@@ -62,15 +62,19 @@ class Injectable extends ClassAnnotation {
 }
 
 /// Methods annotated with [Create] are factories for the return type.
-/// Any parameters are possible, that will be injected.
+/// [eager] if [true], thg instance wil be created automatically. This is the default
+/// [scope] tge scope. Default tis "singleton"
 class Create extends MethodAnnotation {
-  const Create();
+  final bool eager;
+  final String scope;
+
+  const Create({this.eager = true, this.scope = "singleton"});
 
   // override
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    Providers.register(FunctionInstanceProvider(type.type, method));
+    Providers.register(FunctionInstanceProvider(type.type, method, eager: eager, scope: scope));
   }
 }
 

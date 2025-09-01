@@ -79,3 +79,7 @@
 
 - added DI module
 - added configuration mechanism
+
+## 0.18.1
+
+- factories support eager and scope as well.

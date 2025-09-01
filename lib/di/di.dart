@@ -1357,22 +1357,12 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
 // boot
 
-@Module(imports: [])
+@Module()
 class Boot {
   static Environment? environment;
 
   static Environment getEnvironment() {
-    // default factory for types
-
-    TypeParameterResolverFactory();
-
-    // add meta-data
-
-    if (environment == null) {
-      //Velix.bootstrap; // load generated types, setup factories
-
-      environment = Environment(forModule: Boot);
-    } // if
+    environment ??= Environment(forModule: Boot);
 
     return environment!;
   }

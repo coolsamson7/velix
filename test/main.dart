@@ -10,7 +10,9 @@ class TestModule {
   @Create()
   ConfigurationValues createConfigurationValues() {
     return ConfigurationValues({
-      "foo": 4711
+      "foo": {
+        "bar": "4711"
+      }
     });
   }
 
@@ -50,7 +52,7 @@ class Factory {
   }
 
   @Inject()
-  void setFoo(Foo foo, @Value("foo", defaultValue: 1) int value) {
+  void setFoo(Foo foo, @Value("foo.bar", defaultValue: 1) int value) {
     print(foo);
   }
 

@@ -452,7 +452,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         if ( parameter.isNamed)
           write(parameter.displayName).write(": ");
 
-        write("args[${i +1 } ]");
+        write("args[${i + 1}]");
       }
     }
 
@@ -968,8 +968,6 @@ class TypeBuilder implements Builder {
   void generateHeader(StringBuffer buffer) {
     buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
     buffer.writeln('// ignore_for_file: unnecessary_import');
-    //buffer.writeln("import 'package:velix/reflectable/reflectable.dart';");
-
 
     if (partOf.isNotEmpty)
       buffer.writeln("part of '$partOf';");

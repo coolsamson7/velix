@@ -91,7 +91,7 @@ void registerAllDescriptors() {
           param<Foo>('foo', isRequired: true), 
           param<int>('value', isRequired: true,
                     annotations: [
-            Value("foo", defaultValue: 1)
+            Value("foo.bar", defaultValue: 1)
           ],
 )
         ],

@@ -30,9 +30,13 @@ void main() {
 
       expect(conditional.runtimeType, equals(ConditionalDev));
 
+      environment.destroy();
+
       environment = Environment(forModule: TestModule, features: ["prod"]);
 
       conditional = environment.get<ConditionalBase>();
+
+      environment.destroy();
 
       expect(conditional.runtimeType, equals(ConditionalProd));
     });

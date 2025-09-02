@@ -1,6 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
-//import 'package:velix/velix.dart';
 part of 'velix.dart';
 
 void registerVelixDescriptors() {
@@ -18,7 +17,7 @@ void registerVelixDescriptors() {
         parameters: [
           param<ConfigurationManager>('manager', isRequired: true)
         ],
-        invoker: (List<dynamic> args)=> (args[0] as ConfigurationSource).setManager(args[1 ])
+        invoker: (List<dynamic> args)=> (args[0] as ConfigurationSource).setManager(args[1])
       )
     ],
   );
@@ -59,7 +58,7 @@ void registerVelixDescriptors() {
   );
 
   type<SingletonScope>(
-    location: 'package:velix/di/di.dart:167:7',
+    location: 'package:velix/di/di.dart:192:7',
     annotations: [
       Scope(name: "singleton", register: false)
     ],
@@ -68,7 +67,7 @@ void registerVelixDescriptors() {
   );
 
   type<EnvironmentScope>(
-    location: 'package:velix/di/di.dart:187:7',
+    location: 'package:velix/di/di.dart:212:7',
     annotations: [
       Scope(name: "environment", register: false)
     ],
@@ -77,7 +76,7 @@ void registerVelixDescriptors() {
   );
 
   type<RequestScope>(
-    location: 'package:velix/di/di.dart:194:7',
+    location: 'package:velix/di/di.dart:219:7',
     annotations: [
       Scope(name: "request", register: false)
     ],
@@ -86,7 +85,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnInjectProcessor>(
-    location: 'package:velix/di/di.dart:441:7',
+    location: 'package:velix/di/di.dart:466:7',
     annotations: [
       Injectable(eager: false)
     ],
@@ -95,7 +94,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnInitProcessor>(
-    location: 'package:velix/di/di.dart:446:7',
+    location: 'package:velix/di/di.dart:471:7',
     annotations: [
       Injectable(eager: false)
     ],
@@ -104,7 +103,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnRunningProcessor>(
-    location: 'package:velix/di/di.dart:451:7',
+    location: 'package:velix/di/di.dart:476:7',
     annotations: [
       Injectable(eager: false)
     ],
@@ -113,7 +112,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnDestroyProcessor>(
-    location: 'package:velix/di/di.dart:456:7',
+    location: 'package:velix/di/di.dart:481:7',
     annotations: [
       Injectable(eager: false)
     ],
@@ -122,9 +121,9 @@ void registerVelixDescriptors() {
   );
 
   type<Boot>(
-    location: 'package:velix/di/di.dart:1324:7',
+    location: 'package:velix/di/di.dart:1354:7',
     annotations: [
-      Module(imports: [])
+      Module()
     ],
     constructor: () => Boot(),
     fromArrayConstructor: (List<dynamic> args) => Boot(),

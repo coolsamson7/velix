@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../reflectable/reflectable.dart';
 import '../util/tracer.dart';
 
@@ -353,53 +355,79 @@ class MethodCall {
  abstract class AbstractLifecycleMethodProcessor extends LifecycleProcessor {
    // static data
 
-   static Map<Type, List<Set<MethodCall>>> methods = {};
+   static Map<Type, List<List<MethodCall>>> methods = {};
+   static Map<Type, List<List<MethodCall>>> allMethods = {}; // including inherited
 
    // static methods
 
    static void register(TypeDescriptor type, Lifecycle lifecycle, MethodDescriptor method) {
-     var list = methods[type.type];
-     if ( list == null)
-       methods[type.type] = [{}, {}, {}, {}];
-
-     methods[type.type]![lifecycle.index].add(MethodCall(method: method));
+     methods.putIfAbsent(type.type, () => [for (int i = 0; i < 4; i++) []])[lifecycle.index].add(MethodCall(method: method));
    }
 
    static void resolve(Environment environment, TypeDescriptor type, Set<Type> types) {
      // make sure that i inherit superclass methods!
 
-     Set<MethodCall> methodList = {};
+     List<MethodCall> methodList = [];
 
-     for (int lifecycle = 0; lifecycle < 4; lifecycle++) {
-        // local methods
+     // local methods
 
-       void checkMethod(Type type, MethodCall method) {
-         methods.putIfAbsent(type, () => [for (int i = 0; i < 4; i++) <MethodCall>{}]);
+     Iterable<T> iterate<T>(List<T> list, {bool reverse = false}) {
+       return reverse ? list.reversed : list;
+     }
 
-         methods[type]![lifecycle].add(method);
+     void addMethod(Type type, MethodCall method, int lifecycle, bool reverse) {
+       var list = allMethods.putIfAbsent(type, () => [for (int i = 0; i < 4; i++) []])[lifecycle];
+
+       if ( reverse )
+         list.insert(0, method);
+       else
+         list.add(method);
+
+       methodList.add(method);
+     }
+
+     List<List<MethodCall>> inheritMethods(TypeDescriptor t) {
+       var result = allMethods[t.type];
+
+       if ( result != null )
+         return result; // done
+
+       result = allMethods[t.type] = [[], [], [], []];
+
+       // super class
+
+       if ( t.superClass != null ) {
+         // recursion
+
+         var inherited = inheritMethods(t.superClass!);
+
+         for (int lifecycle = 0; lifecycle < 4; lifecycle++) {
+           var reverse = lifecycle == 3;
+
+           for (var method in iterate(inherited[lifecycle], reverse: reverse)) {
+             addMethod(t.type, method, lifecycle, reverse);
+           }
+         }
+       } // if
+
+       // add own methods
+
+       for (int lifecycle = 0; lifecycle < 4; lifecycle++) {
+         var reverse = lifecycle == 3;
+
+         for (MethodCall method in methods[t.type]?[lifecycle] ?? []) {
+           addMethod(t.type, method, lifecycle, reverse); // methodList.add(method); //  was
+         }
        }
 
-       Set<MethodCall> inheritMethods(TypeDescriptor t) {
-         if ( t.superClass != null)
-           for ( var method in inheritMethods(t.superClass!))
-            checkMethod(t.type, method);
+       // done
 
-         // add own methods
+       return result;
+     } // inheritMethods
 
-         methods.putIfAbsent(t.type, () => [for (int i = 0; i < 4; i++) <MethodCall>{}]);
+     // make sure, methods are inherited
 
-         for (MethodCall method in methods[t.type]![lifecycle])
-           methodList.add(method);
-
-         // done
-
-         return methods[t.type]![lifecycle];
-       }
-
-       // make sure, methods are inherited
-
-       inheritMethods(type);
-     } // for
+     inheritMethods(type);
 
      // resolve matching methods
 
@@ -421,24 +449,15 @@ class MethodCall {
    // TODO: implement order
    int get order => 1;
 
-   void execute(Set<MethodCall>? methods, instance, environment) {
-     if ( methods != null && methods.isNotEmpty) {
-       if ( reverse ) {
-         var r = methods.toList(); // TODO
-         for (int i = r.length - 1; i >= 0; i--) {
-           r[i].execute(instance, environment);
-         }
-       }
-       else {
-         for (var method in methods)
-          method.execute(instance, environment);
-       }
-     }
+   void execute(List<MethodCall>? methods, instance, environment) {
+     if ( methods != null)
+       for (var method in methods)
+         method.execute(instance, environment);
    }
 
    @override
    void processLifecycle(instance, Environment environment) {
-     execute(methods[instance.runtimeType]![lifecycle.index], instance, environment);
+     execute(allMethods[instance.runtimeType]![lifecycle.index], instance, environment);
    }
 }
 
@@ -1263,16 +1282,9 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    try {
-      final instance = descriptor.fromArrayConstructor!(args);
+    final instance = descriptor.fromArrayConstructor!(args);
 
-      return environment.created(instance);
-    }
-    catch(e) {
-      print(e);
-
-      return null as T;
-    }
+    return environment.created(instance);
   }
 
   @override

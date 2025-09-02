@@ -143,12 +143,37 @@ class Derived extends Base {
 @Injectable()
 abstract class ConditionalBase{
   ConditionalBase();
+
+  @OnInit()
+  void initBase() {
+    print("ConditionalBase.onInit");
+  }
+
+  @OnDestroy()
+  void destroyBase() {
+    print("ConditionalBase.destroyBase");
+  }
 }
 
-@Injectable()
+@Injectable(scope: "request")
 @Conditional(requires: feature("prod"))
 class ConditionalProd extends ConditionalBase {
   ConditionalProd();
+
+  @OnInit()
+  void initProd() {
+    print("ConditionalProd.onInit");
+  }
+
+  @OnDestroy()
+  void destroyProd() {
+    print("ConditionalProd.destroyProd");
+  }
+
+  @OnRunning()
+  void runProd() {
+    print("ConditionalProd.runProd");
+  }
 }
 
 @Injectable()

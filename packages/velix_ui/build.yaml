@@ -1,0 +1,25 @@
+builders:
+  type_builder:
+    import: "package:velix/src/generators/type_generator.dart"
+    builder_factories: [ "typeBuilder" ]
+    build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
+    auto_apply: none
+    build_to: source
+    defaults:
+      options:
+        function_name: "registerAllDescriptors"
+        part_of: ""
+
+targets:
+  $default:
+    builders:
+  test:
+    sources:
+      - test/**
+    builders:
+      velix|type_builder:
+        generate_for:
+          include:
+            - test/ui.dart
+          exclude:
+            - test/**.g.dart

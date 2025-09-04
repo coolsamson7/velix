@@ -1,0 +1,54 @@
+import 'package:flutter/cupertino.dart';
+
+import 'package:velix/velix.dart';
+import 'package:velix_ui/velix_ui.dart';
+
+///  A [ValuedWidgetAdapter] for a [CupertinoSlider]
+@WidgetAdapter()
+class SliderAdapter extends AbstractValuedWidgetAdapter<CupertinoSlider> {
+  // constructor
+
+  SliderAdapter() : super('slider', 'iOS');
+
+  // override
+
+  @override
+  CupertinoSlider build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
+    var initialValue = mapper.getValue(property);
+
+    CupertinoSlider widget = CupertinoSlider(
+      value:  double.parse(initialValue.toString()),
+      min: double.parse(args["min"].toString()),
+      max: double.parse(args["max"].toString()),
+      divisions: 10,
+      onChanged: (newValue) {
+        (context as Element).markNeedsBuild();
+
+        mapper.notifyChange(property: property, value: newValue.round());
+      },
+    );
+
+    mapper.map(property: property, widget: widget, adapter: this);
+
+    return widget;
+  }
+
+  @override
+  dynamic getValue(CupertinoSlider widget) {
+    return int.parse(widget.value.toString());
+  }
+
+  @override
+  void setValue(CupertinoSlider widget, dynamic value, ValuedWidgetContext context) {
+    // noop
+  }
+}
+
+extension BindSlider on FormMapper {
+  Widget slider({required String path,  required BuildContext context, required int min,  required int max}) {
+    return bind("slider", path: path, context: context, args: Keywords({
+      "min": min,
+      "max": max,
+    }));
+  }
+}

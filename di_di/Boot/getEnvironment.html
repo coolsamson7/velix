@@ -67,17 +67,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Environment getEnvironment() {
-  &#47;&#47; default factory for types
-
-  TypeParameterResolverFactory();
-
-  &#47;&#47; add meta-data
-
-  if (environment == null) {
-    &#47;&#47;Velix.bootstrap; &#47;&#47; load generated types, setup factories
-
-    environment = Environment(forModule: Boot);
-  } &#47;&#47; if
+  environment ??= Environment(forModule: Boot);
 
   return environment!;
 }</code></pre>

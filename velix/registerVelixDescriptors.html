@@ -81,7 +81,7 @@
         parameters: [
           param&lt;ConfigurationManager&gt;(&#39;manager&#39;, isRequired: true)
         ],
-        invoker: (List&lt;dynamic&gt; args)=&gt; (args[0] as ConfigurationSource).setManager(args[1 ])
+        invoker: (List&lt;dynamic&gt; args)=&gt; (args[0] as ConfigurationSource).setManager(args[1])
       )
     ],
   );
@@ -122,7 +122,7 @@
   );
 
   type&lt;SingletonScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:167:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:192:7&#39;,
     annotations: [
       Scope(name: &quot;singleton&quot;, register: false)
     ],
@@ -131,7 +131,7 @@
   );
 
   type&lt;EnvironmentScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:187:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:212:7&#39;,
     annotations: [
       Scope(name: &quot;environment&quot;, register: false)
     ],
@@ -140,7 +140,7 @@
   );
 
   type&lt;RequestScope&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:194:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:219:7&#39;,
     annotations: [
       Scope(name: &quot;request&quot;, register: false)
     ],
@@ -149,7 +149,7 @@
   );
 
   type&lt;OnInjectProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:441:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:466:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
@@ -158,7 +158,7 @@
   );
 
   type&lt;OnInitProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:446:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:471:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
@@ -167,7 +167,7 @@
   );
 
   type&lt;OnRunningProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:451:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:476:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
@@ -176,7 +176,7 @@
   );
 
   type&lt;OnDestroyProcessor&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:456:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:481:7&#39;,
     annotations: [
       Injectable(eager: false)
     ],
@@ -185,9 +185,9 @@
   );
 
   type&lt;Boot&gt;(
-    location: &#39;package:velix&#47;di&#47;di.dart:1324:7&#39;,
+    location: &#39;package:velix&#47;di&#47;di.dart:1354:7&#39;,
     annotations: [
-      Module(imports: [])
+      Module()
     ],
     constructor: () =&gt; Boot(),
     fromArrayConstructor: (List&lt;dynamic&gt; args) =&gt; Boot(),

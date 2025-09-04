@@ -71,7 +71,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void destroy() {
   for ( var instance in instances)
-    executeProcessors(Lifecycle.onDestroy, instance);
+    executeProcessors(null, Lifecycle.onDestroy, instance);
 
   instances.clear();
 }</code></pre>

@@ -55,9 +55,10 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">resolve</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="resolve-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span></li>
+<span class="name ">resolve</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="resolve-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span></li>
+<li><span class="parameter" id="resolve-param-provider"><span class="type-annotation"><a href="../../di_di/InstanceProvider-class.html">InstanceProvider</a></span> <span class="parameter-name">provider</span>, </span></li>
 <li><span class="parameter" id="resolve-param-type"><span class="type-annotation"><a href="../../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a></span> <span class="parameter-name">type</span>, </span></li>
-<li><span class="parameter" id="resolve-param-types"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span> <span class="parameter-name">types</span></span></li>
+<li><span class="parameter" id="resolve-param-types"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span> <span class="parameter-name">types</span>, </span></li>
 </ol>)
 
       
@@ -69,46 +70,83 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static void resolve(Environment environment, TypeDescriptor type, Set&lt;Type&gt; types) {
+  <pre class="language-dart"><code class="language-dart">static void resolve(Environment environment, InstanceProvider provider, TypeDescriptor type, Set&lt;Type&gt; types) {
   &#47;&#47; make sure that i inherit superclass methods!
 
-  Set&lt;MethodCall&gt; methodList = {};
+  List&lt;MethodCall&gt; methodList = [];
 
-  for (int lifecycle = 0; lifecycle &lt; 4; lifecycle++) {
-     &#47;&#47; local methods
+  &#47;&#47; local methods
 
-    void checkMethod(Type type, MethodCall method) {
-      methods.putIfAbsent(type, () =&gt; [for (int i = 0; i &lt; 4; i++) &lt;MethodCall&gt;{}]);
+  Iterable&lt;T&gt; iterate&lt;T&gt;(List&lt;T&gt; list, {bool reverse = false}) {
+    return reverse ? list.reversed : list;
+  }
 
-      methods[type]![lifecycle].add(method);
+  void addMethod(Type type, MethodCall method, int lifecycle, bool reverse) {
+    var list = allMethods.putIfAbsent(type, () =&gt; [for (int i = 0; i &lt; 4; i++) []])[lifecycle];
+
+    if ( reverse )
+      list.insert(0, method);
+    else
+      list.add(method);
+
+    methodList.add(method);
+  }
+
+  List&lt;List&lt;MethodCall&gt;&gt; inheritMethods(TypeDescriptor t) {
+    var result = allMethods[t.type];
+
+    if ( result != null )
+      return result; &#47;&#47; done
+
+    result = allMethods[t.type] = [[], [], [], []];
+
+    &#47;&#47; super class
+
+    if ( t.superClass != null ) {
+      &#47;&#47; recursion
+
+      var inherited = inheritMethods(t.superClass!);
+
+      for (int lifecycle = 0; lifecycle &lt; 4; lifecycle++) {
+        var reverse = lifecycle == 3;
+
+        for (var method in iterate(inherited[lifecycle], reverse: reverse)) {
+          addMethod(t.type, method, lifecycle, reverse);
+        }
+      }
+    } &#47;&#47; if
+
+    &#47;&#47; add own methods
+
+    for (int lifecycle = 0; lifecycle &lt; 4; lifecycle++) {
+      var reverse = lifecycle == 3;
+
+      for (MethodCall method in methods[t.type]?[lifecycle] ?? []) {
+        addMethod(t.type, method, lifecycle, reverse); &#47;&#47; methodList.add(method); &#47;&#47;  was
+      }
     }
 
-    Set&lt;MethodCall&gt; inheritMethods(TypeDescriptor t) {
-      if ( t.superClass != null)
-        for ( var method in inheritMethods(t.superClass!))
-         checkMethod(t.type, method);
+    &#47;&#47; done
 
-      &#47;&#47; add own methods
+    return result;
+  } &#47;&#47; inheritMethods
 
-      methods.putIfAbsent(t.type, () =&gt; [for (int i = 0; i &lt; 4; i++) &lt;MethodCall&gt;{}]);
+  &#47;&#47; make sure, methods are inherited
 
-      for (MethodCall method in methods[t.type]![lifecycle])
-        methodList.add(method);
-
-      &#47;&#47; done
-
-      return methods[t.type]![lifecycle];
-    }
-
-    &#47;&#47; make sure, methods are inherited
-
-    inheritMethods(type);
-  } &#47;&#47; for
+  inheritMethods(type);
 
   &#47;&#47; resolve matching methods
 
   for ( var method in methodList )
     method.resolve(environment, types);
+
+  &#47;&#47; store in provider
+
+  provider.lifecycleMethods = allMethods[type.type]!;
+
+  &#47;&#47;for ( int i = 0; i &lt; 4; i++)
+  &#47;&#47;  if (provider.lifecycleMethods[i]!.isEmpty)
+   &#47;&#47;   provider.lifecycleMethods[i] = null;
 }</code></pre>
 </section>
 

@@ -70,11 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static void register(TypeDescriptor type, Lifecycle lifecycle, MethodDescriptor method) {
-  var list = methods[type.type];
-  if ( list == null)
-    methods[type.type] = [{}, {}, {}, {}];
-
-  methods[type.type]![lifecycle.index].add(MethodCall(method: method));
+  methods.putIfAbsent(type.type, () =&gt; [for (int i = 0; i &lt; 4; i++) []])[lifecycle.index].add(MethodCall(method: method));
 }</code></pre>
 </section>
 

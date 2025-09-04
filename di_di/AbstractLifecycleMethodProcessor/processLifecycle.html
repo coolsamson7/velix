@@ -60,7 +60,8 @@
     </ol>
   </div>
 <span class="returntype">void</span>
-<span class="name ">processLifecycle</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="processLifecycle-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span></li>
+<span class="name ">processLifecycle</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="processLifecycle-param-provider"><span class="type-annotation"><a href="../../di_di/InstanceProvider-class.html">InstanceProvider</a>?</span> <span class="parameter-name">provider</span>, </span></li>
+<li><span class="parameter" id="processLifecycle-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span></li>
 <li><span class="parameter" id="processLifecycle-param-environment"><span class="type-annotation"><a href="../../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span></li>
 </ol>)
 
@@ -74,8 +75,13 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-void processLifecycle(instance, Environment environment) {
-  execute(methods[instance.runtimeType]![lifecycle.index], instance, environment);
+void processLifecycle(InstanceProvider? provider, instance, Environment environment) {
+  &#47;&#47; TODO
+  &#47;&#47;var methods = provider.lifecycleMethods[lifecycle.index];
+  &#47;&#47;if ( methods != null)
+  &#47;&#47;  execute(methods[lifecycle.index], instance, environment);
+
+  execute(allMethods[instance.runtimeType]![lifecycle.index], instance, environment);
 }</code></pre>
 </section>
 

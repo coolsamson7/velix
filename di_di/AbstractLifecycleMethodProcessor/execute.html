@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">execute</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="execute-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
+<span class="name ">execute</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="execute-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span></li>
 <li><span class="parameter" id="execute-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span></li>
 <li><span class="parameter" id="execute-param-environment"><span class="type-annotation">dynamic</span> <span class="parameter-name">environment</span></span></li>
 </ol>)
@@ -69,19 +69,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void execute(Set&lt;MethodCall&gt;? methods, instance, environment) {
-  if ( methods != null &amp;&amp; methods.isNotEmpty) {
-    if ( reverse ) {
-      var r = methods.toList(); &#47;&#47; TODO
-      for (int i = r.length - 1; i &gt;= 0; i--) {
-        r[i].execute(instance, environment);
-      }
-    }
-    else {
-      for (var method in methods)
-       method.execute(instance, environment);
-    }
-  }
+  <pre class="language-dart"><code class="language-dart">void execute(List&lt;MethodCall&gt;? methods, instance, environment) {
+  if ( methods != null)
+    for (var method in methods)
+      method.execute(instance, environment);
 }</code></pre>
 </section>
 

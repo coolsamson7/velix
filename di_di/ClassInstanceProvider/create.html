@@ -78,16 +78,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 T create(Environment environment, [List&lt;dynamic&gt; args = const []]) {
-  try {
-    final instance = descriptor.fromArrayConstructor!(args);
+  final instance = descriptor.fromArrayConstructor!(args);
 
-    return environment.created(instance);
-  }
-  catch(e) {
-    print(e);
-
-    return null as T;
-  }
+  return environment.created(this, instance);
 }</code></pre>
 </section>
 

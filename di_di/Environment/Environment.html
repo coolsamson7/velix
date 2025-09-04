@@ -118,18 +118,45 @@
   }
 
   final Set&lt;TypeDescriptor&gt; loadedModules = {};
-  final List&lt;String&gt; prefixList = [];
+  final List&lt;RegExp&gt; filter = [];
 
   &#47;&#47; filter by module prefix
 
   bool filterProvider(AbstractInstanceProvider provider) {
     final hostModule = TypeDescriptor.forType(provider.host).module;
-    for (final prefix in prefixList) {
-      if (hostModule.startsWith(prefix))
+    for (final fileFilter in filter) {
+      if (fileFilter.hasMatch(hostModule))
         return true;
     }
 
     return false;
+  }
+
+  RegExp buildModuleRegex(String modulePath, {bool includeChildren = false, bool includeSiblings = false}) {
+    final lastSlash = modulePath.lastIndexOf(&#39;&#47;&#39;);
+    final dir = lastSlash &gt;= 0 ? modulePath.substring(0, lastSlash) : &#39;&#39;;
+    final file = lastSlash &gt;= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
+
+    String pattern;
+
+    if (!includeChildren &amp;&amp; !includeSiblings) {
+      &#47;&#47; Only the file itself
+      pattern = &#39;^&#39; + RegExp.escape(modulePath) + r&#39;$&#39;;
+    }
+    else if (includeSiblings &amp;&amp; !includeChildren) {
+      &#47;&#47; All siblings in the same directory
+      pattern = &#39;^&#39; + RegExp.escape(dir) + r&#39;&#47;[^&#47;]+$&#39;;
+    }
+    else if (!includeSiblings &amp;&amp; includeChildren) {
+      &#47;&#47; All children in subdirectories
+      pattern = &#39;^&#39; + RegExp.escape(dir) + r&#39;&#47;.+&#47;.+$&#39;;
+    }
+    else {
+      &#47;&#47; Both siblings and children
+      pattern = &#39;^&#39; + RegExp.escape(dir) + r&#39;&#47;([^&#47;]+|.+&#47;.+)$&#39;;
+    }
+
+    return RegExp(pattern);
   }
 
   &#47;&#47; recursively load environment and its dependencies
@@ -152,11 +179,13 @@
         loadModule(TypeDescriptor.forType(import));
       }
 
-      &#47;&#47; Determine package prefix
+      &#47;&#47; determine package prefix
+
+      final module = moduleDescriptor.getAnnotation&lt;Module&gt;()!;
 
       final packageName = moduleDescriptor.module;
       if (packageName.isNotEmpty) {
-        prefixList.add(packageName);
+        filter.add(buildModuleRegex(packageName, includeChildren: module.includeSubdirectories, includeSiblings: module.includeSiblings));
       }
     }
   }
@@ -180,7 +209,7 @@
   &#47;&#47; run lifecycle callbacks
 
   for (final instance in instances) {
-    executeProcessors(Lifecycle.onRunning, instance);
+    executeProcessors(null, Lifecycle.onRunning, instance);
   }
 
   stopwatch.stop();

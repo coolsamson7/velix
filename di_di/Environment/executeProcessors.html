@@ -55,7 +55,8 @@
     <section class="multi-line-signature">
       
 <span class="returntype">T</span>
-<span class="name ">executeProcessors</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="executeProcessors-param-lifecycle"><span class="type-annotation"><a href="../../di_di/Lifecycle.html">Lifecycle</a></span> <span class="parameter-name">lifecycle</span>, </span></li>
+<span class="name ">executeProcessors</span>&lt;<wbr><span class="type-parameter">T</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="executeProcessors-param-provider"><span class="type-annotation"><a href="../../di_di/InstanceProvider-class.html">InstanceProvider</a>?</span> <span class="parameter-name">provider</span>, </span></li>
+<li><span class="parameter" id="executeProcessors-param-lifecycle"><span class="type-annotation"><a href="../../di_di/Lifecycle.html">Lifecycle</a></span> <span class="parameter-name">lifecycle</span>, </span></li>
 <li><span class="parameter" id="executeProcessors-param-instance"><span class="type-annotation">T</span> <span class="parameter-name">instance</span></span></li>
 </ol>)
 
@@ -68,9 +69,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T executeProcessors&lt;T&gt;(Lifecycle lifecycle, T instance) {
+  <pre class="language-dart"><code class="language-dart">T executeProcessors&lt;T&gt;(InstanceProvider? provider, Lifecycle lifecycle, T instance) {
   for ( var processor in lifecycleProcessors[lifecycle.index])
-      processor.processLifecycle(instance, this);
+      processor.processLifecycle(provider, instance, this);
 
   return instance;
 }</code></pre>

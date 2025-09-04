@@ -174,7 +174,7 @@
     <h2>Methods</h2>
     <dl class="callables">
         <dt id="execute" class="callable">
-  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/execute.html">execute</a></span><span class="signature">(<wbr><span class="parameter" id="execute-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="execute-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="execute-param-environment"><span class="type-annotation">dynamic</span> <span class="parameter-name">environment</span></span>)
+  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/execute.html">execute</a></span><span class="signature">(<wbr><span class="parameter" id="execute-param-methods"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span>?</span> <span class="parameter-name">methods</span>, </span><span class="parameter" id="execute-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="execute-param-environment"><span class="type-annotation">dynamic</span> <span class="parameter-name">environment</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -200,7 +200,7 @@
 </dd>
 
         <dt id="processLifecycle" class="callable">
-  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/processLifecycle.html">processLifecycle</a></span><span class="signature">(<wbr><span class="parameter" id="processLifecycle-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="processLifecycle-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span>)
+  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/processLifecycle.html">processLifecycle</a></span><span class="signature">(<wbr><span class="parameter" id="processLifecycle-param-provider"><span class="type-annotation"><a href="../di_di/InstanceProvider-class.html">InstanceProvider</a>?</span> <span class="parameter-name">provider</span>, </span><span class="parameter" id="processLifecycle-param-instance"><span class="type-annotation">dynamic</span> <span class="parameter-name">instance</span>, </span><span class="parameter" id="processLifecycle-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -252,9 +252,21 @@
   <section class="summary offset-anchor" id="static-properties">
     <h2>Static Properties</h2>
     <dl class="properties">
+        <dt id="allMethods" class="property">
+  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/allMethods.html">allMethods</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span></span>&gt;</span></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="methods" class="property">
   <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/methods.html">methods</a></span>
-  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span></span>&gt;</span></span>&gt;</span></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../di_di/MethodCall-class.html">MethodCall</a></span>&gt;</span></span>&gt;</span></span>&gt;</span></span>
   
 
 </dt>
@@ -284,7 +296,7 @@
 </dd>
 
         <dt id="resolve" class="callable">
-  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/resolve.html">resolve</a></span><span class="signature">(<wbr><span class="parameter" id="resolve-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span><span class="parameter" id="resolve-param-type"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="resolve-param-types"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span> <span class="parameter-name">types</span></span>)
+  <span class="name"><a href="../di_di/AbstractLifecycleMethodProcessor/resolve.html">resolve</a></span><span class="signature">(<wbr><span class="parameter" id="resolve-param-environment"><span class="type-annotation"><a href="../di_di/Environment-class.html">Environment</a></span> <span class="parameter-name">environment</span>, </span><span class="parameter" id="resolve-param-provider"><span class="type-annotation"><a href="../di_di/InstanceProvider-class.html">InstanceProvider</a></span> <span class="parameter-name">provider</span>, </span><span class="parameter" id="resolve-param-type"><span class="type-annotation"><a href="../reflectable_reflectable/TypeDescriptor-class.html">TypeDescriptor</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="resolve-param-types"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>&gt;</span></span> <span class="parameter-name">types</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   

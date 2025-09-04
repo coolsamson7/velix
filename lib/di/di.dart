@@ -84,12 +84,14 @@ class Create extends MethodAnnotation {
 /// The rule is that all classes inside or under the library of this class are eligible.
 class Module extends ClassAnnotation {
   final List<Type> imports;
+  final includeSubdirectories;
+  final includeSiblings;
 
   // constructor
 
   /// Create a new [Module]
   /// [imports] possible list of modules which will be recursively imported.
-  const Module({List<Type>? imports}) : imports = imports ?? const [];
+  const Module({List<Type>? imports, this.includeSubdirectories = true, this.includeSiblings = true}) : imports = imports ?? const [];
 
   // override
 
@@ -911,18 +913,45 @@ class Environment {
     }
 
     final Set<TypeDescriptor> loadedModules = {};
-    final List<String> prefixList = [];
+    final List<RegExp> filter = [];
 
     // filter by module prefix
 
     bool filterProvider(AbstractInstanceProvider provider) {
       final hostModule = TypeDescriptor.forType(provider.host).module;
-      for (final prefix in prefixList) {
-        if (hostModule.startsWith(prefix))
+      for (final fileFilter in filter) {
+        if (fileFilter.hasMatch(hostModule))
           return true;
       }
 
       return false;
+    }
+
+    RegExp buildModuleRegex(String modulePath, {bool includeChildren = false, bool includeSiblings = false}) {
+      final lastSlash = modulePath.lastIndexOf('/');
+      final dir = lastSlash >= 0 ? modulePath.substring(0, lastSlash) : '';
+      final file = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
+
+      String pattern;
+
+      if (!includeChildren && !includeSiblings) {
+        // Only the file itself
+        pattern = '^' + RegExp.escape(modulePath) + r'$';
+      }
+      else if (includeSiblings && !includeChildren) {
+        // All siblings in the same directory
+        pattern = '^' + RegExp.escape(dir) + r'/[^/]+$';
+      }
+      else if (!includeSiblings && includeChildren) {
+        // All children in subdirectories
+        pattern = '^' + RegExp.escape(dir) + r'/.+/.+$';
+      }
+      else {
+        // Both siblings and children
+        pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.+/.+)$';
+      }
+
+      return RegExp(pattern);
     }
 
     // recursively load environment and its dependencies
@@ -945,11 +974,13 @@ class Environment {
           loadModule(TypeDescriptor.forType(import));
         }
 
-        // Determine package prefix
+        // determine package prefix
+
+        final module = moduleDescriptor.getAnnotation<Module>()!;
 
         final packageName = moduleDescriptor.module;
         if (packageName.isNotEmpty) {
-          prefixList.add(packageName);
+          filter.add(buildModuleRegex(packageName, includeChildren: module.includeSubdirectories, includeSiblings: module.includeSiblings));
         }
       }
     }

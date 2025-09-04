@@ -318,7 +318,7 @@ abstract class LifecycleProcessor {
 
   // public
 
-  void processLifecycle(dynamic instance, Environment environment);
+  void processLifecycle(InstanceProvider? provider, dynamic instance, Environment environment);
 }
 
 class MethodCall {
@@ -364,7 +364,7 @@ class MethodCall {
      methods.putIfAbsent(type.type, () => [for (int i = 0; i < 4; i++) []])[lifecycle.index].add(MethodCall(method: method));
    }
 
-   static void resolve(Environment environment, TypeDescriptor type, Set<Type> types) {
+   static void resolve(Environment environment, InstanceProvider provider, TypeDescriptor type, Set<Type> types) {
      // make sure that i inherit superclass methods!
 
      List<MethodCall> methodList = [];
@@ -433,6 +433,14 @@ class MethodCall {
 
      for ( var method in methodList )
        method.resolve(environment, types);
+
+     // store in provider
+
+     provider.lifecycleMethods = allMethods[type.type]!;
+
+     //for ( int i = 0; i < 4; i++)
+     //  if (provider.lifecycleMethods[i]!.isEmpty)
+      //   provider.lifecycleMethods[i] = null;
    }
 
    // instance data
@@ -456,7 +464,12 @@ class MethodCall {
    }
 
    @override
-   void processLifecycle(instance, Environment environment) {
+   void processLifecycle(InstanceProvider? provider, instance, Environment environment) {
+     // TODO
+     //var methods = provider.lifecycleMethods[lifecycle.index];
+     //if ( methods != null)
+     //  execute(methods[lifecycle.index], instance, environment);
+
      execute(allMethods[instance.runtimeType]![lifecycle.index], instance, environment);
    }
 }
@@ -476,7 +489,7 @@ abstract class PostProcessor extends LifecycleProcessor {
   // override
 
   @override
-  void processLifecycle(instance, Environment environment) {
+  void processLifecycle(InstanceProvider? provider, instance, Environment environment) {
     process(instance, environment);
   }
 }
@@ -960,7 +973,7 @@ class Environment {
     // run lifecycle callbacks
 
     for (final instance in instances) {
-      executeProcessors(Lifecycle.onRunning, instance);
+      executeProcessors(null, Lifecycle.onRunning, instance);
     }
 
     stopwatch.stop();
@@ -1001,19 +1014,19 @@ class Environment {
   /// destroy the environment invoking all [OnDestroy] callbacks.
   void destroy() {
     for ( var instance in instances)
-      executeProcessors(Lifecycle.onDestroy, instance);
+      executeProcessors(null, Lifecycle.onDestroy, instance);
 
     instances.clear();
   }
 
-  T executeProcessors<T>(Lifecycle lifecycle, T instance) {
+  T executeProcessors<T>(InstanceProvider? provider, Lifecycle lifecycle, T instance) {
     for ( var processor in lifecycleProcessors[lifecycle.index])
-        processor.processLifecycle(instance, this);
+        processor.processLifecycle(provider, instance, this);
 
     return instance;
   }
 
-  T created<T>(T instance) {
+  T created<T>(InstanceProvider provider, T instance) {
     // remember lifecycle processors
 
     if (instance is LifecycleProcessor) {
@@ -1030,8 +1043,8 @@ class Environment {
 
     // execute processors
 
-    executeProcessors(Lifecycle.onInject, instance);
-    executeProcessors(Lifecycle.onInit, instance);
+    executeProcessors(provider, Lifecycle.onInject, instance);
+    executeProcessors(provider, Lifecycle.onInit, instance);
 
     // done
 
@@ -1085,6 +1098,8 @@ abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   final Type _type;
   final bool _eager;
   final String _scope;
+
+  List<List<MethodCall>?> lifecycleMethods = [];
 
   // constructor
 
@@ -1268,7 +1283,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
     // check methods annotated with @Inject, @OnInit, @OnRunning, etc.
 
-    AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(host), types);
+    AbstractLifecycleMethodProcessor.resolve(environment, this, TypeDescriptor.forType(host), types);
 
     // done
 
@@ -1284,7 +1299,7 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
   T create(Environment environment, [List<dynamic> args = const []]) {
     final instance = descriptor.fromArrayConstructor!(args);
 
-    return environment.created(instance);
+    return environment.created(this, instance);
   }
 
   @override
@@ -1336,7 +1351,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
     // inherit lifecycle methods
 
-    AbstractLifecycleMethodProcessor.resolve(environment, TypeDescriptor.forType(_type), dependencies);
+    AbstractLifecycleMethodProcessor.resolve(environment, this, TypeDescriptor.forType(_type), dependencies);
 
     // done
 
@@ -1350,7 +1365,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
     final instance = method.invoker!(args); // args[0] = self
 
-    return environment.created<T>(instance);
+    return environment.created<T>(this, instance);
   }
 
   @override

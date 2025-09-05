@@ -58,7 +58,7 @@ class Injectable extends ClassAnnotation {
   @override
   void apply(TypeDescriptor type) {
     if (factory && !type.isAbstract)
-      Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope));
+      Providers.register(ClassInstanceProvider(type.type, eager: eager, scope: scope, replace: replace));
   }
 }
 
@@ -76,7 +76,7 @@ class Create extends MethodAnnotation {
 
   @override
   void apply(TypeDescriptor type, MethodDescriptor method) {
-    Providers.register(FunctionInstanceProvider(type.type, method, eager: eager, scope: scope));
+    Providers.register(FunctionInstanceProvider(type.type, method, eager: eager, scope: scope, replace: replace));
   }
 }
 
@@ -664,10 +664,23 @@ class Providers {
 
         if (existingProvider.type != type) {
           if (existingProvider is AmbiguousProvider) {
-            existingProvider.addProvider(provider);
+            if ( provider.replace)
+              cache[type] = provider;
+            else
+              existingProvider.addProvider(provider);
           }
           else {
-            cache[type] = AmbiguousProvider(type: type, providers: [existingProvider, provider]);
+            if ( existingProvider.replace && provider.replace)
+              cache[type] = AmbiguousProvider(type: type, providers: [existingProvider, provider]);
+            else if (existingProvider.replace) {
+              cache[type] = existingProvider;
+            }
+            else if (provider.replace) {
+              cache[type] = provider;
+            }
+            else {
+              cache[type] = AmbiguousProvider(type: type, providers: [existingProvider, provider]);
+            }
           }
         }
       }
@@ -919,39 +932,58 @@ class Environment {
 
     bool filterProvider(AbstractInstanceProvider provider) {
       final hostModule = TypeDescriptor.forType(provider.host).module;
+
+      print("filter $provider");
       for (final fileFilter in filter) {
-        if (fileFilter.hasMatch(hostModule))
+        if (fileFilter.hasMatch(hostModule)) {
+          print("ok");
           return true;
+        }
       }
 
+      print("na");
       return false;
     }
 
     RegExp buildModuleRegex(String modulePath, {bool includeChildren = false, bool includeSiblings = false}) {
       final lastSlash = modulePath.lastIndexOf('/');
       final dir = lastSlash >= 0 ? modulePath.substring(0, lastSlash) : '';
-      //final file = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
+      final fileOrDir = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
 
       String pattern;
 
       if (!includeChildren && !includeSiblings) {
         // Only the file itself
         pattern = '^' + RegExp.escape(modulePath) + r'$';
-      }
-      else if (includeSiblings && !includeChildren) {
+      } else if (includeSiblings && !includeChildren) {
         // All siblings in the same directory
         pattern = '^' + RegExp.escape(dir) + r'/[^/]+$';
-      }
-      else if (!includeSiblings && includeChildren) {
-        // All children in subdirectories
-        pattern = '^' + RegExp.escape(dir) + r'/.+/.+$';
-      }
-      else {
+      } else if (!includeSiblings && includeChildren) {
+        // If the modulePath is a directory (ends with no file), match files/dirs inside it (direct children)
+        // If modulePath is a file, match direct children of its directory and recurse further.
+        if (fileOrDir.contains('.')) {
+          // modulePath is a file, include children means all files and dirs inside its directory recursively
+          pattern = '^' + RegExp.escape(dir) + r'/.*$';
+        } else {
+          // modulePath is a directory, include children means direct children of that directory
+          pattern = '^' + RegExp.escape(modulePath) + r'/[^/]+$';
+        }
+      } else {
         // Both siblings and children
-        pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.+/.+)$';
+        if (fileOrDir.contains('.')) {
+          // If path is a file, siblings + children means siblings of file + any descendants inside directory
+          pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
+        } else {
+          // If path is directory, siblings + children means direct children and directory itself's siblings
+          pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
+        }
       }
 
+      print("$modulePath, includeChildren: $includeChildren, includeSiblings: $includeSiblings -> $pattern");
+
       return RegExp(pattern);
+
+
     }
 
     // recursively load environment and its dependencies
@@ -1103,6 +1135,7 @@ abstract class AbstractInstanceProvider<T> {
   Type get host => runtimeType;
   Type get type;
   bool get eager;
+  bool get replace;
   String get scope;
 
   // abstract
@@ -1129,12 +1162,13 @@ abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   final Type _type;
   final bool _eager;
   final String _scope;
+  final bool replace;
 
   List<List<MethodCall>?> lifecycleMethods = [];
 
   // constructor
 
-  InstanceProvider({required Type type, Type? host, bool eager = true, String scope = "singleton"})
+  InstanceProvider({required Type type, Type? host, bool eager = true, this.replace = false, String scope = "singleton"})
   : _type = type, _eager = eager, _scope = scope {
   _host = host ?? runtimeType;
  }
@@ -1248,6 +1282,9 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   String toString() => "EnvironmentProvider($provider)";
+
+  @override
+  bool get replace => false;
 }
 
 class AmbiguousProvider<T> extends InstanceProvider<T> {
@@ -1289,8 +1326,8 @@ class ClassInstanceProvider<T> extends InstanceProvider<T> {
 
   // constructor
 
-  ClassInstanceProvider(Type type, {bool eager = true, String scope = 'singleton'})
-      : descriptor = TypeDescriptor.forType(type), super(type: type, host: type, eager: eager, scope: scope);
+  ClassInstanceProvider(Type type, {bool eager = true, replace = false, String scope = 'singleton'})
+      : descriptor = TypeDescriptor.forType(type), super(type: type, host: type, eager: eager, scope: scope, replace: replace);
 
   // override
 
@@ -1359,8 +1396,9 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
       Type clazz,
       this.method, {
         bool eager = true,
+        bool replace = false,
         String scope = "singleton",
-      }) : super(type: method.returnType, host: clazz, eager: eager, scope: scope);
+      }) : super(type: method.returnType, host: clazz, eager: eager, scope: scope, replace: replace);
 
   // override
 

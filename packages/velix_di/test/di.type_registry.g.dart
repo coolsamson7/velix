@@ -13,7 +13,7 @@ void registerAllDescriptors() {
   type<MockModule>(
     location: 'asset:velix_di/test/mock/mock.dart:6:7',
     annotations: [
-      Module(imports: [TestModule])
+      Module(imports: [TestModule], includeSubdirectories: false, includeSiblings: false)
     ],
     constructor: () => MockModule(),
     fromArrayConstructor: (List<dynamic> args) => MockModule(),

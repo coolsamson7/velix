@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix/velix.dart';
 
-
 import 'conflict/conflict.dart';
 import 'cycle/cycle.dart';
 import 'di.dart';
@@ -36,10 +35,10 @@ void main() {
     });
 
     test('mock', () {
-      var  environment = Environment(forModule: MockModule,  features: ["dev"]);
+      var  environment = Environment(forModule: MockModule, features: ["dev"]);
 
-      var r = environment.get<ConditionalBase>();
-      print(r);
+      var result = environment.get<ConditionalBase>();
+      expect(result is MockBase, equals(true));
     });
 
     test('features', () {

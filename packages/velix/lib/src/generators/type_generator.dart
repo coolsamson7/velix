@@ -968,18 +968,32 @@ class TypeBuilder implements Builder {
 
     if (partOf.isNotEmpty)
       buffer.writeln("part of '$partOf';");
-    else
+    else {
       buffer.writeln("import 'package:velix/velix.dart';");
+      buffer.writeln("import 'package:velix_di/velix_di.dart';");
+    }
   }
 
   // write imports
 
   void generateImports(StringBuffer buffer) {
     for (final sourceUri in imports) {
-      if (sourceUri.scheme == 'asset')
-        buffer.writeln("import '${sourceUri.pathSegments.last}';");
-      else
+      if (sourceUri.scheme == 'asset') {
+        // join all segments
+        var relativePath = sourceUri.pathSegments.join('/');
+
+        // remove leading 'package_name/test/' if present
+        final testIndex = relativePath.indexOf('/test/');
+        if (testIndex != -1) {
+          // everything after 'test/' becomes the import path
+          relativePath = relativePath.substring(testIndex + '/test/'.length);
+        }
+
+        buffer.writeln("import '$relativePath';");
+      }
+      else {
         buffer.writeln("import '$sourceUri';");
+      }
     }
   }
 
@@ -1005,7 +1019,7 @@ class TypeBuilder implements Builder {
   // override
 
   @override
-  Future<void> build(BuildStep buildStep) async { print("#####");
+  Future<void> build(BuildStep buildStep) async {
     final resolver = buildStep.resolver;
 
     final isTestFile = buildStep.inputId.toString().contains('|test/');
@@ -1018,13 +1032,10 @@ class TypeBuilder implements Builder {
 
       await processLibraryForLocations(library, input, buildStep);
 
-      print("#########  check classes ");
       final annotatedClasses = library.classes.where((cls) {
-        print("check ${cls.name}");
         return cls.metadata.annotations.any((annotation) {
           final name = annotation.element?.enclosingElement?.name;
 
-          print(name);
           return name == 'Dataclass' ||
               name == 'Injectable' ||
               name == 'Module' ||
@@ -1044,6 +1055,7 @@ class TypeBuilder implements Builder {
     generateHeader(buffer);
     if ( partOf.isEmpty)
       generateImports(buffer);
+
     generate(buffer);
 
     final fileName = p.basenameWithoutExtension(buildStep.inputId.path);

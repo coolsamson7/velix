@@ -1,8 +1,9 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
-import 'mock/mock.dart';
 import 'package:velix_di/velix_di.dart';
+import 'mock/mock.dart';
+import 'package:velix_di/di/di.dart';
 import 'di.dart';
 import 'cycle/cycle.dart';
 import 'conflict/conflict.dart';

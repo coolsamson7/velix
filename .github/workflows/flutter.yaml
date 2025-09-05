@@ -17,7 +17,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.8' # This one has Dart >= 3.8.1
+          flutter-version: '3.51.0' # Dart 3.9.x
           channel: 'stable'
           cache: true  # Enables Flutter SDK caching for faster builds
 

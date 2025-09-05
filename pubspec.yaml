@@ -5,7 +5,7 @@ homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix
 
 environment:
-  sdk: ^3.9.0
+  sdk: ^3.8.1
 
 dev_dependencies:
   lints: ^6.0.0

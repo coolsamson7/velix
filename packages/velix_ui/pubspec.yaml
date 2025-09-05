@@ -1,5 +1,5 @@
 name: velix_ui
-description: "flutter foundation library including validation, a reflection based mapper and automatic two-way form binding ."
+description: "flutter automatic two-way form binding ."
 version: 0.9.0
 
 homepage: https://github.com/coolsamson7/velix
@@ -9,7 +9,7 @@ resolution: workspace
 
 environment:
   sdk: ^3.8.1
-  flutter: ">=3.32.8"
+  flutter: ">=3.35.0"
 
 dependencies:
   path_provider: ^2.1.5

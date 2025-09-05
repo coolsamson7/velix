@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:velix/velix.dart';
-import 'package:velix_ui/velix_ui.dart';
+
+import '../../valued_widget.dart';
+import '../../form_mapper.dart';
 
 import '../text.dart';
 

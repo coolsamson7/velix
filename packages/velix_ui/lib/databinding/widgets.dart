@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:velix/util/collections.dart';
-import 'package:velix_ui/databinding/form_mapper.dart';
-import 'package:velix_ui/databinding/valued_widget.dart';
-import 'package:velix_ui/databinding/widgets/cupertino/registry.dart';
-import 'package:velix_ui/databinding/widgets/material/registry.dart';
+
+
+import "valued_widget.dart";
+import "form_mapper.dart";
+import "widgets/cupertino/registry.dart";
+import "widgets/material/registry.dart";
 
 void registerWidgets(TargetPlatform platform) {
 

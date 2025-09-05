@@ -1019,9 +1019,13 @@ class TypeBuilder implements Builder {
 
       await processLibraryForLocations(library, input, buildStep);
 
+      print("check classes ");
       final annotatedClasses = library.classes.where((cls) {
+        print("check ${cls.name}");
         return cls.metadata.annotations.any((annotation) {
           final name = annotation.element?.enclosingElement?.name;
+
+          print(name);
           return name == 'Dataclass' ||
               name == 'Injectable' ||
               name == 'Module' ||

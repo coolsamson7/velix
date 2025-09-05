@@ -1,6 +1,4 @@
-//library velix;
-
-// imports
+library velix;
 
 // reflectable
 

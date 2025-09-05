@@ -16,3 +16,11 @@ export './components/view.dart';
 export './databinding/form_mapper.dart';
 export './databinding/widgets.dart';
 export './databinding/valued_widget.dart';
+
+// widgets
+
+export './databinding/widgets.dart';
+export './databinding/widgets/text.dart';
+
+export './databinding/widgets/cupertino/registry.dart';
+export './databinding/widgets/material/registry.dart';

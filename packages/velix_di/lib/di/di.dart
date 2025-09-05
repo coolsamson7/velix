@@ -47,10 +47,11 @@ class Injectable extends ClassAnnotation {
   final bool eager;
   final String scope;
   final bool factory;
+  final bool replace;
 
   // constructor
 
-  const Injectable({this.factory = true, this.eager = true, this.scope = 'singleton'});
+  const Injectable({this.factory = true, this.eager = true, this.replace = false, this.scope = 'singleton'});
 
   // override
 
@@ -67,8 +68,9 @@ class Injectable extends ClassAnnotation {
 class Create extends MethodAnnotation {
   final bool eager;
   final String scope;
+  final bool replace;
 
-  const Create({this.eager = true, this.scope = "singleton"});
+  const Create({this.eager = true, this.replace = false, this.scope = "singleton"});
 
   // override
 

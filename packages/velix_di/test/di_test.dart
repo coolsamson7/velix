@@ -9,6 +9,7 @@ import 'conflict/conflict.dart';
 import 'cycle/cycle.dart';
 import 'di.dart';
 import 'di.type_registry.g.dart';
+import 'mock/mock.dart';
 
 void main() {
   group('di', () {
@@ -32,6 +33,13 @@ void main() {
 
     test('conflict', () {
       expect(() =>  Environment(forModule: ConflictModule), throwsA(isA<DIException>()));
+    });
+
+    test('mock', () {
+      var  environment = Environment(forModule: MockModule,  features: ["dev"]);
+
+      var r = environment.get<ConditionalBase>();
+      print(r);
     });
 
     test('features', () {

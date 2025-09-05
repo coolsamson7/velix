@@ -1,13 +1,55 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
-import 'cycle/cycle.dart';
+import 'mock/mock.dart';
 import 'package:velix_di/velix_di.dart';
 import 'di.dart';
-import 'package:velix/reflectable/reflectable.dart';
+import 'cycle/cycle.dart';
 import 'conflict/conflict.dart';
+import 'package:velix/reflectable/reflectable.dart';
 
 void registerAllDescriptors() {
+  type<MockModule>(
+    location: 'asset:velix_di/test/mock/mock.dart:6:7',
+    annotations: [
+      Module(imports: [TestModule])
+    ],
+    constructor: () => MockModule(),
+    fromArrayConstructor: (List<dynamic> args) => MockModule(),
+  );
+
+  var ConditionalBaseDescriptor = type<ConditionalBase>(
+    location: 'asset:velix_di/test/di.dart:143:16',
+    annotations: [
+      Injectable()
+    ],
+    isAbstract: true,
+    methods: [
+      method<ConditionalBase,void>('initBase',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalBase).initBase()
+      ), 
+      method<ConditionalBase,void>('destroyBase',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalBase).destroyBase()
+      )
+    ],
+  );
+
+  type<MockBase>(
+    location: 'asset:velix_di/test/mock/mock.dart:10:7',
+    superClass: ConditionalBaseDescriptor,
+    annotations: [
+      Injectable(replace: true)
+    ],
+    constructor: () => MockBase(),
+    fromArrayConstructor: (List<dynamic> args) => MockBase(),
+  );
+
   type<CycleModule>(
     location: 'asset:velix_di/test/cycle/cycle.dart:4:7',
     annotations: [
@@ -39,6 +81,32 @@ void registerAllDescriptors() {
     ],
     constructor: ({required CycleSource source}) => CycleTarget(source),
     fromArrayConstructor: (List<dynamic> args) => CycleTarget(args[0] as CycleSource),
+  );
+
+  type<ConflictModule>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:4:7',
+    annotations: [
+      Module()
+    ],
+    constructor: () => ConflictModule(),
+    fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
+    methods: [
+      method<ConflictModule,Conflict>('create',
+        annotations: [
+          Create()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
+      )
+    ],
+  );
+
+  type<Conflict>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:12:7',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => Conflict(),
+    fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 
   type<TestModule>(
@@ -317,28 +385,6 @@ void registerAllDescriptors() {
     ]
   );
 
-  var ConditionalBaseDescriptor = type<ConditionalBase>(
-    location: 'asset:velix_di/test/di.dart:143:16',
-    annotations: [
-      Injectable()
-    ],
-    isAbstract: true,
-    methods: [
-      method<ConditionalBase,void>('initBase',
-        annotations: [
-          OnInit()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ConditionalBase).initBase()
-      ), 
-      method<ConditionalBase,void>('destroyBase',
-        annotations: [
-          OnDestroy()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ConditionalBase).destroyBase()
-      )
-    ],
-  );
-
   type<ConditionalProd>(
     location: 'asset:velix_di/test/di.dart:159:7',
     superClass: ConditionalBaseDescriptor,
@@ -485,31 +531,5 @@ void registerAllDescriptors() {
         getter: (obj) => obj.price,
       )
     ]
-  );
-
-  type<ConflictModule>(
-    location: 'asset:velix_di/test/conflict/conflict.dart:4:7',
-    annotations: [
-      Module()
-    ],
-    constructor: () => ConflictModule(),
-    fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
-    methods: [
-      method<ConflictModule,Conflict>('create',
-        annotations: [
-          Create()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
-      )
-    ],
-  );
-
-  type<Conflict>(
-    location: 'asset:velix_di/test/conflict/conflict.dart:12:7',
-    annotations: [
-      Injectable()
-    ],
-    constructor: () => Conflict(),
-    fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 }

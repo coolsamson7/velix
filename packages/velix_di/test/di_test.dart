@@ -5,6 +5,7 @@ import 'package:velix_di/velix_di.dart';
 import 'package:velix/velix.dart';
 
 
+import 'conflict/conflict.dart';
 import 'cycle/cycle.dart';
 import 'di.dart';
 import 'di.type_registry.g.dart';
@@ -27,6 +28,10 @@ void main() {
 
     test('cycle', () {
       expect(() =>  Environment(forModule: CycleModule), throwsA(isA<DIException>()));
+    });
+
+    test('conflict', () {
+      expect(() =>  Environment(forModule: ConflictModule), throwsA(isA<DIException>()));
     });
 
     test('features', () {

@@ -5,6 +5,7 @@ import 'cycle/cycle.dart';
 import 'package:velix_di/velix_di.dart';
 import 'di.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'conflict/conflict.dart';
 
 void registerAllDescriptors() {
   type<CycleModule>(
@@ -484,5 +485,31 @@ void registerAllDescriptors() {
         getter: (obj) => obj.price,
       )
     ]
+  );
+
+  type<ConflictModule>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:4:7',
+    annotations: [
+      Module()
+    ],
+    constructor: () => ConflictModule(),
+    fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
+    methods: [
+      method<ConflictModule,Conflict>('create',
+        annotations: [
+          Create()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
+      )
+    ],
+  );
+
+  type<Conflict>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:12:7',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => Conflict(),
+    fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 }

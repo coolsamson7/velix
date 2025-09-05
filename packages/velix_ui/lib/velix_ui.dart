@@ -19,7 +19,6 @@ export './databinding/valued_widget.dart';
 
 // widgets
 
-export './databinding/widgets.dart';
 export './databinding/widgets/text.dart';
 
 export './databinding/widgets/cupertino/registry.dart';

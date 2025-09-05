@@ -6,11 +6,14 @@ homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.9.0
+  flutter: ">=3.35.0"
 
 resolution: workspace
 
 dependencies:
+  flutter:
+    sdk: flutter
   #path_provider: ^2.1.5
   stack_trace: ^1.10.0
   path: ^1.9.1

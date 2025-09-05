@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:velix/velix.dart';
-import 'package:velix_i18n/velix_i18n.dart';
 
 import '../../valued_widget.dart';
 import '../../form_mapper.dart';

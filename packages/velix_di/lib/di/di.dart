@@ -928,7 +928,7 @@ class Environment {
     RegExp buildModuleRegex(String modulePath, {bool includeChildren = false, bool includeSiblings = false}) {
       final lastSlash = modulePath.lastIndexOf('/');
       final dir = lastSlash >= 0 ? modulePath.substring(0, lastSlash) : '';
-      final file = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
+      //final file = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
 
       String pattern;
 

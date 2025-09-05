@@ -8,10 +8,12 @@ repository: https://github.com/coolsamson7/velix
 resolution: workspace
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.9.0
   flutter: ">=3.35.0"
 
 dependencies:
+  flutter:
+    sdk: flutter
   stack_trace: ^1.10.0
   path: ^1.9.1
   source_gen: ^3.0.0

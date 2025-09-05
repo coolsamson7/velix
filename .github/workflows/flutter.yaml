@@ -19,6 +19,10 @@ jobs:
         with:
           flutter-version: '3.32.8' # This one has Dart >= 3.8.1
           channel: 'stable'
+          cache: true  # Enables Flutter SDK caching for faster builds
+
+      - name: Bootstrap Melos workspace
+        run: dart pub global activate melos && melos bootstrap
 
       - name: Install dependencies
         run: flutter pub get
@@ -27,4 +31,4 @@ jobs:
         run: flutter analyze || true
 
       - name: Run tests
-        run: flutter test --reporter expanded
+        run: melos exec --dir-exists=test -- "flutter test"

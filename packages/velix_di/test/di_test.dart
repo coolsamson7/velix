@@ -5,6 +5,7 @@ import 'package:velix_di/velix_di.dart';
 import 'package:velix/velix.dart';
 
 
+import 'cycle/cycle.dart';
 import 'di.dart';
 import 'di.type_registry.g.dart';
 
@@ -23,6 +24,10 @@ void main() {
           "": TraceLevel.full,
           "di": TraceLevel.full
         });
+
+    test('cycle', () {
+      expect(() =>  Environment(forModule: CycleModule), throwsA(isA<DIException>()));
+    });
 
     test('features', () {
       var environment = Environment(forModule: TestModule, features: ["dev"]);

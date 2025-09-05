@@ -1,7 +1,9 @@
 import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
 
-@Module()
+import 'cycle/cycle.dart';
+
+@Module(includeSubdirectories: false)
 class TestModule {
   @Create()
   ConfigurationManager createConfigurationManager() {
@@ -16,8 +18,9 @@ class TestModule {
       }
     });
   }
-
 }
+
+const a = CycleModule;
 
 @Injectable(scope: "singleton", eager: true)
 class Bar {

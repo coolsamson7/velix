@@ -2,15 +2,20 @@
 
 // imports
 
+// imports ( required by the generated code )
+
 import './configuration/configuration.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
 
 import './di/di.dart';
 
+// exports
+
 // configuration
 
 export './configuration/configuration.dart';
+export './configuration/source/json_source.dart';
 
 // di
 

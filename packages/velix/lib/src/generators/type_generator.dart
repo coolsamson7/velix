@@ -1005,7 +1005,7 @@ class TypeBuilder implements Builder {
   // override
 
   @override
-  Future<void> build(BuildStep buildStep) async {
+  Future<void> build(BuildStep buildStep) async { print("#####");
     final resolver = buildStep.resolver;
 
     final isTestFile = buildStep.inputId.toString().contains('|test/');
@@ -1018,7 +1018,7 @@ class TypeBuilder implements Builder {
 
       await processLibraryForLocations(library, input, buildStep);
 
-      print("check classes ");
+      print("#########  check classes ");
       final annotatedClasses = library.classes.where((cls) {
         print("check ${cls.name}");
         return cls.metadata.annotations.any((annotation) {

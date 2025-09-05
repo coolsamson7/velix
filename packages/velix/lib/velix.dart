@@ -1,5 +1,3 @@
-library velix;
-
 // reflectable
 
 export './reflectable/reflectable.dart';

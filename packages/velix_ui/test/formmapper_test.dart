@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:velix_ui/velix_ui.dart';
+import 'package:velix_i18n/velix_i18n.dart';
 
 import 'ui.dart';
+import 'ui.type_registry.g.dart';
 
 
 void main() {
   // initialize
 
-  //TODO registerAllDescriptors();
+  registerAllDescriptors();
   registerWidgets(TargetPlatform.iOS);
 
-  // TODO TypeViolationTranslationProvider();
+  TypeViolationTranslationProvider();
 
   var product = Product(name: 'product', price: Money(currency: "EU", value: 1), status: Status.available);
 

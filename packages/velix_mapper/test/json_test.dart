@@ -4,12 +4,13 @@ import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
 
 import 'model.dart';
+import 'model.type_registry.g.dart';
 
 void main() {
   group('json', () {
     // register types
 
-    //registerAllDescriptors();
+    registerAllDescriptors();
 
     JSON(
         validate: false,

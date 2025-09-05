@@ -82,8 +82,8 @@ class Create extends MethodAnnotation {
 /// The rule is that all classes inside or under the library of this class are eligible.
 class Module extends ClassAnnotation {
   final List<Type> imports;
-  final includeSubdirectories;
-  final includeSiblings;
+  final bool includeSubdirectories;
+  final bool includeSiblings;
 
   // constructor
 

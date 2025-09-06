@@ -1,5 +1,5 @@
 name: velix_ui
-description: "flutter automatic two-way form binding ."
+description: "flutter automatic two-way form binding similar to angular including widget themes that adjust to the platform."
 version: 0.9.1
 
 homepage: https://github.com/coolsamson7/velix

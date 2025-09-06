@@ -15,6 +15,49 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`velix` - `v0.9.3`](#velix---v093)
+ - [`velix_i18n` - `v0.9.1`](#velix_i18n---v091)
+ - [`velix_ui` - `v0.9.2`](#velix_ui---v092)
+ - [`velix_di` - `v0.9.0+3`](#velix_di---v0903)
+ - [`velix_mapper` - `v0.9.0+3`](#velix_mapper---v0903)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `velix_di` - `v0.9.0+3`
+ - `velix_mapper` - `v0.9.0+3`
+
+---
+
+#### `velix` - `v0.9.3`
+
+ - **FEAT**: moved the abstract translator concept to velix.
+
+#### `velix_i18n` - `v0.9.1`
+
+ - **FIX**: fixed import.
+ - **FEAT**: moved the abstract translator concept to velix.
+ - **DOCS**: added description.
+
+#### `velix_ui` - `v0.9.2`
+
+ - **FEAT**: moved the abstract translator concept to velix.
+ - **DOCS**: added description.
+
+
+## 2025-09-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`velix_di` - `v0.9.0+2`](#velix_di---v0902)
  - [`velix_mapper` - `v0.9.0+2`](#velix_mapper---v0902)
 

@@ -1,5 +1,5 @@
 name: velix_mapper
-description: "dart mapping framework."
+description: "a flutter mapping framework for class to class and json."
 version: 0.9.0+1
 
 homepage: https://github.com/coolsamson7/velix

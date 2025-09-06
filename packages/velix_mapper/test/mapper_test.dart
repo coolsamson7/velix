@@ -1,13 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
-import 'package:velix_di/velix_di.dart';
 import 'model.dart';
 import 'model.type_registry.g.dart';
 
 
 void main() {
   group('mapper', () {
-    Velix.bootstrap;
 
     registerAllDescriptors();
 

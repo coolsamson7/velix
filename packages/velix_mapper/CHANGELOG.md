@@ -1,3 +1,7 @@
+## 0.9.0+2
+
+ - **DOCS**: added description.
+
 ## 0.9.0+1
 
  - Update a dependency to the latest release.

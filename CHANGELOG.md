@@ -15,6 +15,32 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`velix_di` - `v0.9.0+2`](#velix_di---v0902)
+ - [`velix_mapper` - `v0.9.0+2`](#velix_mapper---v0902)
+
+---
+
+#### `velix_di` - `v0.9.0+2`
+
+ - **DOCS**: added description.
+
+#### `velix_mapper` - `v0.9.0+2`
+
+ - **DOCS**: added description.
+
+
+## 2025-09-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`velix` - `v0.9.2`](#velix---v092)
  - [`velix_ui` - `v0.9.1`](#velix_ui---v091)
  - [`velix_di` - `v0.9.0+1`](#velix_di---v0901)

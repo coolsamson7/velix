@@ -15,6 +15,50 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`velix` - `v0.90.1`](#velix---v0901)
+ - [`velix_di` - `v0.9.0+4`](#velix_di---v0904)
+ - [`velix_i18n` - `v0.9.1+1`](#velix_i18n---v0911)
+ - [`velix_mapper` - `v0.9.0+4`](#velix_mapper---v0904)
+ - [`velix_ui` - `v0.9.3`](#velix_ui---v093)
+
+---
+
+#### `velix` - `v0.90.1`
+
+ - **FIX**: new starting version 0.90.0 for velix.
+ - **FIX**: new starting version 0.90.0 for velix.
+ - **FEAT**: added command generator in the correct package.
+
+#### `velix_di` - `v0.9.0+4`
+
+ - **FIX**: new starting version 0.90.0 for velix.
+
+#### `velix_i18n` - `v0.9.1+1`
+
+ - **FIX**: new starting version 0.90.0 for velix.
+
+#### `velix_mapper` - `v0.9.0+4`
+
+ - **FIX**: new starting version 0.90.0 for velix.
+
+#### `velix_ui` - `v0.9.3`
+
+ - **FIX**: new starting version 0.90.0 for velix.
+ - **FEAT**: added command generator in the correct package.
+
+
+## 2025-09-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`velix` - `v0.9.3`](#velix---v093)
  - [`velix_i18n` - `v0.9.1`](#velix_i18n---v091)
  - [`velix_ui` - `v0.9.2`](#velix_ui---v092)

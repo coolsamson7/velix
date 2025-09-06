@@ -1,3 +1,9 @@
+## 0.90.1
+
+ - **FIX**: new starting version 0.90.0 for velix.
+ - **FIX**: new starting version 0.90.0 for velix.
+ - **FEAT**: added command generator in the correct package.
+
 ## 0.90.0
 
 - version renaming

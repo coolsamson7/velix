@@ -1,3 +1,7 @@
+## 0.9.0+4
+
+ - **FIX**: new starting version 0.90.0 for velix.
+
 ## 0.9.0+3
 
  - Update a dependency to the latest release.

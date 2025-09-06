@@ -6,6 +6,9 @@ export './reflectable/reflectable.dart';
 
 export './validation/validation.dart';
 
+// i18n
+
+export './i18n/translator.dart';
 
 // util
 

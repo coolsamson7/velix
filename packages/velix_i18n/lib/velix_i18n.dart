@@ -2,7 +2,6 @@
 
 // imports
 
-export './i18n/translator.dart';
 export './i18n/i18n.dart';
 export './i18n/validation.dart';
 

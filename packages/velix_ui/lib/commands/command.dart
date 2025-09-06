@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:velix_i18n/i18n/translator.dart';
+import 'package:velix/i18n/translator.dart';
 
 /// enum specifying how execution of a command will influence the ui state
 enum LockType {

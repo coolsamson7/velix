@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/velix.dart';
 
 import 'package:velix_ui/velix_ui.dart';
-import 'package:velix_i18n/velix_i18n.dart';
 
 import 'ui.dart';
 import 'ui.type_registry.g.dart';
+
+class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation> {
+  // override
+
+  @override
+  String translate(instance) {
+    return "";
+  }
+}
 
 
 void main() {

@@ -933,15 +933,15 @@ class Environment {
     bool filterProvider(AbstractInstanceProvider provider) {
       final hostModule = TypeDescriptor.forType(provider.host).module;
 
-      print("filter $provider");
+      //print("filter $provider");
       for (final fileFilter in filter) {
         if (fileFilter.hasMatch(hostModule)) {
-          print("ok");
+          //print("ok");
           return true;
         }
       }
 
-      print("na");
+      //print("na");
       return false;
     }
 
@@ -955,35 +955,38 @@ class Environment {
       if (!includeChildren && !includeSiblings) {
         // Only the file itself
         pattern = '^' + RegExp.escape(modulePath) + r'$';
-      } else if (includeSiblings && !includeChildren) {
+      }
+      else if (includeSiblings && !includeChildren) {
         // All siblings in the same directory
         pattern = '^' + RegExp.escape(dir) + r'/[^/]+$';
-      } else if (!includeSiblings && includeChildren) {
+      }
+      else if (!includeSiblings && includeChildren) {
         // If the modulePath is a directory (ends with no file), match files/dirs inside it (direct children)
         // If modulePath is a file, match direct children of its directory and recurse further.
         if (fileOrDir.contains('.')) {
           // modulePath is a file, include children means all files and dirs inside its directory recursively
           pattern = '^' + RegExp.escape(dir) + r'/.*$';
-        } else {
+        }
+        else {
           // modulePath is a directory, include children means direct children of that directory
           pattern = '^' + RegExp.escape(modulePath) + r'/[^/]+$';
         }
-      } else {
+      }
+      else {
         // Both siblings and children
         if (fileOrDir.contains('.')) {
           // If path is a file, siblings + children means siblings of file + any descendants inside directory
           pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
-        } else {
+        }
+        else {
           // If path is directory, siblings + children means direct children and directory itself's siblings
           pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
         }
       }
 
-      print("$modulePath, includeChildren: $includeChildren, includeSiblings: $includeSiblings -> $pattern");
+      //print("$modulePath, includeChildren: $includeChildren, includeSiblings: $includeSiblings -> $pattern");
 
       return RegExp(pattern);
-
-
     }
 
     // recursively load environment and its dependencies

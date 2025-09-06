@@ -1,6 +1,6 @@
 name: velix
-description: "flutter foundation library."
-version: 0.18.1
+description: "flutter foundation library. This core library contains basic functionality, mainly the meta-data organization and its related code generator used by the different addons. "
+version: 0.9.0
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

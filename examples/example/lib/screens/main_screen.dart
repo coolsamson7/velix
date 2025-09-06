@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/services/services.dart';
-import 'package:velix/di/di.dart';
-import 'package:velix/i18n/i18n.dart';
-import 'package:velix/i18n/locale.dart';
+import 'package:velix_di/velix_di.dart';
+import 'package:velix_i18n/velix_i18n.dart';
 
 import '../main.dart';
 import 'test_page.dart';

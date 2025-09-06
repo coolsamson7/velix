@@ -2,11 +2,11 @@
 // ignore_for_file: unnecessary_import
 import 'package:velix/velix.dart';
 import 'package:sample/providers/todo_provider.dart';
-import 'package:velix/di/di.dart';
 import 'package:sample/models/todo.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:sample/main.dart';
 import 'package:sample/services/services.dart';
+import 'package:velix_di/di/di.dart';
 
 void registerAllDescriptors() {
   type<TodoProvider>(

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/services/services.dart';
 
-import 'package:velix/velix.dart';
+import 'package:velix_ui/velix_ui.dart';
+import 'package:velix_di/velix_di.dart';
 
 import '../main.dart';
 import '../models/todo.dart';

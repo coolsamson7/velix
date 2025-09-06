@@ -1,4 +1,4 @@
-import 'package:velix/di/di.dart';
+import 'package:velix_di/velix_di.dart';
 
 @Injectable()
 class TodoService {

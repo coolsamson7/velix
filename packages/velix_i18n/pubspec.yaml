@@ -1,5 +1,5 @@
 name: velix_i18n
-description: "flutter i18n framework."
+description: "a flutter i18n framework offering translation and interpolation capabilities."
 version: 0.9.0+1
 
 homepage: https://github.com/coolsamson7/velix

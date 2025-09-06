@@ -3,6 +3,7 @@ import 'package:stack_trace/stack_trace.dart';
 
 enum TraceLevel { off, low, medium, high, full }
 
+// internal
 class TraceEntry {
   final String path;
   final TraceLevel level;

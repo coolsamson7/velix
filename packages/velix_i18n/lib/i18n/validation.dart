@@ -1,6 +1,5 @@
+import 'package:velix/i18n/translator.dart';
 import 'package:velix/validation/validation.dart';
-
-import '../velix_i18n.dart';
 
 class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation> {
   // override

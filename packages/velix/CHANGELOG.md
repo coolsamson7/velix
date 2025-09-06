@@ -1,3 +1,7 @@
+## 0.9.2
+
+ - **FEAT**: moved command generator.
+
 ## 0.9.1
 
  - stripped down version after refactoring

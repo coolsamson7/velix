@@ -1,3 +1,28 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## 2025-09-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`velix` - `v0.9.1`](#velix---v091)
+
+---
+
+#### `velix` - `v0.9.1`
+
+ - stripped down version after refactoring
+
 # Versions
 
 ## 0.8.0

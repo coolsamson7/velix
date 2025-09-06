@@ -1,3 +1,7 @@
+## 0.9.1
+
+ - stripped down version after refactoring
+
 # Versions
 
 ## 0.8.0

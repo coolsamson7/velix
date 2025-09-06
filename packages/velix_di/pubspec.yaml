@@ -1,5 +1,5 @@
 name: velix_di
-description: "flutter di framework."
+description: "a flutter dependency injection framework."
 version: 0.9.0+1
 
 homepage: https://github.com/coolsamson7/velix

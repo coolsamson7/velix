@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
@@ -10,12 +12,11 @@ import 'package:glob/glob.dart';
 class RegistryPerFileBuilder extends Builder {
   @override
   final buildExtensions = const {
-    '.dart': ['.registry.json', '.registry.dart'] // Both JSON metadata AND code fragments
+    '.dart': ['.registry.json', '.registry.dart']
   };
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    // Skip non-Dart files and generated files
     if (!buildStep.inputId.path.endsWith('.dart') ||
         buildStep.inputId.path.contains('.g.dart') ||
         buildStep.inputId.path.contains('.part.dart') ||
@@ -28,11 +29,11 @@ class RegistryPerFileBuilder extends Builder {
     try {
       final lib = await buildStep.resolver.libraryFor(buildStep.inputId);
 
-      // Check if this is actually a library (not a part file)
-      //if (lib.source.uri.toString().contains('part of')) {
-      //  log.fine('Skipping part file: ${buildStep.inputId.path}');
-      //  return; // Skip part files
-      //}
+      // Get parsed AST so we can resolve line/col
+      final session = lib.session;
+      final parsedLib = await session.getParsedLibraryByElement(lib) as ParsedLibraryResult;
+      final unit = parsedLib.units.first.unit;
+      final lineInfo = parsedLib.units.first.lineInfo;
 
       final classesWithDataclass = <Map<String, dynamic>>[];
       final codeFragments = <String>[];
@@ -49,77 +50,67 @@ class RegistryPerFileBuilder extends Builder {
         }
         if (!isDataclass) continue;
 
+        // find AST node for this class
+        final node = unit.declarations
+            .whereType<ClassDeclaration>()
+            .firstWhere((d) => d.name.lexeme == cls.name, orElse: () => throw Exception("jj"));
+
+        int line = -1;
+        int col = -1;
+        if (node != null) {
+          final loc = lineInfo.getLocation(node.offset);
+          line = loc.lineNumber;
+          col = loc.columnNumber;
+        }
+
         final typeName = cls.name;
         final superClass = cls.supertype?.getDisplayString(withNullability: false) ?? 'Object';
 
-        // Extract constructor dependencies
-        final dependencies = <String>[];
-        /*try {
-          final constructor = cls.constructors.firstWhere(
-                (c) => c.name.isEmpty, // Default constructor
-            orElse: () => cls.constructors.isNotEmpty ? cls.constructors.first : null,
-          );
+        final dependencies = <String>[]; // left empty for now
 
-          if (constructor != null) {
-            for (final param in constructor.parameters) {
-              final paramType = param.type.getDisplayString(withNullability: false);
-              if (paramType != 'dynamic' && paramType != 'Object') {
-                dependencies.add(paramType);
-              }
-            }
-          }
-        } catch (e) {
-          log.warning('Could not extract constructor info for $typeName: $e');
-        }*/
-
-        // JSON metadata for sorting
         final meta = {
           'type': typeName,
           'superClass': superClass,
           'dependencies': dependencies,
           'sourceFile': buildStep.inputId.path,
-          'variableName': '${typeName}Type', // Variable name for references
+          'variableName': '${typeName}Type',
+          'line': line,
+          'column': col,
         };
         classesWithDataclass.add(meta);
 
-        // Add import for this class
         imports.add(_getImportPath(buildStep.inputId.path));
 
-        // Generate code fragment for this class
         final codeFragment = _generateClassRegistrationCode(
           typeName!,
           superClass,
           dependencies,
-          cls, // Pass the class element for additional introspection
+          cls,
         );
 
         codeFragments.add(codeFragment);
       }
 
-      // Write JSON metadata (for dependency sorting)
       if (classesWithDataclass.isNotEmpty) {
         final jsonOut = buildStep.inputId.changeExtension('.registry.json');
         await buildStep.writeAsString(
-            jsonOut,
-            const JsonEncoder.withIndent('  ').convert({
-              'classes': classesWithDataclass,
-            })
+          jsonOut,
+          const JsonEncoder.withIndent('  ').convert({'classes': classesWithDataclass}),
         );
       }
 
-      // Write code fragments
       if (codeFragments.isNotEmpty) {
         final codeOut = buildStep.inputId.changeExtension('.registry.dart');
-        final buffer = StringBuffer();
+        final buffer = StringBuffer()
+          ..writeln('// REGISTRY FRAGMENT - DO NOT EDIT')
+          ..writeln('// Source: ${buildStep.inputId.path}')
+          ..writeln();
 
-        // Add imports section
-        buffer.writeln('// REGISTRY FRAGMENT - DO NOT EDIT');
         for (final import in imports) {
           buffer.writeln("import '$import';");
         }
         buffer.writeln();
 
-        // Add all code fragments
         for (final fragment in codeFragments) {
           buffer.writeln(fragment);
           buffer.writeln();
@@ -127,21 +118,14 @@ class RegistryPerFileBuilder extends Builder {
 
         await buildStep.writeAsString(codeOut, buffer.toString());
       }
-
     } catch (e, stackTrace) {
-      // Log and skip files that can't be processed as libraries
       log.warning('Skipping ${buildStep.inputId.path}: $e');
-      log.fine('Stack trace: $stackTrace');
-      return;
+      log.fine('$stackTrace');
     }
   }
 
-  String _getImportPath(String sourceFile) {
-    if (sourceFile.startsWith('lib/')) {
-      return sourceFile.substring(4);
-    }
-    return sourceFile;
-  }
+  String _getImportPath(String sourceFile) =>
+      sourceFile.startsWith('lib/') ? sourceFile.substring(4) : sourceFile;
 
   String _generateClassRegistrationCode(
       String typeName,
@@ -149,32 +133,18 @@ class RegistryPerFileBuilder extends Builder {
       List<String> dependencies,
       ClassElement cls,
       ) {
-    final buffer = StringBuffer();
     final variableName = '${typeName.toLowerCase()}Type';
+    final buffer = StringBuffer();
 
-    // Generate the registration code fragment with variable declaration
     buffer.writeln('// Registration for $typeName');
     buffer.write('final $variableName = type<$typeName>(');
 
     final params = <String>[];
-
-    // Note: superClass and dependencies will be resolved by variable names in the combiner
-    if (superClass != 'Object') {
-      params.add('/* superClass will be resolved */');
-    }
-
-    if (dependencies.isNotEmpty) {
-      params.add('/* dependencies will be resolved */');
-    }
-
-    // TODO: You can add more introspection here:
-    // - Extract properties: cls.fields
-    // - Extract constructor args: cls.constructors.first.parameters
-    // - Add metadata, annotations, etc.
+    if (superClass != 'Object') params.add('/* superClass will be resolved */');
+    if (dependencies.isNotEmpty) params.add('/* dependencies will be resolved */');
 
     buffer.write(params.join(', '));
     buffer.write(');');
-
     return buffer.toString();
   }
 }
@@ -182,105 +152,96 @@ class RegistryPerFileBuilder extends Builder {
 /// ----------------------------
 /// Aggregator builder
 /// ----------------------------
-/// ----------------------------
-/// Aggregator builder (Trigger File Version)
-/// ----------------------------
 class CombinedRegistryAggregator extends Builder {
   @override
-  final buildExtensions = const {
-    '.dart': ['.registry.g.dart']  // Generate .g.dart part file
-  };
+  final buildExtensions = const {'.dart': ['.registry.g.dart']};
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    // Only run when triggered by a specific main file that will include the part
-    //if (!buildStep.inputId.path.endsWith('lib/registry.dart')) {  // or whatever your main file is called
-    //  return; // Skip all other files
-    //}
-
-    print("#### CombinedRegistryAggregator generating part file");
-
     log.info('🚀 CombinedRegistryAggregator triggered by: ${buildStep.inputId.path}');
-
     final rootPackage = buildStep.inputId.package;
-    final mainFileName = buildStep.inputId.pathSegments.last; // e.g., 'registry.dart'
+    final mainFileName = buildStep.inputId.pathSegments.last;
 
     try {
-      // Collect JSON metadata files for dependency sorting
       final allJsonAssets = await buildStep
           .findAssets(Glob('**/*.registry.json'))
           .where((id) => id.package == rootPackage)
           .toList();
 
-      log.info('📄 Found ${allJsonAssets.length} JSON files');
-
-      // Collect code fragment files
       final allRegistryAssets = await buildStep
           .findAssets(Glob('**/*.registry.dart'))
           .where((id) => id.package == rootPackage)
           .toList();
 
-      log.info('📄 Found ${allRegistryAssets.length} registry files');
-
-      if (allJsonAssets.isEmpty && allRegistryAssets.isEmpty) {
-        // Generate empty part file
-        final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
-        await buildStep.writeAsString(outputId, _generateEmptyPartFile(mainFileName));
-        log.info('✅ Generated empty part file');
-        return;
-      }
-
-      // Load and sort classes using JSON metadata
       final allClasses = <Map<String, dynamic>>[];
       for (final assetId in allJsonAssets) {
         try {
           final content = await buildStep.readAsString(assetId);
           final Map<String, dynamic> data = json.decode(content);
-          final classes = (data['classes'] as List<dynamic>).cast<Map<String, dynamic>>();
-          allClasses.addAll(classes);
+          allClasses.addAll((data['classes'] as List).cast<Map<String, dynamic>>());
         } catch (e) {
-          log.warning('Could not process JSON file ${assetId.path}: $e');
-          continue;
+          log.warning('Could not read JSON ${assetId.path}: $e');
         }
       }
 
-      log.info('📊 Total classes found: ${allClasses.length}');
-
-      final sortedClasses = allClasses;//_topologicalSort(allClasses);
-
-      // Load imports from registry files
+      final fragments = <String>[];
       final imports = <String>{};
       for (final assetId in allRegistryAssets) {
         try {
           final content = await buildStep.readAsString(assetId);
-          final lines = content.split('\n');
-          for (final line in lines) {
-            if (line.trim().startsWith('import ')) {
-              imports.add(line.trim());
-            }
+          fragments.add(content);
+          for (final line in content.split('\n')) {
+            if (line.trim().startsWith('import ')) imports.add(line.trim());
           }
         } catch (e) {
-          log.warning('Could not process registry file ${assetId.path}: $e');
+          log.warning('Could not read registry fragment ${assetId.path}: $e');
         }
       }
 
-      final generatedCode = _generatePartFileCode(mainFileName, sortedClasses, imports);
+      final generatedCode =
+      _generatePartFileCode(mainFileName, imports, fragments, allClasses);
       final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
       await buildStep.writeAsString(outputId, generatedCode);
-      log.info('✅ Successfully generated part file with ${sortedClasses.length} classes');
-
     } catch (e, stackTrace) {
       log.severe('❌ Error in CombinedRegistryAggregator: $e');
-      log.fine('Stack trace: $stackTrace');
-
-      // Generate empty part file as fallback
+      log.fine('$stackTrace');
       final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
       await buildStep.writeAsString(outputId, _generateEmptyPartFile(mainFileName));
     }
   }
 
-  String _generateEmptyPartFile(String mainFileName) {
-    return '''// GENERATED CODE - DO NOT MODIFY BY HAND
+  String _generatePartFileCode(
+      String mainFileName,
+      Set<String> imports,
+      List<String> fragments,
+      List<Map<String, dynamic>> allClasses,
+      ) {
+    final buffer = StringBuffer()
+      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
+      ..writeln('// Generated by velix registry builder')
+      ..writeln()
+      ..writeln("part of '$mainFileName';")
+      ..writeln();
+
+    for (final i in imports.toList()..sort()) {
+      buffer.writeln(i);
+    }
+    buffer.writeln();
+
+    buffer.writeln('void registerAll() {');
+    if (fragments.isEmpty) {
+      buffer.writeln('  // No @Dataclass annotated classes found');
+    } else {
+      for (final frag in fragments) {
+        buffer.writeln(frag);
+      }
+    }
+    buffer.writeln('}');
+    return buffer.toString();
+  }
+
+  String _generateEmptyPartFile(String mainFileName) => '''
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // Generated by velix registry builder
 
 part of '$mainFileName';
@@ -289,84 +250,12 @@ void registerAll() {
   // No @Dataclass annotated classes found
 }
 ''';
-  }
-
-  String _generatePartFileCode(
-      String mainFileName,
-      List<Map<String, dynamic>> sortedClasses,
-      Set<String> imports,
-      ) {
-    final buffer = StringBuffer();
-    buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
-    buffer.writeln('// Generated by velix registry builder');
-    buffer.writeln();
-    buffer.writeln("part of '$mainFileName';");
-    buffer.writeln();
-
-    // Add imports (these will be available to the main file)
-    for (final import in imports.toList()..sort()) {
-      buffer.writeln(import);
-    }
-    buffer.writeln();
-
-    buffer.writeln('void registerAll() {');
-
-    if (sortedClasses.isEmpty) {
-      buffer.writeln('  // No @Dataclass annotated classes found');
-      buffer.writeln('}');
-      return buffer.toString();
-    }
-
-    // Generate variables in dependency order
-    final typeToVariable = <String, String>{};
-    for (final classData in sortedClasses) {
-      final typeName = classData['type'] as String;
-      final variableName = classData['variableName'] as String;
-      typeToVariable[typeName] = variableName;
-    }
-
-    // Generate code for each class in sorted order
-    for (final classData in sortedClasses) {
-      final typeName = classData['type'] as String;
-      final superClass = classData['superClass'] as String;
-      final deps = (classData['dependencies'] as List<dynamic>).cast<String>();
-      final variableName = classData['variableName'] as String;
-
-      buffer.writeln('  // $typeName');
-      buffer.write('  final $variableName = type<$typeName>(');
-
-      final params = <String>[];
-
-      if (superClass != 'Object' && typeToVariable.containsKey(superClass)) {
-        params.add('superClass: ${typeToVariable[superClass]}');
-      }
-
-      if (deps.isNotEmpty) {
-        final depVars = deps
-            .where((d) => typeToVariable.containsKey(d))
-            .map((d) => typeToVariable[d]!)
-            .toList();
-        if (depVars.isNotEmpty) {
-          params.add('dependencies: [${depVars.join(', ')}]');
-        }
-      }
-
-      buffer.write(params.join(', '));
-      buffer.writeln(');');
-    }
-
-    buffer.writeln();
-    buffer.writeln('  // Available variables: ${typeToVariable.values.join(', ')}');
-    buffer.writeln('}');
-
-    return buffer.toString();
-  }
-
-// ... keep your existing _topologicalSort method
 }
 
 /// ----------------------------
 /// Builder factories
 /// ----------------------------
-Builder registryPerFileBuilder(BuilderOptions options) => RegistryPerFileBuilder();
-Builder combinedRegistryAggregator(BuilderOptions options) => CombinedRegistryAggregator();
+Builder registryPerFileBuilder(BuilderOptions options) =>
+    RegistryPerFileBuilder();
+Builder combinedRegistryAggregator(BuilderOptions options) =>
+    CombinedRegistryAggregator();

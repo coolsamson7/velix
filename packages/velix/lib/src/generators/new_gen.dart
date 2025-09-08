@@ -9,16 +9,6 @@ import 'package:glob/glob.dart';
 /// ----------------------------
 /// Per-class builder
 /// ----------------------------
-import 'dart:async';
-import 'dart:convert';
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
-import 'package:build/build.dart';
-
-/// ----------------------------
-/// Per-class builder
-/// ----------------------------
 class RegistryPerFileBuilder extends Builder {
   @override
   final buildExtensions = const {
@@ -66,29 +56,39 @@ class RegistryPerFileBuilder extends Builder {
             .firstWhere((d) => d.name.lexeme == cls.name, orElse: () => throw Exception('Class node not found'));
 
         final loc = lineInfo.getLocation(node.offset);
-        final line = loc.lineNumber;
-        final col = loc.columnNumber;
+        final startLine = loc.lineNumber;
+        final startCol = loc.columnNumber;
 
         final typeName = cls.name;
         final superClass = cls.supertype?.getDisplayString(withNullability: false) ?? 'Object';
         final dependencies = <String>[]; // currently empty
 
-        // JSON metadata
+        // JSON metadata includes exact offsets
         final meta = {
           'type': typeName,
           'superClass': superClass,
           'dependencies': dependencies,
           'sourceFile': path,
           'variableName': '${typeName}Type',
-          'line': line,
-          'column': col,
+          'line': startLine,
+          'column': startCol,
+          'fragmentStartOffset': node.offset,
+          'fragmentEndOffset': node.end,
         };
         classesWithDataclass.add(meta);
 
         imports.add(_getImportPath(path));
 
         // Code fragment with location markers
-        final fragment = _generateClassRegistrationCode(typeName!, superClass, dependencies, line, col);
+        final fragment = _generateClassRegistrationCode(
+          typeName!,
+          superClass,
+          dependencies,
+          startLine,
+          startCol,
+          node.offset,
+          node.end,
+        );
         codeFragments.add(fragment);
       }
 
@@ -101,7 +101,7 @@ class RegistryPerFileBuilder extends Builder {
         );
       }
 
-      // Write code fragment
+      // Write code fragment file
       if (codeFragments.isNotEmpty) {
         final codeOut = buildStep.inputId.changeExtension('.registry.dart');
         final buffer = StringBuffer()
@@ -134,14 +134,16 @@ class RegistryPerFileBuilder extends Builder {
       String typeName,
       String superClass,
       List<String> dependencies,
-      int line,
-      int col,
+      int startLine,
+      int startCol,
+      int startOffset,
+      int endOffset,
       ) {
     final variableName = '${typeName.toLowerCase()}Type';
     final buffer = StringBuffer();
 
-    buffer.writeln('// FRAGMENT_START:$typeName');
-    buffer.writeln('// Registration for $typeName ($line:$col)');
+    buffer.writeln('// FRAGMENT_START:$typeName [$startOffset-$endOffset]');
+    buffer.writeln('// Registration for $typeName ($startLine:$startCol)');
     buffer.write('final $variableName = type<$typeName>(');
 
     final params = <String>[];
@@ -150,12 +152,11 @@ class RegistryPerFileBuilder extends Builder {
 
     buffer.write(params.join(', '));
     buffer.writeln(');');
-    buffer.writeln('// FRAGMENT_END:$typeName');
+    buffer.writeln('// FRAGMENT_END:$typeName [$startOffset-$endOffset]');
 
     return buffer.toString();
   }
 }
-
 
 /// ----------------------------
 /// Aggregator builder
@@ -181,8 +182,11 @@ class CombinedRegistryAggregator extends Builder {
           .where((id) => id.package == rootPackage)
           .toList();
 
-      // Load metadata for sorting and dependency resolution
+      // Load metadata for sorting
       final allClasses = <Map<String, dynamic>>[];
+      final fragmentsByClass = <String, String>{};
+      final imports = <String>{};
+
       for (final assetId in allJsonAssets) {
         try {
           final content = await buildStep.readAsString(assetId);
@@ -193,54 +197,34 @@ class CombinedRegistryAggregator extends Builder {
         }
       }
 
-      // Sort classes by location (file, then line, then column)
-      allClasses.sort((a, b) {
-        final fileA = a['sourceFile'] as String;
-        final fileB = b['sourceFile'] as String;
-        final fileComparison = fileA.compareTo(fileB);
-        if (fileComparison != 0) return fileComparison;
-
-        final lineA = a['line'] as int;
-        final lineB = b['line'] as int;
-        final lineComparison = lineA.compareTo(lineB);
-        if (lineComparison != 0) return lineComparison;
-
-        final colA = a['column'] as int;
-        final colB = b['column'] as int;
-        return colA.compareTo(colB);
-      });
-
-      // Extract code fragments from registry files
-      final fragmentsByClass = <String, String>{};
-      final imports = <String>{};
-
       for (final assetId in allRegistryAssets) {
         try {
           final content = await buildStep.readAsString(assetId);
-
           // Extract imports
           for (final line in content.split('\n')) {
-            if (line.trim().startsWith('import ')) {
-              imports.add(line.trim());
-            }
+            if (line.trim().startsWith('import ')) imports.add(line.trim());
           }
-
-          // Extract fragments using markers
-          final fragments = _extractFragmentsFromContent(content);
-          fragmentsByClass.addAll(fragments);
+          // Use entire fragment text as-is from start/end offsets
+          fragmentsByClass.addAll(_extractFragmentsFromContent(content));
         } catch (e) {
           log.warning('Could not read registry fragment ${assetId.path}: $e');
         }
       }
 
-      log.info('📊 Found ${allClasses.length} classes, ${fragmentsByClass.length} fragments');
+      // Sort classes by file, line, column
+      allClasses.sort((a, b) {
+        final fileA = a['sourceFile'] as String;
+        final fileB = b['sourceFile'] as String;
+        final cmpFile = fileA.compareTo(fileB);
+        if (cmpFile != 0) return cmpFile;
 
-      final generatedCode = _generatePartFileCode(
-        mainFileName,
-        imports,
-        allClasses,
-        fragmentsByClass,
-      );
+        final cmpLine = (a['line'] as int).compareTo(b['line'] as int);
+        if (cmpLine != 0) return cmpLine;
+
+        return (a['column'] as int).compareTo(b['column'] as int);
+      });
+
+      final generatedCode = _generatePartFileCode(mainFileName, imports, allClasses, fragmentsByClass);
       final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
       await buildStep.writeAsString(outputId, generatedCode);
       log.info('✅ Successfully generated part file');
@@ -253,18 +237,16 @@ class CombinedRegistryAggregator extends Builder {
     }
   }
 
-  /// Extract code fragments from registry file content using markers
   Map<String, String> _extractFragmentsFromContent(String content) {
     final fragments = <String, String>{};
     final lines = content.split('\n');
-
     String? currentClass;
     final fragmentLines = <String>[];
     bool inFragment = false;
 
     for (final line in lines) {
       if (line.startsWith('// FRAGMENT_START:')) {
-        currentClass = line.substring('// FRAGMENT_START:'.length);
+        currentClass = line.substring('// FRAGMENT_START:'.length).split(' ').first;
         fragmentLines.clear();
         inFragment = true;
       } else if (line.startsWith('// FRAGMENT_END:')) {
@@ -273,11 +255,10 @@ class CombinedRegistryAggregator extends Builder {
         }
         currentClass = null;
         inFragment = false;
-      } else if (inFragment && !line.startsWith('// FRAGMENT_')) {
+      } else if (inFragment) {
         fragmentLines.add(line);
       }
     }
-
     return fragments;
   }
 
@@ -294,10 +275,7 @@ class CombinedRegistryAggregator extends Builder {
       ..writeln("part of '$mainFileName';")
       ..writeln();
 
-    // Add sorted imports
-    for (final import in imports.toList()..sort()) {
-      buffer.writeln(import);
-    }
+    for (final import in imports.toList()..sort()) buffer.writeln(import);
     buffer.writeln();
 
     buffer.writeln('void registerAll() {');
@@ -305,37 +283,24 @@ class CombinedRegistryAggregator extends Builder {
     if (sortedClasses.isEmpty) {
       buffer.writeln('  // No @Dataclass annotated classes found');
     } else {
-      // Create mapping of type names to variable names for dependency resolution
       final typeToVariable = <String, String>{};
       for (final classData in sortedClasses) {
         final typeName = classData['type'] as String;
         final variableName = classData['variableName'] as String;
         typeToVariable[typeName] = variableName;
-      }
 
-      // Generate code for each class in sorted order using fragments
-      for (final classData in sortedClasses) {
-        final typeName = classData['type'] as String;
-        final superClass = classData['superClass'] as String;
-        final deps = (classData['dependencies'] as List<dynamic>).cast<String>();
+        final fragment = fragmentsByClass[typeName] ?? _generateFallbackFragment(classData);
 
-        // Get the original fragment
-        String fragment = fragmentsByClass[typeName] ?? _generateFallbackFragment(classData);
-
-        // Resolve dependencies in the fragment
-        fragment = _resolveDependenciesInFragment(fragment, superClass, deps, typeToVariable);
-
-        // Indent for the registerAll function and add
-        final indentedLines = fragment.split('\n')
+        // Indent
+        final indented = fragment.split('\n')
             .where((line) => line.trim().isNotEmpty)
             .map((line) => '  $line')
             .join('\n');
 
-        buffer.writeln(indentedLines);
+        buffer.writeln(indented);
         buffer.writeln();
       }
 
-      // Add a comment showing available variables
       final variables = typeToVariable.values.toList()..sort();
       buffer.writeln('  // Available variables: ${variables.join(', ')}');
     }
@@ -344,7 +309,6 @@ class CombinedRegistryAggregator extends Builder {
     return buffer.toString();
   }
 
-  /// Generate fallback fragment if original fragment is missing
   String _generateFallbackFragment(Map<String, dynamic> classData) {
     final typeName = classData['type'] as String;
     final variableName = classData['variableName'] as String;
@@ -353,59 +317,6 @@ class CombinedRegistryAggregator extends Builder {
 
     return '''// Registration for $typeName ($line:$col)
 final $variableName = type<$typeName>(/* fallback */);''';
-  }
-
-  /// Resolve dependency placeholders in fragments
-  String _resolveDependenciesInFragment(
-      String fragment,
-      String superClass,
-      List<String> deps,
-      Map<String, String> typeToVariable,
-      ) {
-    String resolved = fragment;
-
-    // Resolve superclass placeholder
-    if (superClass != 'Object' && typeToVariable.containsKey(superClass)) {
-      resolved = resolved.replaceAll(
-          '/* RESOLVE_SUPER:$superClass */',
-          'superClass: ${typeToVariable[superClass]}'
-      );
-    } else {
-      // Remove unresolvable superclass placeholders
-      resolved = resolved.replaceAll(RegExp(r'/\* RESOLVE_SUPER:[^*]* \*/'), '');
-    }
-
-    // Resolve dependencies placeholder
-    if (deps.isNotEmpty) {
-      final resolvedDeps = deps
-          .where((dep) => typeToVariable.containsKey(dep))
-          .map((dep) => typeToVariable[dep]!)
-          .toList();
-
-      if (resolvedDeps.isNotEmpty) {
-        final depsStr = deps.join(',');
-        resolved = resolved.replaceAll(
-            '/* RESOLVE_DEPS:$depsStr */',
-            'dependencies: [${resolvedDeps.join(', ')}]'
-        );
-      } else {
-        // Remove unresolvable dependencies placeholders
-        resolved = resolved.replaceAll(RegExp(r'/\* RESOLVE_DEPS:[^*]* \*/'), '');
-      }
-    }
-
-    // Clean up any remaining placeholders and empty parameter lists
-    resolved = resolved.replaceAll('/* fallback */', '');
-    resolved = resolved.replaceAll(RegExp(r'type<\w+>\(\s*,\s*\)'), 'type<${_extractTypeName(resolved)}>()');
-    resolved = resolved.replaceAll(RegExp(r'type<\w+>\(\s*\)'), 'type<${_extractTypeName(resolved)}>()');
-
-    return resolved;
-  }
-
-  /// Extract type name from fragment for cleanup
-  String _extractTypeName(String fragment) {
-    final match = RegExp(r'type<(\w+)>').firstMatch(fragment);
-    return match?.group(1) ?? 'Unknown';
   }
 
   String _generateEmptyPartFile(String mainFileName) => '''
@@ -423,7 +334,5 @@ void registerAll() {
 /// ----------------------------
 /// Builder factories
 /// ----------------------------
-Builder registryPerFileBuilder(BuilderOptions options) =>
-    RegistryPerFileBuilder();
-Builder combinedRegistryAggregator(BuilderOptions options) =>
-    CombinedRegistryAggregator();
+Builder registryPerFileBuilder(BuilderOptions options) => RegistryPerFileBuilder();
+Builder combinedRegistryAggregator(BuilderOptions options) => CombinedRegistryAggregator();

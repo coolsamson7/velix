@@ -48,46 +48,55 @@ class RegistryPerFileBuilder extends Builder {
           final obj = annotation.computeConstantValue();
           return obj?.type?.getDisplayString(withNullability: false) == 'Dataclass';
         });
-        if (!isDataclass) continue;
+
+        if (!isDataclass)
+          continue;
 
         // Find AST node for line/col
         final node = unit.declarations
             .whereType<ClassDeclaration>()
-            .firstWhere((d) => d.name.lexeme == cls.name, orElse: () => throw Exception('Class node not found'));
+            .firstWhere(
+              (d) => d.name.lexeme == cls.name,
+          orElse: () => throw Exception('Class node not found'),
+        );
 
-        final loc = lineInfo.getLocation(node.offset);
-        final startLine = loc.lineNumber;
-        final startCol = loc.columnNumber;
+        final startLoc = lineInfo.getLocation(node.offset);
+        final endLoc = lineInfo.getLocation(node.end);
 
         final typeName = cls.name;
         final superClass = cls.supertype?.getDisplayString(withNullability: false) ?? 'Object';
         final dependencies = <String>[]; // currently empty
 
-        // JSON metadata includes exact offsets
+        // Add all file imports
+        for (final directive in unit.directives.whereType<ImportDirective>()) {
+          final importPath = directive.uri.stringValue;
+          if (importPath != null)
+            imports.add(importPath);
+        }
+
+        // JSON metadata
         final meta = {
           'type': typeName,
           'superClass': superClass,
           'dependencies': dependencies,
           'sourceFile': path,
           'variableName': '${typeName}Type',
-          'line': startLine,
-          'column': startCol,
-          'fragmentStartOffset': node.offset,
-          'fragmentEndOffset': node.end,
+          'startLine': startLoc.lineNumber,
+          'startColumn': startLoc.columnNumber,
+          'endLine': endLoc.lineNumber,
+          'endColumn': endLoc.columnNumber,
+          'imports': imports.toList(),
         };
         classesWithDataclass.add(meta);
 
-        imports.add(_getImportPath(path));
-
-        // Code fragment with location markers
+        // Generate code fragment: type<...>().location(...)
         final fragment = _generateClassRegistrationCode(
           typeName!,
           superClass,
           dependencies,
-          startLine,
-          startCol,
-          node.offset,
-          node.end,
+          path,
+          startLoc.lineNumber,
+          startLoc.columnNumber,
         );
         codeFragments.add(fragment);
       }
@@ -101,18 +110,13 @@ class RegistryPerFileBuilder extends Builder {
         );
       }
 
-      // Write code fragment file
+      // Write code fragment
       if (codeFragments.isNotEmpty) {
         final codeOut = buildStep.inputId.changeExtension('.registry.dart');
         final buffer = StringBuffer()
           ..writeln('// REGISTRY FRAGMENT - DO NOT EDIT')
           ..writeln('// Source: $path')
           ..writeln();
-
-        for (final import in imports) {
-          buffer.writeln("import '$import';");
-        }
-        buffer.writeln();
 
         for (final fragment in codeFragments) {
           buffer.writeln(fragment);
@@ -127,23 +131,17 @@ class RegistryPerFileBuilder extends Builder {
     }
   }
 
-  String _getImportPath(String sourceFile) =>
-      sourceFile.startsWith('lib/') ? sourceFile.substring(4) : sourceFile;
-
   String _generateClassRegistrationCode(
       String typeName,
       String superClass,
       List<String> dependencies,
+      String sourceFile,
       int startLine,
-      int startCol,
-      int startOffset,
-      int endOffset,
+      int startColumn,
       ) {
     final variableName = '${typeName.toLowerCase()}Type';
     final buffer = StringBuffer();
 
-    buffer.writeln('// FRAGMENT_START:$typeName [$startOffset-$endOffset]');
-    buffer.writeln('// Registration for $typeName ($startLine:$startCol)');
     buffer.write('final $variableName = type<$typeName>(');
 
     final params = <String>[];
@@ -151,8 +149,7 @@ class RegistryPerFileBuilder extends Builder {
     if (dependencies.isNotEmpty) params.add('/* RESOLVE_DEPS:${dependencies.join(',')} */');
 
     buffer.write(params.join(', '));
-    buffer.writeln(');');
-    buffer.writeln('// FRAGMENT_END:$typeName [$startOffset-$endOffset]');
+    buffer.writeln(').location("$sourceFile:$startLine:$startColumn");');
 
     return buffer.toString();
   }
@@ -182,11 +179,8 @@ class CombinedRegistryAggregator extends Builder {
           .where((id) => id.package == rootPackage)
           .toList();
 
-      // Load metadata for sorting
+      // Load metadata for sorting and dependency resolution
       final allClasses = <Map<String, dynamic>>[];
-      final fragmentsByClass = <String, String>{};
-      final imports = <String>{};
-
       for (final assetId in allJsonAssets) {
         try {
           final content = await buildStep.readAsString(assetId);
@@ -197,36 +191,57 @@ class CombinedRegistryAggregator extends Builder {
         }
       }
 
-      for (final assetId in allRegistryAssets) {
-        try {
-          final content = await buildStep.readAsString(assetId);
-          // Extract imports
-          for (final line in content.split('\n')) {
-            if (line.trim().startsWith('import ')) imports.add(line.trim());
-          }
-          // Use entire fragment text as-is from start/end offsets
-          fragmentsByClass.addAll(_extractFragmentsFromContent(content));
-        } catch (e) {
-          log.warning('Could not read registry fragment ${assetId.path}: $e');
-        }
-      }
-
-      // Sort classes by file, line, column
+      // Sort classes by location (file, then startLine, then startColumn)
       allClasses.sort((a, b) {
-        final fileA = a['sourceFile'] as String;
-        final fileB = b['sourceFile'] as String;
-        final cmpFile = fileA.compareTo(fileB);
-        if (cmpFile != 0) return cmpFile;
+        final fileComparison = (a['sourceFile'] as String).compareTo(b['sourceFile'] as String);
+        if (fileComparison != 0) return fileComparison;
 
-        final cmpLine = (a['line'] as int).compareTo(b['line'] as int);
-        if (cmpLine != 0) return cmpLine;
+        final lineComparison = (a['startLine'] as int).compareTo(b['startLine'] as int);
+        if (lineComparison != 0) return lineComparison;
 
-        return (a['column'] as int).compareTo(b['column'] as int);
+        return (a['startColumn'] as int).compareTo(b['startColumn'] as int);
       });
 
-      final generatedCode = _generatePartFileCode(mainFileName, imports, allClasses, fragmentsByClass);
+      // Combine all code fragments
+      final buffer = StringBuffer()
+        ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
+        ..writeln('// Generated by velix registry builder')
+        ..writeln()
+        ..writeln("part of '$mainFileName';")
+        ..writeln();
+
+      // Gather imports from metadata
+      final importSet = <String>{};
+      for (final cls in allClasses) {
+        importSet.addAll((cls['imports'] as List<dynamic>).cast<String>());
+      }
+
+      for (final importPath in importSet.toList()..sort()) {
+        buffer.writeln("import '$importPath';");
+      }
+      buffer.writeln();
+
+      buffer.writeln('void registerAll() {');
+      if (allClasses.isEmpty) {
+        buffer.writeln('  // No @Dataclass annotated classes found');
+      } else {
+        for (final cls in allClasses) {
+          final variableName = cls['variableName'] as String;
+          final typeName = cls['type'] as String;
+          final superClass = cls['superClass'] as String;
+          final deps = (cls['dependencies'] as List<dynamic>).cast<String>();
+          final location = '${cls['sourceFile']}:${cls['startLine']}:${cls['startColumn']}';
+
+          final code = 'final $variableName = type<$typeName>('
+              '${superClass != 'Object' ? '/* RESOLVE_SUPER:$superClass */' : ''}'
+              '${deps.isNotEmpty ? '/* RESOLVE_DEPS:${deps.join(',')} */' : ''}'
+              ').location("$location");';
+          buffer.writeln('  $code');
+        }
+      }
+      buffer.writeln('}');
       final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
-      await buildStep.writeAsString(outputId, generatedCode);
+      await buildStep.writeAsString(outputId, buffer.toString());
       log.info('✅ Successfully generated part file');
 
     } catch (e, stackTrace) {
@@ -235,88 +250,6 @@ class CombinedRegistryAggregator extends Builder {
       final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
       await buildStep.writeAsString(outputId, _generateEmptyPartFile(mainFileName));
     }
-  }
-
-  Map<String, String> _extractFragmentsFromContent(String content) {
-    final fragments = <String, String>{};
-    final lines = content.split('\n');
-    String? currentClass;
-    final fragmentLines = <String>[];
-    bool inFragment = false;
-
-    for (final line in lines) {
-      if (line.startsWith('// FRAGMENT_START:')) {
-        currentClass = line.substring('// FRAGMENT_START:'.length).split(' ').first;
-        fragmentLines.clear();
-        inFragment = true;
-      } else if (line.startsWith('// FRAGMENT_END:')) {
-        if (currentClass != null && fragmentLines.isNotEmpty) {
-          fragments[currentClass] = fragmentLines.join('\n');
-        }
-        currentClass = null;
-        inFragment = false;
-      } else if (inFragment) {
-        fragmentLines.add(line);
-      }
-    }
-    return fragments;
-  }
-
-  String _generatePartFileCode(
-      String mainFileName,
-      Set<String> imports,
-      List<Map<String, dynamic>> sortedClasses,
-      Map<String, String> fragmentsByClass,
-      ) {
-    final buffer = StringBuffer()
-      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
-      ..writeln('// Generated by velix registry builder')
-      ..writeln()
-      ..writeln("part of '$mainFileName';")
-      ..writeln();
-
-    for (final import in imports.toList()..sort()) buffer.writeln(import);
-    buffer.writeln();
-
-    buffer.writeln('void registerAll() {');
-
-    if (sortedClasses.isEmpty) {
-      buffer.writeln('  // No @Dataclass annotated classes found');
-    } else {
-      final typeToVariable = <String, String>{};
-      for (final classData in sortedClasses) {
-        final typeName = classData['type'] as String;
-        final variableName = classData['variableName'] as String;
-        typeToVariable[typeName] = variableName;
-
-        final fragment = fragmentsByClass[typeName] ?? _generateFallbackFragment(classData);
-
-        // Indent
-        final indented = fragment.split('\n')
-            .where((line) => line.trim().isNotEmpty)
-            .map((line) => '  $line')
-            .join('\n');
-
-        buffer.writeln(indented);
-        buffer.writeln();
-      }
-
-      final variables = typeToVariable.values.toList()..sort();
-      buffer.writeln('  // Available variables: ${variables.join(', ')}');
-    }
-
-    buffer.writeln('}');
-    return buffer.toString();
-  }
-
-  String _generateFallbackFragment(Map<String, dynamic> classData) {
-    final typeName = classData['type'] as String;
-    final variableName = classData['variableName'] as String;
-    final line = classData['line'] as int;
-    final col = classData['column'] as int;
-
-    return '''// Registration for $typeName ($line:$col)
-final $variableName = type<$typeName>(/* fallback */);''';
   }
 
   String _generateEmptyPartFile(String mainFileName) => '''
@@ -334,5 +267,7 @@ void registerAll() {
 /// ----------------------------
 /// Builder factories
 /// ----------------------------
-Builder registryPerFileBuilder(BuilderOptions options) => RegistryPerFileBuilder();
-Builder combinedRegistryAggregator(BuilderOptions options) => CombinedRegistryAggregator();
+Builder registryPerFileBuilder(BuilderOptions options) =>
+    RegistryPerFileBuilder();
+Builder combinedRegistryAggregator(BuilderOptions options) =>
+    CombinedRegistryAggregator();

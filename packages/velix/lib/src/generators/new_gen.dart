@@ -9,6 +9,16 @@ import 'package:glob/glob.dart';
 /// ----------------------------
 /// Per-class builder
 /// ----------------------------
+import 'dart:async';
+import 'dart:convert';
+import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:build/build.dart';
+
+/// ----------------------------
+/// Per-class builder
+/// ----------------------------
 class RegistryPerFileBuilder extends Builder {
   @override
   final buildExtensions = const {
@@ -17,19 +27,22 @@ class RegistryPerFileBuilder extends Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    if (!buildStep.inputId.path.endsWith('.dart') ||
-        buildStep.inputId.path.contains('.g.dart') ||
-        buildStep.inputId.path.contains('.part.dart') ||
-        buildStep.inputId.path.contains('.freezed.dart') ||
-        buildStep.inputId.path.contains('.gr.dart') ||
-        buildStep.inputId.path.contains('combined_registry.dart')) {
+    final path = buildStep.inputId.path;
+
+    // Skip generated or irrelevant files
+    if (!path.endsWith('.dart') ||
+        path.contains('.g.dart') ||
+        path.contains('.part.dart') ||
+        path.contains('.freezed.dart') ||
+        path.contains('.gr.dart') ||
+        path.contains('combined_registry.dart')) {
       return;
     }
 
     try {
       final lib = await buildStep.resolver.libraryFor(buildStep.inputId);
 
-      // Get parsed AST so we can resolve line/col
+      // Get parsed AST to resolve line/col
       final session = lib.session;
       final parsedLib = await session.getParsedLibraryByElement(lib) as ParsedLibraryResult;
       final unit = parsedLib.units.first.unit;
@@ -40,59 +53,46 @@ class RegistryPerFileBuilder extends Builder {
       final imports = <String>{};
 
       for (final cls in lib.classes) {
-        var isDataclass = false;
-        for (final annotation in cls.metadata.annotations) {
+        // Check for @Dataclass annotation
+        final isDataclass = cls.metadata.annotations.any((annotation) {
           final obj = annotation.computeConstantValue();
-          if (obj?.type?.getDisplayString(withNullability: false) == 'Dataclass') {
-            isDataclass = true;
-            break;
-          }
-        }
+          return obj?.type?.getDisplayString(withNullability: false) == 'Dataclass';
+        });
         if (!isDataclass) continue;
 
-        // find AST node for this class
+        // Find AST node for line/col
         final node = unit.declarations
             .whereType<ClassDeclaration>()
-            .firstWhere((d) => d.name.lexeme == cls.name, orElse: () => throw Exception("Class node not found"));
+            .firstWhere((d) => d.name.lexeme == cls.name, orElse: () => throw Exception('Class node not found'));
 
-        int line = -1;
-        int col = -1;
-        if (node != null) {
-          final loc = lineInfo.getLocation(node.offset);
-          line = loc.lineNumber;
-          col = loc.columnNumber;
-        }
+        final loc = lineInfo.getLocation(node.offset);
+        final line = loc.lineNumber;
+        final col = loc.columnNumber;
 
         final typeName = cls.name;
         final superClass = cls.supertype?.getDisplayString(withNullability: false) ?? 'Object';
+        final dependencies = <String>[]; // currently empty
 
-        final dependencies = <String>[]; // left empty for now
-
+        // JSON metadata
         final meta = {
           'type': typeName,
           'superClass': superClass,
           'dependencies': dependencies,
-          'sourceFile': buildStep.inputId.path,
+          'sourceFile': path,
           'variableName': '${typeName}Type',
           'line': line,
           'column': col,
         };
         classesWithDataclass.add(meta);
 
-        imports.add(_getImportPath(buildStep.inputId.path));
+        imports.add(_getImportPath(path));
 
-        final codeFragment = _generateClassRegistrationCode(
-          typeName!,
-          superClass,
-          dependencies,
-          cls,
-          line,
-          col,
-        );
-
-        codeFragments.add(codeFragment);
+        // Code fragment with location markers
+        final fragment = _generateClassRegistrationCode(typeName!, superClass, dependencies, line, col);
+        codeFragments.add(fragment);
       }
 
+      // Write JSON metadata
       if (classesWithDataclass.isNotEmpty) {
         final jsonOut = buildStep.inputId.changeExtension('.registry.json');
         await buildStep.writeAsString(
@@ -101,11 +101,12 @@ class RegistryPerFileBuilder extends Builder {
         );
       }
 
+      // Write code fragment
       if (codeFragments.isNotEmpty) {
         final codeOut = buildStep.inputId.changeExtension('.registry.dart');
         final buffer = StringBuffer()
           ..writeln('// REGISTRY FRAGMENT - DO NOT EDIT')
-          ..writeln('// Source: ${buildStep.inputId.path}')
+          ..writeln('// Source: $path')
           ..writeln();
 
         for (final import in imports) {
@@ -113,7 +114,6 @@ class RegistryPerFileBuilder extends Builder {
         }
         buffer.writeln();
 
-        // Add fragments with proper class markers for extraction
         for (final fragment in codeFragments) {
           buffer.writeln(fragment);
           buffer.writeln();
@@ -122,7 +122,7 @@ class RegistryPerFileBuilder extends Builder {
         await buildStep.writeAsString(codeOut, buffer.toString());
       }
     } catch (e, stackTrace) {
-      log.warning('Skipping ${buildStep.inputId.path}: $e');
+      log.warning('Skipping $path: $e');
       log.fine('$stackTrace');
     }
   }
@@ -134,7 +134,6 @@ class RegistryPerFileBuilder extends Builder {
       String typeName,
       String superClass,
       List<String> dependencies,
-      ClassElement cls,
       int line,
       int col,
       ) {
@@ -156,6 +155,7 @@ class RegistryPerFileBuilder extends Builder {
     return buffer.toString();
   }
 }
+
 
 /// ----------------------------
 /// Aggregator builder

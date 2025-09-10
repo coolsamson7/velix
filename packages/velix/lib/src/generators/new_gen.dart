@@ -22,7 +22,7 @@ String assetIdToImportUri(AssetId id) {
   return 'asset:${id.package}/${id.path}';
 }
 
-typedef FetchCode = Future<String> Function(Map<String, dynamic> meta);
+typedef FetchCode = Future<String> Function(String name, List<int> offset);
 typedef FindNode = Element Function(String ref);
 
 String? returnTypeUri(MethodElement method) {
@@ -978,41 +978,40 @@ class FragmentBuilder extends Builder {
 class Element {
   // instance data
 
-  final Map<String,dynamic> meta;
   bool resolved = false;
+
+  final String name;
+  final String type;
+  final List<String> imports;
+  final List<String> dependencies;
+  final List<Element> dependants = [];
+  final List<int> offset;
+  int inDegree = 0;
 
   // constructor
 
-  Element({required this.meta});
+  Element(
+      {required this.name, required this.type, required this.imports, required this.dependencies, required this.offset}) {
+    inDegree = dependencies.length;
+  }
 
   // public
 
-  Future<void> emit(StringBuffer buffer, bool variable, FindNode find, FetchCode fetch) async {
-    if ( !resolved ) {
-      resolved = true;
+  Future<void> emit(StringBuffer buffer, bool variable, FindNode find,
+      FetchCode fetch) async {
+    if (dependants.isNotEmpty) {
+      var colon = name.lastIndexOf(":");
+      var className = name.substring(colon + 1);
 
-      // recursion
+      buffer.write("var ${className}Descriptor = ");
+    }
 
-      for (var dependency in meta["dependencies"]) {
-        await find(dependency).emit(buffer, true, find, fetch);
-      }
+    // emit
 
-      // variable?
-
-      if ( variable ) {
-        var name = meta["name"] as String;
-        var colon = name.lastIndexOf(":");
-        var className =  name.substring(colon + 1);
-
-        buffer.write("var ${className}Descriptor = ");
-      }
-
-      // emit
-
-      buffer.write(await fetch(meta));
-    } // if
+    buffer.write(await fetch(name, offset));
   }
 }
+
 
 class RegistryAggregator extends Builder {
   // instance data
@@ -1074,8 +1073,8 @@ class RegistryAggregator extends Builder {
         return (package, path);
       }
 
-      Future<String> getCode(Map<String,dynamic> meta) async {
-        var (package, path) = packagePath(meta["name"] as String);
+      Future<String> getCode(String name, List<int> offset) async {
+        var (package, path) = packagePath(name);
 
         path = path.substring(0, path.lastIndexOf(":"));
 
@@ -1083,7 +1082,7 @@ class RegistryAggregator extends Builder {
 
         var code = await getAsset(AssetId(package, "lib/$fragmentPath")); // TODO test
 
-        return code.substring(meta["offset"][0], meta["offset"][1]);
+        return code.substring(offset[0], offset[1]);
       }
 
       // Load metadata for sorting and dependency resolution
@@ -1097,8 +1096,16 @@ class RegistryAggregator extends Builder {
 
           final List<dynamic> classes = data['classes'];
 
+          // create and remember wrapper classes
+
           for ( var cl in classes)
-            elements[cl["name"]] = Element(meta: cl);
+            elements[cl["name"]] = Element(
+                name: cl["name"],
+                type: cl["type"],
+                dependencies: (cl["dependencies"] as List<dynamic>).cast<String>(),
+                imports: (cl["imports"] as List<dynamic>).cast<String>(),
+                offset: (cl["offset"] as List<dynamic>).cast<int>(),
+            );
         }
         catch (e) {
           log.warning('Could not read JSON ${assetId.path}: $e');
@@ -1107,6 +1114,15 @@ class RegistryAggregator extends Builder {
 
       Element findElement(String ref) { // "sample:/lib/foo.dart:Foo"
         return elements[ref]!;
+      }
+
+      // resolve elements
+
+      for (final element in elements.values) {
+        for ( var dependency in element.dependencies) {
+
+          findElement(dependency).dependants.add(element);
+        }
       }
 
       // Combine all code fragments
@@ -1123,7 +1139,7 @@ class RegistryAggregator extends Builder {
       final importSet = <String>{};
 
       for (final element in elements.values) {
-        importSet.addAll( (element.meta["imports"] as List<dynamic>).cast<String>());
+        importSet.addAll(element.imports);
       }
 
       // and print
@@ -1139,9 +1155,28 @@ class RegistryAggregator extends Builder {
         buffer.writeln('  // No @Dataclass annotated classes found');
       }
       else {
-        for (final element in elements.values) {
-          await element.emit(buffer, false, findElement, getCode);
-        }
+        //for (final element in elements.values) {
+        //  await element.emit(buffer, false, findElement, getCode);
+        //}
+
+        // start with elements with inDegree == 0
+
+        final List<Element> queue = [
+          for (var element in elements.values)
+            if (element.inDegree == 0) element,
+        ];
+
+        while (queue.isNotEmpty) {
+          final current = queue.removeAt(0);
+
+          await current.emit(buffer, false, findElement, getCode);
+
+          for (var dep in current.dependants) {
+            dep.inDegree--;
+            if (dep.inDegree == 0)
+              queue.add(dep);
+          } // for
+        } // while
       }
 
       buffer.writeln('}');

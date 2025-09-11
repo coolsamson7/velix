@@ -1169,6 +1169,17 @@ class RegistryAggregator extends Builder {
 
       final importSet = <String>{};
 
+      String getImport(String import) {
+        if (import.startsWith('asset:')) { // asset:velix_di/test/bla...
+          // join all segments
+          var index = import.indexOf("/test");
+
+          import = import.substring(index + "/test/".length);
+        }
+
+        return import;
+      }
+
       for (final element in elements.values) {
         importSet.addAll(element.imports);
       }
@@ -1179,10 +1190,12 @@ class RegistryAggregator extends Builder {
         buffer
           ..writeln("part of '$partOf';")
           ..writeln();
-      else
-        for (final importPath in importSet.toList()..sort()) {
-          buffer.writeln("import '$importPath';");
+      else {
+        for (final importPath in importSet.toList()
+          ..sort()) {
+          buffer.writeln("import '${getImport(importPath)}';");
         }
+      }
 
       buffer.writeln();
 

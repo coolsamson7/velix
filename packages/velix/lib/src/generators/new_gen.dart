@@ -13,12 +13,15 @@ import 'package:glob/glob.dart';
 import '../../util/collections.dart';
 import '../../validation/validation.dart';
 
-String assetIdToImportUri(AssetId id) {
+String assetIdToImportUri(AssetId id) { // TODO test
   if (id.path.startsWith('lib/')) {
-    final relative = id.path.substring(4); // drop "lib/"
+    final relative = id.path.substring(4);
     return 'package:${id.package}/$relative';
   }
-  // fallback: use asset: scheme
+  else if (id.path.startsWith('test/')) {
+    final relative = id.path;
+    return 'asset:${id.package}/$relative';
+  }
   return 'asset:${id.package}/${id.path}';
 }
 
@@ -1073,6 +1076,23 @@ class RegistryAggregator extends Builder {
 
       /// Converts a "package:..." URI string into an AssetId
       (String, String) packagePath(String packageUri) {
+        // TODO test
+        if (packageUri.startsWith("asset:")) {
+          // Remove asset: prefix
+          final assetPart = packageUri.substring('asset:'.length);
+          // Split into package and path
+          final slash = assetPart.indexOf('/');
+          final package = assetPart.substring(0, slash); // 'velix_di'
+          // Find the part before the colon (:)
+          final colon = assetPart.lastIndexOf(':');
+          final filePath = assetPart.substring(
+              slash + 1, colon); // 'test/conflict/conflict.dart'
+          final fragmentPath = filePath.replaceAll(
+              RegExp(r'\.dart$'), '.registry.dart');
+
+          return (package, filePath);
+        }
+
         if (!packageUri.startsWith('package:')) {
           throw ArgumentError('Expected a package URI, got: $packageUri');
         }
@@ -1086,11 +1106,14 @@ class RegistryAggregator extends Builder {
       Future<String> getCode(String name, List<int> offset) async {
         var (package, path) = packagePath(name);
 
-        path = path.substring(0, path.lastIndexOf(":"));
+        if ( path.contains(":"))
+          path = path.substring(0, path.lastIndexOf(":"));
 
-        final fragmentPath = path.replaceAll(RegExp(r'\.dart$'), '.registry.dart');
+        var fragmentPath = path.replaceAll(RegExp(r'\.dart$'), '.registry.dart');
+        if ( !fragmentPath.startsWith("test"))
+          fragmentPath = "lib/$fragmentPath";
 
-        var code = await getAsset(AssetId(package, "lib/$fragmentPath")); // TODO test
+        var code = await getAsset(AssetId(package, fragmentPath)); // TODO test
 
         return code.substring(offset[0], offset[1]);
       }

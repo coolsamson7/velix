@@ -918,41 +918,38 @@ class FragmentBuilder extends Builder {
 
       // scan all classes
 
-      for (final cls in lib.classes) {
-        final handle = cls.metadata.annotations.any((annotation) {
-          final name = annotation.element?.enclosingElement?.name;
-
-          return name == 'Dataclass' ||
-              name == 'Injectable' ||
-              name == 'Module' ||
-              name == 'Scope';
+      bool handle(InterfaceElement e) {
+        return e.metadata.annotations.any((a) {
+          final name = a.element?.enclosingElement?.name;
+          return name == 'Dataclass' || name == 'Injectable' || name == 'Module' || name == 'Scope';
         });
+      }
 
-        if (!handle)
-          continue;
+      // scan all classes
 
+      for (final cls in [...lib.classes, ...lib.enums].where(handle)) {
         // Find AST node for line/col
 
-        final node = unit.declarations
-            .whereType<ClassDeclaration>()
-            .firstWhere(
-              (d) => d.name.lexeme == cls.name,
-          orElse: () => throw Exception('Class node not found'),
-        );
+        var location = CharacterLocation(-1, -1);
+        try {
+          final node = unit.declarations
+              .whereType<ClassDeclaration>()
+              .firstWhere(
+                (d) => d.name.lexeme == cls.name,
+            orElse: () => throw Exception('Class node not found'),
+          );
 
-        final location = lineInfo.getLocation(node.offset);
+          location = lineInfo.getLocation(node.offset);
+        }
+        catch(e) {
+          print("no node for $cls");
+        }
 
-        Map<String,dynamic> meta;
-
-       if ( cls is EnumElement)
-         meta = EnumCodeGenerator(variable: false).generate(buffer, cls as EnumElement, buildStep.inputId, location);
-
-       else if ( cls is ClassElement)
-          meta = ClassCodeGenerator(variable: false, generateProperties: false).generate(buffer, cls, buildStep.inputId, location);
-
-        // JSON metadata
-
-        classes.add(meta);
+        if ( cls is EnumElement) {
+          classes.add(EnumCodeGenerator(variable: false).generate(buffer, cls, buildStep.inputId, location));
+        }
+        else if ( cls is ClassElement)
+          classes.add(ClassCodeGenerator(variable: false, generateProperties: false).generate(buffer, cls, buildStep.inputId, location));
       }
 
       // write JSON metadata

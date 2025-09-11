@@ -13,7 +13,7 @@ import 'package:glob/glob.dart';
 import '../../util/collections.dart';
 import '../../validation/validation.dart';
 
-String assetIdToImportUri(AssetId id) { // TODO test
+String assetIdToImportUri(AssetId id) {
   if (id.path.startsWith('lib/')) {
     final relative = id.path.substring(4);
     return 'package:${id.package}/$relative';
@@ -34,7 +34,7 @@ String? returnTypeUri(MethodElement method) {
   // Only class/interface types have a library
   if (returnType is InterfaceType) {
     final classElement = returnType.element;
-    return "${classElement.library.uri}:${classElement.name}";
+    return "${classElement.library.uri}";
   }
 
   // e.g. void, dynamic, function types, etc. → no class
@@ -146,15 +146,15 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     }
   }
 
-  Set<Uri> imports = <Uri>{};
+  Set<String> imports = <String>{};
   Set<String> dependencies = <String>{};
 
-  void addImport(Uri import) {
+  void addImport(String import) {
     imports.add(import);
   }
 
   void collectImports(T element) {
-    addImport(element.library.uri);
+    addImport(element.library.uri.toString());
 
     collectAnnotationImports(element.metadata.annotations);
   }
@@ -172,7 +172,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     for (final annotation in metadata) {
       final libUri = annotation.element?.library?.uri;
       if (libUri != null) {
-        addImport(libUri);
+        addImport(libUri.toString());
       }
     }
   }
@@ -220,7 +220,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
       'type': element.name,
       'dependencies': dependencies.toList(),
       'offset': [start, buffer.length],
-      'imports': imports.map((uri) => uri.toString()).toList(),
+      'imports': imports.toList(),
     };
   }
 }
@@ -418,6 +418,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final returnType = method.returnType;
     final isAsync = method.returnType.isDartAsyncFuture;
 
+    if (returnTypeUri(method) != null)
+      addImport(returnTypeUri(method)!);
+
     // Find the lifecycle annotation
 
     for (final annotation in method.metadata.annotations) {
@@ -429,8 +432,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         }
       }
     }
-    
-    //addDependency(returnTypeUri(method)!);
 
     tab().writeln("method<$className,$returnType>('$methodName',").indent(1);
 
@@ -877,7 +878,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       'type': element.name,
       'dependencies': this.dependencies.toList(),
       'offset': [start, buffer.length],
-      'imports': imports.map((uri) => uri.toString()).toList(),
+      'imports': imports.toList(),
     };
   }
 }
@@ -952,7 +953,7 @@ class FragmentBuilder extends Builder {
           classes.add(EnumCodeGenerator(variable: false).generate(buffer, cls, buildStep.inputId, location));
         }
         else if ( cls is ClassElement)
-          classes.add(ClassCodeGenerator(variable: false, generateProperties: false).generate(buffer, cls, buildStep.inputId, location));
+          classes.add(ClassCodeGenerator(variable: false, generateProperties: isDataclass(cls)).generate(buffer, cls, buildStep.inputId, location));
       }
 
       // write JSON metadata
@@ -1191,6 +1192,8 @@ class RegistryAggregator extends Builder {
           ..writeln("part of '$partOf';")
           ..writeln();
       else {
+        buffer.writeln("import 'package:velix/velix.dart';");
+
         for (final importPath in importSet.toList()
           ..sort()) {
           buffer.writeln("import '${getImport(importPath)}';");

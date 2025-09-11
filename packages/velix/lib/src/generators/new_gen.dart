@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+
+import 'package:async/async.dart';
+
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -22,6 +25,7 @@ String assetIdToImportUri(AssetId id) {
     final relative = id.path;
     return 'asset:${id.package}/$relative';
   }
+
   return 'asset:${id.package}/${id.path}';
 }
 
@@ -38,6 +42,7 @@ String? returnTypeUri(MethodElement method) {
   }
 
   // e.g. void, dynamic, function types, etc. → no class
+
   return null;
 }
 
@@ -401,8 +406,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         write(", defaultValue: $defaultValue");
 
       if (param.metadata.annotations.isNotEmpty) {
-        writeln(",").tab();
+        writeln(",");
         generateAnnotations(param.metadata.annotations);
+        tab();
       }
 
       write(")").writeln(i < len - 1 ? ", " : "");
@@ -839,7 +845,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     tab();
     if (variable)
-      write("var ${className}Descriptor = ");
+      write("  var ${className}Descriptor =");
 
     writeln("type<$className>(").indent(1);
     tab().writeln("location: '$qualifiedName',");
@@ -1009,7 +1015,7 @@ class Element {
       var colon = name.lastIndexOf(":");
       var className = name.substring(colon + 1);
 
-      buffer.write("var ${className}Descriptor = ");
+      buffer.write("var ${className}Descriptor =");
     }
 
     // emit
@@ -1024,14 +1030,14 @@ class RegistryAggregator extends Builder {
 
   String functionName;
   String partOf;
-
+  String prefix;
 
   @override
   final buildExtensions = const {'.dart': ['.registry.g.dart']};
 
   // constructor
 
-  RegistryAggregator({required this.functionName, required this.partOf});
+  RegistryAggregator({required this.functionName, required this.partOf, required this.prefix});
 
   // override
 
@@ -1043,23 +1049,18 @@ class RegistryAggregator extends Builder {
     final mainFileName = buildStep.inputId.pathSegments.last;
 
     try {
-      final allJsonAssets = await buildStep
-          .findAssets(Glob('**/*.registry.json'))
+      final mergedStream = StreamGroup.merge([
+        buildStep.findAssets(Glob('$prefix/*.registry.json')),
+        buildStep.findAssets(Glob('$prefix/**/*.registry.json'))
+      ]);
+
+      final allJsonAssets = await mergedStream
           .where((id) => id.package == rootPackage)
           .toList();
 
       // sort, so we stay stable
 
       allJsonAssets.sort((a,b) => a.path.compareTo(b.path));
-
-      // TODO
-
-      final List<AssetId> allRegistryAssets = await buildStep
-          .findAssets(Glob('**/*.registry.dart'))
-          .where((id) => id.package == rootPackage)
-          .toList();
-
-      print(allRegistryAssets);
 
       final Map<AssetId, String> assets = HashMap<AssetId, String>();
 
@@ -1074,10 +1075,8 @@ class RegistryAggregator extends Builder {
         return result;
       }
 
-
       /// Converts a "package:..." URI string into an AssetId
       (String, String) packagePath(String packageUri) {
-        // TODO test
         if (packageUri.startsWith("asset:")) {
           // Remove asset: prefix
           final assetPart = packageUri.substring('asset:'.length);
@@ -1086,10 +1085,7 @@ class RegistryAggregator extends Builder {
           final package = assetPart.substring(0, slash); // 'velix_di'
           // Find the part before the colon (:)
           final colon = assetPart.lastIndexOf(':');
-          final filePath = assetPart.substring(
-              slash + 1, colon); // 'test/conflict/conflict.dart'
-          final fragmentPath = filePath.replaceAll(
-              RegExp(r'\.dart$'), '.registry.dart');
+          final filePath = assetPart.substring(slash + 1, colon); // 'test/conflict/conflict.dart'
 
           return (package, filePath);
         }
@@ -1097,10 +1093,12 @@ class RegistryAggregator extends Builder {
         if (!packageUri.startsWith('package:')) {
           throw ArgumentError('Expected a package URI, got: $packageUri');
         }
+
         final withoutPrefix = packageUri.substring('package:'.length);
         final parts = withoutPrefix.split('/');
         final package = parts.first;
         final path = parts.skip(1).join('/');
+
         return (package, path);
       }
 
@@ -1114,7 +1112,7 @@ class RegistryAggregator extends Builder {
         if ( !fragmentPath.startsWith("test"))
           fragmentPath = "lib/$fragmentPath";
 
-        var code = await getAsset(AssetId(package, fragmentPath)); // TODO test
+        var code = await getAsset(AssetId(package, fragmentPath));
 
         return code.substring(offset[0], offset[1]);
       }
@@ -1189,7 +1187,7 @@ class RegistryAggregator extends Builder {
 
       if (partOf != "")
         buffer
-          ..writeln("part of '$partOf';")
+          ..writeln("part of '$partOf.dart';")
           ..writeln();
       else {
         buffer.writeln("import 'package:velix/velix.dart';");
@@ -1202,7 +1200,7 @@ class RegistryAggregator extends Builder {
 
       buffer.writeln();
 
-      buffer.writeln('void registerAll() {');
+      buffer.writeln('void $functionName() {');
       if (elements.isEmpty) {
         buffer.writeln('  // No annotated classes found');
       }
@@ -1221,7 +1219,12 @@ class RegistryAggregator extends Builder {
         while (queue.isNotEmpty) {
           final current = queue.removeAt(0);
 
+          if ( current.name.contains("Cycle"))
+            print(current.name);
+
           await current.emit(buffer, false, findElement, getCode);
+
+          buffer.writeln();
 
           for (var dep in current.dependants) {
             dep.inDegree--;
@@ -1267,6 +1270,7 @@ Builder combinedRegistryAggregator(BuilderOptions options) {
 
   final functionName = config['function_name'] as String? ?? 'registerAllDescriptors';
   final partOf = config['part_of'] as String? ?? "";
+  final prefix = config['prefix'] as String? ?? "lib/";
 
-  return RegistryAggregator(functionName: functionName, partOf: partOf);
+  return RegistryAggregator(functionName: functionName, partOf: partOf, prefix: prefix);
 }

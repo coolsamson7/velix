@@ -905,8 +905,7 @@ class RegistryFragmentBuilder extends Builder {
         path.contains('.g.dart') ||
         path.contains('.part.dart') ||
         path.contains('.freezed.dart') ||
-        path.contains('.gr.dart') ||
-        path.contains('combined_registry.dart')) {
+        path.contains('.gr.dart')) {
       return;
     }
 
@@ -1001,8 +1000,14 @@ class Element {
 
   // public
 
-  Future<void> emit(StringBuffer buffer, bool variable, FindNode find,
-      FetchCode fetch) async {
+  Future<void> emit(StringBuffer buffer, bool variable, FindNode find, FetchCode fetch, {String? header}) async {
+    // header
+
+    if ( header != null)
+      buffer.writeln("  // $header");
+
+    // variable declaration
+
     if (dependants.isNotEmpty) {
       var colon = name.lastIndexOf(":");
       var className = name.substring(colon + 1);
@@ -1025,7 +1030,7 @@ class RegistryAggregator extends Builder {
   String prefix;
 
   @override
-  final buildExtensions = const {'.dart': ['.registry.g.dart']};
+  final buildExtensions = const {'.dart': ['.types.g.dart']};
 
   // constructor
 
@@ -1197,10 +1202,6 @@ class RegistryAggregator extends Builder {
         buffer.writeln('  // No annotated classes found');
       }
       else {
-        //for (final element in elements.values) {
-        //  await element.emit(buffer, false, findElement, getCode);
-        //}
-
         // start with elements with inDegree == 0
 
         final List<Element> queue = [
@@ -1208,8 +1209,12 @@ class RegistryAggregator extends Builder {
             if (element.inDegree == 0) element,
         ];
 
+        // process queue
+
         while (queue.isNotEmpty) {
           final current = queue.removeAt(0);
+
+          elements.remove(current.name);
 
           await current.emit(buffer, false, findElement, getCode);
 
@@ -1222,7 +1227,17 @@ class RegistryAggregator extends Builder {
           } // for
         } // while
 
-        // TODO cycles
+        // everything left are cycles
+        // we could throw an exception, or still generate something and leave it to the runtime
+        // for sake of backward compatibility, let's generate ...
+
+        if (elements.isNotEmpty) {
+          for ( var element in elements.values) {
+            await element.emit(buffer, false, findElement, getCode, header: "watchout: is part of a cycle");
+
+            buffer.writeln();
+          }
+        }
       }
 
       buffer.writeln('}');

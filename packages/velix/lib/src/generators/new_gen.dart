@@ -32,12 +32,11 @@ String assetIdToImportUri(AssetId id) {
 typedef FetchCode = Future<String> Function(String name, List<int> offset);
 typedef FindNode = Element Function(String ref);
 
-String? returnTypeUri(MethodElement method) {
-  final DartType returnType = method.returnType;
-
+String? typeLibrary(DartType type) {
   // Only class/interface types have a library
-  if (returnType is InterfaceType) {
-    final classElement = returnType.element;
+  if (type is InterfaceType) {
+    final classElement = type.element;
+
     return "${classElement.library.uri}";
   }
 
@@ -154,8 +153,9 @@ abstract class CodeGenerator<T extends InterfaceElement> {
   Set<String> imports = <String>{};
   Set<String> dependencies = <String>{};
 
-  void addImport(String import) {
-    imports.add(import);
+  void addImport(String? import) {
+    if ( import != null)
+     imports.add(import);
   }
 
   void collectImports(T element) {
@@ -424,8 +424,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final returnType = method.returnType;
     final isAsync = method.returnType.isDartAsyncFuture;
 
-    if (returnTypeUri(method) != null)
-      addImport(returnTypeUri(method)!);
+    addImport(typeLibrary(method.returnType));
 
     // Find the lifecycle annotation
 
@@ -476,8 +475,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     indent(-1).tab().write(')').writeln(last ? "" : ", ");
   }
-
-  //
 
   void generateConstructorParams(ClassElement element) {
     // collect parameters

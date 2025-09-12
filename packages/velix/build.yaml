@@ -32,5 +32,5 @@ builders:
     builder_factories: [ "registryAggregator" ]
     build_extensions:
       ".dart": [ ".types.g.dart" ]  # Generate .g.dart part file
-    auto_apply: none  # Manual trigger only
+    auto_apply: none  # manual trigger only
     build_to: source

@@ -8,6 +8,7 @@ environment:
   sdk: ^3.9.0
 
 dev_dependencies:
+  build_runner: ^2.4.7
   lints: ^6.0.0
   melos: ^7.1.0
 
@@ -23,6 +24,7 @@ workspace:
   - packages/velix_i18n
   - packages/velix_mapper
   - packages/velix_ui
+  - examples/example
 
 scripts:
   test:

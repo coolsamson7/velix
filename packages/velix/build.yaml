@@ -1,11 +1,36 @@
 builders:
-  type_builder:
-    import: "package:velix/src/generators/type_generator.dart"
-    builder_factories: [ "typeBuilder" ]
-    build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
-    auto_apply: none
-    build_to: source
+  #type_builder:
+  #  import: "package:velix/src/generators/type_generator.dart"
+  #  builder_factories: [ "typeBuilder" ]
+  #  build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
+  #  auto_apply: none
+  #  build_to: source
+  #  defaults:
+  #    options:
+  #      function_name: "registerAllDescriptors"
+  #      part_of: ""
+  # Builder for extracting individual class metadata AND code fragments
+  registry_builder:
+    import: "package:velix/src/generators/registry_generator.dart"
+    builder_factories: [ "registryBuilder" ]
+    build_extensions:
+      ".dart": [ ".registry.json", ".registry.dart" ]
+    auto_apply: none  #dependents
+    build_to: cache
     defaults:
-      options:
-        function_name: "registerAllDescriptors"
-        part_of: ""
+      generate_for:
+        - lib/*.dart
+        - lib/**/*.dart
+        - "!lib/**/*.g.dart"
+        - "!lib/**/*.part.dart"
+        - "!lib/**/*.freezed.dart"
+        - "!lib/**/*.gr.dart"
+
+  # Combine all registries
+  registry_aggregator:
+    import: "package:velix/src/generators/registry_generator.dart"
+    builder_factories: [ "registryAggregator" ]
+    build_extensions:
+      ".dart": [ ".types.g.dart" ]  # Generate .g.dart part file
+    auto_apply: none  # Manual trigger only
+    build_to: source

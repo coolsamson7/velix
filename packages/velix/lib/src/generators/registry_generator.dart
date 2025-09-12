@@ -900,6 +900,8 @@ class RegistryFragmentBuilder extends Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     final path = buildStep.inputId.path;
 
+    print(path);
+
     // Skip generated or irrelevant files
     if (!path.endsWith('.dart') ||
         path.contains('.g.dart') ||
@@ -1233,6 +1235,8 @@ class RegistryAggregator extends Builder {
 
         if (elements.isNotEmpty) {
           for ( var element in elements.values) {
+            log.warning('Cycle detected involving ${element.name}');
+
             await element.emit(buffer, false, findElement, getCode, header: "watchout: is part of a cycle");
 
             buffer.writeln();
@@ -1250,6 +1254,7 @@ class RegistryAggregator extends Builder {
     catch (e, stackTrace) {
       log.severe('❌ Error in RegistryAggregator: $e');
       log.fine('$stackTrace');
+
       final outputId = buildStep.inputId.changeExtension('.types.g.dart');
       await buildStep.writeAsString(outputId, _generateEmptyPartFile(mainFileName));
     }
@@ -1276,7 +1281,7 @@ Builder registryAggregator(BuilderOptions options) {
 
   final functionName = config['function_name'] as String? ?? 'registerAllDescriptors';
   final partOf = config['part_of'] as String? ?? "";
-  final prefix = config['prefix'] as String? ?? "lib/";
+  final prefix = config['prefix'] as String? ?? "lib";
 
   return RegistryAggregator(functionName: functionName, partOf: partOf, prefix: prefix);
 }

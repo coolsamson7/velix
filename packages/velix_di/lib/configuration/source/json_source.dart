@@ -6,13 +6,15 @@ import '../configuration.dart';
 
 @Injectable(factory: false)
 class JsonFileConfigurationSource extends ConfigurationSource {
+  // instance data
+
   final String filePath;
+
+  // constructor
 
   JsonFileConfigurationSource(this.filePath);
 
-  //final contents = await rootBundle.loadString(assetPath);
-  //
-  //       if
+  // override
 
   @override
   Map<String, dynamic> load() {
@@ -28,7 +30,8 @@ class JsonFileConfigurationSource extends ConfigurationSource {
         return <String, dynamic>{};
       }
 
-      // Parse JSON
+      // parse JSON
+
       final dynamic parsed = jsonDecode(contents);
 
       if (parsed is! Map<String, dynamic>) {

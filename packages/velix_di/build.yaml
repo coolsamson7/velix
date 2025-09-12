@@ -1,26 +1,53 @@
 builders:
-  type_builder:
-    import: "package:velix/src/generators/type_generator.dart"
-    builder_factories: [ "typeBuilder" ]
-    build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
-    auto_apply: none
-    build_to: source
-    defaults:
-      options:
-        function_name: "registerAllDescriptors"
-        part_of: ""
-
+  #type_builder:
+  #  import: "package:velix/src/generators/type_generator.dart"
+  #  builder_factories: [ "typeBuilder" ]
+  #  build_extensions: { "$lib$": [ ".type_registry.g.dart" ] }
+  #  auto_apply: none
+  #  build_to: source
+  #  defaults:
+  #    options:
+  #      function_name: "registerAllDescriptors"
+  #      part_of: ""
 targets:
   $default:
     builders:
+      velix|registry_builder:
+        generate_for:
+          - lib/**/*.dart
+          - lib/*.dart
+          - "!lib/**/*.g.dart"
+          - "!lib/**/*.part.dart"
+          - "!lib/**/*.freezed.dart"
+          - "!lib/**/*.gr.dart"
+
+      velix|registry_aggregator:
+        options:
+          function_name: "registerVelixDescriptors"
+          part_of: "velix_di"
+          prefix: "lib"
+        generate_for:
+          - lib/velix_di.dart
 
   test:
     sources:
       - test/**
     builders:
-      velix|type_builder:
+      #velix|type_builder:
+      #  generate_for:
+      #    include:
+      #      - test/di.dart
+      #    exclude:
+      #      - test/**.g.dart
+      velix|registry_builder:
         generate_for:
-          include:
-            - test/di.dart
-          exclude:
-            - test/**.g.dart
+          - test/*.dart
+          - test/**/*.dart
+          - "!test/**/*.g.dart"
+          - "!test/**/*.part.dart"
+
+      velix|registry_aggregator:
+        options:
+          prefix: "test"
+        generate_for:
+          - test/di.dart

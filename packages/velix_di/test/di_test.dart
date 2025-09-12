@@ -7,7 +7,7 @@ import 'package:velix/velix.dart';
 import 'conflict/conflict.dart';
 import 'cycle/cycle.dart';
 import 'di.dart';
-import 'di.type_registry.g.dart';
+import 'di.types.g.dart';
 import 'mock/mock.dart';
 
 void main() {

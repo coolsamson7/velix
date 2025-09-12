@@ -886,7 +886,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   }
 }
 
-class FragmentBuilder extends Builder {
+class RegistryFragmentBuilder extends Builder {
   // instance data
 
   @override
@@ -937,20 +937,15 @@ class FragmentBuilder extends Builder {
       for (final cls in [...lib.classes, ...lib.enums].where(handle)) {
         // Find AST node for line/col
 
-        var location = CharacterLocation(-1, -1);
-        try {
-          final node = unit.declarations
-              .whereType<ClassDeclaration>()
-              .firstWhere(
-                (d) => d.name.lexeme == cls.name,
-            orElse: () => throw Exception('Class node not found'),
-          );
+        final node = [
+          ...unit.declarations.whereType<ClassDeclaration>(),
+          ...unit.declarations.whereType<EnumDeclaration>(),
+        ].firstWhere(
+              (d) => d.name.lexeme == cls.name,
+          orElse: () => throw Exception('Node not found for $cls'),
+        );
 
-          location = lineInfo.getLocation(node.offset);
-        }
-        catch(e) {
-          print("no node for $cls");
-        }
+        var location = lineInfo.getLocation(node.offset);
 
         if ( cls is EnumElement) {
           classes.add(EnumCodeGenerator(variable: false).generate(buffer, cls, buildStep.inputId, location));
@@ -1012,7 +1007,7 @@ class Element {
       var colon = name.lastIndexOf(":");
       var className = name.substring(colon + 1);
 
-      buffer.write("var ${className}Descriptor =");
+      buffer.write("  var ${className}Descriptor =");
     }
 
     // emit
@@ -1040,7 +1035,7 @@ class RegistryAggregator extends Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    log.info('🚀 CombinedRegistryAggregator triggered by: ${buildStep.inputId.path}');
+    log.info('🚀 RegistryAggregator triggered by: ${buildStep.inputId.path}');
 
     final rootPackage = buildStep.inputId.package;
     final mainFileName = buildStep.inputId.pathSegments.last;
@@ -1216,9 +1211,6 @@ class RegistryAggregator extends Builder {
         while (queue.isNotEmpty) {
           final current = queue.removeAt(0);
 
-          if ( current.name.contains("Cycle"))
-            print(current.name);
-
           await current.emit(buffer, false, findElement, getCode);
 
           buffer.writeln();
@@ -1229,19 +1221,21 @@ class RegistryAggregator extends Builder {
               queue.add(dep);
           } // for
         } // while
+
+        // TODO cycles
       }
 
       buffer.writeln('}');
 
-      final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
+      final outputId = buildStep.inputId.changeExtension('.types.g.dart');
       await buildStep.writeAsString(outputId, buffer.toString());
 
-      log.info('✅ Successfully generated part file');
+      log.info('✅ Successfully generated types file');
     }
     catch (e, stackTrace) {
-      log.severe('❌ Error in CombinedRegistryAggregator: $e');
+      log.severe('❌ Error in RegistryAggregator: $e');
       log.fine('$stackTrace');
-      final outputId = buildStep.inputId.changeExtension('.registry.g.dart');
+      final outputId = buildStep.inputId.changeExtension('.types.g.dart');
       await buildStep.writeAsString(outputId, _generateEmptyPartFile(mainFileName));
     }
   }
@@ -1260,9 +1254,9 @@ void $functionName() {
 /// Builder factories
 /// ----------------------------
 
-Builder registryPerFileBuilder(BuilderOptions options) =>  FragmentBuilder();
+Builder registryBuilder(BuilderOptions options) =>  RegistryFragmentBuilder();
 
-Builder combinedRegistryAggregator(BuilderOptions options) {
+Builder registryAggregator(BuilderOptions options) {
   final config = options.config;
 
   final functionName = config['function_name'] as String? ?? 'registerAllDescriptors';

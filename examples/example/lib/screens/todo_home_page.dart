@@ -4,11 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:sample/models/todo.dart';
 import '../screens/todo_detail_page.dart';
 import 'package:provider/provider.dart';
-import 'package:velix/velix.dart';
 import 'package:velix_ui/velix_ui.dart';
 import 'package:velix_i18n/velix_i18n.dart';
-import 'package:velix_mapper/velix_mapper.dart';
-import 'package:velix_di/velix_di.dart';
 import '../providers/todo_provider.dart';
 
 part 'todo_home_page.command.g.dart';

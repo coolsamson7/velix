@@ -9,7 +9,7 @@ import 'package:velix_mapper/mapper/mapper.dart';
 import 'package:velix_ui/velix_ui.dart';
 
 import 'package:provider/provider.dart';
-import 'main.type_registry.g.dart';
+import 'main.types.g.dart';
 import 'providers/todo_provider.dart';
 import 'screens/main_screen.dart';
 

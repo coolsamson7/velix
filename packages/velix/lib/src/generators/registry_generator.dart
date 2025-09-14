@@ -900,8 +900,6 @@ class RegistryFragmentBuilder extends Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     final path = buildStep.inputId.path;
 
-    print(path);
-
     // Skip generated or irrelevant files
     if (!path.endsWith('.dart') ||
         path.contains('.g.dart') ||
@@ -1108,8 +1106,9 @@ class RegistryAggregator extends Builder {
           path = path.substring(0, path.lastIndexOf(":"));
 
         var fragmentPath = path.replaceAll(RegExp(r'\.dart$'), '.registry.dart');
-        if ( !fragmentPath.startsWith("test"))
-          fragmentPath = "lib/$fragmentPath";
+
+        //if ( !fragmentPath.startsWith("test") || !fragmentPath.startsWith("example"))
+        //  fragmentPath = "lib/$fragmentPath";
 
         var code = await getAsset(AssetId(package, fragmentPath));
 
@@ -1151,7 +1150,6 @@ class RegistryAggregator extends Builder {
 
       for (final element in elements.values) {
         for ( var dependency in element.dependencies) {
-
           findElement(dependency).dependants.add(element);
         }
       }
@@ -1252,6 +1250,11 @@ class RegistryAggregator extends Builder {
       log.info('✅ Successfully generated types file');
     }
     catch (e, stackTrace) {
+      if ( e is AssetNotFoundException) {
+        print(e.path);
+        print(e.assetId);
+      }
+
       log.severe('❌ Error in RegistryAggregator: $e');
       log.fine('$stackTrace');
 

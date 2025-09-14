@@ -1107,8 +1107,8 @@ class RegistryAggregator extends Builder {
 
         var fragmentPath = path.replaceAll(RegExp(r'\.dart$'), '.registry.dart');
 
-        //if ( !fragmentPath.startsWith("test") || !fragmentPath.startsWith("example"))
-        //  fragmentPath = "lib/$fragmentPath";
+        if (name.startsWith("package:"))
+          fragmentPath = "lib/$fragmentPath";
 
         var code = await getAsset(AssetId(package, fragmentPath));
 

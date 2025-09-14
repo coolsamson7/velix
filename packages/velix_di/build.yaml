@@ -11,7 +11,22 @@ builders:
   #      part_of: ""
 targets:
   $default:
+    sources:
+      - lib/**
+      - $package$
     builders:
+      #velix|registry_builder:
+      #  generate_for:
+      #    - example/*.dart
+      #    - example/**/*.dart
+      #    - "!example/**/*.g.dart"
+      #    - "!example/**/*.part.dart"
+      #velix|registry_aggregator:
+      #  options:
+      #    prefix: "example"
+      #  generate_for:
+      #    - example/main.dart
+
       velix|registry_builder:
         generate_for:
           - lib/**/*.dart

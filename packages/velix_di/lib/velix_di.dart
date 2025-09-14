@@ -23,7 +23,7 @@ export './configuration/source/json_source.dart';
 export './di/di.dart';
 
 // trick to allow to reference generated code
-//part 'velix_di.type_registry.g.dart';
+
 part 'velix_di.types.g.dart';
 
 class Velix {

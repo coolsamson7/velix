@@ -1167,10 +1167,8 @@ class RegistryAggregator extends Builder {
 
       String getImport(String import) {
         if (import.startsWith('asset:')) { // asset:velix_di/test/bla...
-          // join all segments
-          var index = import.indexOf("/test");
-
-          import = import.substring(index + "/test/".length);
+          var parts = import.split('/');
+          import = parts.skip(2).join('/'); // skip first two segments
         }
 
         return import;

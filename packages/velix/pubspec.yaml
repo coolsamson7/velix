@@ -28,3 +28,8 @@ dev_dependencies:
   #test: ^1.25.0
   flutter_test:
     sdk: flutter
+
+flutter:
+  assets:
+    - assets/locales/en/validation.json
+    - assets/locales/de/validation.json

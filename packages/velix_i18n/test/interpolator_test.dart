@@ -42,9 +42,6 @@ void main() {
       stopwatch.stop();
       print('interpolated $loops, time: ${stopwatch.elapsedMilliseconds} ms, avg=${stopwatch.elapsedMilliseconds / loops}');
 
-
-
-
       expect(result, "hello andi, you are worth EUR100.12!");
 
       // date

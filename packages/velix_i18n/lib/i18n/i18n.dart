@@ -100,6 +100,8 @@ class I18N {
     if ( preloadNamespaces != null)
       for ( var preload in  preloadNamespaces)
         _namespaces[preload] = {};
+
+    locales = _buildFallbackLocales(locale, fallbackLocale);
   }
 
   // internal

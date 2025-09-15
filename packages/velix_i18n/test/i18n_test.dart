@@ -17,23 +17,27 @@ void main() {
 
       // start in en
 
-      final localeManager = LocaleManager(Locale('en'));
+      final localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en'), Locale('de')]);
 
       I18N(
         localeManager: localeManager,
-        loader: AssetTranslationLoader(),
+        fallbackLocale: Locale("en", "EN"),
+        loader: AssetTranslationLoader(
+            namespacePackageMap: {
+              "validation": "velix"
+            }),
+
         missingKeyHandler: (key) => '##$key##',
       );
 
       // load namespaces
 
-      await I18N.instance.loadNamespaces(["velix"]);
+      await I18N.instance.loadNamespaces(["validation"]);
 
       // test
 
-      print('velix:validation.currency.type'.tr({'currency': 11, 'symbol': 'EUR'}));
-
-      print('velix:validation.int.lessThan'.tr({'lessThan': 1}));
+      print('validation:currency.type'.tr({'currency': 11, 'symbol': 'EUR'}));
+      print('validation:int.lessThan'.tr({'lessThan': 1}));
 
       // switch to de
 
@@ -43,7 +47,7 @@ void main() {
 
       await Future.delayed(Duration(milliseconds: 50));
 
-      print('velix:validation.int.lessThan'.tr({'lessThan': 1}));
+      print('validation:int.lessThan'.tr({'lessThan': 1}));
     });
   });
 }

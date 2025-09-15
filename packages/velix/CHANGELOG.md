@@ -1,15 +1,12 @@
-## 0.90.2
-
- - **FIX**: i18n fix.
- - **FEAT**: examples.
- - **FEAT**: new generator is active.
- - **DOCS**: adjusted READMEs.
-
 ## 0.90.1
 
- - **FIX**: new starting version 0.90.0 for velix.
- - **FIX**: new starting version 0.90.0 for velix.
- - **FEAT**: added command generator in the correct package.
+- **FIX**: i18n fix.
+- **FEAT**: examples.
+- **FEAT**: new generator is active.
+- **DOCS**: adjusted READMEs.
+- **FIX**: new starting version 0.90.0 for velix.
+- **FIX**: new starting version 0.90.0 for velix.
+- **FEAT**: added command generator in the correct package.
 
 ## 0.90.0
 
@@ -116,3 +113,7 @@
 ## 0.90.1
 
 - split into multiple packages
+
+## 0.90.2
+
+- generator enhancements

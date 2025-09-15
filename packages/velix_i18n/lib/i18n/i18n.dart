@@ -95,6 +95,8 @@ class I18N {
         _missingKeyHandler = missingKeyHandler {
     instance = this;
 
+    localeManager.addListener(() => _reloadTranslations());
+
     // remember preload namespaces
 
     if ( preloadNamespaces != null)

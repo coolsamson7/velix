@@ -30,6 +30,6 @@
 
 
   "currency": {
-    "type": "expected {currency:currency(symbol: $symbol)}!"
+    "type": "{currency:currency(name: $name)} erwartet!"
   }
 }

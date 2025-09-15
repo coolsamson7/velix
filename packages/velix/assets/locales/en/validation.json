@@ -25,10 +25,10 @@
     "type": "expected a bool"
   },
   "datetime": {
-    "type": "expcted a date"
+    "type": "expected a date"
   },
 
   "currency": {
-    "type": "expected {currency:currency(symbol: $symbol)}!"
+    "type": "expected {currency:currency(name: $name)}!"
   }
 }

@@ -4,14 +4,9 @@ import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_i18n/i18n/loader/asset_loader.dart';
 import 'package:velix_i18n/i18n/locale.dart';
 
-
 void main() {
   group('i18n', () {
     WidgetsFlutterBinding.ensureInitialized();
-
-    // register types
-
-    //registerAllDescriptors();
 
     test('translate', () async {
 
@@ -36,18 +31,19 @@ void main() {
 
       // test
 
-      print('validation:currency.type'.tr({'currency': 11, 'symbol': 'EUR'}));
-      print('validation:int.lessThan'.tr({'lessThan': 1}));
+      expect('validation:currency.type'.tr({'currency': 11, 'name': 'EUR'}), equals("expected EUR11.00!"));
+
+      expect('validation:int.lessThan'.tr({'lessThan': 1}), equals("must be less than 1"));
 
       // switch to de
 
       localeManager.locale = Locale('de');
 
-      // Wait for reload TODO
+      // wait for reload
 
       await Future.delayed(Duration(milliseconds: 50));
 
-      print('validation:int.lessThan'.tr({'lessThan': 1}));
+      expect('validation:int.lessThan'.tr({'lessThan': 1}), equals("muss kleiner als 1 sein"));
     });
   });
 }

@@ -13,9 +13,9 @@ class LocaleManager extends ChangeNotifier {
   // constructor
 
   /// Create a new [LocaleManager]
-  /// [_currentLocale] the initial locale
+  /// [locale] the initial locale
   /// [supportedLocales] optional list of supported locales
-  LocaleManager(this._currentLocale, {List<Locale>? supportedLocales }) : supportedLocales = supportedLocales ?? [] {
+  LocaleManager(Locale locale, {List<Locale>? supportedLocales }) : _currentLocale = locale, supportedLocales = supportedLocales ?? [] {
     Intl.defaultLocale = _currentLocale.toString();
 }
 

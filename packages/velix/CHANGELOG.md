@@ -1,3 +1,10 @@
+## 0.90.2
+
+ - **FIX**: i18n fix.
+ - **FEAT**: examples.
+ - **FEAT**: new generator is active.
+ - **DOCS**: adjusted READMEs.
+
 ## 0.90.1
 
  - **FIX**: new starting version 0.90.0 for velix.

@@ -1,3 +1,8 @@
+## 0.9.1+2
+
+ - **FIX**: i18n fix.
+ - **DOCS**: adjusted READMEs.
+
 ## 0.9.1+1
 
  - **FIX**: new starting version 0.90.0 for velix.

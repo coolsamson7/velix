@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-09-15
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`velix` - `v0.90.2`](#velix---v0902)
+ - [`velix_di` - `v0.9.0+5`](#velix_di---v0905)
+ - [`velix_i18n` - `v0.9.1+2`](#velix_i18n---v0912)
+ - [`velix_mapper` - `v0.9.0+5`](#velix_mapper---v0905)
+ - [`velix_ui` - `v0.9.4`](#velix_ui---v094)
+
+---
+
+#### `velix` - `v0.90.2`
+
+ - **FIX**: i18n fix.
+ - **FEAT**: examples.
+ - **FEAT**: new generator is active.
+ - **DOCS**: adjusted READMEs.
+
+#### `velix_di` - `v0.9.0+5`
+
+ - **FIX**: adjusted build.yaml.
+ - **DOCS**: adjusted READMEs.
+
+#### `velix_i18n` - `v0.9.1+2`
+
+ - **FIX**: i18n fix.
+ - **DOCS**: adjusted READMEs.
+
+#### `velix_mapper` - `v0.9.0+5`
+
+ - **DOCS**: adjusted READMEs.
+
+#### `velix_ui` - `v0.9.4`
+
+ - **FIX**: adjusted build.yaml.
+ - **FEAT**: examples.
+ - **DOCS**: adjusted READMEs.
+
+
 ## 2025-09-06
 
 ### Changes

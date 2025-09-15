@@ -1,3 +1,9 @@
+## 0.9.4
+
+ - **FIX**: adjusted build.yaml.
+ - **FEAT**: examples.
+ - **DOCS**: adjusted READMEs.
+
 ## 0.9.3
 
  - **FIX**: new starting version 0.90.0 for velix.

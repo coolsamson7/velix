@@ -1,4 +1,3 @@
-builders:
 targets:
   $default:
     sources:

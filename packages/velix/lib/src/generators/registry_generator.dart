@@ -1296,7 +1296,7 @@ Builder registryBuilder(BuilderOptions options) =>  RegistryFragmentBuilder();
 Builder registryAggregator(BuilderOptions options) {
   final config = options.config;
 
-  final functionName = config['function_name'] as String? ?? 'registerAllDescriptors';
+  final functionName = config['function_name'] as String? ?? 'registerTypes';
   final partOf = config['part_of'] as String? ?? "";
   final prefix = config['prefix'] as String? ?? "lib";
 

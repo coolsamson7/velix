@@ -500,7 +500,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
             var uri = param.type.element?.library?.uri;
 
-           addDependency("${uri}:${param.type.name}");
+            addDependency("${uri}:${param.type.name}");
 
             tab().write("param<$typeStr>('$name'");
 
@@ -853,7 +853,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
 
     if (element.metadata.annotations.isNotEmpty) {
-      //writeln(",").tab();
       generateAnnotations(element.metadata.annotations);
     }
 
@@ -876,10 +875,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     return {
       'name': "${assetIdToImportUri(assetId)}:${element.name}",
-      //'file': assetId.package,
-      //"path": assetId.path,
       'type': element.name,
-      'dependencies': this.dependencies.toList(),
+      'dependencies': dependencies.toList(),
       'offset': [start, buffer.length],
       'imports': imports.toList(),
     };

@@ -19,14 +19,25 @@ void main() {
 
   registerAllDescriptors();
   
-  // 
+  // create some data
   
   var price = Money(currency: "EUR", value: 1);
   
   var type = TypeDescriptor.forType(Money);
 
+  // call getters
+
   var currency = type.get(price, "currency");
   var value = type.get(price, "value");
 
-  var r = type.constructor!(currency: currency, value: value);
+  // call constructor
+
+  var result = type.constructor!(currency: currency, value: -1);
+
+  try {
+    type.validate(result);
+  }
+  catch(e) {
+    print(e);
+  }
 }

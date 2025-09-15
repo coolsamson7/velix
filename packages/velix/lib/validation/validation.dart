@@ -759,10 +759,10 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
 
   // constructor
 
-  ObjectType(Type type) : super(type: type) {
-    baseType<T>(type);
+  ObjectType(TypeDescriptor type) : super(type: type.type) {
+    baseType<T>(type.type);
 
-    typeDescriptor = TypeDescriptor.forType(type);
+    typeDescriptor = type;
   }
 
   @override
@@ -778,13 +778,13 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
       var path = context.path;
       
       for (FieldDescriptor field in typeDescriptor.getFields()) {
-        context.path = "$path.${field.name}";
+        context.path = path.isEmpty ? field.name :  "$path.${field.name}";
 
         field.type.check(field.getter(object), context);
       }
       
       context.path = path;
-    }
+    } // if
   }
 }
 

@@ -278,6 +278,7 @@ class TypeDescriptor<T> {
   final List<Object> annotations;
   final List<T>? enumValues;
   final bool isAbstract;
+  late ObjectType<T> objectType;
 
   TypeDescriptor? superClass;
   List<TypeDescriptor> childClasses = [];
@@ -298,7 +299,7 @@ class TypeDescriptor<T> {
     this.enumValues
   }) {
     type = nonNullableOf<T>();
-
+    objectType = ObjectType(this);
     // super class
 
     if ( superClass != null) {
@@ -348,6 +349,12 @@ class TypeDescriptor<T> {
     for ( var annotation in annotations)
       if ( annotation is ClassAnnotation)
         annotation.apply(this);
+  }
+
+  //
+
+  void validate(T instance) {
+    objectType.validate(instance);
   }
 
   // internal
@@ -548,7 +555,7 @@ dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
         result = (result as dynamic).optional();
     }
     else {
-      result = ObjectType(type);
+      result = ObjectType(TypeDescriptor.forType(type));
       if ( isNullable )
         result = (result as dynamic).optional();
     }

@@ -24,8 +24,14 @@ Check out some articles on Medium:
   - [Commands](https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb)
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
+Detailed information can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
 
-Detailed infromation can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
+This is a melos mono-repo. Checkout the different packages:
+- [velix](https://github.com/coolsamson7/velix/tree/main/packages/velix)
+- [velix_di](https://github.com/coolsamson7/velix/tree/main/packages/velix_di)
+- [velix_mapper](https://github.com/coolsamson7/velix/tree/main/packages/velix_mapper)
+- [velix_i18n](https://github.com/coolsamson7/velix/tree/main/packages/velix_i18n)
+- [velix_ui](https://github.com/coolsamson7/velix/tree/main/packages/velix_ui)
 
 Lets get a quick overview on the topics
 
@@ -603,6 +609,7 @@ Velix takes a different route:
 - Nested object awareness – Works with object graphs, not just flat maps of fields.
 
 The result is a WPF/Angular-style binding experience in Flutter — something currently missing from the ecosystem.
+
 
 # Installation
 

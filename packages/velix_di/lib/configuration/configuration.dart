@@ -7,6 +7,9 @@ class ConfigurationException implements Exception {
   final String message;
   final Exception? cause;
 
+  /// Create a new [ConfigurationException]
+  /// [message] the message
+  /// [cause] optional chained exception
   const ConfigurationException(this.message, [this.cause]);
 
   @override
@@ -158,7 +161,7 @@ class ConfigurationValues extends ConfigurationSource {
   Map<String, dynamic> load() => Map.from(_config);
 }
 
-
+/// Internal: [ParameterResolver] for configuration values
 class ConfigurationValueParameterResolver extends ParameterResolver {
   // instance data
 
@@ -180,6 +183,7 @@ class ConfigurationValueParameterResolver extends ParameterResolver {
   }
 }
 
+/// Internal: Factory for [ConfigurationValueParameterResolver]
 class ConfigurationValueParameterResolverFactory extends ParameterResolverFactory {
   // static
 

@@ -22,7 +22,7 @@ class feature with Condition {
   }
 }
 
-/// this annotation is ued to define specific requirements for the appropriate class
+/// this annotation is used to define specific requirements for the appropriate class
 /// to be managed by an environment
 class Conditional extends ClassAnnotation {
   final Condition requires;
@@ -37,7 +37,7 @@ class Conditional extends ClassAnnotation {
 
   @override
   void apply(TypeDescriptor type) {
-
+    // noop
   }
 }
 
@@ -153,6 +153,7 @@ class OnDestroy extends MethodAnnotation {
   }
 }
 
+/// Annotation used to mark custom [AbstractScope]s
 class Scope extends ClassAnnotation {
   final String name;
   final bool register;
@@ -172,7 +173,7 @@ class Scope extends ClassAnnotation {
   }
 }
 
-
+/// internal factory for [AbstractScope]s
 class Scopes {
   static Map<String, Type> scopes = {};
 
@@ -188,10 +189,16 @@ class Scopes {
 
 typedef ArgumentsProvider = List<dynamic> Function();
 
+/// base class for scopes
 abstract class AbstractScope {
+  /// return a new or cached instance of a requested type
+  /// [provider] a [AbstractInstanceProvider] used to create a new instance
+  /// [environment] the [Environment]
+  /// [argumentProvider] a [ArgumentsProvider] that computed the required constructor parameters
   T get<T>(AbstractInstanceProvider<T> provider, Environment environment, ArgumentsProvider argumentProvider);
 }
 
+/// singleton scope
 @Scope(name: "singleton", register: false)
 class SingletonScope extends AbstractScope {
   // instance data
@@ -212,6 +219,7 @@ class SingletonScope extends AbstractScope {
   }
 }
 
+/// environment scope creates and caches instances per environment
 @Scope(name: "environment", register: false)
 class EnvironmentScope extends SingletonScope {
   // constructor
@@ -219,6 +227,7 @@ class EnvironmentScope extends SingletonScope {
   EnvironmentScope();
 }
 
+/// request scopes create instances on every call
 @Scope(name: "request", register: false)
 class RequestScope extends AbstractScope {
   // implement
@@ -231,6 +240,7 @@ class RequestScope extends AbstractScope {
 
 // we need that to bootstrap the system
 
+/// internal
 class SingletonScopeInstanceProvider extends InstanceProvider<SingletonScope> {
   // constructor
 
@@ -249,6 +259,7 @@ class SingletonScopeInstanceProvider extends InstanceProvider<SingletonScope> {
   String toString() => "SingletonScopeInstanceProvider";
 }
 
+/// internal
 class RequestScopeInstanceProvider extends InstanceProvider<RequestScope> {
   // constructor
 
@@ -267,6 +278,7 @@ class RequestScopeInstanceProvider extends InstanceProvider<RequestScope> {
   String toString() => "RequestScopeInstanceProvider";
 }
 
+/// internal
 class EnvironmentScopeInstanceProvider extends InstanceProvider<EnvironmentScope> {
   // constructor
 
@@ -285,6 +297,7 @@ class EnvironmentScopeInstanceProvider extends InstanceProvider<EnvironmentScope
   String toString() => "EnvironmentScopeInstanceProvider";
 }
 
+/// exceptions thrown by the container
 class DIException implements Exception {
   final String message;
   DIException(this.message);
@@ -293,10 +306,14 @@ class DIException implements Exception {
   String toString() => 'DIException: $message';
 }
 
+
+/// exceptions thrown by the container during registration
 class DIRegistrationException extends DIException {
   DIRegistrationException(String message) : super(message);
 }
 
+
+/// exceptions thrown by the container during runtime
 class DIRuntimeException extends DIException {
   DIRuntimeException(String message) : super(message);
 }
@@ -308,6 +325,7 @@ enum Lifecycle {
   onDestroy,
 }
 
+/// A [LifecycleProcessor] is is called during the different lifecycles of an object.
 abstract class LifecycleProcessor {
   // instance data
 
@@ -320,9 +338,11 @@ abstract class LifecycleProcessor {
 
   // public
 
+  /// any side effect
   void processLifecycle(InstanceProvider? provider, dynamic instance, Environment environment);
 }
 
+/// internal
 class MethodCall {
   // instance data
 
@@ -354,7 +374,8 @@ class MethodCall {
   }
 }
 
- abstract class AbstractLifecycleMethodProcessor extends LifecycleProcessor {
+/// abstract baseclass for [LifecycleProcessor]s
+abstract class AbstractLifecycleMethodProcessor extends LifecycleProcessor {
    // static data
 
    static Map<Type, List<List<MethodCall>>> methods = {};
@@ -496,28 +517,31 @@ abstract class PostProcessor extends LifecycleProcessor {
   }
 }
 
+/// internal
 @Injectable(eager: false)
 class OnInjectProcessor extends AbstractLifecycleMethodProcessor {
   OnInjectProcessor() :super(lifecycle: Lifecycle.onInject);
 }
 
+/// internal
 @Injectable(eager: false)
 class OnInitProcessor extends AbstractLifecycleMethodProcessor {
   OnInitProcessor() :super(lifecycle: Lifecycle.onInit);
 }
 
+/// internal
 @Injectable(eager: false)
 class OnRunningProcessor extends AbstractLifecycleMethodProcessor {
   OnRunningProcessor() :super(lifecycle: Lifecycle.onRunning);
 }
 
+/// internal
 @Injectable(eager: false)
 class OnDestroyProcessor extends AbstractLifecycleMethodProcessor {
   OnDestroyProcessor() :super(lifecycle: Lifecycle.onDestroy, reverse: true);
 }
 
-/// The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
-
+/// internal
 class ResolveContext {
   // instance data
 
@@ -574,6 +598,7 @@ class ResolveContext {
   }
 }
 
+/// Internal: The Providers class is a static class used in the context of the registration and resolution of InstanceProviders.
 class Providers {
   // static data
 
@@ -1192,6 +1217,7 @@ abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   Type get host => _host;
 }
 
+// A [AbstractInstanceProvider] that caches instances per environment
 class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   // instance data
 
@@ -1291,6 +1317,7 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
   bool get replace => false;
 }
 
+/// internal: provider that is created in cases of ambiguities
 class AmbiguousProvider<T> extends InstanceProvider<T> {
   // instance data
 
@@ -1322,6 +1349,7 @@ class AmbiguousProvider<T> extends InstanceProvider<T> {
   String toString() => "AmbiguousProvider(${type.runtimeType})";
 }
 
+/// A [InstanceProvider] that calls class constructors
 class ClassInstanceProvider<T> extends InstanceProvider<T> {
   // instance data
 
@@ -1457,6 +1485,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
 
 // boot
 
+/// internal module used for bootstrapping
 @Module()
 class Boot {
   static Environment? environment;

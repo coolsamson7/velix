@@ -4,6 +4,7 @@ import 'dart:io';
 import '../../di/di.dart';
 import '../configuration.dart';
 
+/// A [ConfigurationSource] for json files
 @Injectable(factory: false)
 class JsonFileConfigurationSource extends ConfigurationSource {
   // instance data

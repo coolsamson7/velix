@@ -1,3 +1,4 @@
+// ignore_for_file: unnecessary_import, unused_local_variable
 import 'package:velix/velix.dart';
 
 @Dataclass()

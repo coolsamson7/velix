@@ -533,7 +533,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   }
 
   void generateField(String className, FieldElement field, bool last) {
-    final name = field.name3;
+    final name = field.name;
     final type = field.type.getDisplayString(withNullability: false);
 
     final isFinal = field.isFinal;
@@ -912,7 +912,7 @@ class RegistryFragmentBuilder extends Builder {
       // Get parsed AST to resolve line/col
 
       final session = lib.session;
-      final parsedLib = await session.getParsedLibraryByElement(lib) as ParsedLibraryResult;
+      final parsedLib = session.getParsedLibraryByElement(lib) as ParsedLibraryResult;
       final unit = parsedLib.units.first.unit;
       final lineInfo = parsedLib.units.first.lineInfo;
 

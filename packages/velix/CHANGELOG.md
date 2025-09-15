@@ -105,3 +105,7 @@
 ## 0.18.1
 
 - factories support eager and scope as well.
+
+## 0.90.1
+
+- split into multiple packages

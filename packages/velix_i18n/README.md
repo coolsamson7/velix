@@ -25,16 +25,14 @@ Check out some articles on Medium:
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
 
-Detailed infromation can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
-
-Lets get a quick overview on the topics
+Detailed information can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
 
 # I18N
 
 An i18n is implemented with more or less the same scope and api as popular libraries like `i18next`. but some additional features i haven't found anywhere else.
 The solution is made up of two distinct elements.
 
-A `LocaleManager` is reposonsible to keep track of the current locale.
+A `LocaleManager` is responsible to keep track of the current locale.
 
 It is constructed via
 

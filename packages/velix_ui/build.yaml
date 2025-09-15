@@ -6,3 +6,21 @@ builders:
     auto_apply: dependents
     build_to: source
     applies_builders: [ "source_gen|combining_builder" ]
+
+targets:
+  $default:
+    sources:
+      - example/**
+      - $package$
+    builders:
+      velix|registry_builder:
+        generate_for:
+          - example/*.dart
+          - example/**/*.dart
+          - "!example/**/*.g.dart"
+          - "!example/**/*.part.dart"
+      velix|registry_aggregator:
+        options:
+          prefix: "example"
+        generate_for:
+          - example/main.dart

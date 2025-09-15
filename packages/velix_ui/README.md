@@ -24,10 +24,7 @@ Check out some articles on Medium:
   - [Commands](https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb)
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
-
-Detailed infromation can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
-
-Lets get a quick overview on the topics
+Detailed information can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
  
 # Model-base form data-binding
 

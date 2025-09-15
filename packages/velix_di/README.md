@@ -24,46 +24,12 @@ Check out some articles on Medium:
   - [Commands](https://medium.com/@andreas.ernst7/from-code-to-command-crafting-scalable-and-interceptable-commands-in-flutter-75ed90f136cb)
   - [Model driven Forms](https://medium.com/@andreas.ernst7/model-driven-forms-for-flutter-e0535659489a)
 
-
 Detailed information can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
-
-Lets get a quick overview on the topics
-
-# Validation
-
-As in some popular Typescript libraries like `yup`, it is possible to declare type constraints with a simple fluent language
-
-```dart
-var type = IntType().greaterThan(0).lessThan(100);
-
-type.validate(-1); // meeeh....will throw
-```
-
-# Type Meta-Data
-
-In combination with a custom code generator, classes decorated with specific annotations - here `@Dataclass`-  emit the meta data:
-
-```dart
-@Dataclass()
-class Money {
-  // instance data
-
-  @Attribute(type: "length 7")
-  final String currency;
-  @Attribute(type: ">= 0")
-  final int value;
-
-  const Money({required this.currency, required this.value});
-}
-```
-The information will be used by a number of mechanisms, such as 
-- dependency injection container
-- the mapping framework
-- form data-binding.
 
 # Dependency Injection
 
-A DI solution similar based on the existing meta-data has been created, that let's a __container__ handle the lifecycle of objects.
+This package contains the dependency injection container, that takes care of the assembly and lifecycle of managed objects.
+It utilizes the type code-generator of the core package.
 
 **Example**:
 

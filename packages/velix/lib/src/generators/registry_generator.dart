@@ -154,8 +154,8 @@ abstract class CodeGenerator<T extends InterfaceElement> {
   Set<String> dependencies = <String>{};
 
   void addImport(String? import) {
-    if ( import != null)
-     imports.add(import);
+    if ( import != null && !import.startsWith("dart:") && !import.startsWith("velix:"))
+      imports.add(import);
   }
 
   void collectImports(T element) {
@@ -164,9 +164,14 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     collectAnnotationImports(element.metadata.annotations);
   }
 
-  void addDependency(String dependency) {
-    if ( !dependency.startsWith("dart:"))
+  void addDependency(String dependency, {bool variable = false}) {
+    if ( !dependency.startsWith("dart:")) {
+      if (variable)
+        dependency = "$dependency!";
+
+
       dependencies.add(dependency);
+    }
   }
 
   void collectDependencies(T element) {
@@ -253,7 +258,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       final superElement = superType.element;
 
       if (isDataclass(superElement) || isInjectable(superElement)) {
-        addDependency("${superType.element.library.uri}:${superElement.name}");
+        addDependency("${superType.element.library.uri}:${superElement.name}", variable: true);
       }
     } // if
   }
@@ -501,6 +506,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
             var uri = param.type.element?.library?.uri;
 
             addDependency("$uri:${param.type.name}");
+
+            addImport(typeLibrary(param.type));
 
             tab().write("param<$typeStr>('$name'");
 
@@ -981,6 +988,7 @@ class Element {
   bool resolved = false;
 
   final String name;
+  var requiresVariable = false;
   final String type;
   final List<String> imports;
   final List<String> dependencies;
@@ -997,7 +1005,7 @@ class Element {
 
   // public
 
-  Future<void> emit(StringBuffer buffer, bool variable, FindNode find, FetchCode fetch, {String? header}) async {
+  Future<void> emit(StringBuffer buffer, FindNode find, FetchCode fetch, {String? header}) async {
     // header
 
     if ( header != null)
@@ -1005,7 +1013,7 @@ class Element {
 
     // variable declaration
 
-    if (dependants.isNotEmpty) {
+    if (dependants.isNotEmpty && requiresVariable) {
       var colon = name.lastIndexOf(":");
       var className = name.substring(colon + 1);
 
@@ -1147,7 +1155,16 @@ class RegistryAggregator extends Builder {
 
       for (final element in elements.values) {
         for ( var dependency in element.dependencies) {
-          findElement(dependency).dependants.add(element);
+          var requiresVariable = dependency.endsWith("!");
+          if ( requiresVariable )
+            dependency = dependency.substring(0, dependency.length - 1);
+
+          var referencedElement = findElement(dependency);
+
+          if (requiresVariable)
+            referencedElement.requiresVariable = true;
+
+          referencedElement.dependants.add(element);
         }
       }
 
@@ -1212,7 +1229,7 @@ class RegistryAggregator extends Builder {
 
           elements.remove(current.name);
 
-          await current.emit(buffer, false, findElement, getCode);
+          await current.emit(buffer, findElement, getCode);
 
           buffer.writeln();
 
@@ -1231,7 +1248,7 @@ class RegistryAggregator extends Builder {
           for ( var element in elements.values) {
             log.warning('Cycle detected involving ${element.name}');
 
-            await element.emit(buffer, false, findElement, getCode, header: "watchout: is part of a cycle");
+            await element.emit(buffer, findElement, getCode, header: "watchout: is part of a cycle");
 
             buffer.writeln();
           }

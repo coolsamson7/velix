@@ -7,7 +7,7 @@ part of 'velix_di.dart';
 
 void registerVelixDescriptors() {
   type<ConfigurationManager>(
-    location: 'package:velix_di/configuration/configuration.dart:29:1',
+    location: 'package:velix_di/configuration/configuration.dart:32:1',
     annotations: [
       Injectable(factory: false)
     ],
@@ -16,7 +16,7 @@ void registerVelixDescriptors() {
   );
 
   var ConfigurationSourceDescriptor =  type<ConfigurationSource>(
-    location: 'package:velix_di/configuration/configuration.dart:137:1',
+    location: 'package:velix_di/configuration/configuration.dart:140:1',
     annotations: [
       Injectable(factory: false)
     ],
@@ -35,7 +35,7 @@ void registerVelixDescriptors() {
   );
 
   type<SingletonScope>(
-    location: 'package:velix_di/di/di.dart:195:1',
+    location: 'package:velix_di/di/di.dart:201:1',
     annotations: [
       Scope(name: "singleton", register: false)
     ],
@@ -44,7 +44,7 @@ void registerVelixDescriptors() {
   );
 
   type<EnvironmentScope>(
-    location: 'package:velix_di/di/di.dart:215:1',
+    location: 'package:velix_di/di/di.dart:222:1',
     annotations: [
       Scope(name: "environment", register: false)
     ],
@@ -53,7 +53,7 @@ void registerVelixDescriptors() {
   );
 
   type<RequestScope>(
-    location: 'package:velix_di/di/di.dart:222:1',
+    location: 'package:velix_di/di/di.dart:230:1',
     annotations: [
       Scope(name: "request", register: false)
     ],
@@ -62,7 +62,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnInjectProcessor>(
-    location: 'package:velix_di/di/di.dart:499:1',
+    location: 'package:velix_di/di/di.dart:520:1',
     annotations: [
       Injectable(eager: false)
     ],
@@ -71,7 +71,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnInitProcessor>(
-    location: 'package:velix_di/di/di.dart:504:1',
+    location: 'package:velix_di/di/di.dart:526:1',
     annotations: [
       Injectable(eager: false)
     ],
@@ -80,7 +80,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnRunningProcessor>(
-    location: 'package:velix_di/di/di.dart:509:1',
+    location: 'package:velix_di/di/di.dart:532:1',
     annotations: [
       Injectable(eager: false)
     ],
@@ -89,7 +89,7 @@ void registerVelixDescriptors() {
   );
 
   type<OnDestroyProcessor>(
-    location: 'package:velix_di/di/di.dart:514:1',
+    location: 'package:velix_di/di/di.dart:538:1',
     annotations: [
       Injectable(eager: false)
     ],
@@ -98,7 +98,7 @@ void registerVelixDescriptors() {
   );
 
   type<Boot>(
-    location: 'package:velix_di/di/di.dart:1459:1',
+    location: 'package:velix_di/di/di.dart:1488:1',
     annotations: [
       Module()
     ],
@@ -107,7 +107,7 @@ void registerVelixDescriptors() {
   );
 
   type<ConfigurationValues>(
-    location: 'package:velix_di/configuration/configuration.dart:149:1',
+    location: 'package:velix_di/configuration/configuration.dart:152:1',
     superClass: ConfigurationSourceDescriptor,
     annotations: [
       Injectable(factory: false)

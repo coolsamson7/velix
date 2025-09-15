@@ -70,7 +70,7 @@ void registerAllDescriptors() {
     ],
   );
 
-  var BarDescriptor =  type<Bar>(
+  type<Bar>(
     location: 'asset:velix_di/test/di.dart:25:1',
     annotations: [
       Injectable(scope: "singleton", eager: true)
@@ -153,7 +153,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var MoneyDescriptor =  type<Money>(
+  type<Money>(
     location: 'asset:velix_di/test/di.dart:100:1',
     params: [
       param<String>('currency', isNamed: true, isRequired: true), 
@@ -286,7 +286,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var StatusDescriptor =  enumeration<Status>(
+  enumeration<Status>(
     name: 'asset:velix_di/test/di.dart.Status',
     values: Status.values
   );
@@ -437,7 +437,7 @@ void registerAllDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => DerivedType(),
   );
 
-  var ImmutableProductDescriptor =  type<ImmutableProduct>(
+  type<ImmutableProduct>(
     location: 'asset:velix_di/test/di.dart:210:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
@@ -459,7 +459,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var ProductDescriptor =  type<Product>(
+  type<Product>(
     location: 'asset:velix_di/test/di.dart:219:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
@@ -513,7 +513,7 @@ void registerAllDescriptors() {
   );
 
   // watchout: is part of a cycle
-  var CycleSourceDescriptor =  type<CycleSource>(
+  type<CycleSource>(
     location: 'asset:velix_di/test/cycle/cycle.dart:7:1',
     annotations: [
       Injectable()
@@ -526,7 +526,7 @@ void registerAllDescriptors() {
   );
 
   // watchout: is part of a cycle
-  var CycleTargetDescriptor =  type<CycleTarget>(
+  type<CycleTarget>(
     location: 'asset:velix_di/test/cycle/cycle.dart:12:1',
     annotations: [
       Injectable()

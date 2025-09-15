@@ -3,7 +3,7 @@ builders:
     import: "package:velix_ui/src/generators/command_generator.dart"
     builder_factories: [ "commandBuilder" ]
     build_extensions: { ".dart": [ ".command.g.dart" ] }
-    auto_apply: dependents
+    auto_apply: none
     build_to: source
     applies_builders: [ "source_gen|combining_builder" ]
 
@@ -11,6 +11,7 @@ targets:
   $default:
     sources:
       - example/**
+      - lib/**
       - $package$
     builders:
       velix|registry_builder:

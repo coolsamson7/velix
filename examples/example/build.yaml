@@ -1,29 +1,15 @@
-builders:
-  command_builder:
-    import: "package:velix_ui/src/generators/command_generator.dart"
-    builder_factories: [ "commandBuilder" ]
-    build_extensions: { ".dart": [ ".command.g.dart" ] }
-    auto_apply: dependents
-    build_to: source
-    applies_builders: [ "source_gen|combining_builder" ]
-
 targets:
   $default:
+    sources:
+      - "lib/**"
+      - "$package$"
     builders:
-      ##velix_ui|command_builder:
-      #  generate_for:
-      #    include:
-      #      - lib/**/*.dart
-      #    exclude:
-      #      - lib/**.g.dart#
-
-      #velix|type_builder:
-      #  generate_for:
-      #    include:
-      #      - lib/main.dart
-      #    exclude:
-      #      - lib/**.g.dart
-
+      velix_ui|command_builder:
+        generate_for:
+          include:
+            - lib/**/*.dart
+          exclude:
+            - lib/**.g.dart#
       velix|registry_builder:
         generate_for:
           - lib/*.dart

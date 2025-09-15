@@ -1165,6 +1165,7 @@ abstract class InstanceProvider<T> extends AbstractInstanceProvider<T> {
   final Type _type;
   final bool _eager;
   final String _scope;
+  @override
   final bool replace;
 
   List<List<MethodCall>?> lifecycleMethods = [];

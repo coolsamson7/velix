@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix/velix.dart';
-import 'package:velix_di/di/di.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';

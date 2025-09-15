@@ -1,3 +1,7 @@
+## 1.0.0
+
+- release version
+
 ## 0.9.1+2
 
  - **FIX**: i18n fix.

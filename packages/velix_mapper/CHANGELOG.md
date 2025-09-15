@@ -1,3 +1,7 @@
+## 1.0.0
+
+- Release version
+
 ## 0.9.0+5
 
  - **DOCS**: adjusted READMEs.

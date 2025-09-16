@@ -1,5 +1,9 @@
 ## 1.0.0
 
+- **DOCS**: docs
+
+## 1.0.0
+
 - release version
 
 ## 0.9.0+5

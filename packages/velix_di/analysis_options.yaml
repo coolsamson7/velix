@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_print: false
+    curly_braces_in_flow_control_structures: false
+    prefer_function_declarations_over_variables: false
+    use_super_parameters: false
+
+analyzer:
+  errors:
+    deprecated_member_use: ignore

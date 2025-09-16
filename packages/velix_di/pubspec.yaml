@@ -1,6 +1,6 @@
 name: velix_di
-description: "a flutter dependency injection framework."
-version: 1.0.0
+description: "a flutter dependency injection framework that implements containers that assemble and control object lifecycle as in spring."
+version: 1.0.1
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

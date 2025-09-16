@@ -83,17 +83,43 @@ class ContainerWidgetData extends WidgetData {
 class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   @override
   Widget create(ContainerWidgetData data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: data.children
-          .map((child) => DynamicWidget(
-        model: child,
-        meta: typeRegistry.types[child.type]!,
-      ))
-          .toList(),
+    return DragTarget<String>(
+      onWillAccept: (_) => true,
+      onAccept: (type) {
+        WidgetData newWidget;
+        if (type == "text") {
+          newWidget = TextWidgetData(label: "New Text");
+        } else if (type == "container") {
+          newWidget = ContainerWidgetData(children: []);
+        } else {
+          return;
+        }
+
+        data.children.add(newWidget);
+        // Trigger rebuild if needed
+      },
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            color: Colors.grey.shade100,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: data.children
+                .map((child) => DynamicWidget(
+              model: child,
+              meta: typeRegistry.types[child.type]!,
+            ))
+                .toList(),
+          ),
+        );
+      },
     );
   }
 }
+
 
 
 class Theme {
@@ -112,17 +138,18 @@ class DynamicWidget extends StatefulWidget {
   State<DynamicWidget> createState() => _DynamicWidgetState();
 }
 
-
 class _DynamicWidgetState extends State<DynamicWidget> {
   @override
   Widget build(BuildContext context) {
-    final theme = runtimeTheme; // from DI or global
+    final theme = runtimeTheme;
+
     final child = theme.widgets[widget.model.type]!.create(widget.model);
 
     return GestureDetector(
       onTap: () {
         selectionController.select(widget.model);
       },
+      behavior: HitTestBehavior.translucent,
       child: ValueListenableBuilder(
         valueListenable: selectionController.selected,
         builder: (_, selected, __) {
@@ -158,6 +185,7 @@ class _DynamicWidgetState extends State<DynamicWidget> {
     );
   }
 }
+
 
 
 

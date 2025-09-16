@@ -52,7 +52,7 @@ abstract class WidgetData {
 class TextWidgetData extends WidgetData {
   String label;
 
-  TextWidgetData({required this.label, required super.type});
+  TextWidgetData({required this.label, super.type = "text"});
 }
 
 class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
@@ -198,7 +198,7 @@ class EditorRegistry {
 }
 
 final editorRegistry = EditorRegistry()
-  ..register<String>(StringEditor())
+  ..register<String>(StringEditor());
   //..register<double>(DoubleEditor())
   //..register<int>(ColorEditor()); // for ARGB color ints
 
@@ -253,29 +253,54 @@ class SelectionController {
 }
 
 final selectionController = SelectionController();
-
-class EditorCanvas extends StatelessWidget {
+class EditorCanvas extends StatefulWidget {
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
 
   const EditorCanvas({super.key, required this.models, required this.metadata});
 
   @override
+  State<EditorCanvas> createState() => _EditorCanvasState();
+}
+
+class _EditorCanvasState extends State<EditorCanvas> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey.shade200,
-      child: ListView(
-        children: models.map((m) {
-          final meta = metadata[m.type]!;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DynamicWidget(model: m, meta: meta),
-          );
-        }).toList(),
-      ),
+    return DragTarget<String>(
+      onAccept: (type) {
+        // Create a new WidgetData instance based on type
+        final meta = widget.metadata[type]!;
+        WidgetData newWidget;
+        if (type == "text") {
+          newWidget = TextWidgetData(label: "New Text");
+        } else if (type == "container") {
+          newWidget = ContainerWidgetData(children: []);
+        } else {
+          return;
+        }
+
+        setState(() {
+          widget.models.add(newWidget);
+        });
+      },
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          color: Colors.grey.shade200,
+          child: ListView(
+            children: widget.models.map((m) {
+              final meta = widget.metadata[m.type]!;
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DynamicWidget(model: m, meta: meta),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
+
 
 class SelectionPropertyPanel extends StatelessWidget {
   final Map<String, MetaData> metadata;
@@ -312,6 +337,7 @@ class EditorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        WidgetPalette(widgetTypes: metadata.keys.toList()), // palette
         Expanded(
           flex: 2,
           child: EditorCanvas(models: models, metadata: metadata),
@@ -322,6 +348,43 @@ class EditorScreen extends StatelessWidget {
           child: SelectionPropertyPanel(metadata: metadata),
         ),
       ],
+    );
+  }
+}
+
+
+class WidgetPalette extends StatelessWidget {
+  final List<String> widgetTypes; // e.g., ["text", "container"]
+
+  const WidgetPalette({super.key, required this.widgetTypes});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      color: Colors.grey.shade300,
+      child: ListView(
+        children: widgetTypes.map((type) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Draggable<String>(
+              data: type,
+              feedback: Material(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  color: Colors.blueAccent,
+                  child: Text(type, style: const TextStyle(color: Colors.white)),
+                ),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.white,
+                child: Text(type),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

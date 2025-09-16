@@ -33,6 +33,10 @@ class TypeRegistry {
 
     return types[type]!.parse<T>(data);
   }
+
+  MetaData operator [](String other) {
+    return types[type]!;
+  }
 }
 
 var typeRegistry = TypeRegistry();
@@ -83,34 +87,35 @@ class ContainerWidgetData extends WidgetData {
 class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   @override
   Widget create(ContainerWidgetData data) {
-    return DragTarget<String>(
-      onWillAccept: (_) => true,
-      onAccept: (type) {
-        WidgetData newWidget;
-        if (type == "text") {
-          newWidget = TextWidgetData(label: "New Text");
-        } else if (type == "container") {
-          newWidget = ContainerWidgetData(children: []);
-        } else {
-          return;
+    return DragTarget<Object>(
+      onWillAccept: (incoming) => true,
+      onAccept: (incoming) {
+        if (incoming is String) {
+          // palette drop
+          WidgetData newWidget = incoming == "text"
+              ? TextWidgetData(label: "New Text")
+              : ContainerWidgetData(children: []);
+          data.children.add(newWidget);
+        } else if (incoming is WidgetData) {
+          // reparenting drop
+          // remove from old parent
+          _removeFromParent(incoming);
+          data.children.add(incoming);
         }
-
-        data.children.add(newWidget);
-        // Trigger rebuild if needed
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade400),
-            color: Colors.grey.shade100,
-          ),
+              border: Border.all(color: Colors.grey.shade400),
+              color: Colors.grey.shade100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: data.children
                 .map((child) => DynamicWidget(
               model: child,
-              meta: typeRegistry.types[child.type]!,
+              meta: typeRegistry[child.type],
+              parent: data,
             ))
                 .toList(),
           ),
@@ -118,7 +123,25 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       },
     );
   }
+
+  void _removeFromParent(WidgetData widget) {
+    void removeRecursive(ContainerWidgetData container) {
+      container.children.remove(widget);
+      for (var child in container.children) {
+        if (child is ContainerWidgetData) removeRecursive(child);
+      }
+    }
+
+    /*for (var top in canvasModels) {
+      if (top == widget) {
+        canvasModels.remove(top);
+      } else if (top is ContainerWidgetData) {
+        removeRecursive(top);
+      }
+      }*/
+  }
 }
+
 
 
 
@@ -131,8 +154,9 @@ Theme runtimeTheme = Theme();
 class DynamicWidget extends StatefulWidget {
   final WidgetData model;
   final MetaData meta;
+  final WidgetData? parent; // optional reference to parent container
 
-  const DynamicWidget({super.key, required this.model, required this.meta});
+  const DynamicWidget({super.key, required this.model, required this.meta, this.parent});
 
   @override
   State<DynamicWidget> createState() => _DynamicWidgetState();
@@ -142,49 +166,57 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = runtimeTheme;
-
     final child = theme.widgets[widget.model.type]!.create(widget.model);
 
-    return GestureDetector(
-      onTap: () {
-        selectionController.select(widget.model);
-      },
-      behavior: HitTestBehavior.translucent,
-      child: ValueListenableBuilder(
-        valueListenable: selectionController.selected,
-        builder: (_, selected, __) {
-          final selectedNow = selected == widget.model;
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              child,
-              if (selectedNow)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 2),
+    return LongPressDraggable<WidgetData>(
+      data: widget.model,
+      feedback: Material(
+        child: Opacity(
+          opacity: 0.7,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            color: Colors.blueAccent,
+            child: child,
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.5, child: child),
+      child: GestureDetector(
+        onTap: () => selectionController.select(widget.model),
+        behavior: HitTestBehavior.translucent,
+        child: ValueListenableBuilder(
+          valueListenable: selectionController.selected,
+          builder: (_, selected, __) {
+            final selectedNow = selected == widget.model;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                child,
+                if (selectedNow)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue, width: 2),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              if (selectedNow)
-                Positioned(
-                  right: -4,
-                  bottom: -4,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    color: Colors.blue,
+                if (selectedNow)
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Container(width: 8, height: 8, color: Colors.blue),
                   ),
-                ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 }
+
 
 
 
@@ -284,7 +316,6 @@ final selectionController = SelectionController();
 class EditorCanvas extends StatefulWidget {
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
-
   const EditorCanvas({super.key, required this.models, required this.metadata});
 
   @override
@@ -294,40 +325,55 @@ class EditorCanvas extends StatefulWidget {
 class _EditorCanvasState extends State<EditorCanvas> {
   @override
   Widget build(BuildContext context) {
-    return DragTarget<String>(
-      onAccept: (type) {
-        // Create a new WidgetData instance based on type
-        final meta = widget.metadata[type]!;
-        WidgetData newWidget;
-        if (type == "text") {
-          newWidget = TextWidgetData(label: "New Text");
-        } else if (type == "container") {
-          newWidget = ContainerWidgetData(children: []);
-        } else {
-          return;
+    return DragTarget<Object>(
+      onWillAccept: (_) => true,
+      onAccept: (incoming) {
+        if (incoming is String) {
+          // palette
+          WidgetData newWidget = incoming == "text"
+              ? TextWidgetData(label: "New Text")
+              : ContainerWidgetData(children: []);
+          setState(() => widget.models.add(newWidget));
+        } else if (incoming is WidgetData) {
+          // reparenting
+          _removeFromParent(incoming);
+          setState(() => widget.models.add(incoming));
         }
-
-        setState(() {
-          widget.models.add(newWidget);
-        });
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
           color: Colors.grey.shade200,
           child: ListView(
-            children: widget.models.map((m) {
-              final meta = widget.metadata[m.type]!;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DynamicWidget(model: m, meta: meta),
-              );
-            }).toList(),
+            children: widget.models
+                .map((m) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DynamicWidget(model: m, meta: widget.metadata[m.type]!),
+            ))
+                .toList(),
           ),
         );
       },
     );
   }
+
+  void _removeFromParent(WidgetData widget) {
+    void removeRecursive(ContainerWidgetData container) {
+      container.children.remove(widget);
+      for (var child in container.children) {
+        if (child is ContainerWidgetData) removeRecursive(child);
+      }
+    }
+
+    /*for (var top in widget.models) {
+      if (top == widget) {
+        widget.models.remove(top);
+      } else if (top is ContainerWidgetData) {
+        removeRecursive(top);
+      }
+    }*/
+  }
 }
+
 
 
 class SelectionPropertyPanel extends StatelessWidget {
@@ -365,6 +411,7 @@ class EditorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        WidgetTreePanel(models: models, metadata: metadata),
         WidgetPalette(widgetTypes: metadata.keys.toList()), // palette
         Expanded(
           flex: 2,
@@ -416,6 +463,93 @@ class WidgetPalette extends StatelessWidget {
     );
   }
 }
+
+// tree
+
+class WidgetTreeNode extends StatefulWidget {
+  final WidgetData model;
+  final Map<String, MetaData> metadata;
+
+  const WidgetTreeNode({super.key, required this.model, required this.metadata});
+
+  @override
+  State<WidgetTreeNode> createState() => _WidgetTreeNodeState();
+}
+
+class _WidgetTreeNodeState extends State<WidgetTreeNode> {
+  bool expanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = selectionController.selected.value == widget.model;
+    final hasChildren =
+        widget.model is ContainerWidgetData && (widget.model as ContainerWidgetData).children.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => selectionController.select(widget.model),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            color: isSelected ? Colors.blue.shade100 : null,
+            child: Row(
+              children: [
+                if (hasChildren)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() => expanded = !expanded);
+                    },
+                    child: Icon(
+                      expanded ? Icons.expand_more : Icons.chevron_right,
+                      size: 16,
+                    ),
+                  )
+                else
+                  const SizedBox(width: 16),
+                const SizedBox(width: 4),
+                Text(widget.model.type),
+              ],
+            ),
+          ),
+        ),
+        if (hasChildren && expanded)
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: (widget.model as ContainerWidgetData)
+                  .children
+                  .map((child) => WidgetTreeNode(model: child, metadata: widget.metadata))
+                  .toList(),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class WidgetTreePanel extends StatelessWidget {
+  final List<WidgetData> models;
+  final Map<String, MetaData> metadata;
+
+  const WidgetTreePanel({super.key, required this.models, required this.metadata});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 250,
+      color: Colors.grey.shade100,
+      child: ListView(
+        children: models
+            .map((model) => WidgetTreeNode(model: model, metadata: metadata))
+            .toList(),
+      ),
+    );
+  }
+}
+
+
 
 //
 

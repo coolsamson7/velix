@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -11,44 +13,35 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 
 class JsonEditorPanel extends StatelessWidget {
-  final Map<String, MetaData> metadata;
+  // constructor
 
-  const JsonEditorPanel({super.key, required this.metadata});
+  const JsonEditorPanel({super.key});
+
+  // override
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<WidgetData?>(
-      valueListenable: selectionController.selected,
-      builder: (context, selected, _) {
-        if (selected == null) {
-          return const Center(child: Text("No selection"));
-        }
+    String jsonString = const JsonEncoder.withIndent('  ').convert({"foo": 1}); // TODO
 
-        // Serialize selected widget to JSON
-        Map<String, dynamic> jsonMap = _serializeWidget(selected);
-        String jsonString = const JsonEncoder.withIndent('  ').convert(jsonMap);
-
-        return Container(
+    return Container(
+      padding: const EdgeInsets.all(8),
+      color: Colors.grey.shade50,
+      child: SingleChildScrollView(
+        child: HighlightView(
+          jsonString,
+          language: 'json',
+          theme: githubTheme,
           padding: const EdgeInsets.all(8),
-          color: Colors.grey.shade50,
-          child: SingleChildScrollView(
-            child: HighlightView(
-              jsonString,
-              language: 'json',
-              theme: githubTheme,
-              padding: const EdgeInsets.all(8),
-              textStyle: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 14,
-              ),
-            ),
+          textStyle: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 14,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Map<String, dynamic> _serializeWidget(WidgetData widget) {
+  /*Map<String, dynamic> _serializeWidget(WidgetData widget) {
     Map<String, dynamic> map = {'type': widget.type};
 
     final meta = metadata[widget.type]!;
@@ -65,7 +58,7 @@ class JsonEditorPanel extends StatelessWidget {
     }
 
     return map;
-  }
+  }*/
 }
 
 
@@ -136,24 +129,43 @@ class BreadcrumbItem {
 }
 
 /// A simple message bus for pub/sub style communication.
+@Injectable(scope: "environment", eager: false)
 class MessageBus {
+  // instance data
+
   final _streamController = StreamController<_Message>.broadcast();
+
+  // constructor
+
+  MessageBus() {
+    print("MessageBus");
+  }
+
+  // public
 
   /// Publish a message on a given topic.
   void publish(String topic, [dynamic data]) {
+    print("[MessageBus] publish: topic=$topic, data=$data (${data.runtimeType})");
+
     _streamController.add(_Message(topic, data));
   }
 
   /// Subscribe to a topic.
   StreamSubscription<T> subscribe<T>(
       String topic,
-      void Function(T data) handler,
+      void Function(T) onData,
       ) {
+    print("[MessageBus] subscribe: topic=$topic, type=$T");
+
     return _streamController.stream
-        .where((msg) => msg.topic == topic)
+        .where((msg) => msg.topic == topic && msg.data is T)
         .map((msg) => msg.data as T)
-        .listen(handler);
+        .listen((event) {
+      print("[MessageBus] deliver: topic=$topic, event=$event");
+      onData(event);
+    });
   }
+
 
   /// Dispose the bus.
   void dispose() {
@@ -165,6 +177,24 @@ class _Message {
   final String topic;
   final dynamic data;
   _Message(this.topic, this.data);
+}
+
+abstract class Event {
+  final Object? source;
+
+  Event({this.source});
+}
+
+class PropertyChangeEvent extends Event {
+  WidgetData? widget;
+
+  PropertyChangeEvent({required this.widget, required super.source});
+}
+
+class SelectionEvent extends Event {
+  WidgetData? selection;
+
+  SelectionEvent({required this.selection, required super.source});
 }
 
 class Property {
@@ -179,8 +209,10 @@ class Property {
 
   // public
 
-  dynamic createDefault() {
+  dynamic createDefault() {// TODO _> metadata
     switch (type) {
+      case String:
+        return "";
       case int:
         return 0;
       case double:
@@ -209,6 +241,14 @@ class MetaData {
   MetaData({required this.name, required this.type, required this.properties});
 
   // public
+
+  T get<T>(dynamic instance,  String property) {
+    return type.get<T>(instance, property);
+  }
+
+  void set(dynamic instance,  String property, dynamic value) {
+    type.set(instance, property, value);
+  }
 
   WidgetData create() {
     Map<String,dynamic> args = {};
@@ -512,17 +552,56 @@ class DynamicWidget extends StatefulWidget {
 class _DynamicWidgetState extends State<DynamicWidget> {
   // instance data
 
-  Environment? environment;
-  Theme? theme;
+  late final Environment environment;
+  late final Theme theme;
+  bool selected = false;
+
+  late final StreamSubscription selectionSubscription;
+  late final StreamSubscription propertyChangeSubscription;
+
+  // internal
+
+  void select(SelectionEvent event) {
+    if ( event.source != this) {
+      if (event.selection != widget.model) {
+        setState(() {
+          selected = event.selection == widget.model;
+        });
+      }
+    }
+  }
+
+  void changed(PropertyChangeEvent event) {
+    if ( event.widget == widget.model) {
+      setState(() {});
+      print("change");
+    }
+  }
 
   // override
 
   @override
-  Widget build(BuildContext context) {
-    environment ??= Environment(parent: EnvironmentProvider.of(context));
-    theme ??= environment!.get<Theme>();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    final child = theme![widget.model.type].create(widget.model);
+    environment = EnvironmentProvider.of(context);
+    theme = environment.get<Theme>();
+
+    selectionSubscription = environment.get<MessageBus>().subscribe<SelectionEvent>("selection", (event) => select(event));
+    propertyChangeSubscription = environment.get<MessageBus>().subscribe<PropertyChangeEvent>("property-changed", (event) => changed(event));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    selectionSubscription.cancel();
+    propertyChangeSubscription.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final child = theme[widget.model.type].create(widget.model);
 
     return LongPressDraggable<WidgetData>(
       data: widget.model,
@@ -538,17 +617,13 @@ class _DynamicWidgetState extends State<DynamicWidget> {
       ),
       childWhenDragging: Opacity(opacity: 0.5, child: child),
       child: GestureDetector(
-        onTap: () => selectionController.select(widget.model),
+        onTap: () => environment.get<MessageBus>().publish("selection", SelectionEvent(selection: widget.model, source: this)),
         behavior: HitTestBehavior.translucent,
-        child: ValueListenableBuilder(
-          valueListenable: selectionController.selected,
-          builder: (_, selected, __) {
-            final selectedNow = selected == widget.model;
-            return Stack(
+        child: Stack(
               clipBehavior: Clip.none,
               children: [
                 child,
-                if (selectedNow)
+                if (selected)
                   Positioned.fill(
                     child: IgnorePointer(
                       child: Container(
@@ -558,25 +633,32 @@ class _DynamicWidgetState extends State<DynamicWidget> {
                       ),
                     ),
                   ),
-                if (selectedNow)
+                if (selected)
                   Positioned(
                     right: -4,
                     bottom: -4,
                     child: Container(width: 8, height: 8, color: Colors.blue),
                   ),
               ],
-            );
-          },
+            )
         ),
-      ),
-    );
+      );
   }
 }
 
-
 // panel
 
-abstract class PropertyEditor {
+@Injectable()
+abstract class PropertyEditorBuilder<T> {
+  // lifecycle
+
+  @Inject()
+  void setup(PropertyEditorRegistry registry) {
+    registry.register<T>(this);
+  }
+
+  // abstract
+
   Widget buildEditor({
     required String label,
     required dynamic value,
@@ -584,7 +666,10 @@ abstract class PropertyEditor {
   });
 }
 
-class StringEditor extends PropertyEditor {
+@Injectable()
+class StringEditorBuilder extends PropertyEditorBuilder<String> {
+  // override
+
   @override
   Widget buildEditor({
     required String label,
@@ -599,45 +684,83 @@ class StringEditor extends PropertyEditor {
   }
 }
 
-class EditorRegistry {
-  final Map<Type, PropertyEditor> _editors = {};
+@Injectable()
+class PropertyEditorRegistry {
+  // instance data
 
-  void register<T>(PropertyEditor editor) {
+  final Map<Type, PropertyEditorBuilder> _editors = {};
+
+  void register<T>(PropertyEditorBuilder editor) {
     _editors[T] = editor;
   }
 
-  PropertyEditor? resolve(Type type) => _editors[type];
+  // public
+
+  PropertyEditorBuilder? resolve(Type type) => _editors[type];
 }
 
-final editorRegistry = EditorRegistry()
-  ..register<String>(StringEditor());
-  //..register<double>(DoubleEditor())
-  //..register<int>(ColorEditor()); // for ARGB color ints
+class PropertyPanel extends StatefulWidget {
+  // instance data
 
-class PropertyPanel extends StatelessWidget {
-  final WidgetData model;
-  final MetaData meta;
-  final ValueChanged<WidgetData> onChanged;
+  // constructor
 
-  const PropertyPanel({
-    super.key,
-    required this.model,
-    required this.meta,
-    required this.onChanged,
-  });
+  const PropertyPanel({super.key});
+
+  // override
+
+  @override
+  State<PropertyPanel> createState() => _PropertyPanelState();
+}
+
+class _PropertyPanelState extends State<PropertyPanel> {
+  // instance data
+
+  WidgetData? selected;
+  late final MessageBus bus;
+  late final PropertyEditorRegistry editorRegistry;
+  StreamSubscription? subscription;
+  late final TypeRegistry typeRegistry;
+
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    bus = EnvironmentProvider.of(context).get<MessageBus>();
+    typeRegistry = EnvironmentProvider.of(context).get<TypeRegistry>();
+    editorRegistry = EnvironmentProvider.of(context).get();
+
+    // Listen for selection changes
+
+    subscription ??= bus.subscribe<SelectionEvent>("selection", (event) {
+      setState(() => selected = event.selection);
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (selected == null) {
+      return const Center(child: Text("No selection"));
+    }
+
+    final meta = typeRegistry[selected!.type];
+
     return ListView(
       children: meta.properties.map((prop) {
         final editor = editorRegistry.resolve(prop.type);
         if (editor == null) {
-          return ListTile(
-            title: Text("${prop.name} (no editor)"),
-          );
+          return ListTile(title: Text("${prop.name} (no editor)"));
         }
 
-        final value = TypeDescriptor.forType(model.runtimeType).get(model, prop.name);
+        final value = meta.get(selected!, prop.name);
 
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -645,8 +768,11 @@ class PropertyPanel extends StatelessWidget {
             label: prop.name,
             value: value,
             onChanged: (newVal) {
-              TypeDescriptor.forType(model.runtimeType).set(model, prop.name, newVal);
-              onChanged(model);
+              meta.set(selected!, prop.name, newVal);
+
+              // notify canvas/other panels
+
+              bus.publish("property-changed", PropertyChangeEvent(widget: selected, source: this));
             },
           ),
         );
@@ -655,39 +781,45 @@ class PropertyPanel extends StatelessWidget {
   }
 }
 
-class SelectionController {
-  final selected = ValueNotifier<WidgetData?>(null);
-
-  void select(WidgetData? widget) {
-    selected.value = widget;
-  }
-}
-
-final selectionController = SelectionController();
 class EditorCanvas extends StatefulWidget {
+  // instance data
+
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
   const EditorCanvas({super.key, required this.models, required this.metadata});
+
+  // override
 
   @override
   State<EditorCanvas> createState() => _EditorCanvasState();
 }
 
 class _EditorCanvasState extends State<EditorCanvas> {
+  // instance data
+
+  TypeRegistry? typeRegistry;
+
+  // override
+
   @override
   Widget build(BuildContext context) {
+    typeRegistry ??= EnvironmentProvider.of(context).get<TypeRegistry>();
+
     return DragTarget<Object>(
       onWillAccept: (_) => true,
       onAccept: (incoming) {
+        // palette
+
         if (incoming is String) {
-          // palette
-          WidgetData newWidget = incoming == "text"
-              ? TextWidgetData(label: "New Text")
-              : ContainerWidgetData(children: []);
+
+          WidgetData newWidget = typeRegistry![incoming].create();
+
           setState(() => widget.models.add(newWidget));
-        } else if (incoming is WidgetData) {
-          // reparenting
+        }
+        // reparenting
+        else if (incoming is WidgetData) {
           _removeFromParent(incoming);
+
           setState(() => widget.models.add(incoming));
         }
       },
@@ -725,77 +857,100 @@ class _EditorCanvasState extends State<EditorCanvas> {
   }
 }
 
+// the overall screen, that combines all aspects
 
+class EditorScreen extends StatefulWidget {
+  // instance data
 
-class SelectionPropertyPanel extends StatelessWidget {
-  final Map<String, MetaData> metadata;
-  const SelectionPropertyPanel({super.key, required this.metadata});
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<WidgetData?>(
-      valueListenable: selectionController.selected,
-      builder: (context, selected, _) {
-        if (selected == null) {
-          return const Center(child: Text("No selection"));
-        }
-        final meta = metadata[selected.type]!;
-        return PropertyPanel(
-          model: selected,
-          meta: meta,
-          onChanged: (updated) {
-            // Force UI rebuild if needed
-          },
-        );
-      },
-    );
-  }
-}
-
-class EditorScreen extends StatelessWidget {
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
 
+  // constructor
+
   const EditorScreen({super.key, required this.models, required this.metadata});
+
+  // override
+
+  @override
+  State<EditorScreen> createState() => _EditorScreenState();
+}
+
+class _EditorScreenState extends State<EditorScreen> {
+  // instance data
+
+  late final Environment environment;
+
+  // constructor
+
+  late final List<StreamSubscription> subscriptions;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // create message bus
+
+    environment = Environment(parent: EnvironmentProvider.of(context));
+
+    // create bus
+
+    environment.get<MessageBus>();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    for (var sub in subscriptions)
+      sub.cancel();
+
+    environment.destroy();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        //WidgetTreePanel(models: models, metadata: metadata),
-        //WidgetPalette(widgetTypes: metadata.keys.toList()), // palette
-        LeftPanelSwitcher(
-          panels: {
-            "tree": WidgetTreePanel(models: models, metadata: metadata),
-            "palette": WidgetPalette(widgetTypes: metadata.keys.toList()),
-            "json": JsonEditorPanel(metadata: metadata), // JSON view
-            //"images": ImagePanel(imageUrls: [
-            //  "https://via.placeholder.com/100",
-            //  "https://picsum.photos/100",
-            //  "https://placekitten.com/100/100"
-            //]
-            }
-            ),
+    return EnvironmentProvider(
+        environment: environment,
+        child: Row(
+          children: [
+            LeftPanelSwitcher(
+              panels: {
+                "tree": WidgetTreePanel(models: widget.models),
+                "palette": WidgetPalette(typeRegistry: environment.get<TypeRegistry>()),
+                "json": JsonEditorPanel(), // JSON view
+              }),
 
-        Expanded(
-          flex: 2,
-          child: EditorCanvas(models: models, metadata: metadata),
-        ),
-        Container(
-          width: 300,
-          color: Colors.white,
-          child: SelectionPropertyPanel(metadata: metadata),
-        ),
-      ],
+            Expanded(
+              flex: 2,
+              child: EditorCanvas(models: widget.models, metadata: widget.metadata),
+            ),
+            Container(
+              width: 300,
+              color: Colors.white,
+              child: PropertyPanel(),
+            ),
+          ],
+        )
     );
   }
 }
 
-
 class WidgetPalette extends StatelessWidget {
-  final List<String> widgetTypes; // e.g., ["text", "container"]
+  // instance data
 
-  const WidgetPalette({super.key, required this.widgetTypes});
+  //final List<String> widgetTypes; // e.g., ["text", "container"]
+  final TypeRegistry typeRegistry;
+
+  // constructor
+
+  const WidgetPalette({super.key, required this.typeRegistry});
+
+  // override
 
   @override
   Widget build(BuildContext context) {
@@ -803,22 +958,22 @@ class WidgetPalette extends StatelessWidget {
       width: 150,
       color: Colors.grey.shade300,
       child: ListView(
-        children: widgetTypes.map((type) {
+        children: typeRegistry.metaData.values.map((type) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Draggable<String>(
-              data: type,
+              data: type.name,
               feedback: Material(
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   color: Colors.blueAccent,
-                  child: Text(type, style: const TextStyle(color: Colors.white)),
+                  child: Text(type.name, style: const TextStyle(color: Colors.white)),
                 ),
               ),
               child: Container(
                 padding: const EdgeInsets.all(8),
                 color: Colors.white,
-                child: Text(type),
+                child: Text(type.name),
               ),
             ),
           );
@@ -831,21 +986,60 @@ class WidgetPalette extends StatelessWidget {
 // tree
 
 class WidgetTreeNode extends StatefulWidget {
-  final WidgetData model;
-  final Map<String, MetaData> metadata;
+  // instance data
 
-  const WidgetTreeNode({super.key, required this.model, required this.metadata});
+  final WidgetData model;
+
+  // constructor
+
+  const WidgetTreeNode({super.key, required this.model});
+
+  // override
 
   @override
   State<WidgetTreeNode> createState() => _WidgetTreeNodeState();
 }
 
 class _WidgetTreeNodeState extends State<WidgetTreeNode> {
+  // instance data
+
   bool expanded = true;
+  bool selected = false;
+  late final MessageBus bus;
+  late final StreamSubscription<SelectionEvent> subscription;
+
+  // internal
+
+  void select(SelectionEvent event) {
+    if ( event.source != this) {
+      if (event.selection != widget.model) {
+        setState(() {
+          selected = event.selection == widget.model;
+        });
+      }
+    }
+  }
+
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    bus = EnvironmentProvider.of(context).get<MessageBus>();
+
+    subscription = bus.subscribe<SelectionEvent>("selection", (event) => select(event));
+  }
+
+  @override
+  void dispose() {
+    subscription.cancel();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = selectionController.selected.value == widget.model;
     final hasChildren =
         widget.model is ContainerWidgetData && (widget.model as ContainerWidgetData).children.isNotEmpty;
 
@@ -853,10 +1047,10 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => selectionController.select(widget.model),
+          onTap: () => bus.publish("selection", SelectionEvent(selection: widget.model, source: this)),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            color: isSelected ? Colors.blue.shade100 : null,
+            color: selected ? Colors.blue.shade100 : null,
             child: Row(
               children: [
                 if (hasChildren)
@@ -884,7 +1078,7 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: (widget.model as ContainerWidgetData)
                   .children
-                  .map((child) => WidgetTreeNode(model: child, metadata: widget.metadata))
+                  .map((child) => WidgetTreeNode(model: child))
                   .toList(),
             ),
           ),
@@ -894,10 +1088,15 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
 }
 
 class WidgetTreePanel extends StatelessWidget {
-  final List<WidgetData> models;
-  final Map<String, MetaData> metadata;
+  // instance data
 
-  const WidgetTreePanel({super.key, required this.models, required this.metadata});
+  final List<WidgetData> models;
+
+  // constructor
+
+  const WidgetTreePanel({super.key, required this.models});
+
+  // override
 
   @override
   Widget build(BuildContext context) {
@@ -906,7 +1105,7 @@ class WidgetTreePanel extends StatelessWidget {
       color: Colors.grey.shade100,
       child: ListView(
         children: models
-            .map((model) => WidgetTreeNode(model: model, metadata: metadata))
+            .map((model) => WidgetTreeNode(model: model))
             .toList(),
       ),
     );

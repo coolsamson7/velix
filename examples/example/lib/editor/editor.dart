@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -12,6 +11,69 @@ import 'dart:convert';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 
+import 'package:flutter/material.dart';
+
+/// Reusable panel header with a title and close button
+class PanelHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onClose;
+
+  const PanelHeader({super.key, required this.title, this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade400, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const Spacer(),
+          if (onClose != null)
+            InkWell(
+              onTap: onClose,
+              borderRadius: BorderRadius.circular(4),
+              child: const Icon(Icons.close, size: 16),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Example wrapper that uses the header above a panel body
+class PanelContainer extends StatelessWidget {
+  final String title;
+  final Widget child;
+  final VoidCallback? onClose;
+
+  const PanelContainer({
+    super.key,
+    required this.title,
+    required this.child,
+    this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        PanelHeader(title: title, onClose: onClose),
+        Expanded(child: child),
+      ],
+    );
+  }
+}
+
 class JsonEditorPanel extends StatelessWidget {
   // constructor
 
@@ -21,23 +83,24 @@ class JsonEditorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String jsonString = const JsonEncoder.withIndent('  ').convert({"foo": 1}); // TODO
+    String jsonString = const JsonEncoder.withIndent(
+      '  ',
+    ).convert({"foo": 1}); // TODO
 
     return Container(
       padding: const EdgeInsets.all(8),
       color: Colors.grey.shade50,
-      child: SingleChildScrollView(
-        child: HighlightView(
-          jsonString,
-          language: 'json',
-          theme: githubTheme,
-          padding: const EdgeInsets.all(8),
-          textStyle: const TextStyle(
-            fontFamily: 'monospace',
-            fontSize: 14,
-          ),
-        ),
-      ),
+      child: PanelContainer(
+          title: "JSON",
+          child: SingleChildScrollView(
+            child: HighlightView(
+              jsonString,
+              language: 'json',
+              theme: githubTheme,
+              padding: const EdgeInsets.all(8),
+              textStyle: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+            ),
+          )),
     );
   }
 
@@ -60,7 +123,6 @@ class JsonEditorPanel extends StatelessWidget {
     return map;
   }*/
 }
-
 
 //@Module(imports: [])
 class EditorModule {
@@ -99,25 +161,23 @@ class Breadcrumb extends StatelessWidget {
             item.label,
             style: TextStyle(
               color: item.onTap != null ? Colors.blue : Colors.grey[700],
-              decoration:
-              item.onTap != null ? TextDecoration.underline : null,
+              decoration: item.onTap != null ? TextDecoration.underline : null,
             ),
           ),
         ),
       );
 
       if (i < items.length - 1) {
-        children.add(Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: separator,
-        ));
+        children.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: separator,
+          ),
+        );
       }
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: children,
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 }
 
@@ -145,27 +205,25 @@ class MessageBus {
 
   /// Publish a message on a given topic.
   void publish(String topic, [dynamic data]) {
-    print("[MessageBus] publish: topic=$topic, data=$data (${data.runtimeType})");
+    print(
+      "[MessageBus] publish: topic=$topic, data=$data (${data.runtimeType})",
+    );
 
     _streamController.add(_Message(topic, data));
   }
 
   /// Subscribe to a topic.
-  StreamSubscription<T> subscribe<T>(
-      String topic,
-      void Function(T) onData,
-      ) {
+  StreamSubscription<T> subscribe<T>(String topic, void Function(T) onData) {
     print("[MessageBus] subscribe: topic=$topic, type=$T");
 
     return _streamController.stream
         .where((msg) => msg.topic == topic && msg.data is T)
         .map((msg) => msg.data as T)
         .listen((event) {
-      print("[MessageBus] deliver: topic=$topic, event=$event");
-      onData(event);
-    });
+          print("[MessageBus] deliver: topic=$topic, event=$event");
+          onData(event);
+        });
   }
-
 
   /// Dispose the bus.
   void dispose() {
@@ -209,7 +267,8 @@ class Property {
 
   // public
 
-  dynamic createDefault() {// TODO _> metadata
+  dynamic createDefault() {
+    // TODO _> metadata
     switch (type) {
       case String:
         return "";
@@ -221,8 +280,7 @@ class Property {
         return false;
     }
 
-    if ( type is List)
-      return [];
+    if (type is List) return [];
 
     throw Exception("unsupported type");
   }
@@ -242,20 +300,20 @@ class MetaData {
 
   // public
 
-  T get<T>(dynamic instance,  String property) {
+  T get<T>(dynamic instance, String property) {
     return type.get<T>(instance, property);
   }
 
-  void set(dynamic instance,  String property, dynamic value) {
+  void set(dynamic instance, String property, dynamic value) {
     type.set(instance, property, value);
   }
 
   WidgetData create() {
-    Map<String,dynamic> args = {};
+    Map<String, dynamic> args = {};
 
     // fetch defaults
 
-    for ( var property in properties)
+    for (var property in properties)
       args[property.name] = property.createDefault();
 
     // done
@@ -263,7 +321,7 @@ class MetaData {
     return type.fromMapConstructor!(args);
   }
 
-  T parse<T>(Map<String,dynamic> data) {
+  T parse<T>(Map<String, dynamic> data) {
     return JSON.deserialize<T>(data);
   }
 }
@@ -282,7 +340,7 @@ class TypeRegistry {
 
   // instance data
 
-  Map<String,MetaData> metaData = {};
+  Map<String, MetaData> metaData = {};
 
   // constructor
 
@@ -295,7 +353,7 @@ class TypeRegistry {
 
       List<Property> properties = [];
 
-      for ( var field in widgetType.getFields()) {
+      for (var field in widgetType.getFields()) {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
@@ -303,7 +361,11 @@ class TypeRegistry {
         }
       }
 
-      var widgetMetaData = MetaData(name: declareWidget.name, type: widgetType, properties: properties);
+      var widgetMetaData = MetaData(
+        name: declareWidget.name,
+        type: widgetType,
+        properties: properties,
+      );
 
       register(widgetMetaData);
     }
@@ -311,7 +373,7 @@ class TypeRegistry {
 
   // public
 
-  T parse<T>(Map<String,dynamic> data) {
+  T parse<T>(Map<String, dynamic> data) {
     var type = data["type"]!;
 
     return metaData[type]!.parse<T>(data);
@@ -382,10 +444,8 @@ class DeclareProperty extends FieldAnnotation {
   // override
 
   @override
-  void apply(TypeDescriptor type, FieldDescriptor field) {
-  }
+  void apply(TypeDescriptor type, FieldDescriptor field) {}
 }
-
 
 @Dataclass()
 abstract class WidgetData {
@@ -419,9 +479,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 
   @override
   Widget create(TextWidgetData data) {
-    return TextField(
-      decoration: InputDecoration(labelText: data.label),
-    );
+    return TextField(decoration: InputDecoration(labelText: data.label));
   }
 }
 
@@ -435,10 +493,7 @@ class ContainerWidgetData extends WidgetData {
 
   // constructor
 
-  ContainerWidgetData({
-    required this.children,
-    super.type = "container",
-  });
+  ContainerWidgetData({required this.children, super.type = "container"});
 }
 
 @Injectable()
@@ -449,7 +504,8 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 
   // constructor
 
-  ContainerWidgetBuilder({required this.typeRegistry}) : super(name: "container");
+  ContainerWidgetBuilder({required this.typeRegistry})
+    : super(name: "container");
 
   // lifecycle
 
@@ -478,16 +534,19 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade400),
-              color: Colors.grey.shade100),
+            border: Border.all(color: Colors.grey.shade400),
+            color: Colors.grey.shade100,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: data.children
-                .map((child) => DynamicWidget(
-              model: child,
-              meta: typeRegistry[child.type],
-              parent: data,
-            ))
+                .map(
+                  (child) => DynamicWidget(
+                    model: child,
+                    meta: typeRegistry[child.type],
+                    parent: data,
+                  ),
+                )
                 .toList(),
           ),
         );
@@ -512,8 +571,6 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       }*/
   }
 }
-
-
 
 @Injectable()
 class Theme {
@@ -543,7 +600,12 @@ class DynamicWidget extends StatefulWidget {
   final MetaData meta;
   final WidgetData? parent; // optional reference to parent container
 
-  const DynamicWidget({super.key, required this.model, required this.meta, this.parent});
+  const DynamicWidget({
+    super.key,
+    required this.model,
+    required this.meta,
+    this.parent,
+  });
 
   @override
   State<DynamicWidget> createState() => _DynamicWidgetState();
@@ -562,7 +624,7 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   // internal
 
   void select(SelectionEvent event) {
-    if ( event.source != this) {
+    if (event.source != this) {
       if (event.selection != widget.model) {
         setState(() {
           selected = event.selection == widget.model;
@@ -572,7 +634,7 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   }
 
   void changed(PropertyChangeEvent event) {
-    if ( event.widget == widget.model) {
+    if (event.widget == widget.model) {
       setState(() {});
       print("change");
     }
@@ -587,8 +649,15 @@ class _DynamicWidgetState extends State<DynamicWidget> {
     environment = EnvironmentProvider.of(context);
     theme = environment.get<Theme>();
 
-    selectionSubscription = environment.get<MessageBus>().subscribe<SelectionEvent>("selection", (event) => select(event));
-    propertyChangeSubscription = environment.get<MessageBus>().subscribe<PropertyChangeEvent>("property-changed", (event) => changed(event));
+    selectionSubscription = environment
+        .get<MessageBus>()
+        .subscribe<SelectionEvent>("selection", (event) => select(event));
+    propertyChangeSubscription = environment
+        .get<MessageBus>()
+        .subscribe<PropertyChangeEvent>(
+          "property-changed",
+          (event) => changed(event),
+        );
   }
 
   @override
@@ -617,32 +686,35 @@ class _DynamicWidgetState extends State<DynamicWidget> {
       ),
       childWhenDragging: Opacity(opacity: 0.5, child: child),
       child: GestureDetector(
-        onTap: () => environment.get<MessageBus>().publish("selection", SelectionEvent(selection: widget.model, source: this)),
+        onTap: () => environment.get<MessageBus>().publish(
+          "selection",
+          SelectionEvent(selection: widget.model, source: this),
+        ),
         behavior: HitTestBehavior.translucent,
         child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                child,
-                if (selected)
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blue, width: 2),
-                        ),
-                      ),
+          clipBehavior: Clip.none,
+          children: [
+            child,
+            if (selected)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue, width: 2),
                     ),
                   ),
-                if (selected)
-                  Positioned(
-                    right: -4,
-                    bottom: -4,
-                    child: Container(width: 8, height: 8, color: Colors.blue),
-                  ),
-              ],
-            )
+                ),
+              ),
+            if (selected)
+              Positioned(
+                right: -4,
+                bottom: -4,
+                child: Container(width: 8, height: 8, color: Colors.blue),
+              ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -753,30 +825,36 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     final meta = typeRegistry[selected!.type];
 
-    return ListView(
-      children: meta.properties.map((prop) {
-        final editor = editorRegistry.resolve(prop.type);
-        if (editor == null) {
-          return ListTile(title: Text("${prop.name} (no editor)"));
-        }
+    return PanelContainer(
+        title: "Properties",
+        child: ListView(
+          children: meta.properties.map((prop) {
+            final editor = editorRegistry.resolve(prop.type);
+            if (editor == null) {
+              return ListTile(title: Text("${prop.name} (no editor)"));
+            }
 
-        final value = meta.get(selected!, prop.name);
+            final value = meta.get(selected!, prop.name);
 
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: editor.buildEditor(
-            label: prop.name,
-            value: value,
-            onChanged: (newVal) {
-              meta.set(selected!, prop.name, newVal);
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: editor.buildEditor(
+                label: prop.name,
+                value: value,
+                onChanged: (newVal) {
+                  meta.set(selected!, prop.name, newVal);
 
-              // notify canvas/other panels
+                  // notify canvas/other panels
 
-              bus.publish("property-changed", PropertyChangeEvent(widget: selected, source: this));
-            },
-          ),
-        );
-      }).toList(),
+                  bus.publish(
+                    "property-changed",
+                    PropertyChangeEvent(widget: selected, source: this),
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        )
     );
   }
 }
@@ -811,7 +889,6 @@ class _EditorCanvasState extends State<EditorCanvas> {
         // palette
 
         if (incoming is String) {
-
           WidgetData newWidget = typeRegistry![incoming].create();
 
           setState(() => widget.models.add(newWidget));
@@ -828,10 +905,15 @@ class _EditorCanvasState extends State<EditorCanvas> {
           color: Colors.grey.shade200,
           child: ListView(
             children: widget.models
-                .map((m) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DynamicWidget(model: m, meta: widget.metadata[m.type]!),
-            ))
+                .map(
+                  (m) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DynamicWidget(
+                      model: m,
+                      meta: widget.metadata[m.type]!,
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         );
@@ -904,8 +986,7 @@ class _EditorScreenState extends State<EditorScreen> {
 
   @override
   void dispose() {
-    for (var sub in subscriptions)
-      sub.cancel();
+    for (var sub in subscriptions) sub.cancel();
 
     environment.destroy();
 
@@ -915,27 +996,29 @@ class _EditorScreenState extends State<EditorScreen> {
   @override
   Widget build(BuildContext context) {
     return EnvironmentProvider(
-        environment: environment,
-        child: Row(
-          children: [
-            LeftPanelSwitcher(
-              panels: {
-                "tree": WidgetTreePanel(models: widget.models),
-                "palette": WidgetPalette(typeRegistry: environment.get<TypeRegistry>()),
-                "json": JsonEditorPanel(), // JSON view
-              }),
+      environment: environment,
+      child: Row(
+        children: [
+          LeftPanelSwitcher(
+            panels: {
+              "tree": WidgetTreePanel(models: widget.models),
+              "palette": WidgetPalette(
+                typeRegistry: environment.get<TypeRegistry>(),
+              ),
+              "json": JsonEditorPanel(), // JSON view
+            },
+          ),
 
-            Expanded(
-              flex: 2,
-              child: EditorCanvas(models: widget.models, metadata: widget.metadata),
+          Expanded(
+            flex: 2,
+            child: EditorCanvas(
+              models: widget.models,
+              metadata: widget.metadata,
             ),
-            Container(
-              width: 300,
-              color: Colors.white,
-              child: PropertyPanel(),
-            ),
-          ],
-        )
+          ),
+          Container(width: 300, color: Colors.white, child: PropertyPanel()),
+        ],
+      ),
     );
   }
 }
@@ -957,28 +1040,34 @@ class WidgetPalette extends StatelessWidget {
     return Container(
       width: 150,
       color: Colors.grey.shade300,
-      child: ListView(
-        children: typeRegistry.metaData.values.map((type) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Draggable<String>(
-              data: type.name,
-              feedback: Material(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.blueAccent,
-                  child: Text(type.name, style: const TextStyle(color: Colors.white)),
+      child: PanelContainer(
+          title: "Panel",
+          child: ListView(
+            children: typeRegistry.metaData.values.map((type) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Draggable<String>(
+                  data: type.name,
+                  feedback: Material(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      color: Colors.blueAccent,
+                      child: Text(
+                        type.name,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.white,
+                    child: Text(type.name),
+                  ),
                 ),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                color: Colors.white,
-                child: Text(type.name),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+              );
+            }).toList(),
+          )
+        ),
     );
   }
 }
@@ -1011,7 +1100,7 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
   // internal
 
   void select(SelectionEvent event) {
-    if ( event.source != this) {
+    if (event.source != this) {
       if (event.selection != widget.model) {
         setState(() {
           selected = event.selection == widget.model;
@@ -1028,7 +1117,10 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
 
     bus = EnvironmentProvider.of(context).get<MessageBus>();
 
-    subscription = bus.subscribe<SelectionEvent>("selection", (event) => select(event));
+    subscription = bus.subscribe<SelectionEvent>(
+      "selection",
+      (event) => select(event),
+    );
   }
 
   @override
@@ -1041,13 +1133,17 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
   @override
   Widget build(BuildContext context) {
     final hasChildren =
-        widget.model is ContainerWidgetData && (widget.model as ContainerWidgetData).children.isNotEmpty;
+        widget.model is ContainerWidgetData &&
+        (widget.model as ContainerWidgetData).children.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => bus.publish("selection", SelectionEvent(selection: widget.model, source: this)),
+          onTap: () => bus.publish(
+            "selection",
+            SelectionEvent(selection: widget.model, source: this),
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             color: selected ? Colors.blue.shade100 : null,
@@ -1076,8 +1172,7 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
             padding: const EdgeInsets.only(left: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: (widget.model as ContainerWidgetData)
-                  .children
+              children: (widget.model as ContainerWidgetData).children
                   .map((child) => WidgetTreeNode(model: child))
                   .toList(),
             ),
@@ -1103,10 +1198,13 @@ class WidgetTreePanel extends StatelessWidget {
     return Container(
       width: 250,
       color: Colors.grey.shade100,
-      child: ListView(
-        children: models
-            .map((model) => WidgetTreeNode(model: model))
-            .toList(),
+      child: PanelContainer(
+        title: "Tree",
+        child: ListView(
+          children: models
+              .map((model) => WidgetTreeNode(model: model))
+              .toList(),
+        ),
       ),
     );
   }

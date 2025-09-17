@@ -1,9 +1,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_di/di/di.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'dart:async';
 
+import '../main.dart';
+
+//@Module(imports: [])
+class EditorModule {
+  @OnInit()
+  void onInit() {
+    print("EditorModule.onInit()");
+  }
+
+  @OnDestroy()
+  void onDestroy() {
+    print("EditorModule.onDestroy()");
+  }
+}
 
 class Breadcrumb extends StatelessWidget {
   final List<BreadcrumbItem> items;
@@ -91,52 +106,184 @@ class _Message {
 }
 
 class Property {
+  // instance data
+
   final String name;
   final Type type;
 
   // constructor
 
   Property({required this.name, required this.type});
+
+  // public
+
+  dynamic createDefault() {
+    switch (type) {
+      case int:
+        return 0;
+      case double:
+        return 0.0;
+      case bool:
+        return false;
+    }
+
+    if ( type is List)
+      return [];
+
+    throw Exception("unsupported type");
+  }
 }
 
 // we will use that for generic property panels
 class MetaData {
+  // instance data
+
   final String name;
-  final Type type;
+  final TypeDescriptor type;
   List<Property> properties;
 
+  // constructor
+
   MetaData({required this.name, required this.type, required this.properties});
+
+  // public
+
+  WidgetData create() {
+    Map<String,dynamic> args = {};
+
+    // fetch defaults
+
+    for ( var property in properties)
+      args[property.name] = property.createDefault();
+
+    // done
+
+    return type.fromMapConstructor!(args);
+  }
 
   T parse<T>(Map<String,dynamic> data) {
     return JSON.deserialize<T>(data);
   }
 }
 
+@Injectable()
 class TypeRegistry {
-  Map<String,MetaData> types = {};
+  // static data
+
+  static List<TypeDescriptor> types = [];
+
+  // static methods
+
+  static void declare(TypeDescriptor type) {
+    types.add(type);
+  }
+
+  // instance data
+
+  Map<String,MetaData> metaData = {};
+
+  // constructor
+
+  // lifecycle
+
+  @OnInit()
+  void setup() {
+    for (var widgetType in types) {
+      var declareWidget = widgetType.getAnnotation<DeclareWidget>()!;
+
+      List<Property> properties = [];
+
+      for ( var field in widgetType.getFields()) {
+        var property = field.findAnnotation<DeclareProperty>();
+
+        if (property != null) {
+          properties.add(Property(name: field.name, type: field.type.type));
+        }
+      }
+
+      var widgetMetaData = MetaData(name: declareWidget.name, type: widgetType, properties: properties);
+
+      register(widgetMetaData);
+    }
+  }
+
+  // public
 
   T parse<T>(Map<String,dynamic> data) {
     var type = data["type"]!;
 
-    return types[type]!.parse<T>(data);
+    return metaData[type]!.parse<T>(data);
   }
 
   TypeRegistry register(MetaData metaData) {
-    types[metaData.name] = metaData;
+    this.metaData[metaData.name] = metaData;
 
     return this;
   }
 
   MetaData operator [](String type) {
-    return types[type]!;
+    return metaData[type]!;
   }
 }
 
-var typeRegistry = TypeRegistry();
+//var typeRegistry = TypeRegistry();
 
-abstract class WidgetBuilder<T> {
-   Widget create(T data);
+@Injectable(factory: false, eager: false) // TODO
+abstract class WidgetBuilder<T extends WidgetData> {
+  // instance data
+
+  String name;
+
+  // constructor
+
+  WidgetBuilder({required this.name});
+
+  // lifecycle
+
+  @Inject()
+  void setThema(Theme theme) {
+    theme.register(this, name);
+  }
+  // abstract
+
+  Widget create(T data);
 }
+
+// annotation
+
+class DeclareWidget extends ClassAnnotation {
+  // instance data
+
+  final String name;
+
+  // constructor
+
+  const DeclareWidget({required this.name});
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type) {
+    TypeRegistry.declare(type);
+  }
+}
+
+class DeclareProperty extends FieldAnnotation {
+  // instance data
+
+  final String group;
+
+  // constructor
+
+  const DeclareProperty({required this.group});
+
+  // override
+
+  @override
+  void apply(TypeDescriptor type, FieldDescriptor field) {
+  }
+}
+
 
 @Dataclass()
 abstract class WidgetData {
@@ -146,16 +293,25 @@ abstract class WidgetData {
 }
 
 @Dataclass()
+@DeclareWidget(name: "text")
 class TextWidgetData extends WidgetData {
+  // instance data
+
+  @DeclareProperty(group: "general")
   String label;
+
+  // constructor
 
   TextWidgetData({required this.label, super.type = "text"});
 }
 
+@Injectable()
 class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   // instance data
 
   // constructor
+
+  TextWidgetBuilder() : super(name: "text");
 
   // override
 
@@ -168,8 +324,14 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 }
 
 @Dataclass()
+@DeclareWidget(name: "container")
 class ContainerWidgetData extends WidgetData {
+  // instance data
+
+  @DeclareProperty(group: "general")
   List<WidgetData> children;
+
+  // constructor
 
   ContainerWidgetData({
     required this.children,
@@ -177,19 +339,33 @@ class ContainerWidgetData extends WidgetData {
   });
 }
 
+@Injectable()
 class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
+  // instance data
+
+  TypeRegistry typeRegistry;
+
+  // constructor
+
+  ContainerWidgetBuilder({required this.typeRegistry}) : super(name: "container");
+
+  // lifecycle
+
+  // override
+
   @override
   Widget create(ContainerWidgetData data) {
     return DragTarget<Object>(
       onWillAccept: (incoming) => true,
       onAccept: (incoming) {
+        // palette
         if (incoming is String) {
-          // palette drop
-          WidgetData newWidget = incoming == "text"
-              ? TextWidgetData(label: "New Text")
-              : ContainerWidgetData(children: []);
-          data.children.add(newWidget);
-        } else if (incoming is WidgetData) {
+          var metaData = typeRegistry[incoming];
+
+          data.children.add(metaData.create());
+        }
+        // reparent
+        else if (incoming is WidgetData) {
           // reparenting drop
           // remove from old parent
           _removeFromParent(incoming);
@@ -237,14 +413,30 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 
 
 
-
+@Injectable()
 class Theme {
+  // instance data
+
   Map<String, WidgetBuilder> widgets = {};
+
+  // constructor
+
+  // public
+
+  void register(WidgetBuilder builder, String name) {
+    widgets[name] = builder;
+  }
+
+  WidgetBuilder operator [](String type) {
+    return widgets[type]!;
+  }
 }
 
-Theme runtimeTheme = Theme();
+//Theme runtimeTheme = Theme();
 
 class DynamicWidget extends StatefulWidget {
+  // instance data
+
   final WidgetData model;
   final MetaData meta;
   final WidgetData? parent; // optional reference to parent container
@@ -256,10 +448,19 @@ class DynamicWidget extends StatefulWidget {
 }
 
 class _DynamicWidgetState extends State<DynamicWidget> {
+  // instance data
+
+  Environment? environment;
+  Theme? theme;
+
+  // override
+
   @override
   Widget build(BuildContext context) {
-    final theme = runtimeTheme;
-    final child = theme.widgets[widget.model.type]!.create(widget.model);
+    environment ??= Environment(parent: EnvironmentProvider.of(context));
+    theme ??= environment!.get<Theme>();
+
+    final child = theme![widget.model.type].create(widget.model);
 
     return LongPressDraggable<WidgetData>(
       data: widget.model,
@@ -309,10 +510,6 @@ class _DynamicWidgetState extends State<DynamicWidget> {
     );
   }
 }
-
-
-
-
 
 
 // panel
@@ -710,30 +907,4 @@ class _LeftPanelSwitcherState extends State<LeftPanelSwitcher> {
       ],
     );
   }
-}
-
-
-//
-
-void main() {
-  var meta = MetaData(name: "text", type: TextWidgetData, properties: [
-    Property(name: "label", type: String)
-  ]);
-
-  var types = TypeRegistry();
-
-  types.types["text"] = meta;
-
-  var theme = Theme();
-
-  // currently we do this manually, but we will use the code generator soon enough
-
-  theme.widgets["text"] = TextWidgetBuilder();
-
-  var textData = {
-    "type": "text",
-    "label": "label"
-  };
-
-  var widgetData = types.parse<WidgetData>(textData);
 }

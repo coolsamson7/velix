@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -10,8 +8,6 @@ import '../main.dart';
 import 'dart:convert';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
-
-import 'package:flutter/material.dart';
 
 /// Reusable panel header with a title and close button
 class PanelHeader extends StatelessWidget {
@@ -259,17 +255,18 @@ class Property {
   // instance data
 
   final String name;
+  final FieldDescriptor field;
   final String group;
-  final Type type;
+
+  Type get type => field.type.type;
 
   // constructor
 
-  Property({required this.name, required this.group, required this.type});
+  Property({required this.name, required this.field, required this.group});
 
   // public
 
   dynamic createDefault() {
-    // TODO _> metadata
     switch (type) {
       case String:
         return "";
@@ -281,9 +278,7 @@ class Property {
         return false;
     }
 
-    if (type is List) return [];
-
-    throw Exception("unsupported type");
+    return field.factoryConstructor!();
   }
 }
 
@@ -359,7 +354,7 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(Property(name: field.name, group: property.group, type: field.type.type));
+          properties.add(Property(name: field.name, group: property.group, field: field));
         }
       }
 
@@ -392,8 +387,6 @@ class TypeRegistry {
     return metaData[type]!;
   }
 }
-
-//var typeRegistry = TypeRegistry();
 
 @Injectable(factory: false, eager: false) // TODO
 abstract class WidgetBuilder<T extends WidgetData> {
@@ -595,7 +588,150 @@ class Theme {
   }
 }
 
-//Theme runtimeTheme = Theme();
+/// Extracted draggable border wrapper
+class DraggableWidgetBorder extends StatelessWidget {
+  final Widget child;
+  final bool selected;
+  final String name;
+  final WidgetData data;
+  final VoidCallback? onDelete;
+  final VoidCallback? onSelect;
+
+  const DraggableWidgetBorder({
+    super.key,
+    required this.child,
+    required this.name,
+    required this.data,
+    required this.selected,
+    this.onDelete,
+    this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LongPressDraggable<WidgetData>(
+      data: data,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Opacity(
+          opacity: 0.7,
+          child: _buildBorderedChild(),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.5, child: _buildBorderedChild()),
+      child: GestureDetector(
+        onTap: onSelect,
+        // always pass a widget, not null
+        child: _buildBorderedChild(),
+      ),
+    );
+  }
+
+  Widget _buildBorderedChild() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          decoration: selected
+              ? BoxDecoration(
+            border: Border.all(
+              color: Colors.blue.withOpacity(0.5),
+              width: 2,
+            ),
+          )
+              : null,
+          child: child,
+        ),
+        if (selected) ..._buildHandlesAndLabels(),
+      ],
+    );
+  }
+
+  List<Widget> _buildHandlesAndLabels() {
+    return [
+      // Top handle
+      Positioned(
+        top: -4,
+        left: 0,
+        right: 0,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: _buildHandle(),
+        ),
+      ),
+      // Bottom handle
+      Positioned(
+        bottom: -4,
+        left: 0,
+        right: 0,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: _buildHandle(),
+        ),
+      ),
+      // Left handle
+      Positioned(
+        top: 0,
+        bottom: 0,
+        left: -4,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: _buildHandle(),
+        ),
+      ),
+      // Right handle
+      Positioned(
+        top: 0,
+        bottom: 0,
+        right: -4,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: _buildHandle(),
+        ),
+      ),
+      // Top-left name
+      Positioned(
+        top: -18,
+        left: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          color: Colors.black.withOpacity(0.3),
+          child: Text(
+            name,
+            style: const TextStyle(fontSize: 12, color: Colors.white),
+          ),
+        ),
+      ),
+      // Top-right delete
+      if (onDelete != null)
+        Positioned(
+          top: -18,
+          right: 0,
+          child: InkWell(
+            onTap: onDelete,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              color: Colors.black.withOpacity(0.3),
+              child: const Icon(Icons.close, size: 12, color: Colors.white),
+            ),
+          ),
+        ),
+    ];
+  }
+
+
+  Widget _buildHandle() {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.5),
+        shape: BoxShape.rectangle, // circle looks nicer
+      ),
+    );
+  }
+}
+
 
 class DynamicWidget extends StatefulWidget {
   // instance data
@@ -625,13 +761,22 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   late final StreamSubscription selectionSubscription;
   late final StreamSubscription propertyChangeSubscription;
 
+  // constructor
+
+  _DynamicWidgetState() {
+    print("create widget");
+  }
+
   // internal
 
   void select(SelectionEvent event) {
     if (event.source != this) {
-      if (event.selection != widget.model) {
+      var newSelected = identical(event.selection, widget.model);
+      if (newSelected != selected) {
         setState(() {
-          selected = event.selection == widget.model;
+          selected = newSelected;
+          print("${widget.model.type} is selected: $selected");
+          print("");
         });
       }
     }
@@ -640,7 +785,6 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   void changed(PropertyChangeEvent event) {
     if (event.widget == widget.model) {
       setState(() {});
-      print("change");
     }
   }
 
@@ -674,50 +818,18 @@ class _DynamicWidgetState extends State<DynamicWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final child = theme[widget.model.type].create(widget.model);
+    print("create ${widget.model.type}, selected: $selected");
 
-    return LongPressDraggable<WidgetData>(
-      data: widget.model,
-      feedback: Material(
-        child: Opacity(
-          opacity: 0.7,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            color: Colors.blueAccent,
-            child: child,
-          ),
-        ),
+    return DraggableWidgetBorder(
+      child: theme[widget.model.type].create(widget.model),
+      name: widget.model.type,
+      selected: selected,
+      onDelete: () => {}, // TODO
+      onSelect: () => environment.get<MessageBus>().publish(
+        "selection",
+        SelectionEvent(selection: widget.model, source: this),
       ),
-      childWhenDragging: Opacity(opacity: 0.5, child: child),
-      child: GestureDetector(
-        onTap: () => environment.get<MessageBus>().publish(
-          "selection",
-          SelectionEvent(selection: widget.model, source: this),
-        ),
-        behavior: HitTestBehavior.translucent,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            child,
-            if (selected)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 2),
-                    ),
-                  ),
-                ),
-              ),
-            if (selected)
-              Positioned(
-                right: -4,
-                bottom: -4,
-                child: Container(width: 8, height: 8, color: Colors.blue),
-              ),
-          ],
-        ),
-      ),
+      data: widget.model
     );
   }
 }
@@ -783,12 +895,16 @@ class PropertyPanel extends StatefulWidget {
 }
 
 class _PropertyPanelState extends State<PropertyPanel> {
+  // instance data
+
   WidgetData? selected;
   late final MessageBus bus;
   late final PropertyEditorRegistry editorRegistry;
   StreamSubscription? subscription;
   late final TypeRegistry typeRegistry;
   final Map<String, bool> _expandedGroups = {};
+
+  // override
 
   @override
   void didChangeDependencies() {

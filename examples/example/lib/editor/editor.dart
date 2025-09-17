@@ -259,11 +259,12 @@ class Property {
   // instance data
 
   final String name;
+  final String group;
   final Type type;
 
   // constructor
 
-  Property({required this.name, required this.type});
+  Property({required this.name, required this.group, required this.type});
 
   // public
 
@@ -291,12 +292,13 @@ class MetaData {
   // instance data
 
   final String name;
+  final String group;
   final TypeDescriptor type;
   List<Property> properties;
 
   // constructor
 
-  MetaData({required this.name, required this.type, required this.properties});
+  MetaData({required this.name, required this.group, required this.type, required this.properties});
 
   // public
 
@@ -357,12 +359,13 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(Property(name: field.name, type: field.type.type));
+          properties.add(Property(name: field.name, group: property.group, type: field.type.type));
         }
       }
 
       var widgetMetaData = MetaData(
         name: declareWidget.name,
+        group: declareWidget.group,
         type: widgetType,
         properties: properties,
       );
@@ -419,10 +422,11 @@ class DeclareWidget extends ClassAnnotation {
   // instance data
 
   final String name;
+  final String group;
 
   // constructor
 
-  const DeclareWidget({required this.name});
+  const DeclareWidget({required this.name, required this.group});
 
   // override
 
@@ -455,7 +459,7 @@ abstract class WidgetData {
 }
 
 @Dataclass()
-@DeclareWidget(name: "text")
+@DeclareWidget(name: "text", group: "Widgets")
 class TextWidgetData extends WidgetData {
   // instance data
 
@@ -484,7 +488,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 }
 
 @Dataclass()
-@DeclareWidget(name: "container")
+@DeclareWidget(name: "container", group: "Container")
 class ContainerWidgetData extends WidgetData {
   // instance data
 
@@ -772,28 +776,19 @@ class PropertyEditorRegistry {
 }
 
 class PropertyPanel extends StatefulWidget {
-  // instance data
-
-  // constructor
-
   const PropertyPanel({super.key});
-
-  // override
 
   @override
   State<PropertyPanel> createState() => _PropertyPanelState();
 }
 
 class _PropertyPanelState extends State<PropertyPanel> {
-  // instance data
-
   WidgetData? selected;
   late final MessageBus bus;
   late final PropertyEditorRegistry editorRegistry;
   StreamSubscription? subscription;
   late final TypeRegistry typeRegistry;
-
-  // override
+  final Map<String, bool> _expandedGroups = {};
 
   @override
   void didChangeDependencies() {
@@ -801,9 +796,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     bus = EnvironmentProvider.of(context).get<MessageBus>();
     typeRegistry = EnvironmentProvider.of(context).get<TypeRegistry>();
-    editorRegistry = EnvironmentProvider.of(context).get();
-
-    // Listen for selection changes
+    editorRegistry = EnvironmentProvider.of(context).get<PropertyEditorRegistry>();
 
     subscription ??= bus.subscribe<SelectionEvent>("selection", (event) {
       setState(() => selected = event.selection);
@@ -813,7 +806,6 @@ class _PropertyPanelState extends State<PropertyPanel> {
   @override
   void dispose() {
     subscription?.cancel();
-
     super.dispose();
   }
 
@@ -825,39 +817,89 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     final meta = typeRegistry[selected!.type];
 
+    // Group properties by group
+    final groupedProps = <String, List<Property>>{};
+    for (var prop in meta.properties) {
+      groupedProps.putIfAbsent(prop.group, () => []).add(prop);
+    }
+
+    final sortedGroupNames = groupedProps.keys.toList()..sort();
+
     return PanelContainer(
-        title: "Properties",
-        child: ListView(
-          children: meta.properties.map((prop) {
-            final editor = editorRegistry.resolve(prop.type);
-            if (editor == null) {
-              return ListTile(title: Text("${prop.name} (no editor)"));
-            }
+      title: "Properties",
+      child: ListView(
+        children: sortedGroupNames.map((groupName) {
+          final props = groupedProps[groupName]!..sort((a, b) => a.name.compareTo(b.name));
+          _expandedGroups.putIfAbsent(groupName, () => true);
 
-            final value = meta.get(selected!, prop.name);
+          return ExpansionPanelList(
+            expansionCallback: (index, isExpanded) {
+              setState(() {
+                _expandedGroups[groupName] = !isExpanded;
+              });
+            },
+            elevation: 0,
+            expandedHeaderPadding: EdgeInsets.zero,
+            children: [
+              ExpansionPanel(
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    groupName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                body: Column(
+                  children: props.map((prop) {
+                    final editor = editorRegistry.resolve(prop.type);
+                    final value = meta.get(selected!, prop.name);
 
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: editor.buildEditor(
-                label: prop.name,
-                value: value,
-                onChanged: (newVal) {
-                  meta.set(selected!, prop.name, newVal);
-
-                  // notify canvas/other panels
-
-                  bus.publish(
-                    "property-changed",
-                    PropertyChangeEvent(widget: selected, source: this),
-                  );
-                },
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Property name
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              prop.name,
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Editor widget
+                          Expanded(
+                            child: editor != null
+                                ? editor.buildEditor(
+                              label: prop.name,
+                              value: value,
+                              onChanged: (newVal) {
+                                meta.set(selected!, prop.name, newVal);
+                                bus.publish(
+                                  "property-changed",
+                                  PropertyChangeEvent(widget: selected, source: this),
+                                );
+                              },
+                            )
+                                : Text("No editor for ${prop.name}"),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+                isExpanded: _expandedGroups[groupName]!,
               ),
-            );
-          }).toList(),
-        )
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 }
+
 
 class EditorCanvas extends StatefulWidget {
   // instance data
@@ -940,161 +982,274 @@ class _EditorCanvasState extends State<EditorCanvas> {
 }
 
 // the overall screen, that combines all aspects
-
 class EditorScreen extends StatefulWidget {
-  // instance data
-
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
 
-  // constructor
-
   const EditorScreen({super.key, required this.models, required this.metadata});
-
-  // override
 
   @override
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
 class _EditorScreenState extends State<EditorScreen> {
-  // instance data
-
   late final Environment environment;
-
-  // constructor
-
-  late final List<StreamSubscription> subscriptions;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // create message bus
-
     environment = Environment(parent: EnvironmentProvider.of(context));
-
-    // create bus
-
     environment.get<MessageBus>();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    for (var sub in subscriptions) sub.cancel();
-
-    environment.destroy();
-
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return EnvironmentProvider(
       environment: environment,
-      child: Row(
+      child: Column(
         children: [
-          LeftPanelSwitcher(
-            panels: {
-              "tree": WidgetTreePanel(models: widget.models),
-              "palette": WidgetPalette(
-                typeRegistry: environment.get<TypeRegistry>(),
-              ),
-              "json": JsonEditorPanel(), // JSON view
-            },
-          ),
-
-          Expanded(
-            flex: 2,
-            child: Column(
+          // ===== Toolbar =====
+          Container(
+            height: 48,
+            color: Colors.grey.shade200,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
               children: [
-                Expanded(
-                  child: EditorCanvas(
-                    models: widget.models,
-                    metadata: widget.metadata,
-                  ),
+                IconButton(
+                  tooltip: "Save",
+                  icon: const Icon(Icons.save),
+                  onPressed: () {
+                    // TODO: implement save
+                  },
                 ),
-                // 👇 Breadcrumb directly under canvas
-                Container(
-                  height: 32,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    border: Border(
-                      top: BorderSide(color: Colors.grey.shade400, width: 0.5),
-                    ),
-                  ),
-                  child: Breadcrumb(
-                    items: [
-                      BreadcrumbItem(label: "Root", onTap: () {}),
-                      BreadcrumbItem(label: "Container", onTap: () {}),
-                      BreadcrumbItem(label: "Text", onTap: () {}),
-                    ],
-                  ),
+                IconButton(
+                  tooltip: "Revert",
+                  icon: const Icon(Icons.undo),
+                  onPressed: () {
+                    // TODO: implement revert
+                  },
                 ),
+                IconButton(
+                  tooltip: "Open",
+                  icon: const Icon(Icons.folder_open),
+                  onPressed: () {
+                    // TODO: implement open
+                  },
+                ),
+                IconButton(
+                  tooltip: "Play",
+                  icon: const Icon(Icons.play_arrow),
+                  onPressed: () {
+                    // TODO: implement play
+                  },
+                ),
+                const Spacer(),
+                // Optional: add extra buttons or status indicators
+                Text("Status: Ready", style: TextStyle(color: Colors.grey.shade700)),
               ],
             ),
           ),
-          Container(width: 300, color: Colors.white, child: PropertyPanel()),
+
+          // ===== Main Editor =====
+          Expanded(
+            child: Row(
+              children: [
+                LeftPanelSwitcher(
+                  panels: {
+                    "tree": WidgetTreePanel(models: widget.models),
+                    "palette": WidgetPalette(
+                      typeRegistry: environment.get<TypeRegistry>(),
+                    ),
+                    "json": JsonEditorPanel(),
+                  },
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: EditorCanvas(
+                          models: widget.models,
+                          metadata: widget.metadata,
+                        ),
+                      ),
+                      Container(
+                        height: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          border: Border(
+                            top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                          ),
+                        ),
+                        child: Breadcrumb(
+                          items: [
+                            BreadcrumbItem(label: "Root", onTap: () {}),
+                            BreadcrumbItem(label: "Container", onTap: () {}),
+                            BreadcrumbItem(label: "Text", onTap: () {}),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(width: 300, color: Colors.white, child: PropertyPanel()),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class WidgetPalette extends StatelessWidget {
-  // instance data
 
-  //final List<String> widgetTypes; // e.g., ["text", "container"]
+class WidgetPalette extends StatefulWidget {
   final TypeRegistry typeRegistry;
-
-  // constructor
 
   const WidgetPalette({super.key, required this.typeRegistry});
 
-  // override
+  @override
+  State<WidgetPalette> createState() => _WidgetPaletteState();
+}
+
+class _WidgetPaletteState extends State<WidgetPalette> {
+  double _width = 150; // initial width
+  static const double _minWidth = 120;
+  static const double _maxWidth = 400;
+
+  // Track which groups are expanded
+  final Map<String, bool> _expandedGroups = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // initially expand all groups
+    for (var group in widget.typeRegistry.metaData.values.map((e) => e.group).toSet()) {
+      _expandedGroups[group] = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      color: Colors.grey.shade300,
-      child: PanelContainer(
-          title: "Panel",
+    // Group widgets by group name
+    final Map<String, List<MetaData>> groupedWidgets = {};
+    for (var meta in widget.typeRegistry.metaData.values) {
+      groupedWidgets.putIfAbsent(meta.group, () => []).add(meta);
+    }
+
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        setState(() {
+          _width = (_width + details.delta.dx).clamp(_minWidth, _maxWidth);
+        });
+      },
+      child: Container(
+        width: _width,
+        color: Colors.grey.shade300,
+        child: PanelContainer(
+          title: "Palette",
           child: ListView(
-            children: typeRegistry.metaData.values.map((type) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Draggable<String>(
-                  data: type.name,
-                  feedback: Material(
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      color: Colors.blueAccent,
-                      child: Text(
-                        type.name,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.white,
-                    child: Text(type.name),
-                  ),
-                ),
-              );
+            children: groupedWidgets.entries.map((entry) {
+              final groupName = entry.key;
+              final widgetsInGroup = entry.value;
+
+              return _buildGroup(groupName, widgetsInGroup);
             }).toList(),
-          )
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGroup(String groupName, List<MetaData> widgetsInGroup) {
+    final isExpanded = _expandedGroups[groupName] ?? true;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Group header
+        InkWell(
+          onTap: () => setState(() => _expandedGroups[groupName] = !isExpanded),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            color: Colors.grey.shade200,
+            child: Row(
+              children: [
+                Icon(isExpanded ? Icons.expand_more : Icons.chevron_right, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  groupName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Widgets grid
+        if (isExpanded)
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth = 80.0;
+                final crossAxisCount =
+                (constraints.maxWidth / itemWidth).floor().clamp(1, 10);
+
+                return GridView.count(
+                  crossAxisCount: crossAxisCount,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  children: widgetsInGroup.map((type) {
+                    return Draggable<String>(
+                      data: type.name,
+                      feedback: Material(
+                        child: Opacity(
+                          opacity: 0.8,
+                          child: _buildPaletteItem(type, highlight: true),
+                        ),
+                      ),
+                      child: _buildPaletteItem(type),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPaletteItem(MetaData type, {bool highlight = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: highlight ? Colors.blueAccent : Colors.white,
+        border: Border.all(color: Colors.grey.shade500),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.widgets, size: 32), // generic icon
+          const SizedBox(height: 4),
+          Text(
+            type.name,
+            style: TextStyle(
+              fontSize: 12,
+              color: highlight ? Colors.white : Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
+
+
+
 
 // tree
 

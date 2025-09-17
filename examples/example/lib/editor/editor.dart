@@ -761,12 +761,6 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   late final StreamSubscription selectionSubscription;
   late final StreamSubscription propertyChangeSubscription;
 
-  // constructor
-
-  _DynamicWidgetState() {
-    print("create widget");
-  }
-
   // internal
 
   void select(SelectionEvent event) {
@@ -775,8 +769,6 @@ class _DynamicWidgetState extends State<DynamicWidget> {
       if (newSelected != selected) {
         setState(() {
           selected = newSelected;
-          print("${widget.model.type} is selected: $selected");
-          print("");
         });
       }
     }
@@ -1395,12 +1387,11 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
   // internal
 
   void select(SelectionEvent event) {
-    if (event.source != this) {
-      if (event.selection != widget.model) {
-        setState(() {
-          selected = event.selection == widget.model;
-        });
-      }
+    var newSelected = identical(event.selection, widget.model);
+    if (newSelected != selected) {
+      setState(() {
+        selected = newSelected;
+      });
     }
   }
 

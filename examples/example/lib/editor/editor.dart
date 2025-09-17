@@ -6,6 +6,68 @@ import 'package:velix_mapper/mapper/json.dart';
 import 'dart:async';
 
 import '../main.dart';
+import 'dart:convert';
+import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:flutter_highlight/themes/github.dart';
+
+class JsonEditorPanel extends StatelessWidget {
+  final Map<String, MetaData> metadata;
+
+  const JsonEditorPanel({super.key, required this.metadata});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<WidgetData?>(
+      valueListenable: selectionController.selected,
+      builder: (context, selected, _) {
+        if (selected == null) {
+          return const Center(child: Text("No selection"));
+        }
+
+        // Serialize selected widget to JSON
+        Map<String, dynamic> jsonMap = _serializeWidget(selected);
+        String jsonString = const JsonEncoder.withIndent('  ').convert(jsonMap);
+
+        return Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.grey.shade50,
+          child: SingleChildScrollView(
+            child: HighlightView(
+              jsonString,
+              language: 'json',
+              theme: githubTheme,
+              padding: const EdgeInsets.all(8),
+              textStyle: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Map<String, dynamic> _serializeWidget(WidgetData widget) {
+    Map<String, dynamic> map = {'type': widget.type};
+
+    final meta = metadata[widget.type]!;
+
+    for (var prop in meta.properties) {
+      final value = TypeDescriptor.forType(widget.runtimeType).get(widget, prop.name);
+      if (value is WidgetData) {
+        map[prop.name] = _serializeWidget(value);
+      } else if (value is List<WidgetData>) {
+        map[prop.name] = value.map((w) => _serializeWidget(w)).toList();
+      } else {
+        map[prop.name] = value;
+      }
+    }
+
+    return map;
+  }
+}
+
 
 //@Module(imports: [])
 class EditorModule {
@@ -706,6 +768,7 @@ class EditorScreen extends StatelessWidget {
           panels: {
             "tree": WidgetTreePanel(models: models, metadata: metadata),
             "palette": WidgetPalette(widgetTypes: metadata.keys.toList()),
+            "json": JsonEditorPanel(metadata: metadata), // JSON view
             //"images": ImagePanel(imageUrls: [
             //  "https://via.placeholder.com/100",
             //  "https://picsum.photos/100",
@@ -885,10 +948,10 @@ class _LeftPanelSwitcherState extends State<LeftPanelSwitcher> {
                 onPressed: () => setState(() => selectedPanel = "palette"),
               ),
               IconButton(
-                icon: const Icon(Icons.image),
-                tooltip: "Images",
-                color: selectedPanel == "images" ? Colors.blue : null,
-                onPressed: () => setState(() => selectedPanel = "images"),
+                icon: const Icon(Icons.code),
+                tooltip: "JSON",
+                color: selectedPanel == "json" ? Colors.blue : null,
+                onPressed: () => setState(() => selectedPanel = "json"),
               ),
             ],
           ),

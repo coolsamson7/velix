@@ -1011,9 +1011,33 @@ class _EditorScreenState extends State<EditorScreen> {
 
           Expanded(
             flex: 2,
-            child: EditorCanvas(
-              models: widget.models,
-              metadata: widget.metadata,
+            child: Column(
+              children: [
+                Expanded(
+                  child: EditorCanvas(
+                    models: widget.models,
+                    metadata: widget.metadata,
+                  ),
+                ),
+                // 👇 Breadcrumb directly under canvas
+                Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    border: Border(
+                      top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                    ),
+                  ),
+                  child: Breadcrumb(
+                    items: [
+                      BreadcrumbItem(label: "Root", onTap: () {}),
+                      BreadcrumbItem(label: "Container", onTap: () {}),
+                      BreadcrumbItem(label: "Text", onTap: () {}),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           Container(width: 300, color: Colors.white, child: PropertyPanel()),

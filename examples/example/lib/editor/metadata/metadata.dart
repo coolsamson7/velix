@@ -10,12 +10,13 @@ class Property {
   final String name;
   final FieldDescriptor field;
   final String group;
+  final bool hide;
 
   Type get type => field.type.type;
 
   // constructor
 
-  Property({required this.name, required this.field, required this.group});
+  Property({required this.name, required this.field, required this.group, required this.hide});
 
   // public
 

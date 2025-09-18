@@ -60,14 +60,15 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     // Group properties by group
     final groupedProps = <String, List<Property>>{};
-    for (var prop in meta.properties) {
-      groupedProps.putIfAbsent(prop.group, () => []).add(prop);
-    }
+    for (var prop in meta.properties)
+      if ( !prop.hide) {
+        groupedProps.putIfAbsent(prop.group, () => []).add(prop);
+      }
 
     final sortedGroupNames = groupedProps.keys.toList()..sort();
 
     return PanelContainer(
-      title: "Properties",
+      title: selected != null ? selected!.type : "Properties",
       child: ListView(
         children: sortedGroupNames.map((groupName) {
           final props = groupedProps[groupName]!..sort((a, b) => a.name.compareTo(b.name));

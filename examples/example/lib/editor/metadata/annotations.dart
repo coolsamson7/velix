@@ -26,10 +26,11 @@ class DeclareProperty extends FieldAnnotation {
   // instance data
 
   final String group;
+  final bool hide;
 
   // constructor
 
-  const DeclareProperty({required this.group});
+  const DeclareProperty({required this.group, this.hide = false});
 
   // override
 

@@ -1,9 +1,18 @@
 
 import 'package:velix/reflectable/reflectable.dart';
 
+import 'annotations.dart';
+
 @Dataclass()
 abstract class WidgetData {
-  String type;
+  // instance data
 
-  WidgetData({required this.type});
+  String type;
+  @DeclareProperty(group: "general")
+  List<WidgetData> children;
+  WidgetData? parent;
+
+  // constructor
+
+  WidgetData({required this.type, this.children = const []});
 }

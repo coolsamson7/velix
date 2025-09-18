@@ -8,11 +8,33 @@ import '../metadata/widgets/container.dart';
 import '../provider/environment_provider.dart';
 
 class EditorCanvas extends StatefulWidget {
+  // static
+
+  static WidgetData linkParents(WidgetData data) {
+    void link(WidgetData data, WidgetData? parent) {
+      data.parent = parent;
+      for (var child in data.children)
+        link(child, data);
+    }
+
+    link(data, null);
+
+    // done
+
+    return data;
+  }
+
   // instance data
 
   final List<WidgetData> models;
   final Map<String, MetaData> metadata;
-  const EditorCanvas({super.key, required this.models, required this.metadata});
+
+  // constructor
+
+   EditorCanvas({super.key, required this.models, required this.metadata}) {
+    for ( var model in models)
+      linkParents(model);
+  }
 
   // override
 

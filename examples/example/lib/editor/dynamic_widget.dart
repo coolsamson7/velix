@@ -110,7 +110,7 @@ class DraggableWidgetBorder extends StatelessWidget {
         left: 0,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.blue.withOpacity(0.3),
           child: Text(
             name,
             style: const TextStyle(fontSize: 12, color: Colors.white),
@@ -125,7 +125,7 @@ class DraggableWidgetBorder extends StatelessWidget {
             onTap: onDelete,
             child: Container(
               padding: const EdgeInsets.all(2),
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.red.withOpacity(0.3),
               child: const Icon(Icons.close, size: 12, color: Colors.white),
             ),
           ),

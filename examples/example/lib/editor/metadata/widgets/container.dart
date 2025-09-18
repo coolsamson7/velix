@@ -9,10 +9,7 @@ import '../widget_data.dart';
 class ContainerWidgetData extends WidgetData {
   // instance data
 
-  @DeclareProperty(group: "general")
-  List<WidgetData> children;
-
   // constructor
 
-  ContainerWidgetData({required this.children, super.type = "container"});
+  ContainerWidgetData({required super.children, super.type = "container"});
 }

@@ -36,7 +36,7 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(Property(name: field.name, group: property.group, field: field));
+          properties.add(Property(name: field.name, group: property.group, field: field, hide: property.hide));
         }
       }
 

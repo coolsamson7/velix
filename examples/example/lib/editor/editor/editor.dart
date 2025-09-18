@@ -27,7 +27,19 @@ class EditorScreen extends StatefulWidget {
 }
 
 class _EditorScreenState extends State<EditorScreen> {
+  // instance data
+
   late final Environment environment;
+
+  // internal
+
+  void save() {}
+
+  void revert() {}
+
+  void play() {}
+
+  // override
 
   @override
   void didChangeDependencies() {
@@ -53,14 +65,14 @@ class _EditorScreenState extends State<EditorScreen> {
                   tooltip: "Save",
                   icon: const Icon(Icons.save),
                   onPressed: () {
-                    // TODO: implement save
+                    save();
                   },
                 ),
                 IconButton(
                   tooltip: "Revert",
                   icon: const Icon(Icons.undo),
                   onPressed: () {
-                    // TODO: implement revert
+                    revert();
                   },
                 ),
                 IconButton(
@@ -74,7 +86,7 @@ class _EditorScreenState extends State<EditorScreen> {
                   tooltip: "Play",
                   icon: const Icon(Icons.play_arrow),
                   onPressed: () {
-                    // TODO: implement play
+                    play();
                   },
                 ),
                 const Spacer(),
@@ -116,7 +128,10 @@ class _EditorScreenState extends State<EditorScreen> {
                             top: BorderSide(color: Colors.grey.shade400, width: 0.5),
                           ),
                         ),
-                        child: WidgetBreadcrumbWidget(),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: WidgetBreadcrumbWidget(),
+                        ),
                       ),
                     ],
                   ),

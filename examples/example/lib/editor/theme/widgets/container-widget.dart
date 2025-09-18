@@ -66,10 +66,10 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   }
 
   void _removeFromParent(WidgetData widget) {
-    void removeRecursive(ContainerWidgetData container) {
+    void removeRecursive(WidgetData container) {
       container.children.remove(widget);
       for (var child in container.children) {
-        if (child is ContainerWidgetData) removeRecursive(child);
+        removeRecursive(child);
       }
     }
 

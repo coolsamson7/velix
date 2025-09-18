@@ -10,8 +10,12 @@ class ButtonWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   String label;
+  @DeclareProperty(group: "Group1")
+  int number;
+  @DeclareProperty(group: "Group2")
+  bool isCool;
 
   // constructor
 
-  ButtonWidgetData({required this.label, super.type = "button"});
+  ButtonWidgetData({required this.label, required this.number, required this.isCool, super.type = "button"});
 }

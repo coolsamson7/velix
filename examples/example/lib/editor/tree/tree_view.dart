@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../metadata/widget_data.dart';
-import '../metadata/widgets/container.dart';
 import '../provider/environment_provider.dart';
 import '../util/message_bus.dart';
 
@@ -67,9 +66,7 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
 
   @override
   Widget build(BuildContext context) {
-    final hasChildren =
-        widget.model is ContainerWidgetData &&
-            (widget.model as ContainerWidgetData).children.isNotEmpty;
+    final hasChildren = widget.model.children.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +104,7 @@ class _WidgetTreeNodeState extends State<WidgetTreeNode> {
             padding: const EdgeInsets.only(left: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: (widget.model as ContainerWidgetData).children
+              children: widget.model.children
                   .map((child) => WidgetTreeNode(model: child))
                   .toList(),
             ),

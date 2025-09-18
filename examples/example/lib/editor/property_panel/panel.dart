@@ -1,7 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MetaData;
+import 'package:sample/editor/commands/command.dart';
 
+import '../commands/command_stack.dart';
+import '../commands/property_changed_command.dart';
 import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../metadata/metadata.dart';
@@ -23,11 +26,30 @@ class _PropertyPanelState extends State<PropertyPanel> {
   // instance data
 
   WidgetData? selected;
+  MetaData? metaData;
   late final MessageBus bus;
+  late final CommandStack commandStack;
   late final PropertyEditorRegistry editorRegistry;
   StreamSubscription? subscription;
   late final TypeRegistry typeRegistry;
   final Map<String, bool> _expandedGroups = {};
+  Command? currentCommand;
+
+  // iternal
+
+  void changedProperty(String property, dynamic value) {
+    // take care of command stack
+
+    if (currentCommand == null || !(currentCommand is PropertyChangeCommand && (currentCommand as PropertyChangeCommand).target == selected)) // TODO
+      currentCommand = commandStack.addCommand(PropertyChangeCommand(
+        bus: bus,
+        metaData: metaData!,
+        target: selected!,
+        property: property,
+        newValue: value
+      ));
+    else (currentCommand as PropertyChangeCommand).value = value;
+  }
 
   // override
 
@@ -35,9 +57,14 @@ class _PropertyPanelState extends State<PropertyPanel> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    bus = EnvironmentProvider.of(context).get<MessageBus>();
-    typeRegistry = EnvironmentProvider.of(context).get<TypeRegistry>();
-    editorRegistry = EnvironmentProvider.of(context).get<PropertyEditorRegistry>();
+    var environment = EnvironmentProvider.of(context);
+
+    bus = environment.get<MessageBus>();
+    typeRegistry = environment.get<TypeRegistry>();
+    editorRegistry = environment.get<PropertyEditorRegistry>();
+    commandStack = environment.get<CommandStack>();
+
+    commandStack.addListener(() => setState(() {}));
 
     subscription ??= bus.subscribe<SelectionEvent>("selection", (event) {
       setState(() => selected = event.selection);
@@ -53,14 +80,15 @@ class _PropertyPanelState extends State<PropertyPanel> {
   @override
   Widget build(BuildContext context) {
     if (selected == null) {
+      metaData = null;
       return const Center(child: Text("No selection"));
     }
 
-    final meta = typeRegistry[selected!.type];
+    metaData = typeRegistry[selected!.type];
 
     // Group properties by group
     final groupedProps = <String, List<Property>>{};
-    for (var prop in meta.properties)
+    for (var prop in metaData!.properties)
       if ( !prop.hide) {
         groupedProps.putIfAbsent(prop.group, () => []).add(prop);
       }
@@ -95,7 +123,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                 body: Column(
                   children: props.map((prop) {
                     final editor = editorRegistry.resolve(prop.type);
-                    final value = meta.get(selected!, prop.name);
+                    final value = metaData!.get(selected!, prop.name);
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
@@ -113,17 +141,10 @@ class _PropertyPanelState extends State<PropertyPanel> {
                           const SizedBox(width: 8),
                           // Editor widget
                           Expanded(
-                            child: editor != null
-                                ? editor.buildEditor(
+                            child: editor != null  ? editor.buildEditor(
                               label: prop.name,
                               value: value,
-                              onChanged: (newVal) {
-                                meta.set(selected!, prop.name, newVal);
-                                bus.publish(
-                                  "property-changed",
-                                  PropertyChangeEvent(widget: selected, source: this),
-                                );
-                              },
+                              onChanged: (newVal) => changedProperty(prop.name, newVal)
                             )
                                 : Text("No editor for ${prop.name}"),
                           ),

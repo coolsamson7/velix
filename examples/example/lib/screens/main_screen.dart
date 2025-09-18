@@ -4,7 +4,7 @@ import 'package:sample/services/services.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 
-import '../main.dart';
+import '../editor/provider/environment_provider.dart';
 import 'test_page.dart';
 import 'todo_home_page.dart';
 

@@ -4,6 +4,7 @@ import 'package:sample/editor/editor/widget_breadcrumb.dart';
 import 'package:velix_di/di/di.dart';
 
 
+import '../commands/command_stack.dart';
 import '../json/json_view.dart';
 import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
@@ -30,12 +31,19 @@ class _EditorScreenState extends State<EditorScreen> {
   // instance data
 
   late final Environment environment;
+  late final CommandStack commandStack;
 
   // internal
 
+  bool isDirty() {
+    return commandStack.isDirty();
+  }
+
   void save() {}
 
-  void revert() {}
+  void revert() {
+    commandStack.undo();
+  }
 
   void play() {}
 
@@ -44,8 +52,15 @@ class _EditorScreenState extends State<EditorScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     environment = Environment(parent: EnvironmentProvider.of(context));
+
+    // create
+
     environment.get<MessageBus>();
+    commandStack = environment.get<CommandStack>();
+
+    commandStack.addListener(() => setState(() {}));
   }
 
   @override
@@ -64,16 +79,16 @@ class _EditorScreenState extends State<EditorScreen> {
                 IconButton(
                   tooltip: "Save",
                   icon: const Icon(Icons.save),
-                  onPressed: () {
+                  onPressed: isDirty() ? () {
                     save();
-                  },
+                  } : null,
                 ),
                 IconButton(
                   tooltip: "Revert",
                   icon: const Icon(Icons.undo),
-                  onPressed: () {
+                  onPressed: isDirty() ? () {
                     revert();
-                  },
+                  } : null,
                 ),
                 IconButton(
                   tooltip: "Open",

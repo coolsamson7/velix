@@ -88,6 +88,7 @@ class JsonEditorPanel extends StatelessWidget {
       color: Colors.grey.shade50,
       child: PanelContainer(
           title: "JSON",
+          onClose: () => {},
           child: SingleChildScrollView(
             child: HighlightView(
               jsonString,
@@ -609,22 +610,31 @@ class DraggableWidgetBorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LongPressDraggable<WidgetData>(
-      data: data,
-      feedback: Material(
-        color: Colors.transparent,
-        child: Opacity(
-          opacity: 0.7,
+    Widget bordered = GestureDetector(
+      onTap: onSelect,
+      child: _buildBorderedChild(),
+    );
+
+    // Only make draggable when selected
+    if (selected) {
+      bordered = LongPressDraggable<WidgetData>(
+        data: data,
+        feedback: Material(
+          color: Colors.transparent,
+          child: Opacity(
+            opacity: 0.7,
+            child: _buildBorderedChild(),
+          ),
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
           child: _buildBorderedChild(),
         ),
-      ),
-      childWhenDragging: Opacity(opacity: 0.5, child: _buildBorderedChild()),
-      child: GestureDetector(
-        onTap: onSelect,
-        // always pass a widget, not null
-        child: _buildBorderedChild(),
-      ),
-    );
+        child: bordered,
+      );
+    }
+
+    return bordered;
   }
 
   Widget _buildBorderedChild() {
@@ -649,47 +659,30 @@ class DraggableWidgetBorder extends StatelessWidget {
 
   List<Widget> _buildHandlesAndLabels() {
     return [
-      // Top handle
       Positioned(
         top: -4,
         left: 0,
         right: 0,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: _buildHandle(),
-        ),
+        child: Align(alignment: Alignment.topCenter, child: _buildHandle()),
       ),
-      // Bottom handle
       Positioned(
         bottom: -4,
         left: 0,
         right: 0,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: _buildHandle(),
-        ),
+        child: Align(alignment: Alignment.bottomCenter, child: _buildHandle()),
       ),
-      // Left handle
       Positioned(
         top: 0,
         bottom: 0,
         left: -4,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: _buildHandle(),
-        ),
+        child: Align(alignment: Alignment.centerLeft, child: _buildHandle()),
       ),
-      // Right handle
       Positioned(
         top: 0,
         bottom: 0,
         right: -4,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: _buildHandle(),
-        ),
+        child: Align(alignment: Alignment.centerRight, child: _buildHandle()),
       ),
-      // Top-left name
       Positioned(
         top: -18,
         left: 0,
@@ -702,7 +695,6 @@ class DraggableWidgetBorder extends StatelessWidget {
           ),
         ),
       ),
-      // Top-right delete
       if (onDelete != null)
         Positioned(
           top: -18,
@@ -719,14 +711,13 @@ class DraggableWidgetBorder extends StatelessWidget {
     ];
   }
 
-
   Widget _buildHandle() {
     return Container(
       width: 8,
       height: 8,
       decoration: BoxDecoration(
         color: Colors.blue.withOpacity(0.5),
-        shape: BoxShape.rectangle, // circle looks nicer
+        shape: BoxShape.rectangle,
       ),
     );
   }
@@ -764,13 +755,11 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   // internal
 
   void select(SelectionEvent event) {
-    if (event.source != this) {
-      var newSelected = identical(event.selection, widget.model);
-      if (newSelected != selected) {
-        setState(() {
-          selected = newSelected;
-        });
-      }
+    var newSelected = identical(event.selection, widget.model);
+    if (newSelected != selected) {
+      setState(() {
+        selected = newSelected;
+      });
     }
   }
 
@@ -1257,6 +1246,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
         color: Colors.grey.shade300,
         child: PanelContainer(
           title: "Palette",
+          onClose: () => {},
           child: ListView(
             children: groupedWidgets.entries.map((entry) {
               final groupName = entry.key;
@@ -1486,6 +1476,7 @@ class WidgetTreePanel extends StatelessWidget {
       color: Colors.grey.shade100,
       child: PanelContainer(
         title: "Tree",
+        onClose: () => {},
         child: ListView(
           children: models
               .map((model) => WidgetTreeNode(model: model))

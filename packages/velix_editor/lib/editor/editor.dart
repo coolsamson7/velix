@@ -159,9 +159,9 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                 DockedPanelSwitcher(
                   side: DockSide.left,
                   panels: {
-                    "tree": WidgetTreePanel(models: widget.models),
-                    "palette": WidgetPalette(typeRegistry: environment.get<TypeRegistry>()),
-                    "json": JsonEditorPanel(),
+                    "tree": (onClose) => WidgetTreePanel(models: widget.models),
+                    "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>()),
+                    "json": (onClose) => JsonEditorPanel(),
                   },
                   icons: {
                     "tree": Icons.account_tree,
@@ -207,7 +207,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                 DockedPanelSwitcher(
                   side: DockSide.right,
                   panels: {
-                    "properties": PropertyPanel(),
+                    "properties": (onClose) => PropertyPanel(),
                   },
                   icons: {
                     "properties": Icons.tune,

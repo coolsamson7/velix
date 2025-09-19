@@ -33,38 +33,12 @@ class DraggableWidgetBorder extends StatelessWidget {
     this.onSelect,
   });
 
+  // override
 
   @override
+  @override
   Widget build(BuildContext context) {
-    Widget bordered = GestureDetector(
-      onTap: onSelect,
-      child: _buildBorderedChild(),
-    );
-
-    // Only make draggable when selected
-    if (selected) {
-      bordered = LongPressDraggable<WidgetData>(
-        data: data,
-        feedback: Material(
-          color: Colors.transparent,
-          child: Opacity(
-            opacity: 0.7,
-            child: _buildBorderedChild(),
-          ),
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.5,
-          child: _buildBorderedChild(),
-        ),
-        child: bordered,
-      );
-    }
-
-    return bordered;
-  }
-
-  Widget _buildBorderedChild() {
-    return Stack(
+    Widget borderedChild = Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
@@ -76,12 +50,44 @@ class DraggableWidgetBorder extends StatelessWidget {
             ),
           )
               : null,
-          child: IgnorePointer(child: child), // <-- disables all input for widget
+          child: child, // no IgnorePointer here
         ),
         if (selected) ..._buildHandlesAndLabels(),
       ],
     );
+
+    Widget selectableArea = GestureDetector(
+      onTap: () {
+        onSelect?.call();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: borderedChild,
+    );
+
+    if (selected) {
+      return RepaintBoundary(
+        child: Draggable<WidgetData>(
+          data: data,
+          feedback: Material(
+            color: Colors.transparent,
+            child: Opacity(
+              opacity: 0.7,
+              child: borderedChild,
+            ),
+          ),
+          childWhenDragging: Opacity(
+            opacity: 0.5,
+            child: selectableArea,
+          ),
+          child: selectableArea,
+        ),
+      );
+    } else {
+      return selectableArea;
+    }
   }
+
+
 
   List<Widget> _buildHandlesAndLabels() {
     return [
@@ -109,7 +115,6 @@ class DraggableWidgetBorder extends StatelessWidget {
         right: -4,
         child: Align(alignment: Alignment.centerRight, child: _buildHandle()),
       ),
-
       Positioned(
         top: -(tabHeight + borderWidth),
         left: 0,
@@ -124,7 +129,6 @@ class DraggableWidgetBorder extends StatelessWidget {
           ),
         ),
       ),
-
       if (onDelete != null)
         Positioned(
           top: -(tabHeight + borderWidth),
@@ -140,7 +144,6 @@ class DraggableWidgetBorder extends StatelessWidget {
             ),
           ),
         ),
-
     ];
   }
 

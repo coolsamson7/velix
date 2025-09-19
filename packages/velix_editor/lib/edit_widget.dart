@@ -33,6 +33,7 @@ class DraggableWidgetBorder extends StatelessWidget {
     this.onSelect,
   });
 
+
   @override
   Widget build(BuildContext context) {
     Widget bordered = GestureDetector(
@@ -75,7 +76,7 @@ class DraggableWidgetBorder extends StatelessWidget {
             ),
           )
               : null,
-          child: child,
+          child: IgnorePointer(child: child), // <-- disables all input for widget
         ),
         if (selected) ..._buildHandlesAndLabels(),
       ],

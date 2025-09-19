@@ -11,6 +11,9 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import 'theme/theme.dart';
 import 'util/message_bus.dart';
 
+const double tabHeight = 20;
+const double borderWidth = 2;
+
 /// Extracted draggable border wrapper
 class DraggableWidgetBorder extends StatelessWidget {
   final Widget child;
@@ -105,31 +108,38 @@ class DraggableWidgetBorder extends StatelessWidget {
         right: -4,
         child: Align(alignment: Alignment.centerRight, child: _buildHandle()),
       ),
+
       Positioned(
-        top: -18,
+        top: -(tabHeight + borderWidth),
         left: 0,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          color: Colors.blue.withOpacity(0.3),
+          height: tabHeight,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          color: Colors.blue.withOpacity(0.7),
           child: Text(
             name,
             style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
         ),
       ),
+
       if (onDelete != null)
         Positioned(
-          top: -18,
+          top: -(tabHeight + borderWidth),
           right: 0,
           child: InkWell(
             onTap: onDelete,
             child: Container(
-              padding: const EdgeInsets.all(2),
-              color: Colors.red.withOpacity(0.3),
+              height: tabHeight,
+              width: tabHeight,
+              alignment: Alignment.center,
+              color: Colors.red.withOpacity(0.7),
               child: const Icon(Icons.close, size: 12, color: Colors.white),
             ),
           ),
         ),
+
     ];
   }
 
@@ -198,8 +208,11 @@ class _EditWidgetState extends State<EditWidget> {
     super.didChangeDependencies();
 
     var environment = EnvironmentProvider.of(context);
+
     theme = environment.get<Theme>();
     bus = environment.get<MessageBus>();
+
+    print("subscribe to bus ${widget.model.type}");
 
     selectionSubscription = bus.subscribe<SelectionEvent>("selection", (event) => select(event));
     propertyChangeSubscription = bus.subscribe<PropertyChangeEvent>(

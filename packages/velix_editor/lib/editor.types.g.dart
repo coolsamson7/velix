@@ -20,9 +20,9 @@ import 'package:velix_editor/property_panel/editor_builder.dart';
 import 'package:velix_editor/property_panel/editor_registry.dart';
 import 'package:velix_editor/theme/theme.dart';
 import 'package:velix_editor/theme/widget_builder.dart';
-import 'package:velix_editor/theme/widgets/button-widget.dart';
-import 'package:velix_editor/theme/widgets/container-widget.dart';
-import 'package:velix_editor/theme/widgets/text-widget.dart';
+import 'package:velix_editor/theme/widgets/button_widget.dart';
+import 'package:velix_editor/theme/widgets/container_widget.dart';
+import 'package:velix_editor/theme/widgets/text_widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_mapper/mapper/json.dart';
 

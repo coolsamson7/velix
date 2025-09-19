@@ -14,7 +14,7 @@ class BooleanEditorBuilder extends PropertyEditorBuilder<bool> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+        //Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
         Switch(
           value: value ?? false,
           onChanged: (newValue) => onChanged(newValue),

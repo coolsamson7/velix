@@ -70,7 +70,7 @@ class _IntEditorStatefulState extends State<_IntEditorStateful> {
       focusNode: _focusNode,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      decoration: InputDecoration(labelText: widget.label),
+      //decoration: InputDecoration(labelText: widget.label),
       onChanged: (val) {
         final intValue = int.tryParse(val) ?? 0;
         widget.onChanged(intValue);

@@ -68,7 +68,7 @@ class _StringEditorStatefulState extends State<_StringEditorStateful> {
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
-      decoration: InputDecoration(labelText: widget.label),
+      //decoration: InputDecoration(labelText: widget.label),
       onChanged: widget.onChanged,
     );
   }

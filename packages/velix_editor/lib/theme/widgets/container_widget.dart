@@ -12,35 +12,52 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/container.dart';
 import '../widget_builder.dart';
 
+import 'package:flutter/material.dart' hide WidgetBuilder, MetaData;
+import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/commands/command_stack.dart';
+import 'package:velix_editor/event/events.dart';
+import 'package:velix_editor/util/message_bus.dart';
+
+import '../../commands/reparent_command.dart';
+import '../../dynamic_widget.dart';
+import '../../edit_widget.dart';
+import '../../metadata/type_registry.dart';
+import '../../metadata/widget_data.dart';
+import '../../metadata/widgets/container.dart';
+import '../widget_builder.dart';
+
 @Injectable()
 class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
-  // instance data
-
-  TypeRegistry typeRegistry;
-
-  // constructor
+  final TypeRegistry typeRegistry;
 
   ContainerEditWidgetBuilder({required this.typeRegistry})
       : super(name: "container", edit: true);
-
-  // internal
-
-  // override
 
   @override
   Widget create(ContainerWidgetData data, Environment environment) {
     return DragTarget<WidgetData>(
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
-        environment.get<CommandStack>().execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, newParent: data));
+        environment.get<CommandStack>().execute(
+          ReparentCommand(
+            bus: environment.get<MessageBus>(),
+            widget: widget,
+            newParent: data,
+          ),
+        );
 
         WidgetsBinding.instance.addPostFrameCallback((_) =>
-          environment.get<MessageBus>().publish("select", SelectionEvent(selection: widget, source: this)));
+            environment.get<MessageBus>().publish(
+              "select",
+              SelectionEvent(selection: widget, source: this),
+            ));
       },
       builder: (context, candidateData, rejectedData) {
-          final isActive = candidateData.isNotEmpty;
+        final isActive = candidateData.isNotEmpty;
 
-          return Container(
+        return IgnorePointer( // 👈 makes container non-interactive
+          ignoring: true,
+          child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               border: Border.all(
@@ -61,27 +78,19 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
               )
                   .toList(),
             ),
-          );
-        },
-
+          ),
         );
+      },
+    );
   }
 }
 
 @Injectable()
 class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
-  // instance data
-
-  TypeRegistry typeRegistry;
-
-  // constructor
+  final TypeRegistry typeRegistry;
 
   ContainerWidgetBuilder({required this.typeRegistry})
       : super(name: "container");
-
-  // lifecycle
-
-  // override
 
   @override
   Widget create(ContainerWidgetData data, Environment environment) {
@@ -94,12 +103,14 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: data.children
-            .map((child) => DynamicWidget(
-                    model: child,
-                    meta: typeRegistry[child.type],
-                    parent: data,
-                  ),
-        ).toList(),
+            .map(
+              (child) => DynamicWidget(
+            model: child,
+            meta: typeRegistry[child.type],
+            parent: data,
+          ),
+        )
+            .toList(),
       ),
     );
   }

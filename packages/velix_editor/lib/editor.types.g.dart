@@ -92,7 +92,7 @@ void registerEditorTypes() {
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          DeclareProperty(group: "general")
+          DeclareProperty(group: "general", hide: true)
         ],
         elementType: WidgetData,
         factoryConstructor: () => <WidgetData>[],

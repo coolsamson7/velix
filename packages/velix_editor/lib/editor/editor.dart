@@ -12,7 +12,7 @@ import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
 import '../palette/palette_view.dart';
 import '../property_panel/property_panel.dart';
-import '../provider/environment_provider.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import '../tree/tree_view.dart';
 import '../util/message_bus.dart';
 import '../widget_container.dart';

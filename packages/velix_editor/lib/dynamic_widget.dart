@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart' hide Theme, MetaData;
+import 'package:velix_ui/provider/environment_provider.dart';
 
 import 'metadata/metadata.dart';
 import 'metadata/widget_data.dart';
-import 'provider/environment_provider.dart';
+
 import 'theme/theme.dart';
 
 

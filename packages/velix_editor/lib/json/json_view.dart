@@ -10,7 +10,7 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../metadata/widget_data.dart';
-import '../provider/environment_provider.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 
 class JsonEditorPanel extends StatefulWidget {

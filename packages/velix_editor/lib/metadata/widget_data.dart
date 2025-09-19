@@ -10,7 +10,7 @@ abstract class WidgetData {
   // instance data
 
   String type;
-  @DeclareProperty(group: "general")
+  @DeclareProperty(group: "general", hide: true)
   List<WidgetData> children;
   WidgetData? parent;
 

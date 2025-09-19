@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../components/breadcrumb.dart';
 import '../event/events.dart';
 import '../metadata/widget_data.dart';
-import '../provider/environment_provider.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 
 /// Panel that listens to the MessageBus and displays the current selection as a thumbnail.

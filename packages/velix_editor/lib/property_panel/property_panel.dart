@@ -10,7 +10,7 @@ import '../event/events.dart';
 import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
-import '../provider/environment_provider.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 import 'editor_registry.dart';
 

@@ -65,8 +65,19 @@ class _PropertyPanelState extends State<PropertyPanel> {
     else (currentCommand as PropertyChangeCommand).value = value;
   }
 
-  void _resetProperty(String property) {
-    commandStack.revert(selected, property);
+  void _resetProperty(Property property) {
+    currentCommand = null;
+    commandStack.revert(selected, property.name);
+
+    setState(() {currentCommand = null;});
+  }
+
+  bool isPropertyDirty(Property property) {
+    var dirty = commandStack.propertyIsDirty(selected, property.name);
+
+    print("property ${property.name}.dirty = $dirty");
+
+    return dirty;
   }
 
   // override
@@ -158,14 +169,14 @@ class _PropertyPanelState extends State<PropertyPanel> {
                                   style: const TextStyle(fontWeight: FontWeight.w500),
                                 ),
                                 const SizedBox(width: 4),
-                                if (commandStack.propertyIsDirty(selected, prop.name))
+                                if (isPropertyDirty(prop))
                                   GestureDetector(
-                                    onTap: () => _resetProperty(prop.name), // call your reset logic
+                                    onTap: () => _resetProperty(prop), // call your reset logic
                                     child: Container(
                                       width: 8,
                                       height: 8,
                                       decoration: const BoxDecoration(
-                                        color: Colors.white,
+                                        color: Colors.blue,
                                         shape: BoxShape.circle,
                                       ),
                                     ),

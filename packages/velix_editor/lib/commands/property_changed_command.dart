@@ -46,7 +46,7 @@ class PropertyChangeCommand<T> extends Command {
   }
 
   @override
-  void undo() {
+  void undo({bool deleteOnly = false}) {
     metaData.set(target, property, oldValue);
 
     bus.publish(
@@ -54,6 +54,6 @@ class PropertyChangeCommand<T> extends Command {
       PropertyChangeEvent(widget: target as WidgetData, source: this),
     );
 
-    super.undo();
+    super.undo(deleteOnly: deleteOnly);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:velix/util/tracer.dart';
 
 import 'package:velix_di/di/di.dart';
 
@@ -15,6 +16,8 @@ class CommandStack extends ChangeNotifier {
   // public
 
   void revert(dynamic object, String property) {
+    // local function
+
     bool applies(Command command) {
       if ( command is PropertyChangeCommand) {
         if (identical(command.target, object) && command.property == property)
@@ -24,9 +27,11 @@ class CommandStack extends ChangeNotifier {
       return false;
     }
 
+    var wasDirty = isDirty();
+
     // undo the first command
 
-    _stack.firstWhere(applies).undo();
+    _stack.firstWhere(applies).undo(deleteOnly: true);
 
     // get rid of the rest
 
@@ -34,6 +39,19 @@ class CommandStack extends ChangeNotifier {
       if ( applies(_stack[i])) {
         _stack.removeAt(i);
       }
+
+    // did we change out state?
+
+    _changeDirty(wasDirty);
+  }
+
+  void _changeDirty(bool wasDirty) {
+    if ( wasDirty != isDirty()) {
+      if (Tracer.enabled)
+        Tracer.trace("editor.history", TraceLevel.high, "history.dirty = ${isDirty()}");
+
+      notifyListeners();
+    }
   }
 
   bool propertyIsDirty(dynamic object, String property) {
@@ -69,6 +87,9 @@ class CommandStack extends ChangeNotifier {
   }
 
   Command addCommand(Command cmd) {
+    if ( Tracer.enabled)
+      Tracer.trace("editor.history", TraceLevel.high, "add command");
+
     var wasDirty = isDirty();
 
     cmd.stack = this;
@@ -76,8 +97,7 @@ class CommandStack extends ChangeNotifier {
     _stack.add(cmd);
     cmd.execute();
 
-    if ( wasDirty != isDirty())
-      notifyListeners();
+    _changeDirty(wasDirty);
 
     return cmd;
   }
@@ -89,8 +109,7 @@ class CommandStack extends ChangeNotifier {
     if (idx >= 0) {
       _stack.removeRange(0, idx + 1);
 
-      if ( wasDirty != isDirty())
-        notifyListeners();
+      _changeDirty(wasDirty);
     }
   }
 }

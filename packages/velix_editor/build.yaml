@@ -1,0 +1,26 @@
+targets:
+  $default:
+    sources:
+      - "lib/**"
+      - "$package$"
+    builders:
+      velix_ui|command_builder:
+        generate_for:
+          include:
+            - lib/**/*.dart
+          exclude:
+            - lib/**.g.dart#
+      velix|registry_builder:
+        generate_for:
+          - lib/*.dart
+          - lib/**/*.dart
+          - "!lib/*.g.dart"
+          - "!lib/**/*.g.dart"
+          - "!lib/**/*.part.dart"
+          - "!lib/**/*.freezed.dart"
+          - "!lib/**/*.gr.dart"
+          - "!lib/combined_registry.dart"
+
+      velix|registry_aggregator:
+        generate_for:
+          - lib/main.dart

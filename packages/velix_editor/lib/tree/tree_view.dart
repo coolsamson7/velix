@@ -112,7 +112,7 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    environment = Environment(parent: EnvironmentProvider.of(context));
+    environment = EnvironmentProvider.of(context);
   }
 
   void _onControllerUpdate() => setState(() {});

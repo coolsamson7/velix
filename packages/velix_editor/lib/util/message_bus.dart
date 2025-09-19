@@ -11,6 +11,9 @@ class MessageBus {
 
   final _streamController = StreamController<_Message>.broadcast();
 
+  MessageBus() {
+    print(".");
+  }
   // public
 
   /// Publish a message on a given topic.

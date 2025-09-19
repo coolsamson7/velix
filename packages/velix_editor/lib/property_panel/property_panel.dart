@@ -132,7 +132,10 @@ class _PropertyPanelState extends State<PropertyPanel> {
                         child: const Icon(Icons.chevron_right, size: 16),
                       ),
                       const SizedBox(width: 4),
-                      Text(groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(groupName, style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade900, // header text
+                        ),),
                     ],
                   ),
                 ),

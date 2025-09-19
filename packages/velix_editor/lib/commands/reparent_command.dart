@@ -11,6 +11,7 @@ class ReparentCommand extends Command {
 
   final MessageBus bus;
   final WidgetData widget;
+  int index = -1;
   final WidgetData? oldParent;
   final WidgetData? newParent;
 
@@ -30,14 +31,26 @@ class ReparentCommand extends Command {
     // remove from old
 
     if ( oldParent != null) {
+      index = oldParent!.children.indexOf(widget);
       oldParent!.children.remove(widget);
+
+      bus.publish(
+        "property-changed",
+        PropertyChangeEvent(widget: oldParent, source: this),
+      );
     }
 
     // add to new
 
+    widget.parent = newParent;
+
     if ( newParent != null) {
       newParent!.children.add(widget);
-      widget.parent = newParent;
+
+      bus.publish(
+        "property-changed",
+        PropertyChangeEvent(widget: newParent, source: this),
+      );
     }
   }
 
@@ -45,27 +58,30 @@ class ReparentCommand extends Command {
   void undo({bool deleteOnly = false}) {
     // remove from parent
 
-    if ( newParent != null)
+    if ( newParent != null) {
       newParent!.children.remove(widget);
 
-    bus.publish(
-      "property-changed",
-      PropertyChangeEvent(widget: newParent, source: this),
-    );
+      bus.publish(
+        "property-changed",
+        PropertyChangeEvent(widget: newParent, source: this),
+      );
+    }
+
+    widget.parent = oldParent;
 
     // add to old
 
     if (oldParent != null) {
-      oldParent!.children.add(widget);
-      widget.parent = oldParent;
+      if ( index >= 0)
+        oldParent!.children.insert(index, widget);
+      else
+        oldParent!.children.add(widget);
+
+      bus.publish(
+        "property-changed",
+        PropertyChangeEvent(widget: oldParent, source: this),
+      );
     }
-
-    // bus?
-
-    bus.publish(
-      "property-changed",
-      PropertyChangeEvent(widget: oldParent, source: this),
-    );
 
     super.undo(deleteOnly: deleteOnly);
   }

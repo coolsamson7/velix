@@ -3,6 +3,46 @@ import 'package:flutter/material.dart' hide MetaData;
 import '../components/panel_header.dart';
 import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
+import '../metadata/widget_data.dart';
+
+class _PaletteDraggable extends StatefulWidget {
+  final MetaData type;
+  final Widget Function(bool highlight) itemBuilder;
+
+  const _PaletteDraggable({required this.type, required this.itemBuilder, Key? key}) : super(key: key);
+
+  @override
+  State<_PaletteDraggable> createState() => _PaletteDraggableState();
+}
+
+class _PaletteDraggableState extends State<_PaletteDraggable> {
+  late WidgetData dragInstance;
+
+  @override
+  void initState() {
+    super.initState();
+    dragInstance = widget.type.create();
+  }
+
+  void _newDragInstance() => setState(() { dragInstance = widget.type.create(); });
+
+  @override
+  Widget build(BuildContext context) {
+    return Draggable<WidgetData>(
+      data: dragInstance,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Opacity(
+          opacity: 0.8,
+          child: widget.itemBuilder(true),
+        ),
+      ),
+      childWhenDragging: widget.itemBuilder(false),
+      child: widget.itemBuilder(false),
+      onDragStarted: _newDragInstance,
+    );
+  }
+}
 
 
 class WidgetPalette extends StatefulWidget {
@@ -70,7 +110,6 @@ class _WidgetPaletteState extends State<WidgetPalette> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Group header
         InkWell(
           onTap: () => setState(() => _expandedGroups[groupName] = !isExpanded),
           child: Container(
@@ -88,7 +127,6 @@ class _WidgetPaletteState extends State<WidgetPalette> {
             ),
           ),
         ),
-        // Widgets grid
         if (isExpanded)
           Padding(
             padding: const EdgeInsets.all(8),
@@ -105,15 +143,9 @@ class _WidgetPaletteState extends State<WidgetPalette> {
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                   children: widgetsInGroup.map((type) {
-                    return Draggable<String>(
-                      data: type.name,
-                      feedback: Material(
-                        child: Opacity(
-                          opacity: 0.8,
-                          child: _buildPaletteItem(type, highlight: true),
-                        ),
-                      ),
-                      child: _buildPaletteItem(type),
+                    return _PaletteDraggable(
+                      type: type,
+                      itemBuilder: (highlight) => _buildPaletteItem(type, highlight: highlight),
                     );
                   }).toList(),
                 );
@@ -123,6 +155,8 @@ class _WidgetPaletteState extends State<WidgetPalette> {
       ],
     );
   }
+
+
 
   Widget _buildPaletteItem(MetaData type, {bool highlight = false}) {
     return Container(

@@ -14,4 +14,11 @@ class ContainerWidgetData extends WidgetData {
   // constructor
 
   ContainerWidgetData({required super.children, super.type = "container"});
+
+  // override
+
+  @override
+  bool acceptsChild(WidgetData widget) {
+    return true;
+  }
 }

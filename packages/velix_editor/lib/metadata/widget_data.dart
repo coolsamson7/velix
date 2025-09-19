@@ -17,4 +17,10 @@ abstract class WidgetData {
   // constructor
 
   WidgetData({required this.type, this.children = const []});
+
+  // public
+
+  bool acceptsChild(WidgetData widget) {
+    return false;
+  }
 }

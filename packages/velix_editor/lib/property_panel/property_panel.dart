@@ -75,8 +75,6 @@ class _PropertyPanelState extends State<PropertyPanel> {
   bool isPropertyDirty(Property property) {
     var dirty = commandStack.propertyIsDirty(selected, property.name);
 
-    print("property ${property.name}.dirty = $dirty");
-
     return dirty;
   }
 

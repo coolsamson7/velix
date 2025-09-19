@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide WidgetBuilder, MetaData;
 import 'package:velix_di/di/di.dart';
 
 import '../../dynamic_widget.dart';
+import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/container.dart';
@@ -18,23 +19,25 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   ContainerEditWidgetBuilder({required this.typeRegistry})
       : super(name: "container", edit: true);
 
-  // lifecycle
+  // internal
 
   // override
 
   @override
   Widget create(ContainerWidgetData data) {
-    return DragTarget<Object>(
-      onWillAccept: (incoming) => true,
+    return DragTarget<WidgetData>(
+      onWillAccept: (event) => data.acceptsChild(event!),
       onAccept: (incoming) {
         // palette
-        if (incoming is String) {
-          var metaData = typeRegistry[incoming];
+        if (incoming is WidgetData && incoming.parent == null) {
+          // link
 
-          data.children.add(metaData.create());
+          incoming.parent = data;
+
+          data.children.add(incoming);
         }
         // reparent
-        else if (incoming is WidgetData) {
+        else {
           // reparenting drop
           // remove from old parent
           _removeFromParent(incoming);
@@ -42,27 +45,33 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
         }
       },
       builder: (context, candidateData, rejectedData) {
-        return Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade400),
-            color: Colors.grey.shade100,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: data.children
-                .map(
-                  (child) => DynamicWidget(
-                model: child,
-                meta: typeRegistry[child.type],
-                parent: data,
+          final isActive = candidateData.isNotEmpty;
+
+          return Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isActive ? Colors.blue : Colors.grey.shade400,
+                width: isActive ? 3 : 1,
               ),
-            )
-                .toList(),
-          ),
+              color: isActive ? Colors.blue.shade50 : Colors.grey.shade100,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: data.children
+                  .map(
+                    (child) => EditWidget(
+                  model: child,
+                  meta: typeRegistry[child.type],
+                  parent: data,
+                ),
+              )
+                  .toList(),
+            ),
+          );
+        },
+
         );
-      },
-    );
   }
 
   void _removeFromParent(WidgetData widget) {

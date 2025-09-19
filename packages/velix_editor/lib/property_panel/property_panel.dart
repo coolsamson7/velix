@@ -63,6 +63,8 @@ class _PropertyPanelState extends State<PropertyPanel> {
         newValue: value
       ));
     else (currentCommand as PropertyChangeCommand).value = value;
+
+    setState(() {});
   }
 
   void _resetProperty(Property property) {

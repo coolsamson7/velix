@@ -25,7 +25,7 @@ class MessageBus {
   /// Subscribe to a topic.
   StreamSubscription<T> subscribe<T>(String topic, void Function(T) onData) {
     return _streamController.stream
-        .where((msg) => msg.topic == topic && msg.data is T)
+        .where((msg) => msg.topic == topic /*&& msg.data is T*/)
         .map((msg) => msg.data as T)
         .listen((event) {
       if ( Tracer.enabled)

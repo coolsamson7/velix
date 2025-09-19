@@ -13,10 +13,63 @@ class StringEditorBuilder extends PropertyEditorBuilder<String> {
     required dynamic value,
     required ValueChanged<dynamic> onChanged,
   }) {
-    return TextField(
-      controller: TextEditingController(text: value?.toString() ?? ""),
-      //decoration: InputDecoration(labelText: label),
+    return _StringEditorStateful(
+      label: label,
+      value: value ?? "",
       onChanged: onChanged,
+    );
+  }
+}
+
+class _StringEditorStateful extends StatefulWidget {
+  final String label;
+  final String value;
+  final ValueChanged<dynamic> onChanged;
+
+  const _StringEditorStateful({
+    Key? key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  State<_StringEditorStateful> createState() => _StringEditorStatefulState();
+}
+
+class _StringEditorStatefulState extends State<_StringEditorStateful> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value);
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StringEditorStateful oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value != _controller.text) {
+      _controller.text = widget.value;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      focusNode: _focusNode,
+      decoration: InputDecoration(labelText: widget.label),
+      onChanged: widget.onChanged,
     );
   }
 }

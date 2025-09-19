@@ -1,61 +1,73 @@
 import 'package:flutter/material.dart';
 
-
-class LeftPanelSwitcher extends StatefulWidget {
+/// A docked switchable panel that can appear on the left or right side.
+class DockedPanelSwitcher extends StatefulWidget {
   final Map<String, Widget> panels; // panel name -> widget
-  const LeftPanelSwitcher({super.key, required this.panels});
+  final Map<String, IconData> icons; // panel name -> icon
+  final String initialPanel;
+  final DockSide side;
+  final double barWidth;
+  final double panelWidth;
+
+  const DockedPanelSwitcher({
+    super.key,
+    required this.panels,
+    required this.icons,
+    this.initialPanel = "",
+    this.side = DockSide.left,
+    this.barWidth = 40,
+    this.panelWidth = 200,
+  });
 
   @override
-  State<LeftPanelSwitcher> createState() => _LeftPanelSwitcherState();
+  State<DockedPanelSwitcher> createState() => _DockedPanelSwitcherState();
 }
 
-class _LeftPanelSwitcherState extends State<LeftPanelSwitcher> {
-  String selectedPanel = "tree";
+class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
+  late String selectedPanel;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedPanel = widget.initialPanel.isNotEmpty
+        ? widget.initialPanel
+        : widget.panels.keys.first;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Vertical Icon Bar
-        Container(
-          width: 40,
-          color: Colors.grey.shade300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.account_tree),
-                tooltip: "Tree",
-                color: selectedPanel == "tree" ? Colors.blue : null,
-                onPressed: () => setState(() => selectedPanel = "tree"),
-              ),
-              IconButton(
-                icon: const Icon(Icons.widgets),
-                tooltip: "Palette",
-                color: selectedPanel == "palette" ? Colors.blue : null,
-                onPressed: () => setState(() => selectedPanel = "palette"),
-              ),
-              IconButton(
-                icon: const Icon(Icons.code),
-                tooltip: "JSON",
-                color: selectedPanel == "json" ? Colors.blue : null,
-                onPressed: () => setState(() => selectedPanel = "json"),
-              ),
-            ],
-          ),
-        ),
+    final isLeft = widget.side == DockSide.left;
 
-        // Left Panel
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: Container(
-            key: ValueKey(selectedPanel),
-            width: 200,
-            color: Colors.grey.shade100,
-            child: widget.panels[selectedPanel]!,
-          ),
-        ),
-      ],
+    final bar = Container(
+      width: widget.barWidth,
+      color: Colors.grey.shade300,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: widget.panels.keys.map((name) {
+          return IconButton(
+            icon: Icon(widget.icons[name] ?? Icons.help_outline),
+            tooltip: name,
+            color: selectedPanel == name ? Colors.blue : null,
+            onPressed: () => setState(() => selectedPanel = name),
+          );
+        }).toList(),
+      ),
+    );
+
+    final panel = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: Container(
+        key: ValueKey(selectedPanel),
+        width: widget.panelWidth,
+        color: Colors.grey.shade100,
+        child: widget.panels[selectedPanel]!,
+      ),
+    );
+
+    return Row(
+      children: isLeft ? [bar, panel] : [panel, bar],
     );
   }
 }
+
+enum DockSide { left, right }

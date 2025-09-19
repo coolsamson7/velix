@@ -46,19 +46,36 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
     return commandStack.isDirty();
   }
 
+  IconButton button(String commandName) {
+    var command = getCommand(commandName);
+
+    return IconButton(
+      tooltip: command.label ?? command.name,
+      icon: Icon(command.icon),
+      onPressed: command.enabled ? () {
+        command.execute([]);
+      } : null,
+    );
+  }
+
   // commands
 
-  @Command(label: "Save")
+
+  @Command(label: "Open", icon: Icons.folder_open)
+  @override
+  void _open() {}
+
+  @Command(label: "Save", icon: Icons.save)
   @override
   void _save() {}
 
-  @Command(label: "Revert")
+  @Command(label: "Undo", icon: Icons.undo)
   @override
   void _revert() {
     commandStack.undo();
   }
 
-  @Command(label: "Play")
+  @Command(label: "Play", icon: Icons.play_arrow)
   @override
   void _play() {
     edit = !edit;
@@ -106,27 +123,11 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
-                IconButton(
-                  tooltip: "Save",
-                  icon: const Icon(Icons.save),
-                  onPressed: isDirty() ? () {
-                    save();
-                  } : null,
-                ),
-                IconButton(
-                  tooltip: "Revert",
-                  icon: const Icon(Icons.undo),
-                  onPressed: isDirty() ? () {
-                    revert();
-                  } : null,
-                ),
-                IconButton(
-                  tooltip: "Open",
-                  icon: const Icon(Icons.folder_open),
-                  onPressed: () {
-                    // TODO: implement open
-                  },
-                ),
+                button("open"),
+                button("save"),
+                button("revert"),
+                button("save"),
+
                 IconButton(
                   tooltip: edit ? "Play" : "Stop",
                   icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
@@ -145,7 +146,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
           Expanded(
             child: Row(
               children: [
-                LeftPanelSwitcher(
+                /*eftPanelSwitcher(
                   panels: {
                     "tree": WidgetTreePanel(models: widget.models),
                     "palette": WidgetPalette(
@@ -153,7 +154,23 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     ),
                     "json": JsonEditorPanel(),
                   },
+                ),*/
+
+                DockedPanelSwitcher(
+                  side: DockSide.left,
+                  panels: {
+                    "tree": WidgetTreePanel(models: widget.models),
+                    "palette": WidgetPalette(typeRegistry: environment.get<TypeRegistry>()),
+                    "json": JsonEditorPanel(),
+                  },
+                  icons: {
+                    "tree": Icons.account_tree,
+                    "palette": Icons.widgets,
+                    "json": Icons.code,
+                  },
+                  initialPanel: "tree",
                 ),
+
                 Expanded(
                   flex: 2,
                   child: Column(
@@ -186,7 +203,17 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     ],
                   ),
                 ),
-                Container(width: 300, color: Colors.white, child: PropertyPanel()),
+                //Container(width: 300, color: Colors.white, child: PropertyPanel()),
+                DockedPanelSwitcher(
+                  side: DockSide.right,
+                  panels: {
+                    "properties": PropertyPanel(),
+                  },
+                  icons: {
+                    "properties": Icons.tune,
+                  },
+                  initialPanel: "properties",
+                )
               ],
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide MetaData;
 
 import 'package:velix_di/di/di.dart';
+import 'package:velix_ui/commands/command.dart';
 
 
 import '../commands/command_stack.dart';
@@ -10,7 +11,7 @@ import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
 import '../palette/palette_view.dart';
-import '../property_panel/panel.dart';
+import '../property_panel/property_panel.dart';
 import '../provider/environment_provider.dart';
 import '../tree/tree_view.dart';
 import '../util/message_bus.dart';
@@ -18,6 +19,8 @@ import '../widget_container.dart';
 import 'canvas.dart';
 import 'panel_switcher.dart';
 import 'widget_breadcrumb.dart';
+
+part "editor.command.g.dart";
 
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
@@ -30,7 +33,7 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
-class _EditorScreenState extends State<EditorScreen> {
+class _EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, _EditorScreenStateCommands {
   // instance data
 
   late final Environment environment;
@@ -43,18 +46,33 @@ class _EditorScreenState extends State<EditorScreen> {
     return commandStack.isDirty();
   }
 
-  void save() {}
+  // commands
 
-  void revert() {
+  @Command(label: "Save")
+  @override
+  void _save() {}
+
+  @Command(label: "Revert")
+  @override
+  void _revert() {
     commandStack.undo();
   }
 
-  void play() {
+  @Command(label: "Play")
+  @override
+  void _play() {
     edit = !edit;
     setState(() {});
   }
 
   // override
+
+  @override
+  void updateCommandState() {
+    setCommandEnabled("play", true);
+    setCommandEnabled("revert", commandStack.isDirty());
+    //setCommandEnabled("revert", true);
+  }
 
   @override
   void didChangeDependencies() {
@@ -67,7 +85,9 @@ class _EditorScreenState extends State<EditorScreen> {
     var bus = environment.get<MessageBus>();
     commandStack = environment.get<CommandStack>();
 
-    commandStack.addListener(() => setState(() {}));
+    commandStack.addListener(() => setState(() {
+      updateCommandState();
+    }));
 
     bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
   }

@@ -6,6 +6,7 @@ import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
+import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
 import 'package:velix_editor/metadata/widget_data.dart';
@@ -25,7 +26,7 @@ import 'package:velix_editor/theme/widgets/text-widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-void registerEditorTypes() {
+void registerTypes() {
   type<CommandStack>(
     location: 'package:velix_editor/commands/command_stack.dart:9:1',
     annotations: [
@@ -34,6 +35,30 @@ void registerEditorTypes() {
     constructor: () => CommandStack(),
     fromMapConstructor: (Map<String,dynamic> args) => CommandStack(),
     fromArrayConstructor: (List<dynamic> args) => CommandStack(),
+  );
+
+  type<EditorModule>(
+    location: 'package:velix_editor/editor_module.dart:3:1',
+    annotations: [
+      Module(imports: [])
+    ],
+    constructor: () => EditorModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => EditorModule(),
+    fromArrayConstructor: (List<dynamic> args) => EditorModule(),
+    methods: [
+      method<EditorModule,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorModule).onInit()
+      ), 
+      method<EditorModule,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorModule).onDestroy()
+      )
+    ],
   );
 
   type<TypeRegistry>(
@@ -141,7 +166,7 @@ void registerEditorTypes() {
   );
 
   type<MessageBus>(
-    location: 'package:velix_editor/util/message_bus.dart:6:1',
+    location: 'package:velix_editor/util/message_bus.dart:7:1',
     annotations: [
       Injectable(scope: "environment", eager: false)
     ],

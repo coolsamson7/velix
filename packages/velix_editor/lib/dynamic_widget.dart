@@ -12,7 +12,7 @@ class DynamicWidget extends StatefulWidget {
   // instance data
 
   final WidgetData model;
-  final MetaData meta;
+  final WidgetDescriptor meta;
   final WidgetData? parent; // optional reference to parent container
 
   const DynamicWidget({
@@ -29,7 +29,7 @@ class DynamicWidget extends StatefulWidget {
 class _DynamicWidgetState extends State<DynamicWidget> {
   // instance data
 
-  late final Theme theme;
+  late final WidgetFactory theme;
   late final Environment environment;
 
   // override
@@ -39,7 +39,7 @@ class _DynamicWidgetState extends State<DynamicWidget> {
     super.didChangeDependencies();
 
     environment = EnvironmentProvider.of(context);
-    theme = environment.get<Theme>();
+    theme = environment.get<WidgetFactory>();
   }
 
   @override

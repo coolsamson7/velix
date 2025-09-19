@@ -5,7 +5,7 @@ import 'package:velix_di/di/di.dart';
 import 'widget_builder.dart';
 
 @Injectable()
-class Theme {
+class WidgetFactory {
   // instance data
 
   Map<String, WidgetBuilder> widgets = {};

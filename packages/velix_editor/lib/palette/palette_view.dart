@@ -6,7 +6,7 @@ import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
 
 class _PaletteDraggable extends StatefulWidget {
-  final MetaData type;
+  final WidgetDescriptor type;
   final Widget Function(bool highlight) itemBuilder;
 
   const _PaletteDraggable({required this.type, required this.itemBuilder, Key? key}) : super(key: key);
@@ -74,7 +74,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
   @override
   Widget build(BuildContext context) {
     // Group widgets by group name
-    final Map<String, List<MetaData>> groupedWidgets = {};
+    final Map<String, List<WidgetDescriptor>> groupedWidgets = {};
     for (var meta in widget.typeRegistry.metaData.values) {
       groupedWidgets.putIfAbsent(meta.group, () => []).add(meta);
     }
@@ -104,7 +104,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
     );
   }
 
-  Widget _buildGroup(String groupName, List<MetaData> widgetsInGroup) {
+  Widget _buildGroup(String groupName, List<WidgetDescriptor> widgetsInGroup) {
     final isExpanded = _expandedGroups[groupName] ?? true;
 
     return Column(
@@ -158,7 +158,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
 
 
 
-  Widget _buildPaletteItem(MetaData type, {bool highlight = false}) {
+  Widget _buildPaletteItem(WidgetDescriptor type, {bool highlight = false}) {
     return Container(
       decoration: BoxDecoration(
         color: highlight ? Colors.blueAccent : Colors.white,

@@ -25,7 +25,7 @@ part "editor.command.g.dart";
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
   final List<WidgetData> models;
-  final Map<String, MetaData> metadata;
+  final Map<String, WidgetDescriptor> metadata;
 
   const EditorScreen({super.key, required this.models, required this.metadata});
 

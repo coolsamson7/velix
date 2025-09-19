@@ -22,7 +22,7 @@ class PropertyPanel extends StatefulWidget {
 
 class _PropertyPanelState extends State<PropertyPanel> {
   WidgetData? selected;
-  MetaData? metaData;
+  WidgetDescriptor? metaData;
   late final MessageBus bus;
   late final CommandStack commandStack;
   late final PropertyEditorRegistry editorRegistry;

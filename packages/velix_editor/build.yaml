@@ -22,5 +22,8 @@ targets:
           - "!lib/combined_registry.dart"
 
       velix|registry_aggregator:
+        options:
+          prefix: "lib"
+          function_name: "registerEditorTypes"
         generate_for:
           - lib/editor.dart

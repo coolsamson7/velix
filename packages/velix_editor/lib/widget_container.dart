@@ -10,7 +10,7 @@ class WidgetContainer extends StatefulWidget {
   // instance data
 
   final List<WidgetData> models;
-  final Map<String, MetaData> metadata;
+  final Map<String, WidgetDescriptor> metadata;
 
   // constructor
 

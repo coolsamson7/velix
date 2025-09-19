@@ -13,7 +13,7 @@ import 'metadata/metadata.dart';
 
 class EditWidget extends StatefulWidget {
   final WidgetData model;
-  final MetaData meta;
+  final WidgetDescriptor meta;
   final WidgetData? parent;
 
   const EditWidget({
@@ -29,7 +29,7 @@ class EditWidget extends StatefulWidget {
 
 class _EditWidgetState extends State<EditWidget> {
   late final Environment environment;
-  late final Theme theme;
+  late final WidgetFactory theme;
   late final MessageBus bus;
   bool selected = false;
 
@@ -58,7 +58,7 @@ class _EditWidgetState extends State<EditWidget> {
     super.didChangeDependencies();
 
     environment = EnvironmentProvider.of(context);
-    theme = environment.get<Theme>();
+    theme = environment.get<WidgetFactory>();
     bus = environment.get<MessageBus>();
 
     selectionSubscription = bus.subscribe<SelectionEvent>("selection", select);

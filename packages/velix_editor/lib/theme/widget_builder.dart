@@ -19,7 +19,7 @@ abstract class WidgetBuilder<T extends WidgetData> {
   // lifecycle
 
   @Inject()
-  void setThema(Theme theme) {
+  void setThema(WidgetFactory theme) {
     theme.register(this, name, edit);
   }
 

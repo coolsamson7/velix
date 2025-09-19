@@ -10,7 +10,7 @@ class PropertyChangeCommand<T> extends Command {
   // instance data
 
   final MessageBus bus;
-  final MetaData metaData;
+  final WidgetDescriptor metaData;
   final Object target;
   final String property;
   final T oldValue;

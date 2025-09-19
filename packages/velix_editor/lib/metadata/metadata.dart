@@ -40,7 +40,7 @@ class Property {
 }
 
 // we will use that for generic property panels
-class MetaData {
+class WidgetDescriptor {
   // instance data
 
   final String name;
@@ -51,7 +51,7 @@ class MetaData {
 
   // constructor
 
-  MetaData({required this.name, required this.group, required this.type, required this.properties, required this.icon});
+  WidgetDescriptor({required this.name, required this.group, required this.type, required this.properties, required this.icon});
 
   // public
 

@@ -1,48 +1,66 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:velix_di/di/di.dart';
 
+import '../commands/command_stack.dart';
+import '../commands/reparent_command.dart';
 import '../event/events.dart';
 import '../metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 
+/// Controller to handle tree state, selection, expansion, and drag/drop
 class WidgetTreeController extends ChangeNotifier {
-  // instance data
-
   final List<WidgetData> roots;
 
-  /// Tracks which nodes are expanded
+  /// Tracks expanded state per node
   final Map<WidgetData, bool> _expanded = {};
 
-  /// Currently selected node
   WidgetData? selectedNode;
 
-  late final StreamSubscription<SelectionEvent> _busSub;
+  late final StreamSubscription<SelectionEvent> _selectionSub;
+  late final StreamSubscription<PropertyChangeEvent> _propertySub;
+
   final MessageBus bus;
 
-  // constructor
-
   WidgetTreeController({required this.roots, required this.bus}) {
-    _busSub = bus.subscribe<SelectionEvent>("selection", _onSelectionEvent);
+    _selectionSub = bus.subscribe<SelectionEvent>("selection", _onSelection);
+    _propertySub =
+        bus.subscribe<PropertyChangeEvent>("property-changed", _onPropertyChanged);
   }
 
-  // internal
+  // --------------------
+  // Bus event handlers
+  // --------------------
 
-  void _onSelectionEvent(SelectionEvent event) {
+  void _onSelection(SelectionEvent event) {
     if (selectedNode != event.selection) {
       selectedNode = event.selection;
       notifyListeners();
     }
   }
 
-  // override
-
-  @override
-  void dispose() {
-    _busSub.cancel();
-    super.dispose();
+  void _onPropertyChanged(PropertyChangeEvent event) {
+    if (_isNodeInTree(event.widget!)) {
+      notifyListeners();
+    }
   }
+
+  bool _isNodeInTree(WidgetData node) {
+    bool contains(List<WidgetData> nodes) {
+      for (var n in nodes) {
+        if (identical(n, node)) return true;
+        if (contains(n.children)) return true;
+      }
+      return false;
+    }
+
+    return contains(roots);
+  }
+
+  // --------------------
+  // Public API
+  // --------------------
 
   bool isExpanded(WidgetData node) => _expanded[node] ?? true;
 
@@ -59,68 +77,41 @@ class WidgetTreeController extends ChangeNotifier {
     }
   }
 
-  /// Moves a node (drag & drop) while preventing cycles
-  bool moveNode({required WidgetData source, WidgetData? target}) {
-    WidgetData? p = target;
-    while (p != null) {
-      if (p == source) return false; // can't drop into own child
-      p = p.parent;
-    }
-
-    // detach from old parent
-    if (source.parent != null) {
-      source.parent!.children.remove(source);
-    }
-    else {
-      roots.remove(source);
-    }
-
-    // attach to new parent
-    if (target == null) {
-      roots.add(source);
-      source.parent = null;
-    }
-    else {
-      target.children.add(source);
-      source.parent = target;
-    }
-
-    notifyListeners();
-    return true;
+  @override
+  void dispose() {
+    _selectionSub.cancel();
+    _propertySub.cancel();
+    super.dispose();
   }
 }
 
+/// WidgetTree view
 class WidgetTreeView extends StatefulWidget {
-  // instance data
-
   final WidgetTreeController controller;
 
-  // constructor
-
   const WidgetTreeView({super.key, required this.controller});
-
-  // override
 
   @override
   State<WidgetTreeView> createState() => _WidgetTreeViewState();
 }
 
 class _WidgetTreeViewState extends State<WidgetTreeView> {
+   late final Environment environment;
+
   // override
 
   @override
   void initState() {
     super.initState();
+
     widget.controller.addListener(_onControllerUpdate);
   }
 
   @override
-  void didUpdateWidget(covariant WidgetTreeView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
-      oldWidget.controller.removeListener(_onControllerUpdate);
-      widget.controller.addListener(_onControllerUpdate);
-    }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    environment = Environment(parent: EnvironmentProvider.of(context));
   }
 
   void _onControllerUpdate() => setState(() {});
@@ -148,26 +139,32 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DragTarget<WidgetData>(
-          onWillAccept: (data) => data != null && data != node,
-          onAccept: (data) =>
-              widget.controller.moveNode(source: data, target: node),
+          onWillAccept: (widget) => node.acceptsChild(widget!),
+          onAccept: (widget) => environment.get<CommandStack>().execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, newParent: node)),
           builder: (context, candidateData, rejectedData) {
+            final isHovering = candidateData.isNotEmpty;
+
             return GestureDetector(
               onTap: () => widget.controller.selectNode(node),
               child: Container(
-                color: isSelected
-                    ? Colors.blue.withOpacity(0.2)
-                    : candidateData.isNotEmpty
-                    ? Colors.green.withOpacity(0.2)
-                    : null,
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.blue.withOpacity(0.2)
+                      : null,
+                  border: isHovering
+                      ? Border.all(color: Colors.green, width: 2)
+                      : null,
+                ),
+                padding:
+                const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: Row(
                   children: [
                     SizedBox(width: depth * 16),
                     if (hasChildren)
                       IconButton(
-                        icon: Icon(
-                            isExpanded ? Icons.expand_more : Icons.chevron_right),
+                        icon: Icon(isExpanded
+                            ? Icons.expand_more
+                            : Icons.chevron_right),
                         iconSize: 20,
                         padding: EdgeInsets.zero,
                         onPressed: () =>
@@ -175,17 +172,22 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                       )
                     else
                       const SizedBox(width: 24),
-                    LongPressDraggable<WidgetData>(
+                    Expanded(child: Draggable<WidgetData>(
                       data: node,
                       feedback: Material(
+                        elevation: 4,
                         child: Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(8),
                           color: Colors.grey.shade200,
                           child: Text(node.type),
                         ),
                       ),
+                      childWhenDragging: Opacity(
+                        opacity: 0.5,
+                        child: Text(node.type),
+                      ),
                       child: Text(node.type),
-                    ),
+                    )),
                   ],
                 ),
               ),
@@ -206,12 +208,9 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
   }
 }
 
+/// Top-level panel for the tree
 class WidgetTreePanel extends StatefulWidget {
-  // instance data
-
   final List<WidgetData> models;
-
-  // constructor
 
   const WidgetTreePanel({required this.models, super.key});
 
@@ -220,12 +219,8 @@ class WidgetTreePanel extends StatefulWidget {
 }
 
 class _WidgetTreePanelState extends State<WidgetTreePanel> {
-  // instance data
-
   late WidgetTreeController controller;
   late MessageBus bus;
-
-  // override
 
   @override
   void didChangeDependencies() {
@@ -233,11 +228,6 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
 
     bus = EnvironmentProvider.of(context).get<MessageBus>();
     controller = WidgetTreeController(roots: widget.models, bus: bus);
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override

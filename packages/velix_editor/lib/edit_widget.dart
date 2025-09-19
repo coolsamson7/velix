@@ -210,7 +210,7 @@ class _EditWidgetState extends State<EditWidget> {
   }
 
   void delete() {
-    environment.get<CommandStack>().addCommand(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, oldParent: widget.model.parent, newParent: null));
+    environment.get<CommandStack>().execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, newParent: null));
   }
 
   // override

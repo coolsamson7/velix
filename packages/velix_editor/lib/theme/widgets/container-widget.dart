@@ -32,7 +32,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
     return DragTarget<WidgetData>(
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
-        environment.get<CommandStack>().addCommand(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, oldParent: widget.parent, newParent: data));
+        environment.get<CommandStack>().execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, newParent: data));
 
         WidgetsBinding.instance.addPostFrameCallback((_) =>
           environment.get<MessageBus>().publish("select", SelectionEvent(selection: widget, source: this)));

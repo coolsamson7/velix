@@ -86,7 +86,7 @@ class CommandStack extends ChangeNotifier {
       tos()!.undo();
   }
 
-  Command addCommand(Command cmd) {
+  Command execute(Command cmd) {
     if ( Tracer.enabled)
       Tracer.trace("editor.history", TraceLevel.high, "add command");
 

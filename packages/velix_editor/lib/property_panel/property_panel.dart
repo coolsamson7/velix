@@ -55,7 +55,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
     // take care of command stack
 
     if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) 
-      currentCommand = commandStack.addCommand(PropertyChangeCommand(
+      currentCommand = commandStack.execute(PropertyChangeCommand(
         bus: bus,
         metaData: metaData!,
         target: selected!,

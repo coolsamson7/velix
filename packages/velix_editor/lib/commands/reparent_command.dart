@@ -19,9 +19,8 @@ class ReparentCommand extends Command {
   ReparentCommand({
     required this.bus,
     required this.widget,
-    required this.oldParent,
     required this.newParent,
-  });
+  }) : oldParent = widget.parent;
 
   // override
 

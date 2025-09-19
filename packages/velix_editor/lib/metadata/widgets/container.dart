@@ -18,7 +18,7 @@ class ContainerWidgetData extends WidgetData {
   // override
 
   @override
-  bool acceptsChild(WidgetData widget) {
+  bool acceptsChild(WidgetData widget) { // TODO parent -> child
     return widget.parent != this;
   }
 }

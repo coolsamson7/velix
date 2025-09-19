@@ -25,6 +25,6 @@ abstract class WidgetBuilder<T extends WidgetData> {
 
   // abstract
 
-  Widget create(T data);
+  Widget create(T data, Environment environment);
 }
 

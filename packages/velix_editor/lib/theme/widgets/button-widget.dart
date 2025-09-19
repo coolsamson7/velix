@@ -9,7 +9,7 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   ButtonWidgetBuilder() : super(name: "button");
 
   @override
-  Widget create(ButtonWidgetData data) {
+  Widget create(ButtonWidgetData data, Environment environment) {
     return ElevatedButton(
       onPressed: () {  }, // TODO
       child: Text(data.label),
@@ -22,7 +22,7 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   ButtonEditWidgetBuilder() : super(name: "button", edit: true);
 
   @override
-  Widget create(ButtonWidgetData data) {
+  Widget create(ButtonWidgetData data, Environment environment) {
     return ElevatedButton(
       onPressed: () {  }, // TODO
       child: Text(data.label),

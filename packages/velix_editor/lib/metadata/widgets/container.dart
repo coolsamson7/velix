@@ -19,6 +19,6 @@ class ContainerWidgetData extends WidgetData {
 
   @override
   bool acceptsChild(WidgetData widget) {
-    return true;
+    return widget.parent != this;
   }
 }

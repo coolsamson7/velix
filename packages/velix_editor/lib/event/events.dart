@@ -24,3 +24,9 @@ class SelectionEvent extends Event {
 
   SelectionEvent({required this.selection, required super.source});
 }
+
+class CreateWidgetEvent extends Event {
+  WidgetData? widget;
+
+  CreateWidgetEvent({required this.widget, required super.source});
+}

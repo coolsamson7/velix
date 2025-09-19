@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, MetaData;
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/commands/command_stack.dart';
+import 'package:velix_editor/util/message_bus.dart';
 
+import '../../commands/reparent_command.dart';
 import '../../dynamic_widget.dart';
 import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
@@ -24,25 +27,11 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   // override
 
   @override
-  Widget create(ContainerWidgetData data) {
+  Widget create(ContainerWidgetData data, Environment environment) {
     return DragTarget<WidgetData>(
-      onWillAccept: (event) => data.acceptsChild(event!),
-      onAccept: (incoming) {
-        // palette
-        if (incoming is WidgetData && incoming.parent == null) {
-          // link
-
-          incoming.parent = data;
-
-          data.children.add(incoming);
-        }
-        // reparent
-        else {
-          // reparenting drop
-          // remove from old parent
-          _removeFromParent(incoming);
-          data.children.add(incoming);
-        }
+      onWillAccept: (widget) => data.acceptsChild(widget!),
+      onAccept: (widget) {
+        environment.get<CommandStack>().addCommand(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, oldParent: widget.parent, newParent: data));
       },
       builder: (context, candidateData, rejectedData) {
           final isActive = candidateData.isNotEmpty;
@@ -73,23 +62,6 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 
         );
   }
-
-  void _removeFromParent(WidgetData widget) {
-    void removeRecursive(WidgetData container) {
-      container.children.remove(widget);
-      for (var child in container.children) {
-        removeRecursive(child);
-      }
-    }
-
-    /*for (var top in canvasModels) {
-      if (top == widget) {
-        canvasModels.remove(top);
-      } else if (top is ContainerWidgetData) {
-        removeRecursive(top);
-      }
-      }*/
-  }
 }
 
 @Injectable()
@@ -108,62 +80,23 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   // override
 
   @override
-  Widget create(ContainerWidgetData data) {
-    return DragTarget<Object>(
-      onWillAccept: (incoming) => true,
-      onAccept: (incoming) {
-        // palette
-        if (incoming is String) {
-          var metaData = typeRegistry[incoming];
-
-          data.children.add(metaData.create());
-        }
-        // reparent
-        else if (incoming is WidgetData) {
-          // reparenting drop
-          // remove from old parent
-          _removeFromParent(incoming);
-          data.children.add(incoming);
-        }
-      },
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade400),
-            color: Colors.grey.shade100,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: data.children
-                .map(
-                  (child) => DynamicWidget(
-                model: child,
-                meta: typeRegistry[child.type],
-                parent: data,
-              ),
-            )
-                .toList(),
-          ),
-        );
-      },
+  Widget create(ContainerWidgetData data, Environment environment) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        color: Colors.grey.shade100,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: data.children
+            .map((child) => DynamicWidget(
+                    model: child,
+                    meta: typeRegistry[child.type],
+                    parent: data,
+                  ),
+        ).toList(),
+      ),
     );
-  }
-
-  void _removeFromParent(WidgetData widget) {
-    void removeRecursive(WidgetData container) {
-      container.children.remove(widget);
-      for (var child in container.children) {
-        removeRecursive(child);
-      }
-    }
-
-    /*for (var top in canvasModels) {
-      if (top == widget) {
-        canvasModels.remove(top);
-      } else if (top is ContainerWidgetData) {
-        removeRecursive(top);
-      }
-      }*/
   }
 }

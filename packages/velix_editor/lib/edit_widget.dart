@@ -2,8 +2,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Theme, MetaData;
+import 'package:velix_di/di/di.dart';
 
 
+import 'commands/command_stack.dart';
+import 'commands/reparent_command.dart';
 import 'event/events.dart';
 import 'metadata/metadata.dart';
 import 'metadata/widget_data.dart';
@@ -181,6 +184,7 @@ class EditWidget extends StatefulWidget {
 class _EditWidgetState extends State<EditWidget> {
   // instance data
 
+  late final Environment environment;
   late final Theme theme;
   late final MessageBus bus;
   bool selected = false;
@@ -205,18 +209,19 @@ class _EditWidgetState extends State<EditWidget> {
     }
   }
 
+  void delete() {
+    environment.get<CommandStack>().addCommand(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, oldParent: widget.model.parent, newParent: null));
+  }
+
   // override
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    var environment = EnvironmentProvider.of(context);
-
+    environment = EnvironmentProvider.of(context);
     theme = environment.get<Theme>();
     bus = environment.get<MessageBus>();
-
-    print("subscribe to bus ${widget.model.type}");
 
     selectionSubscription = bus.subscribe<SelectionEvent>("selection", (event) => select(event));
     propertyChangeSubscription = bus.subscribe<PropertyChangeEvent>(
@@ -235,18 +240,16 @@ class _EditWidgetState extends State<EditWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("create ${widget.model.type}, selected: $selected");
-
     return DraggableWidgetBorder(
         name: widget.model.type,
         selected: selected,
-        onDelete: () => {}, // TODO
+        onDelete: delete,
         onSelect: () => bus.publish(
           "selection",
           SelectionEvent(selection: widget.model, source: this),
         ),
         data: widget.model,
-        child: theme.builder(widget.model.type, edit: true).create(widget.model)
+        child: theme.builder(widget.model.type, edit: true).create(widget.model, environment)
     );
   }
 }

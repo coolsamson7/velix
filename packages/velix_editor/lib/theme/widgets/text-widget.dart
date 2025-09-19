@@ -15,7 +15,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   // override
 
   @override
-  Widget create(TextWidgetData data) {
+  Widget create(TextWidgetData data, Environment environment) {
     return TextField(decoration: InputDecoration(labelText: data.label));
   }
 }
@@ -31,7 +31,7 @@ class TextEditWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   // override
 
   @override
-  Widget create(TextWidgetData data) {
+  Widget create(TextWidgetData data, Environment environment) {
     return TextField(decoration: InputDecoration(labelText: data.label));
   }
 }

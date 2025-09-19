@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Theme, MetaData;
+import 'package:velix_di/di/di.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
 import 'metadata/metadata.dart';
@@ -29,6 +30,7 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   // instance data
 
   late final Theme theme;
+  late final Environment environment;
 
   // override
 
@@ -36,11 +38,12 @@ class _DynamicWidgetState extends State<DynamicWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    theme = EnvironmentProvider.of(context).get<Theme>();
+    environment = EnvironmentProvider.of(context);
+    theme = environment.get<Theme>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return theme.builder(widget.model.type).create(widget.model);
+    return theme.builder(widget.model.type).create(widget.model, environment);
   }
 }

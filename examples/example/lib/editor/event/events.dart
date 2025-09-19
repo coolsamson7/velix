@@ -7,6 +7,12 @@ abstract class Event {
   Event({this.source});
 }
 
+class LoadEvent extends Event {
+  WidgetData? widget;
+
+  LoadEvent({required this.widget, required super.source});
+}
+
 class PropertyChangeEvent extends Event {
   WidgetData? widget;
 

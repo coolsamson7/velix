@@ -10,17 +10,19 @@ abstract class WidgetBuilder<T extends WidgetData> {
   // instance data
 
   String name;
+  bool edit;
 
   // constructor
 
-  WidgetBuilder({required this.name});
+  WidgetBuilder({required this.name, bool edit = false}) : edit = edit;
 
   // lifecycle
 
   @Inject()
   void setThema(Theme theme) {
-    theme.register(this, name);
+    theme.register(this, name, edit);
   }
+
   // abstract
 
   Widget create(T data);

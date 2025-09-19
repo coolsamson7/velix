@@ -35,12 +35,27 @@ class _PropertyPanelState extends State<PropertyPanel> {
   final Map<String, bool> _expandedGroups = {};
   Command? currentCommand;
 
-  // iternal
+  // internal
+
+  bool isPropertyChangeCommand(Command command, String property) {
+    if ( command is PropertyChangeCommand) {
+      if (command.target != selected)
+        return false;
+
+      if (command.property != property)
+        return false;
+      
+      return true;
+    }
+
+    return false;
+  }
+
 
   void changedProperty(String property, dynamic value) {
     // take care of command stack
 
-    if (currentCommand == null || !(currentCommand is PropertyChangeCommand && (currentCommand as PropertyChangeCommand).target == selected)) // TODO
+    if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) 
       currentCommand = commandStack.addCommand(PropertyChangeCommand(
         bus: bus,
         metaData: metaData!,
@@ -49,6 +64,10 @@ class _PropertyPanelState extends State<PropertyPanel> {
         newValue: value
       ));
     else (currentCommand as PropertyChangeCommand).value = value;
+  }
+
+  void _resetProperty(String property) {
+    commandStack.revert(selected, property);
   }
 
   // override
@@ -130,26 +149,44 @@ class _PropertyPanelState extends State<PropertyPanel> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Property name
+                          // Property name + dirty indicator
                           SizedBox(
                             width: 100,
-                            child: Text(
-                              prop.name,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            child: Row(
+                              children: [
+                                Text(
+                                  prop.name,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(width: 4),
+                                if (commandStack.propertyIsDirty(selected, prop.name))
+                                  GestureDetector(
+                                    onTap: () => _resetProperty(prop.name), // call your reset logic
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           // Editor widget
                           Expanded(
-                            child: editor != null  ? editor.buildEditor(
+                            child: editor != null
+                                ? editor.buildEditor(
                               label: prop.name,
                               value: value,
-                              onChanged: (newVal) => changedProperty(prop.name, newVal)
+                              onChanged: (newVal) => changedProperty(prop.name, newVal),
                             )
                                 : Text("No editor for ${prop.name}"),
                           ),
                         ],
-                      ),
+                      )
                     );
                   }).toList(),
                 ),

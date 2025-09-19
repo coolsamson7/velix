@@ -7,16 +7,20 @@ class Theme {
   // instance data
 
   Map<String, WidgetBuilder> widgets = {};
+  Map<String, WidgetBuilder> editWidgets = {};
 
   // constructor
 
   // public
 
-  void register(WidgetBuilder builder, String name) {
-    widgets[name] = builder;
+  void register(WidgetBuilder builder, String name, bool edit) {
+    if (edit)
+      editWidgets[name] = builder;
+    else
+      widgets[name] = builder;
   }
 
-  WidgetBuilder operator [](String type) {
-    return widgets[type]!;
+  WidgetBuilder builder(String type, {bool edit = false}) {
+    return edit ? editWidgets[type]! : widgets[type]!;
   }
 }

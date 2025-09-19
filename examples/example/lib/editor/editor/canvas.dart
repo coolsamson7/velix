@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart' hide MetaData;
 
-import '../dynamic_widget.dart';
+import '../edit_widget.dart';
 import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
-import '../metadata/widgets/container.dart';
 import '../provider/environment_provider.dart';
 
 class EditorCanvas extends StatefulWidget {
@@ -78,7 +77,7 @@ class _EditorCanvasState extends State<EditorCanvas> {
                 .map(
                   (m) => Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: DynamicWidget(
+                child: EditWidget(
                   model: m,
                   meta: widget.metadata[m.type]!,
                 ),

@@ -16,3 +16,16 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
     );
   }
 }
+
+@Injectable()
+class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
+  ButtonEditWidgetBuilder() : super(name: "button", edit: true);
+
+  @override
+  Widget create(ButtonWidgetData data) {
+    return ElevatedButton(
+      onPressed: () {  }, // TODO
+      child: Text(data.label),
+    );
+  }
+}

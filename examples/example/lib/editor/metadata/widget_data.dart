@@ -1,9 +1,11 @@
 
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_mapper/mapper/json.dart';
 
 import 'annotations.dart';
 
 @Dataclass()
+@JsonSerializable(discriminatorField: "type")
 abstract class WidgetData {
   // instance data
 

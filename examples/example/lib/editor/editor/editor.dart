@@ -5,6 +5,7 @@ import 'package:velix_di/di/di.dart';
 
 
 import '../commands/command_stack.dart';
+import '../event/events.dart';
 import '../json/json_view.dart';
 import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
@@ -14,6 +15,7 @@ import '../property_panel/panel.dart';
 import '../provider/environment_provider.dart';
 import '../tree/tree_view.dart';
 import '../util/message_bus.dart';
+import '../widget_container.dart';
 import 'canvas.dart';
 
 // the overall screen, that combines all aspects
@@ -32,6 +34,7 @@ class _EditorScreenState extends State<EditorScreen> {
 
   late final Environment environment;
   late final CommandStack commandStack;
+  bool edit = true;
 
   // internal
 
@@ -45,7 +48,10 @@ class _EditorScreenState extends State<EditorScreen> {
     commandStack.undo();
   }
 
-  void play() {}
+  void play() {
+    edit = !edit;
+    setState(() {});
+  }
 
   // override
 
@@ -57,10 +63,12 @@ class _EditorScreenState extends State<EditorScreen> {
 
     // create
 
-    environment.get<MessageBus>();
+    var bus = environment.get<MessageBus>();
     commandStack = environment.get<CommandStack>();
 
     commandStack.addListener(() => setState(() {}));
+
+    bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
   }
 
   @override
@@ -98,8 +106,8 @@ class _EditorScreenState extends State<EditorScreen> {
                   },
                 ),
                 IconButton(
-                  tooltip: "Play",
-                  icon: const Icon(Icons.play_arrow),
+                  tooltip: edit ? "Play" : "Stop",
+                  icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
                   onPressed: () {
                     play();
                   },
@@ -129,10 +137,15 @@ class _EditorScreenState extends State<EditorScreen> {
                   child: Column(
                     children: [
                       Expanded(
-                        child: EditorCanvas(
-                          models: widget.models,
-                          metadata: widget.metadata,
-                        ),
+                        child: edit ?
+                          EditorCanvas(
+                            models: widget.models,
+                            metadata: widget.metadata,
+                          ) :
+                          WidgetContainer(
+                            models: widget.models,
+                            metadata: widget.metadata
+                          ),
                       ),
                       Container(
                         height: 32,

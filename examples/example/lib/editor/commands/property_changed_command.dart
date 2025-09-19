@@ -14,7 +14,7 @@ class PropertyChangeCommand<T> extends Command {
   final Object target;
   final String property;
   final T oldValue;
-  late final T _newValue;
+  late T _newValue;
 
   set value(dynamic value) {
     _newValue = value;

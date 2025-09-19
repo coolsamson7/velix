@@ -19,3 +19,19 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
     return TextField(decoration: InputDecoration(labelText: data.label));
   }
 }
+
+@Injectable()
+class TextEditWidgetBuilder extends WidgetBuilder<TextWidgetData> {
+  // instance data
+
+  // constructor
+
+  TextEditWidgetBuilder() : super(name: "text", edit: true);
+
+  // override
+
+  @override
+  Widget create(TextWidgetData data) {
+    return TextField(decoration: InputDecoration(labelText: data.label));
+  }
+}

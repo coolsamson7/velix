@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, MetaData;
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
+import 'package:velix_editor/event/events.dart';
 import 'package:velix_editor/util/message_bus.dart';
 
 import '../../commands/reparent_command.dart';
@@ -32,6 +33,9 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
         environment.get<CommandStack>().addCommand(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, oldParent: widget.parent, newParent: data));
+
+        WidgetsBinding.instance.addPostFrameCallback((_) =>
+          environment.get<MessageBus>().publish("select", SelectionEvent(selection: widget, source: this)));
       },
       builder: (context, candidateData, rejectedData) {
           final isActive = candidateData.isNotEmpty;

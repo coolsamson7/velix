@@ -15,7 +15,7 @@ class StringEditorBuilder extends PropertyEditorBuilder<String> {
   }) {
     return TextField(
       controller: TextEditingController(text: value?.toString() ?? ""),
-      decoration: InputDecoration(labelText: label),
+      //decoration: InputDecoration(labelText: label),
       onChanged: onChanged,
     );
   }

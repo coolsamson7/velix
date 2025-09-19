@@ -97,13 +97,5 @@ class _EditorCanvasState extends State<EditorCanvas> {
         removeRecursive(child);
       }
     }
-
-    /*for (var top in widget.models) {
-      if (top == widget) {
-        widget.models.remove(top);
-      } else if (top is ContainerWidgetData) {
-        removeRecursive(top);
-      }
-    }*/
   }
 }

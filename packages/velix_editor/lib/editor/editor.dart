@@ -89,7 +89,8 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
       updateCommandState();
     }));
 
-    bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        bus.publish("load", LoadEvent(widget: widget.models.first, source: this)));
   }
 
   @override

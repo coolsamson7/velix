@@ -155,7 +155,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Property name + dirty indicator
                           SizedBox(

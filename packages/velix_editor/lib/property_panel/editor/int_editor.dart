@@ -16,7 +16,7 @@ class IntEditorBuilder extends PropertyEditorBuilder<int> {
   }) {
     return TextField(
       controller: TextEditingController(text: value?.toString() ?? "0"),
-      decoration: InputDecoration(labelText: label),
+      //decoration: InputDecoration(labelText: label),
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       onChanged: (val) {

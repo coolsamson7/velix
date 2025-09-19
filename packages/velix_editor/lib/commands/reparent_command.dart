@@ -1,7 +1,6 @@
 
 
 import '../event/events.dart';
-import '../metadata/metadata.dart';
 import '../metadata/widget_data.dart';
 import '../util/message_bus.dart';
 import 'command.dart';

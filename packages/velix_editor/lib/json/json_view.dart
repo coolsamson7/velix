@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:velix_di/di/di.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../components/panel_header.dart';
@@ -17,7 +18,7 @@ class JsonEditorPanel extends StatefulWidget {
   const JsonEditorPanel({super.key});
 
   @override
-  _JsonEditorPanelState createState() => _JsonEditorPanelState();
+  State<JsonEditorPanel>  createState() => _JsonEditorPanelState();
 }
 
 class _JsonEditorPanelState extends State<JsonEditorPanel> {
@@ -26,8 +27,8 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   WidgetData? root;
 
   late String jsonString = "";
-  late final StreamSubscription _subscription;
-  late final StreamSubscription _changeSubscription;
+  late final StreamSubscription? _subscription;
+  late final StreamSubscription? _changeSubscription;
 
   // internal
 
@@ -40,7 +41,21 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   void setWidget(WidgetData? root) {
     this.root = root;
 
-    updateJson(JSON.serialize(root)); // initial JSON
+    if ( root != null)
+      updateJson(JSON.serialize(root)); // initial JSON
+  }
+
+  void setup(Environment environment) {
+    var bus = environment.get<MessageBus>();
+
+    _subscription = bus.subscribe<LoadEvent>("load", (event) {
+      // update selected item (event.selection may be null)
+      setWidget(event.widget);
+    });
+    _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed", (event) {
+      // update selected item (event.selection may be null)
+      setWidget(root);
+    });
   }
 
   // override
@@ -60,18 +75,19 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
     });
     _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed", (event) {
       // update selected item (event.selection may be null)
-      setWidget(root);
+      setWidget(event.widget);
     });
+
+    setWidget(root);
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
-    _changeSubscription.cancel();
+    _subscription?.cancel();
+    _changeSubscription?.cancel();
 
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {

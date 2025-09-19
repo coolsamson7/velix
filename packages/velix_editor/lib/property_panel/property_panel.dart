@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart' hide MetaData;
 
 import '../commands/command.dart';
@@ -14,7 +13,6 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 import 'editor_registry.dart';
 
-
 class PropertyPanel extends StatefulWidget {
   const PropertyPanel({super.key});
 
@@ -23,8 +21,6 @@ class PropertyPanel extends StatefulWidget {
 }
 
 class _PropertyPanelState extends State<PropertyPanel> {
-  // instance data
-
   WidgetData? selected;
   MetaData? metaData;
   late final MessageBus bus;
@@ -35,57 +31,43 @@ class _PropertyPanelState extends State<PropertyPanel> {
   final Map<String, bool> _expandedGroups = {};
   Command? currentCommand;
 
-  // internal
-
   bool isPropertyChangeCommand(Command command, String property) {
-    if ( command is PropertyChangeCommand) {
-      if (command.target != selected)
-        return false;
-
-      if (command.property != property)
-        return false;
-      
+    if (command is PropertyChangeCommand) {
+      if (command.target != selected) return false;
+      if (command.property != property) return false;
       return true;
     }
-
     return false;
   }
 
   void changedProperty(String property, dynamic value) {
-    // take care of command stack
-
-    if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) 
+    if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
       currentCommand = commandStack.execute(PropertyChangeCommand(
         bus: bus,
         metaData: metaData!,
         target: selected!,
         property: property,
-        newValue: value
+        newValue: value,
       ));
-    else (currentCommand as PropertyChangeCommand).value = value;
-
+    } else {
+      (currentCommand as PropertyChangeCommand).value = value;
+    }
     setState(() {});
   }
 
   void _resetProperty(Property property) {
     currentCommand = null;
     commandStack.revert(selected, property.name);
-
-    setState(() {currentCommand = null;});
+    setState(() {});
   }
 
   bool isPropertyDirty(Property property) {
-    var dirty = commandStack.propertyIsDirty(selected, property.name);
-
-    return dirty;
+    return commandStack.propertyIsDirty(selected, property.name);
   }
-
-  // override
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     var environment = EnvironmentProvider.of(context);
 
     bus = environment.get<MessageBus>();
@@ -117,90 +99,99 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     // Group properties by group
     final groupedProps = <String, List<Property>>{};
-    for (var prop in metaData!.properties)
-      if ( !prop.hide) {
+    for (var prop in metaData!.properties) {
+      if (!prop.hide) {
         groupedProps.putIfAbsent(prop.group, () => []).add(prop);
       }
+    }
 
     final sortedGroupNames = groupedProps.keys.toList()..sort();
 
     return PanelContainer(
-      title: selected != null ? selected!.type : "Properties",
+      title: selected!.type,
       child: ListView(
         children: sortedGroupNames.map((groupName) {
           final props = groupedProps[groupName]!..sort((a, b) => a.name.compareTo(b.name));
           _expandedGroups.putIfAbsent(groupName, () => true);
+          final isExpanded = _expandedGroups[groupName]!;
 
-          return ExpansionPanelList(
-            expansionCallback: (index, isExpanded) {
-              setState(() {
-                _expandedGroups[groupName] = !isExpanded;
-              });
-            },
-            elevation: 0,
-            expandedHeaderPadding: EdgeInsets.zero,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ExpansionPanel(
-                canTapOnHeader: true,
-                headerBuilder: (context, isExpanded) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    groupName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              InkWell(
+                onTap: () => setState(() => _expandedGroups[groupName] = !isExpanded),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  color: Colors.grey.shade200,
+                  child: Row(
+                    children: [
+                      // Animated arrow rotation
+                      AnimatedRotation(
+                        turns: isExpanded ? 0.25 : 0.0, // 0 = >, 0.25 = v
+                        duration: const Duration(milliseconds: 200),
+                        child: const Icon(Icons.chevron_right, size: 16),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
-                body: Column(
-                  children: props.map((prop) {
-                    final editorBuilder = editorRegistry.resolve(prop.type);
-                    final value = metaData!.get(selected!, prop.name);
+              ),
+              // Animated expansion of the group content
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: isExpanded
+                    ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Column(
+                    children: props.map((prop) {
+                      final editorBuilder = editorRegistry.resolve(prop.type);
+                      final value = metaData!.get(selected!, prop.name);
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Property name + dirty indicator
-                          SizedBox(
-                            width: 100,
-                            child: Row(
-                              children: [
-                                Text(
-                                  prop.name,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(width: 4),
-                                if (isPropertyDirty(prop))
-                                  GestureDetector(
-                                    onTap: () => _resetProperty(prop), // call your reset logic
-                                    child: Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.blue,
-                                        shape: BoxShape.circle,
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 100,
+                              child: Row(
+                                children: [
+                                  Text(prop.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                  const SizedBox(width: 4),
+                                  if (isPropertyDirty(prop))
+                                    GestureDetector(
+                                      onTap: () => _resetProperty(prop),
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.blue,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Editor widget
-                          Expanded(
-                            child: editorBuilder != null ?
-                              editorBuilder.buildEditor(
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: editorBuilder != null
+                                  ? editorBuilder.buildEditor(
                                 label: prop.name,
                                 value: value,
                                 onChanged: (newVal) => changedProperty(prop.name, newVal),
-                              ) :
-                            Text("No editor for ${prop.name}"),
-                          ),
-                        ],
-                      )
-                    );
-                  }).toList(),
-                ),
-                isExpanded: _expandedGroups[groupName]!,
+                              )
+                                  : Text("No editor for ${prop.name}"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
+                    : const SizedBox.shrink(),
               ),
             ],
           );

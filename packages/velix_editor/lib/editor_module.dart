@@ -1,8 +1,6 @@
-
-
-//@Module(imports: [])
 import 'package:velix_di/di/di.dart';
 
+@Module(imports: [])
 class EditorModule {
   @OnInit()
   void onInit() {

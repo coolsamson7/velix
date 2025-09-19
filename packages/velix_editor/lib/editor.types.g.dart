@@ -26,7 +26,7 @@ import 'package:velix_editor/theme/widgets/text-widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-void registerTypes() {
+void registerEditorTypes() {
   type<CommandStack>(
     location: 'package:velix_editor/commands/command_stack.dart:9:1',
     annotations: [

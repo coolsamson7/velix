@@ -51,7 +51,6 @@ class _PropertyPanelState extends State<PropertyPanel> {
     return false;
   }
 
-
   void changedProperty(String property, dynamic value) {
     // take care of command stack
 
@@ -141,7 +140,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                 ),
                 body: Column(
                   children: props.map((prop) {
-                    final editor = editorRegistry.resolve(prop.type);
+                    final editorBuilder = editorRegistry.resolve(prop.type);
                     final value = metaData!.get(selected!, prop.name);
 
                     return Padding(
@@ -177,13 +176,13 @@ class _PropertyPanelState extends State<PropertyPanel> {
                           const SizedBox(width: 8),
                           // Editor widget
                           Expanded(
-                            child: editor != null
-                                ? editor.buildEditor(
-                              label: prop.name,
-                              value: value,
-                              onChanged: (newVal) => changedProperty(prop.name, newVal),
-                            )
-                                : Text("No editor for ${prop.name}"),
+                            child: editorBuilder != null ?
+                              editorBuilder.buildEditor(
+                                label: prop.name,
+                                value: value,
+                                onChanged: (newVal) => changedProperty(prop.name, newVal),
+                              ) :
+                            Text("No editor for ${prop.name}"),
                           ),
                         ],
                       )

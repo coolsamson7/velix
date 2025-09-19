@@ -37,6 +37,8 @@ class CommandStack extends ChangeNotifier {
   }
 
   bool propertyIsDirty(dynamic object, String property) {
+    // local function
+
     bool applies(Command command) {
       if ( command is PropertyChangeCommand) {
         if (identical(command.target, object) && command.property == property)

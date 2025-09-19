@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// A docked switchable panel that can appear on the left or right side.
-import 'package:flutter/material.dart';
+typedef OnClose<T> = void Function(T value);
 
 class DockedPanelSwitcher extends StatefulWidget {
   final Map<String, Widget Function(VoidCallback onClose)> panels;

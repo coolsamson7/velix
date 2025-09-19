@@ -5,6 +5,7 @@ import 'package:velix_editor/metadata/type_registry.dart';
 
 import '../commands/command_stack.dart';
 import '../commands/reparent_command.dart';
+import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
@@ -259,8 +260,9 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
 /// Top-level panel for the tree
 class WidgetTreePanel extends StatefulWidget {
   final List<WidgetData> models;
+  final VoidCallback onClose;
 
-  const WidgetTreePanel({required this.models, super.key});
+  const WidgetTreePanel({required this.models, required this.onClose, super.key});
 
   @override
   State<WidgetTreePanel> createState() => _WidgetTreePanelState();
@@ -280,6 +282,10 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
 
   @override
   Widget build(BuildContext context) {
-    return WidgetTreeView(controller: controller);
+    return PanelContainer(
+        title: "Tree",
+        onClose: widget.onClose,
+        child: WidgetTreeView(controller: controller)
+    );
   }
 }

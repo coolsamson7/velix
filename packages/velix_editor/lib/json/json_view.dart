@@ -15,7 +15,10 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 
 class JsonEditorPanel extends StatefulWidget {
-  const JsonEditorPanel({super.key});
+  final WidgetData model;
+  final VoidCallback onClose;
+
+  const JsonEditorPanel({required this.model, required this.onClose, super.key});
 
   @override
   State<JsonEditorPanel>  createState() => _JsonEditorPanelState();
@@ -31,6 +34,13 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   late final StreamSubscription? _changeSubscription;
 
   // internal
+
+  WidgetData getRoot(WidgetData widget) {
+    while (widget.parent != null)
+      widget = widget.parent!;
+
+    return widget;
+  }
 
   void updateJson(Map<String, dynamic> newJson) {
     setState(() {
@@ -53,8 +63,7 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
       setWidget(event.widget);
     });
     _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed", (event) {
-      // update selected item (event.selection may be null)
-      setWidget(root);
+      setWidget(getRoot(event.widget!));
     });
   }
 
@@ -71,14 +80,14 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
 
     _subscription = bus.subscribe<LoadEvent>("load", (event) {
       // update selected item (event.selection may be null)
-      setWidget(event.widget);
+      setState(() {});
     });
     _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed", (event) {
       // update selected item (event.selection may be null)
-      setWidget(event.widget);
+      setState(() {});
     });
 
-    setWidget(root);
+    setWidget(widget.model);
   }
 
   @override
@@ -92,11 +101,11 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      //padding: const EdgeInsets.all(8),
       color: Colors.grey.shade50,
       child: PanelContainer(
         title: "JSON",
-        onClose: () => {},
+        onClose: widget.onClose,
         child: SingleChildScrollView(
           child: HighlightView(
             jsonString,

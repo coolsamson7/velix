@@ -14,7 +14,9 @@ import '../util/message_bus.dart';
 import 'editor_registry.dart';
 
 class PropertyPanel extends StatefulWidget {
-  const PropertyPanel({super.key});
+  final VoidCallback onClose;
+
+  const PropertyPanel({required this.onClose, super.key});
 
   @override
   State<PropertyPanel> createState() => _PropertyPanelState();
@@ -109,6 +111,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     return PanelContainer(
       title: selected!.type,
+      onClose: widget.onClose,
       child: ListView(
         children: sortedGroupNames.map((groupName) {
           final props = groupedProps[groupName]!..sort((a, b) => a.name.compareTo(b.name));

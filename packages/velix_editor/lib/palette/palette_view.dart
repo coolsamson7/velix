@@ -47,8 +47,9 @@ class _PaletteDraggableState extends State<_PaletteDraggable> {
 
 class WidgetPalette extends StatefulWidget {
   final TypeRegistry typeRegistry;
+  final VoidCallback onClose;
 
-  const WidgetPalette({super.key, required this.typeRegistry});
+  const WidgetPalette({super.key, required this.onClose, required this.typeRegistry});
 
   @override
   State<WidgetPalette> createState() => _WidgetPaletteState();
@@ -90,7 +91,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
         color: Colors.grey.shade300,
         child: PanelContainer(
           title: "Palette",
-          onClose: () => {},
+          onClose: widget.onClose,
           child: ListView(
             children: groupedWidgets.entries.map((entry) {
               final groupName = entry.key;

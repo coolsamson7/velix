@@ -1,6 +1,7 @@
 
 
 
+import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -44,12 +45,13 @@ class MetaData {
 
   final String name;
   final String group;
+  final IconData? icon;
   final TypeDescriptor type;
   List<Property> properties;
 
   // constructor
 
-  MetaData({required this.name, required this.group, required this.type, required this.properties});
+  MetaData({required this.name, required this.group, required this.type, required this.properties, required this.icon});
 
   // public
 

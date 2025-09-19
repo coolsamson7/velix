@@ -1,6 +1,7 @@
 
 // annotation
 
+import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 
 import 'type_registry.dart';
@@ -10,10 +11,11 @@ class DeclareWidget extends ClassAnnotation {
 
   final String name;
   final String group;
+  final IconData? icon;
 
   // constructor
 
-  const DeclareWidget({required this.name, required this.group});
+  const DeclareWidget({required this.name, required this.group, required this.icon});
 
   // override
 

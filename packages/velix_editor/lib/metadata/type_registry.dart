@@ -4,6 +4,7 @@ import 'package:velix_di/di/di.dart';
 
 import 'annotations.dart';
 import 'metadata.dart';
+import 'widget_data.dart';
 
 @Injectable()
 class TypeRegistry {
@@ -20,6 +21,7 @@ class TypeRegistry {
   // instance data
 
   Map<String, MetaData> metaData = {};
+  Map<Type, MetaData> byType = {};
 
   // constructor
 
@@ -42,6 +44,7 @@ class TypeRegistry {
 
       var widgetMetaData = MetaData(
         name: declareWidget.name,
+        icon: declareWidget.icon,
         group: declareWidget.group,
         type: widgetType,
         properties: properties,
@@ -61,8 +64,13 @@ class TypeRegistry {
 
   TypeRegistry register(MetaData metaData) {
     this.metaData[metaData.name] = metaData;
+    this.byType[metaData.type.type] = metaData;
 
     return this;
+  }
+
+  MetaData getMetaData(WidgetData data) {
+    return byType[data.runtimeType]!;
   }
 
   MetaData operator [](String type) {

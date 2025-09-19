@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/metadata/type_registry.dart';
 
 import '../commands/command_stack.dart';
 import '../commands/reparent_command.dart';
@@ -130,82 +131,124 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
     );
   }
 
-  Widget _buildNode(WidgetData node, int depth) {
-    final isExpanded = widget.controller.isExpanded(node);
-    final isSelected = widget.controller.selectedNode == node;
-    final hasChildren = node.children.isNotEmpty;
+   Widget _buildNode(WidgetData node, int depth) {
+     final isExpanded = widget.controller.isExpanded(node);
+     final isSelected = widget.controller.selectedNode == node;
+     final hasChildren = node.children.isNotEmpty;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DragTarget<WidgetData>(
-          onWillAccept: (widget) => node.acceptsChild(widget!),
-          onAccept: (widget) => environment.get<CommandStack>().execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget, newParent: node)),
-          builder: (context, candidateData, rejectedData) {
-            final isHovering = candidateData.isNotEmpty;
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.start,
+       children: [
+         DragTarget<WidgetData>(
+           onWillAccept: (widgetData) => node.acceptsChild(widgetData!),
+           onAccept: (widgetData) => environment.get<CommandStack>().execute(
+             ReparentCommand(
+               bus: environment.get<MessageBus>(),
+               widget: widgetData,
+               newParent: node,
+             ),
+           ),
+           builder: (context, candidateData, rejectedData) {
+             final isHovering = candidateData.isNotEmpty;
 
-            return GestureDetector(
-              onTap: () => widget.controller.selectNode(node),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.blue.withOpacity(0.2)
-                      : null,
-                  border: isHovering
-                      ? Border.all(color: Colors.green, width: 2)
-                      : null,
-                ),
-                padding:
-                const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: Row(
-                  children: [
-                    SizedBox(width: depth * 16),
-                    if (hasChildren)
-                      IconButton(
-                        icon: Icon(isExpanded
-                            ? Icons.expand_more
-                            : Icons.chevron_right),
-                        iconSize: 20,
-                        padding: EdgeInsets.zero,
-                        onPressed: () =>
-                            widget.controller.toggleExpanded(node),
-                      )
-                    else
-                      const SizedBox(width: 24),
-                    Expanded(child: Draggable<WidgetData>(
-                      data: node,
-                      feedback: Material(
-                        elevation: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          color: Colors.grey.shade200,
-                          child: Text(node.type),
-                        ),
-                      ),
-                      childWhenDragging: Opacity(
-                        opacity: 0.5,
-                        child: Text(node.type),
-                      ),
-                      child: Text(node.type),
-                    )),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-        if (hasChildren && isExpanded)
-          Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-              node.children.map((c) => _buildNode(c, depth + 1)).toList(),
-            ),
-          ),
-      ],
-    );
-  }
+             return GestureDetector(
+               onTap: () => widget.controller.selectNode(node),
+               child: Container(
+                 decoration: BoxDecoration(
+                   color: isSelected ? Colors.blue.withOpacity(0.2) : null,
+                   border: isHovering ? Border.all(color: Colors.green, width: 2) : null,
+                 ),
+                 padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                 child: Row(
+                   children: [
+                     SizedBox(width: depth * 16),
+
+                     // Leading icon
+                     SizedBox(
+                       width: 16,
+                       height: 16,
+                       child: Icon(
+                         _getIconForNode(node),
+                         size: 16,
+                         color: Colors.grey.shade700,
+                       ),
+                     ),
+
+                     const SizedBox(width: 4),
+
+                     // Chevron for expanding
+                     if (hasChildren)
+                       GestureDetector(
+                         behavior: HitTestBehavior.translucent,
+                         onTap: () => widget.controller.toggleExpanded(node),
+                         child: SizedBox(
+                           width: 16,
+                           height: 16,
+                           child: Icon(
+                             isExpanded ? Icons.expand_more : Icons.chevron_right,
+                             size: 16,
+                           ),
+                         ),
+                       )
+                     else
+                       const SizedBox(width: 16),
+
+                     const SizedBox(width: 4),
+
+                     // Node label + draggable
+                     Expanded(
+                       child: Draggable<WidgetData>(
+                         data: node,
+                         feedback: Material(
+                           elevation: 4,
+                           child: Container(
+                             padding: const EdgeInsets.all(8),
+                             color: Colors.grey.shade200,
+                             child: Text(node.type),
+                           ),
+                         ),
+                         childWhenDragging: Opacity(
+                           opacity: 0.5,
+                           child: Text(node.type),
+                         ),
+                         child: Text(node.type),
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+             );
+           },
+         ),
+
+         // Children
+         if (hasChildren && isExpanded)
+           Padding(
+             padding: const EdgeInsets.only(left: 24),
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: node.children.map((c) => _buildNode(c, depth + 1)).toList(),
+             ),
+           ),
+       ],
+     );
+   }
+
+   /// Helper: icon per node type
+   IconData _getIconForNode(WidgetData node) {
+    return environment.get<TypeRegistry>().getMetaData(node).icon!;
+     switch (node.type) {
+       case "container":
+         return Icons.view_column;
+       case "text":
+         return Icons.text_fields;
+       case "button":
+         return Icons.smart_button;
+       default:
+         return Icons.widgets;
+     }
+   }
+
 }
 
 /// Top-level panel for the tree

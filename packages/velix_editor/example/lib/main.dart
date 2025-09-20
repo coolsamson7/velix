@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:editor_sample/main.types.g.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix/velix.dart' hide Property;
 import 'package:velix_di/velix_di.dart';
@@ -59,6 +60,8 @@ void main() async {
 
   Velix.bootstrap;
   EditorModule.boot; // this sucks
+
+  registerTypes();
 
   // configure json stuff
 
@@ -122,59 +125,63 @@ void main() async {
 
   // load namespaces
 
-  runApp(EditorApp(environment: environment, i18n: i18n, widgets: [widgets]));
+  runApp(EditorApp(environment: environment, i18n: i18n, localeManager: localeManager, widgets: [widgets]));
 }
 
 class EditorApp extends StatelessWidget {
   // instance data
 
   final I18N i18n;
+  final LocaleManager localeManager;
   final Environment environment;
   final List<WidgetData> widgets;
   
   // constructor
 
-  const EditorApp({super.key, required this.i18n, required this.environment, required this.widgets});
+  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment, required this.widgets});
   
   // override
 
   @override
   Widget build(BuildContext context) {
-    final localeManager = context.watch<LocaleManager>();
+    //final localeManager = context.watch<LocaleManager>();
 
-    return EnvironmentProvider(
-        environment: environment,
-        child:  MultiProvider(
-          providers: [
-            Provider<CommandManager>(create: (_) => CommandManager(
-                interceptors: [
-                  LockCommandInterceptor(),
-                  TracingCommandInterceptor()
-                ]
-            )),
-          ],
-          child: Consumer<LocaleManager>(
-              builder: (BuildContext context, LocaleManager value, Widget? child) {
-                return CupertinoApp(
-                  title: 'Editor',
+    return ChangeNotifierProvider.value(
+        value: localeManager,
+        child: EnvironmentProvider(
+          environment: environment,
+          child:  MultiProvider(
+            providers: [
+              Provider<CommandManager>(create: (_) => CommandManager(
+                  interceptors: [
+                    LockCommandInterceptor(),
+                    TracingCommandInterceptor()
+                  ]
+              )),
+            ],
+            child: Consumer<LocaleManager>(
+                builder: (BuildContext context, LocaleManager value, Widget? child) {
+                  return MaterialApp(
+                    title: 'Editor',
 
-                  theme: const CupertinoThemeData(
-                    brightness: Brightness.light,
-                    primaryColor: CupertinoColors.activeBlue,
-                  ),
+                    //theme: const CupertinoThemeData(
+                    //  brightness: Brightness.light,
+                    //  primaryColor: CupertinoColors.activeBlue,
+                    //),
 
-                  // localization
+                    // localization
 
-                  localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
-                  supportedLocales: localeManager.supportedLocales,
-                  locale: localeManager.locale,
+                    localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
+                    supportedLocales: localeManager.supportedLocales,
+                    locale: localeManager.locale,
 
-                  // main screen
+                    // main screen
 
-                  home: EditorScreen(models: widgets),
-                );
-              }
-          )
+                    home: Scaffold(body: EditorScreen(models: widgets)),
+                  );
+                }
+            )
+        )
       )
     );
   }

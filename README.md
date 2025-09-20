@@ -33,7 +33,7 @@ This is a melos mono-repo. Checkout the different packages:
 - [velix_i18n](https://github.com/coolsamson7/velix/tree/main/packages/velix_i18n)
 - [velix_ui](https://github.com/coolsamson7/velix/tree/main/packages/velix_ui)
 
-Lets get a quick overview on the topics
+Lets get a quick overview on the topics.
 
 # Validation
 

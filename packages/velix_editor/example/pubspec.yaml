@@ -4,7 +4,7 @@ description: "velix editor sample."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-#resolution: workspace
+resolution: workspace
 version: 1.0.0+1
 
 environment:

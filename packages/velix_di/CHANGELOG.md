@@ -1,3 +1,7 @@
+## 1.0.2
+
+- **FEAT**: velix version bump
+
 ## 1.0.1
 
 - **DOCS**: docs

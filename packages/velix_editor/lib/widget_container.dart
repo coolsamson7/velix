@@ -10,11 +10,11 @@ class WidgetContainer extends StatefulWidget {
   // instance data
 
   final List<WidgetData> models;
-  final Map<String, WidgetDescriptor> metadata;
+  final TypeRegistry typeRegistry;
 
   // constructor
 
-  const WidgetContainer({super.key, required this.models, required this.metadata});
+  const WidgetContainer({super.key, required this.models, required this.typeRegistry});
 
   // override
 
@@ -36,10 +36,7 @@ class _WidgetContainerState extends State<WidgetContainer> {
     return Container(
       color: Colors.grey.shade200,
       child: ListView(
-        children: widget.models
-            .map(
-              (m) => DynamicWidget(model: m, meta: widget.metadata[m.type]!),
-        ).toList(),
+        children: widget.models.map((m) => DynamicWidget(model: m, meta: typeRegistry![m.type])).toList(),
       ),
     );
   }

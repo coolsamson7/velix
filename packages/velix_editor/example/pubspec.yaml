@@ -1,7 +1,10 @@
-name: velix_editor
-description: "velix ui editor."
+name: editor_sample
+description: "velix editor sample."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-resolution: workspace
+#resolution: workspace
 version: 1.0.0+1
 
 environment:
@@ -21,9 +24,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   velix: ^0.90.1
   velix_di: ^1.0.0
-  velix_mapper: ^1.0.1
+  velix_mapper: ^1.1.0
   velix_i18n: ^1.0.0
   velix_ui: ^1.1.0
+  velix_editor:
+    path: ../
   highlight: ^0.7.0
   flutter_highlight: ^0.7.0
 
@@ -35,8 +40,8 @@ dev_dependencies:
 
 flutter:
   assets:
-    #- assets/locales/en/example.json
-    #- assets/locales/de/example.json
+    - assets/locales/en/example.json
+    - assets/locales/de/example.json
     #- packages/velix/assets/locales/en/velix.json
     #- packages/velix/assets/locales/de/velix.json
 

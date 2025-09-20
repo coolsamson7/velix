@@ -15,6 +15,7 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
     addCommand("open", _open, label: 'Open', icon: Icons.folder_open);
     addCommand("save", _save, label: 'Save', icon: Icons.save);
     addCommand("revert", _revert, label: 'Undo', icon: Icons.undo);
+    addCommand("undo", _undo, label: 'Undo', icon: Icons.undo);
     addCommand("play", _play, label: 'Play', icon: Icons.play_arrow);
   }
 
@@ -22,6 +23,7 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
 
   void _open();
   void _save();
+  void _undo();
   void _revert();
   void _play();
 
@@ -37,6 +39,10 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
 
   void revert() {
     execute("revert", []);
+  }
+
+  void undo() {
+    execute("undo", []);
   }
 
   void play() {

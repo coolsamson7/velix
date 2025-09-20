@@ -26,11 +26,11 @@ class EditorCanvas extends StatefulWidget {
   // instance data
 
   final List<WidgetData> models;
-  final Map<String, WidgetDescriptor> metadata;
+  final TypeRegistry typeRegistry;
 
   // constructor
 
-   EditorCanvas({super.key, required this.models, required this.metadata}) {
+   EditorCanvas({super.key, required this.models, required this.typeRegistry}) {
     for ( var model in models)
       linkParents(model);
   }

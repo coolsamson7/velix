@@ -7,7 +7,6 @@ import 'package:velix_ui/commands/command.dart';
 import '../commands/command_stack.dart';
 import '../event/events.dart';
 import '../json/json_view.dart';
-import '../metadata/metadata.dart';
 import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
 import '../palette/palette_view.dart';
@@ -24,10 +23,15 @@ part "editor.command.g.dart";
 
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
-  final List<WidgetData> models;
-  final Map<String, WidgetDescriptor> metadata;
+  // instance data
 
-  const EditorScreen({super.key, required this.models, required this.metadata});
+  final List<WidgetData> models;
+
+  // constructor
+
+  const EditorScreen({super.key, required this.models});
+
+  // override
 
   @override
   State<EditorScreen> createState() => _EditorScreenState();
@@ -60,7 +64,6 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
   // commands
 
-
   @Command(label: "Open", icon: Icons.folder_open)
   @override
   void _open() {}
@@ -69,9 +72,15 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   @override
   void _save() {}
 
-  @Command(label: "Undo", icon: Icons.undo)
+  @Command(label: "Revert", icon: Icons.undo)
   @override
   void _revert() {
+    commandStack.undo();
+  }
+
+  @Command(label: "Undo", icon: Icons.undo)
+  @override
+  void _undo() {
     commandStack.undo();
   }
 
@@ -87,7 +96,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   @override
   void updateCommandState() {
     setCommandEnabled("play", true);
-    setCommandEnabled("revert", commandStack.isDirty());
+    setCommandEnabled("undo", commandStack.isDirty());
     //setCommandEnabled("revert", true);
   }
 
@@ -146,16 +155,6 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
           Expanded(
             child: Row(
               children: [
-                /*eftPanelSwitcher(
-                  panels: {
-                    "tree": WidgetTreePanel(models: widget.models),
-                    "palette": WidgetPalette(
-                      typeRegistry: environment.get<TypeRegistry>(),
-                    ),
-                    "json": JsonEditorPanel(),
-                  },
-                ),*/
-
                 DockedPanelSwitcher(
                   side: DockSide.left,
                   panels: {
@@ -179,11 +178,11 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                         child: edit ?
                           EditorCanvas(
                             models: widget.models,
-                            metadata: widget.metadata,
+                            typeRegistry: environment.get<TypeRegistry>(),
                           ) :
                           WidgetContainer(
                             models: widget.models,
-                            metadata: widget.metadata
+                            typeRegistry: environment.get<TypeRegistry>()
                           ),
                       ),
                       Container(

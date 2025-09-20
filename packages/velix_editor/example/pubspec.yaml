@@ -22,7 +22,7 @@ dependencies:
   build: ^3.0.0
   easy_localization: ^3.0.8
   cupertino_icons: ^1.0.8
-  velix: ^0.90.1
+  velix: ^0.91.0
   velix_di: ^1.0.0
   velix_mapper: ^1.1.0
   velix_i18n: ^1.0.0

@@ -1,5 +1,4 @@
-import 'package:flutter/cupertino.dart' hide MetaData;
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix/velix.dart' hide Property;
 import 'package:velix_di/velix_di.dart';
@@ -35,17 +34,6 @@ class VelixTranslator extends Translator {
 
 @Module(imports: [EditorModule])
 class ApplicationModule {
-  // lifecycle
-
-  @OnInit()
-  void onInit() {
-    print("ApplicationModule.onInit()");
-  }
-
-  @OnDestroy()
-  void onDestroy() {
-    print("ApplicationModule.onDestroy()");
-  }
 }
 
 void main() async {

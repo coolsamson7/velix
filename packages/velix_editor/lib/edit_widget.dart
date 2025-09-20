@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart' hide Theme, MetaData;
+import 'package:flutter/material.dart' hide Theme;
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
 import 'package:velix_editor/event/events.dart';
@@ -9,7 +9,6 @@ import 'package:velix_ui/provider/environment_provider.dart';
 
 import '../../metadata/widget_data.dart';
 import 'commands/reparent_command.dart';
-import 'metadata/metadata.dart';
 
 class EditWidget extends StatefulWidget {
   // instance data

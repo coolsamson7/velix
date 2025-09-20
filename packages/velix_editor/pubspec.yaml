@@ -1,11 +1,11 @@
 name: velix_editor
-description: "velix Wysiwyg UI editor and runtime engine."
+description: "Velix Wysiwyg UI editor and runtime engine."
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix
 
 resolution: workspace
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: ^3.9.0
@@ -26,7 +26,7 @@ dependencies:
   velix_di: ^1.0.0
   velix_mapper: ^1.1.0
   velix_i18n: ^1.0.0
-  velix_ui: ^1.1.0
+  velix_ui: ^1.1.1
   highlight: ^0.7.0
   flutter_highlight: ^0.7.0
 

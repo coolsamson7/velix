@@ -18,6 +18,7 @@ targets:
         generate_for:
           - example/*.dart
           - example/**/*.dart
+          - lib/**/*.dart
           - "!example/**/*.g.dart"
           - "!example/**/*.part.dart"
       velix|registry_aggregator:

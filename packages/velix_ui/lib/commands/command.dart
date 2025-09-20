@@ -157,18 +157,17 @@ class CommandManager {
 
   MethodCommandInterceptor methodInterceptor = MethodCommandInterceptor();
   List<CommandInterceptor> interceptors = [];
-  Translator translator;
 
   // constructor
 
-  CommandManager({this.interceptors = const [], this.translator = noTranslator});
+  CommandManager({this.interceptors = const []});
 
   // public
 
   CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType lock = LockType.command}) {
     if ( label == null) {
       if (i18n != null) {
-        label = translator.translate(i18n);
+        label = Translator.instance.translate(i18n);
       }
       else {
         label = name;

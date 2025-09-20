@@ -23,3 +23,7 @@ export './databinding/widgets/text.dart';
 
 export './databinding/widgets/cupertino/registry.dart';
 export './databinding/widgets/material/registry.dart';
+
+// provider
+
+export './provider/environment_provider.dart';

@@ -1,3 +1,7 @@
+## 1.1.0
+
+- environment provider
+
 ## 1.0.0
 
 - release version

@@ -1,3 +1,7 @@
+## 1.1.2
+
+-  velix version bump
+
 ## 1.1.1
 
 -  velix version bump

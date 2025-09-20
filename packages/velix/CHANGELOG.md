@@ -1,3 +1,7 @@
+## 0.91.1
+
+- **FIX**: Lazy type descriptors fix.
+
 ## 0.91.0
 
 - **FEAT**: Lazy type descriptors.

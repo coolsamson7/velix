@@ -25,6 +25,7 @@ workspace:
   - packages/velix_mapper
   - packages/velix_ui
   - packages/velix_editor
+  - packages/velix_editor/example
   - examples/example
 
 scripts:

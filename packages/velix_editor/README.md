@@ -1,3 +1,7 @@
-# sample
+# Velix UI Editor
 
-A new Flutter project.
+This package implements a wysiwyg UI editor and runtime engine with JSON as the persistence format.
+
+## Design Principles
+
+Every aspect is model based and pluggable.

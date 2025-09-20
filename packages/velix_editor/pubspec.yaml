@@ -1,5 +1,8 @@
 name: velix_editor
-description: "velix ui editor."
+description: "velix Wysiwyg UI editor and runtime engine."
+
+homepage: https://github.com/coolsamson7/velix
+repository: https://github.com/coolsamson7/velix
 
 resolution: workspace
 version: 0.1.0

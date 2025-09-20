@@ -978,38 +978,15 @@ class Environment {
       String pattern;
 
       if (!includeChildren && !includeSiblings) {
-        // Only the file itself
         pattern = '^' + RegExp.escape(modulePath) + r'$';
+      } else if (includeSiblings && !includeChildren) {
+        pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'[^/]+$';
+      } else if (!includeSiblings && includeChildren) {
+        pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'.+$';
+      } else {
+        // both children and siblings
+        pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'.+$';
       }
-      else if (includeSiblings && !includeChildren) {
-        // All siblings in the same directory
-        pattern = '^' + RegExp.escape(dir) + r'/[^/]+$';
-      }
-      else if (!includeSiblings && includeChildren) {
-        // If the modulePath is a directory (ends with no file), match files/dirs inside it (direct children)
-        // If modulePath is a file, match direct children of its directory and recurse further.
-        if (fileOrDir.contains('.')) {
-          // modulePath is a file, include children means all files and dirs inside its directory recursively
-          pattern = '^' + RegExp.escape(dir) + r'/.*$';
-        }
-        else {
-          // modulePath is a directory, include children means direct children of that directory
-          pattern = '^' + RegExp.escape(modulePath) + r'/[^/]+$';
-        }
-      }
-      else {
-        // Both siblings and children
-        if (fileOrDir.contains('.')) {
-          // If path is a file, siblings + children means siblings of file + any descendants inside directory
-          pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
-        }
-        else {
-          // If path is directory, siblings + children means direct children and directory itself's siblings
-          pattern = '^' + RegExp.escape(dir) + r'/([^/]+|.*)$';
-        }
-      }
-
-      //print("$modulePath, includeChildren: $includeChildren, includeSiblings: $includeSiblings -> $pattern");
 
       return RegExp(pattern);
     }
@@ -1287,8 +1264,8 @@ class EnvironmentInstanceProvider<T> extends AbstractInstanceProvider<T> {
 
   @override
   T create(Environment environment, [List<dynamic> args = const []]) {
-    if ( Tracer.enabled)
-      Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
+    //if ( Tracer.enabled)
+    //  Tracer.trace("di", TraceLevel.full, "create ${provider.type} in $environment");
 
     return scopeInstance.get<T>(provider, environment,  () => ArgumentResolver.createArgs(environment, resolvers));
   }
@@ -1325,7 +1302,7 @@ class AmbiguousProvider<T> extends InstanceProvider<T> {
 
   // constructor
 
-  AmbiguousProvider({required super.type, required this.providers});
+  AmbiguousProvider({required super.type, required this.providers}) : super(eager: false); // TODO
 
   // public
 

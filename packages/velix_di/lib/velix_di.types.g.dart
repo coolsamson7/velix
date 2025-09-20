@@ -12,6 +12,7 @@ void registerVelixDescriptors() {
       Injectable(factory: false)
     ],
     constructor: () => ConfigurationManager(),
+    fromMapConstructor: (Map<String,dynamic> args) => ConfigurationManager(),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationManager(),
   );
 
@@ -40,6 +41,7 @@ void registerVelixDescriptors() {
       Scope(name: "singleton", register: false)
     ],
     constructor: () => SingletonScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => SingletonScope(),
     fromArrayConstructor: (List<dynamic> args) => SingletonScope(),
   );
 
@@ -49,6 +51,7 @@ void registerVelixDescriptors() {
       Scope(name: "environment", register: false)
     ],
     constructor: () => EnvironmentScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => EnvironmentScope(),
     fromArrayConstructor: (List<dynamic> args) => EnvironmentScope(),
   );
 
@@ -58,6 +61,7 @@ void registerVelixDescriptors() {
       Scope(name: "request", register: false)
     ],
     constructor: () => RequestScope(),
+    fromMapConstructor: (Map<String,dynamic> args) => RequestScope(),
     fromArrayConstructor: (List<dynamic> args) => RequestScope(),
   );
 
@@ -67,6 +71,7 @@ void registerVelixDescriptors() {
       Injectable(eager: false)
     ],
     constructor: () => OnInjectProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnInjectProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnInjectProcessor(),
   );
 
@@ -76,6 +81,7 @@ void registerVelixDescriptors() {
       Injectable(eager: false)
     ],
     constructor: () => OnInitProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnInitProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnInitProcessor(),
   );
 
@@ -85,6 +91,7 @@ void registerVelixDescriptors() {
       Injectable(eager: false)
     ],
     constructor: () => OnRunningProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnRunningProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnRunningProcessor(),
   );
 
@@ -94,15 +101,17 @@ void registerVelixDescriptors() {
       Injectable(eager: false)
     ],
     constructor: () => OnDestroyProcessor(),
+    fromMapConstructor: (Map<String,dynamic> args) => OnDestroyProcessor(),
     fromArrayConstructor: (List<dynamic> args) => OnDestroyProcessor(),
   );
 
   type<Boot>(
-    location: 'package:velix_di/di/di.dart:1488:1',
+    location: 'package:velix_di/di/di.dart:1465:1',
     annotations: [
       Module()
     ],
     constructor: () => Boot(),
+    fromMapConstructor: (Map<String,dynamic> args) => Boot(),
     fromArrayConstructor: (List<dynamic> args) => Boot(),
   );
 
@@ -116,6 +125,7 @@ void registerVelixDescriptors() {
       param<Map<String, dynamic>>('values', isRequired: true)
     ],
     constructor: ({required Map<String, dynamic> values}) => ConfigurationValues(values),
+    fromMapConstructor: (Map<String,dynamic> args) => ConfigurationValues(args['values'] as Map<String, dynamic>),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationValues(args[0] as Map<String, dynamic>),
   );
 
@@ -129,6 +139,7 @@ void registerVelixDescriptors() {
       param<String>('filePath', isRequired: true)
     ],
     constructor: ({String filePath = ''}) => JsonFileConfigurationSource(filePath),
+    fromMapConstructor: (Map<String,dynamic> args) => JsonFileConfigurationSource(args['filePath'] as String),
     fromArrayConstructor: (List<dynamic> args) => JsonFileConfigurationSource(args[0] as String),
   );
 

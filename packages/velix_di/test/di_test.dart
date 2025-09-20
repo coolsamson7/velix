@@ -16,7 +16,7 @@ void main() {
 
     Velix.bootstrap;
 
-    registerAllDescriptors();
+    registerTypes();
 
     Tracer(
         isEnabled: true,

@@ -11,13 +11,14 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/configuration/configuration.dart';
 import 'package:velix_di/di/di.dart';
 
-void registerAllDescriptors() {
+void registerTypes() {
   type<ConflictModule>(
     location: 'asset:velix_di/test/conflict/conflict.dart:3:1',
     annotations: [
       Module()
     ],
     constructor: () => ConflictModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => ConflictModule(),
     fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
     methods: [
       method<ConflictModule,Conflict>('create',
@@ -35,6 +36,7 @@ void registerAllDescriptors() {
       Injectable()
     ],
     constructor: () => Conflict(),
+    fromMapConstructor: (Map<String,dynamic> args) => Conflict(),
     fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 
@@ -44,6 +46,7 @@ void registerAllDescriptors() {
       Module()
     ],
     constructor: () => CycleModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => CycleModule(),
     fromArrayConstructor: (List<dynamic> args) => CycleModule(),
   );
 
@@ -53,6 +56,7 @@ void registerAllDescriptors() {
       Module(includeSubdirectories: false)
     ],
     constructor: () => TestModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
     methods: [
       method<TestModule,ConfigurationManager>('createConfigurationManager',
@@ -76,6 +80,7 @@ void registerAllDescriptors() {
       Injectable(scope: "singleton", eager: true)
     ],
     constructor: () => Bar(),
+    fromMapConstructor: (Map<String,dynamic> args) => Bar(),
     fromArrayConstructor: (List<dynamic> args) => Bar(),
   );
 
@@ -85,6 +90,7 @@ void registerAllDescriptors() {
       Injectable(factory: false)
     ],
     constructor: () => Baz(),
+    fromMapConstructor: (Map<String,dynamic> args) => Baz(),
     fromArrayConstructor: (List<dynamic> args) => Baz(),
   );
 
@@ -94,6 +100,7 @@ void registerAllDescriptors() {
       Injectable(scope: "singleton", eager: true)
     ],
     constructor: () => Factory(),
+    fromMapConstructor: (Map<String,dynamic> args) => Factory(),
     fromArrayConstructor: (List<dynamic> args) => Factory(),
     methods: [
       method<Factory,void>('onInit',
@@ -143,6 +150,7 @@ void registerAllDescriptors() {
       param<List<Money>>('prices', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Money> prices}) => Collections(prices: prices),
+    fromMapConstructor: (Map<String,dynamic> args) => Collections(prices: args['prices'] as List<Money>),
     fromArrayConstructor: (List<dynamic> args) => Collections(prices: args[0] as List<Money>),
     fields: [
       field<Collections,List<Money>>('prices',
@@ -160,6 +168,7 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
@@ -179,6 +188,7 @@ void registerAllDescriptors() {
       param<String>('name', isRequired: true)
     ],
     constructor: ({String name = ''}) => Base(name),
+    fromMapConstructor: (Map<String,dynamic> args) => Base(args['name'] as String),
     fromArrayConstructor: (List<dynamic> args) => Base(args[0] as String),
     fields: [
       field<Base,String>('name',
@@ -226,6 +236,7 @@ void registerAllDescriptors() {
       param<String>('string_var', isNamed: true, isRequired: true)
     ],
     constructor: ({int int_var = 0, double double_var = 0.0, bool bool_var = false, String string_var = ''}) => Types(int_var: int_var, double_var: double_var, bool_var: bool_var, string_var: string_var),
+    fromMapConstructor: (Map<String,dynamic> args) => Types(int_var: args['int_var'] as int? ?? 0, double_var: args['double_var'] as double? ?? 0.0, bool_var: args['bool_var'] as bool? ?? false, string_var: args['string_var'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => Types(int_var: args[0] as int? ?? 0, double_var: args[1] as double? ?? 0.0, bool_var: args[2] as bool? ?? false, string_var: args[3] as String? ?? ''),
     fields: [
       field<Types,int>('int_var',
@@ -250,6 +261,7 @@ void registerAllDescriptors() {
       param<DateTime>('date', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
+    fromMapConstructor: (Map<String,dynamic> args) => Invoice(products: args['products'] as List<Product>, date: args['date'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
@@ -271,6 +283,7 @@ void registerAllDescriptors() {
       param<int>('priceValue', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', String priceCurrency = '', int priceValue = 0}) => Flat(id: id, priceCurrency: priceCurrency, priceValue: priceValue),
+    fromMapConstructor: (Map<String,dynamic> args) => Flat(id: args['id'] as String? ?? '', priceCurrency: args['priceCurrency'] as String? ?? '', priceValue: args['priceValue'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Flat(id: args[0] as String? ?? '', priceCurrency: args[1] as String? ?? '', priceValue: args[2] as int? ?? 0),
     fields: [
       field<Flat,String>('id',
@@ -297,6 +310,7 @@ void registerAllDescriptors() {
       Module(imports: [TestModule], includeSubdirectories: false, includeSiblings: false)
     ],
     constructor: () => MockModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => MockModule(),
     fromArrayConstructor: (List<dynamic> args) => MockModule(),
   );
 
@@ -309,6 +323,7 @@ void registerAllDescriptors() {
       param<Bar>('bar', isNamed: true, isRequired: true)
     ],
     constructor: ({required Bar bar}) => Foo(bar: bar),
+    fromMapConstructor: (Map<String,dynamic> args) => Foo(bar: args['bar'] as Bar),
     fromArrayConstructor: (List<dynamic> args) => Foo(bar: args[0] as Bar),
   );
 
@@ -320,6 +335,7 @@ void registerAllDescriptors() {
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
+    fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String? ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String? ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
     fields: [
       field<Mutable,String>('id',
@@ -347,6 +363,7 @@ void registerAllDescriptors() {
       param<Money>('price', isNamed: true, isRequired: true)
     ],
     constructor: ({String id = '', required Money price}) => Immutable(id: id, price: price),
+    fromMapConstructor: (Map<String,dynamic> args) => Immutable(id: args['id'] as String? ?? '', price: args['price'] as Money),
     fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String? ?? '', price: args[1] as Money),
     fields: [
       field<Immutable,String>('id',
@@ -367,6 +384,7 @@ void registerAllDescriptors() {
       param<int>('number', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', int number = 0}) => Derived(name, number: number),
+    fromMapConstructor: (Map<String,dynamic> args) => Derived(args['name'] as String, number: args['number'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Derived(args[0] as String, number: args[1] as int? ?? 0),
     fields: [
       field<Derived,int>('number',
@@ -383,6 +401,7 @@ void registerAllDescriptors() {
       Conditional(requires: feature("prod"))
     ],
     constructor: () => ConditionalProd(),
+    fromMapConstructor: (Map<String,dynamic> args) => ConditionalProd(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalProd(),
     methods: [
       method<ConditionalProd,void>('initProd',
@@ -414,6 +433,7 @@ void registerAllDescriptors() {
       Conditional(requires: feature("dev"))
     ],
     constructor: () => ConditionalDev(),
+    fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalDev(),
   );
 
@@ -424,6 +444,7 @@ void registerAllDescriptors() {
       Injectable(replace: true)
     ],
     constructor: () => MockBase(),
+    fromMapConstructor: (Map<String,dynamic> args) => MockBase(),
     fromArrayConstructor: (List<dynamic> args) => MockBase(),
   );
 
@@ -434,6 +455,7 @@ void registerAllDescriptors() {
       Injectable()
     ],
     constructor: () => DerivedType(),
+    fromMapConstructor: (Map<String,dynamic> args) => DerivedType(),
     fromArrayConstructor: (List<dynamic> args) => DerivedType(),
   );
 
@@ -445,6 +467,7 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => ImmutableProduct(name: name, price: price, status: status),
+    fromMapConstructor: (Map<String,dynamic> args) => ImmutableProduct(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fromArrayConstructor: (List<dynamic> args) => ImmutableProduct(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<ImmutableProduct,String>('name',
@@ -467,6 +490,7 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
+    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<Product,String>('name',
@@ -490,6 +514,7 @@ void registerAllDescriptors() {
       param<ImmutableProduct>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required ImmutableProduct product}) => ImmutableRoot(product: product),
+    fromMapConstructor: (Map<String,dynamic> args) => ImmutableRoot(product: args['product'] as ImmutableProduct),
     fromArrayConstructor: (List<dynamic> args) => ImmutableRoot(product: args[0] as ImmutableProduct),
     fields: [
       field<ImmutableRoot,ImmutableProduct>('product',
@@ -504,6 +529,7 @@ void registerAllDescriptors() {
       param<Product>('product', isNamed: true, isRequired: true)
     ],
     constructor: ({required Product product}) => MutableRoot(product: product),
+    fromMapConstructor: (Map<String,dynamic> args) => MutableRoot(product: args['product'] as Product),
     fromArrayConstructor: (List<dynamic> args) => MutableRoot(product: args[0] as Product),
     fields: [
       field<MutableRoot,Product>('product',
@@ -522,6 +548,7 @@ void registerAllDescriptors() {
       param<CycleTarget>('target', isRequired: true)
     ],
     constructor: ({required CycleTarget target}) => CycleSource(target),
+    fromMapConstructor: (Map<String,dynamic> args) => CycleSource(args['target'] as CycleTarget),
     fromArrayConstructor: (List<dynamic> args) => CycleSource(args[0] as CycleTarget),
   );
 
@@ -535,6 +562,7 @@ void registerAllDescriptors() {
       param<CycleSource>('source', isRequired: true)
     ],
     constructor: ({required CycleSource source}) => CycleTarget(source),
+    fromMapConstructor: (Map<String,dynamic> args) => CycleTarget(args['source'] as CycleSource),
     fromArrayConstructor: (List<dynamic> args) => CycleTarget(args[0] as CycleSource),
   );
 

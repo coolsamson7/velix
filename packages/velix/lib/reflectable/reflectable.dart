@@ -197,8 +197,8 @@ class TypeDescriptor<T> {
 
   /// Return a new or cached 'TypeDescriptor' given a type.
   /// [T] the reflected type
-  static TypeDescriptor forType<T>(T type) {
-    final descriptor = _byType[type];
+  static TypeDescriptor forType<T>([Type? type]) {
+    final descriptor = _byType[type ?? T];
     if (descriptor == null) {
       return TypeDescriptor<T>.lazy();
 
@@ -311,10 +311,6 @@ class TypeDescriptor<T> {
       annotations: [],
       lazy: true
   ) ;
-
-  // type<Bla>(field<Bla>))
-  // field legt typedesciptor an, leer
-  // type<Bal> kommt hinterher und befüllt instanz, muss aber die late version zurückgeben
 
   TypeDescriptor({
     required this.location,
@@ -617,7 +613,7 @@ dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
         result = (result as dynamic).optional();
     }
     else {
-      result = ObjectType(TypeDescriptor.forType(type));
+      result = ObjectType(TypeDescriptor.forType<T>());
       if ( isNullable )
         result = (result as dynamic).optional();
     }

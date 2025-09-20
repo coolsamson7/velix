@@ -23,7 +23,7 @@ void main() {
   
   var price = Money(currency: "EUR", value: 1);
   
-  var type = TypeDescriptor.forType(Money);
+  var type = TypeDescriptor.forType<Money>();
 
   // call getters
 

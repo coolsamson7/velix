@@ -428,7 +428,7 @@ class JSONMapper {
   V deserialize<V>(Map<String,dynamic> json) {
     // TODO wrong spot it will happen i a list as well fuck
 
-    var baseDesc = TypeDescriptor.forType(V);
+    var baseDesc = TypeDescriptor.forType<V>();
     var discField = baseDesc.findAnnotation<JsonSerializable>()?.discriminatorField;
 
     if (discField != null && discField.isNotEmpty) {

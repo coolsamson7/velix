@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide MetaData;
 
 import './dynamic_widget.dart';
-import './metadata/metadata.dart';
 import './metadata/type_registry.dart';
 import './metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';

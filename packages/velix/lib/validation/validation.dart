@@ -788,7 +788,7 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
 
   static AbstractType create<T>(ResolveFunction? resolve) {
     if (TypeDescriptor.hasType(T))
-      return ObjectType<T>(TypeDescriptor.forType(T));
+      return ObjectType<T>(TypeDescriptor.forType<T>());
     else
       return LazyObjectType.create<T>(resolve!);
   }

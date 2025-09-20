@@ -22,16 +22,19 @@ dependencies:
   build: ^3.0.0
   easy_localization: ^3.0.8
   cupertino_icons: ^1.0.8
-  velix: ^0.90.1
+  velix: ^0.91.0
   velix_di: ^1.0.0
-  velix_mapper: ^1.0.0
+  velix_mapper: ^1.1.0
   velix_i18n: ^1.0.0
-  velix_ui: ^1.0.0
+  velix_ui: ^1.1.0
+  velix_editor:
+    path: ../../packages/velix_editor
+  highlight: ^0.7.0
+  flutter_highlight: ^0.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.4.7
   flutter_lints: ^6.0.0
   glob: ^2.1.3
 

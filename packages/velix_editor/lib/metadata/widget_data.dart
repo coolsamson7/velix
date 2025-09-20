@@ -1,5 +1,6 @@
 
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 @Dataclass()
@@ -8,6 +9,7 @@ abstract class WidgetData {
   // instance data
 
   String type;
+  @DeclareProperty(group: "general", hide: true)
   List<WidgetData> children;
   @Json(ignore: true)
   WidgetData? parent;

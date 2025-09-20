@@ -39,7 +39,7 @@ void registerEditorTypes() {
   );
 
   type<EditorModule>(
-    location: 'package:velix_editor/editor_module.dart:3:1',
+    location: 'package:velix_editor/editor_module.dart:5:1',
     annotations: [
       Module(imports: [])
     ],
@@ -81,7 +81,7 @@ void registerEditorTypes() {
   );
 
   var WidgetDataDescriptor =  type<WidgetData>(
-    location: 'package:velix_editor/metadata/widget_data.dart:7:1',
+    location: 'package:velix_editor/metadata/widget_data.dart:6:1',
     annotations: [
       JsonSerializable(discriminatorField: "type")
     ],
@@ -93,7 +93,7 @@ void registerEditorTypes() {
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          //DeclareProperty(group: "general", hide: true)
+          DeclareProperty(group: "general", hide: true)
         ],
         elementType: WidgetData,
         factoryConstructor: () => <WidgetData>[],
@@ -317,7 +317,7 @@ void registerEditorTypes() {
   );
 
   type<ContainerEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/container_widget.dart:29:1',
+    location: 'package:velix_editor/theme/widgets/container_widget.dart:15:1',
     superClass: WidgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -331,7 +331,7 @@ void registerEditorTypes() {
   );
 
   type<ContainerWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/container_widget.dart:88:1',
+    location: 'package:velix_editor/theme/widgets/container_widget.dart:91:1',
     superClass: WidgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -356,7 +356,7 @@ void registerEditorTypes() {
   );
 
   type<TextEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:23:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:17:1',
     superClass: WidgetBuilderDescriptor,
     annotations: [
       Injectable()

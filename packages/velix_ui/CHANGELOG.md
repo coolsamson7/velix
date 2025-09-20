@@ -1,3 +1,7 @@
+## 1.1.2
+
+- version fix
+
 ## 1.1.1
 
 - version fix

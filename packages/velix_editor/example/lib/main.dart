@@ -146,7 +146,7 @@ class EditorApp extends StatelessWidget {
   
   // constructor
 
-  EditorApp({super.key, required this.i18n, required this.environment, required this.widgets});
+  const EditorApp({super.key, required this.i18n, required this.environment, required this.widgets});
   
   // override
 

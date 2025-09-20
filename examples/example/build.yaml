@@ -9,7 +9,7 @@ targets:
           include:
             - lib/**/*.dart
           exclude:
-            - lib/**.g.dart#
+            - lib/**.g.dart
       velix|registry_builder:
         generate_for:
           - lib/*.dart

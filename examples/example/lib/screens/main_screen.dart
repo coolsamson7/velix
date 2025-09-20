@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/services/services.dart';
 import 'package:velix_di/velix_di.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 
-import '../editor/provider/environment_provider.dart';
 import 'test_page.dart';
 import 'todo_home_page.dart';
 

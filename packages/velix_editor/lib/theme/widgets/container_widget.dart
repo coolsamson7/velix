@@ -34,35 +34,56 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 
         WidgetsBinding.instance.addPostFrameCallback((_) =>
             environment.get<MessageBus>().publish(
-              "select",
+              "selection",
               SelectionEvent(selection: widget, source: this),
             ));
       },
       builder: (context, candidateData, rejectedData) {
         final isActive = candidateData.isNotEmpty;
+        final hasChildren = data.children.isNotEmpty;
 
-        return IgnorePointer( // 👈 makes container non-interactive
-          ignoring: true,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: isActive ? Colors.blue : Colors.grey.shade400,
-                width: isActive ? 3 : 1,
-              ),
-              color: isActive ? Colors.blue.shade50 : Colors.grey.shade100,
+        return Container(
+          constraints: const BoxConstraints(
+            minWidth: 100,
+            minHeight: 60,
+          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isActive ? Colors.blue : Colors.grey.shade400,
+              width: isActive ? 3 : 1,
+              style: hasChildren ? BorderStyle.solid : BorderStyle.solid,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: data.children
-                  .map(
-                    (child) => EditWidget(
-                  model: child,
-                  meta: typeRegistry[child.type],
+            color: isActive
+                ? Colors.blue.shade50
+                : (hasChildren ? Colors.transparent : Colors.grey.shade50),
+          ),
+          child: hasChildren
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (int i = 0; i < data.children.length; i++) ...[
+                EditWidget(
+                  model: data.children[i],
+                  meta: typeRegistry[data.children[i].type],
                   parent: data,
                 ),
-              )
-                  .toList(),
+                // Add spacing between children except for the last one
+                if (i < data.children.length - 1)
+                  const SizedBox(height: 8),
+              ],
+            ],
+          )
+              : Center(
+            child: Text(
+              isActive ? 'Drop widgets here' : 'Empty Container',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isActive ? Colors.blue.shade600 : Colors.grey.shade600,
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ),
         );
@@ -86,17 +107,31 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
         border: Border.all(color: Colors.grey.shade400),
         color: Colors.grey.shade100,
       ),
-      child: Column(
+      child: data.children.isNotEmpty
+          ? Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: data.children
             .map(
-              (child) => DynamicWidget(
-            model: child,
-            meta: typeRegistry[child.type],
-            parent: data,
+              (child) => Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: DynamicWidget(
+              model: child,
+              meta: typeRegistry[child.type],
+              parent: data,
+            ),
           ),
         )
             .toList(),
+      )
+          : const SizedBox(
+        height: 50,
+        child: Center(
+          child: Text(
+            'Empty container',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ),
       ),
     );
   }

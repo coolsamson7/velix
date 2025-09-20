@@ -23,9 +23,13 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
 
   @override
   Widget create(ButtonWidgetData data, Environment environment) {
-    return ElevatedButton(
-      onPressed: () {  }, // TODO
-      child: Text(data.label),
+    // In edit mode, make the button non-interactive
+    return IgnorePointer(
+      ignoring: true,
+      child: ElevatedButton(
+        onPressed: () {  }, // This won't be called due to IgnorePointer
+        child: Text(data.label),
+      ),
     );
   }
 }

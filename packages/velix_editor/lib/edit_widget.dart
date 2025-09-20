@@ -32,6 +32,7 @@ class _EditWidgetState extends State<EditWidget> {
   late final WidgetFactory theme;
   late final MessageBus bus;
   bool selected = false;
+  bool isHovered = false;
 
   late final StreamSubscription selectionSubscription;
   late final StreamSubscription propertyChangeSubscription;
@@ -78,122 +79,191 @@ class _EditWidgetState extends State<EditWidget> {
     final visualChild = theme.builder(widget.model.type, edit: true)
         .create(widget.model, environment);
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Visual child (display only, doesn't block taps)
-        IgnorePointer(ignoring: true, child: visualChild),
-
-        // GestureDetector covering exactly the child area
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => bus.publish(
-              "selection",
-              SelectionEvent(selection: widget.model, source: this),
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: Draggable<WidgetData>(
+        data: widget.model,
+        onDragStarted: () {
+          print('Drag started for: ${widget.model.type}');
+        },
+        onDragEnd: (details) {
+          print('Drag ended for: ${widget.model.type}');
+        },
+        feedback: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              'Moving ${widget.model.type}',
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ),
         ),
-
-        // Draggable handle (top-left corner)
-        if (selected)
-          Positioned(
-            top: 0,
-            left: 0,
-            child: LongPressDraggable<WidgetData>(
-              data: widget.model,
-              feedback: Material(
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  color: Colors.grey.shade200,
-                  child: Text(widget.model.type),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              visualChild,
+              // Show dashed border when dragging
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.blue.withOpacity(0.5),
+                        width: 2,
+                        style: BorderStyle.solid,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              childWhenDragging: Opacity(opacity: 0.5, child: visualChild),
-              child: Container(width: 20, height: 20, color: Colors.transparent),
-            ),
+            ],
           ),
+        ),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            bus.publish(
+              "selection",
+              SelectionEvent(selection: widget.model, source: this),
+            );
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // The actual widget content (made non-interactive by the builders)
+              visualChild,
 
-        // Selection border, delete button, handles
-        if (selected) ..._buildHandlesAndLabels(),
-      ],
+              // Selection border
+              if (selected || isHovered)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selected
+                              ? Colors.blue.withOpacity(0.8)
+                              : Colors.blue.withOpacity(0.4),
+                          width: selected ? 2 : 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Selection controls - only when selected
+              if (selected) ..._buildSelectionControls(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  List<Widget> _buildHandlesAndLabels() {
-    const double tabHeight = 20;
+  List<Widget> _buildSelectionControls() {
+    const double controlHeight = 24;
     const double borderWidth = 2;
 
     return [
-      // Top label
+      // Type label
       Positioned(
-        top: -(tabHeight + borderWidth),
+        top: -(controlHeight + borderWidth),
         left: 0,
         child: Container(
-          height: tabHeight,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          color: Colors.blue.withOpacity(0.7),
-          child: Text(
-            widget.model.type,
-            style: const TextStyle(fontSize: 12, color: Colors.white),
+          height: controlHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.9),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(4),
+              topRight: Radius.circular(4),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              widget.model.type,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ),
       ),
 
       // Delete button
       Positioned(
-        top: -(tabHeight + borderWidth),
+        top: -(controlHeight + borderWidth),
         right: 0,
         child: GestureDetector(
           onTap: delete,
-          behavior: HitTestBehavior.translucent,
           child: Container(
-            height: tabHeight,
-            width: tabHeight,
-            alignment: Alignment.center,
-            color: Colors.red.withOpacity(0.7),
-            child: const Icon(Icons.close, size: 12, color: Colors.white),
+            height: controlHeight,
+            width: controlHeight,
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.9),
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(4),
+              ),
+            ),
+            child: const Icon(Icons.close, size: 14, color: Colors.white),
           ),
         ),
       ),
 
-      // Small handles
-      Positioned(
-        top: -4,
-        left: 0,
-        right: 0,
-        child: Align(alignment: Alignment.topCenter, child: _buildHandle()),
-      ),
-      Positioned(
-        bottom: -4,
-        left: 0,
-        right: 0,
-        child: Align(alignment: Alignment.bottomCenter, child: _buildHandle()),
-      ),
-      Positioned(
-        top: 0,
-        bottom: 0,
-        left: -4,
-        child: Align(alignment: Alignment.centerLeft, child: _buildHandle()),
-      ),
-      Positioned(
-        top: 0,
-        bottom: 0,
-        right: -4,
-        child: Align(alignment: Alignment.centerRight, child: _buildHandle()),
-      ),
+      // Resize handles
+      ..._buildResizeHandles(),
     ];
   }
 
-  Widget _buildHandle() {
-    return Container(
-      width: 8,
-      height: 8,
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.5),
-        shape: BoxShape.rectangle,
+  List<Widget> _buildResizeHandles() {
+    const double handleSize = 8;
+
+    Widget buildHandle() {
+      return Container(
+        width: handleSize,
+        height: handleSize,
+        decoration: BoxDecoration(
+          color: Colors.blue.withOpacity(0.9),
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      );
+    }
+
+    return [
+      // Corner handles
+      Positioned(top: -4, left: -4, child: buildHandle()),
+      Positioned(top: -4, right: -4, child: buildHandle()),
+      Positioned(bottom: -4, left: -4, child: buildHandle()),
+      Positioned(bottom: -4, right: -4, child: buildHandle()),
+
+      // Mid-point handles
+      Positioned(
+        top: -4, left: 0, right: 0,
+        child: Align(alignment: Alignment.topCenter, child: buildHandle()),
       ),
-    );
+      Positioned(
+        bottom: -4, left: 0, right: 0,
+        child: Align(alignment: Alignment.bottomCenter, child: buildHandle()),
+      ),
+      Positioned(
+        top: 0, bottom: 0, left: -4,
+        child: Align(alignment: Alignment.centerLeft, child: buildHandle()),
+      ),
+      Positioned(
+        top: 0, bottom: 0, right: -4,
+        child: Align(alignment: Alignment.centerRight, child: buildHandle()),
+      ),
+    ];
   }
 }

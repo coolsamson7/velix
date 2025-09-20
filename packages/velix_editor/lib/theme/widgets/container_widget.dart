@@ -12,20 +12,6 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/container.dart';
 import '../widget_builder.dart';
 
-import 'package:flutter/material.dart' hide WidgetBuilder, MetaData;
-import 'package:velix_di/di/di.dart';
-import 'package:velix_editor/commands/command_stack.dart';
-import 'package:velix_editor/event/events.dart';
-import 'package:velix_editor/util/message_bus.dart';
-
-import '../../commands/reparent_command.dart';
-import '../../dynamic_widget.dart';
-import '../../edit_widget.dart';
-import '../../metadata/type_registry.dart';
-import '../../metadata/widget_data.dart';
-import '../../metadata/widgets/container.dart';
-import '../widget_builder.dart';
-
 @Injectable()
 class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   final TypeRegistry typeRegistry;

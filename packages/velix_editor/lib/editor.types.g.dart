@@ -93,7 +93,7 @@ void registerEditorTypes() {
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          DeclareProperty(group: "general", hide: true)
+          //DeclareProperty(group: "general", hide: true)
         ],
         elementType: WidgetData,
         factoryConstructor: () => <WidgetData>[],
@@ -101,6 +101,9 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as WidgetData).children = value,
       ), 
       field<WidgetData,WidgetData>('parent',
+        annotations: [
+          Json(ignore: true)
+        ],
         getter: (obj) => obj.parent,
         setter: (obj, value) => (obj as WidgetData).parent = value,
         isNullable: true

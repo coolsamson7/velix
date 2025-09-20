@@ -2,16 +2,14 @@
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-import 'annotations.dart';
-
 @Dataclass()
 @JsonSerializable(discriminatorField: "type")
 abstract class WidgetData {
   // instance data
 
   String type;
-  @DeclareProperty(group: "general", hide: true) // TODO: do we need that?
   List<WidgetData> children;
+  @Json(ignore: true)
   WidgetData? parent;
 
   // constructor

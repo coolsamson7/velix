@@ -1,3 +1,7 @@
+## 0.91.0
+
+- **FEAT**: Lazy type descriptors.
+
 ## 0.90.1
 
 - **FIX**: i18n fix.

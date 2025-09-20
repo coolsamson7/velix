@@ -43,3 +43,20 @@ targets:
           prefix: "example"
         generate_for:
           - example/main.dart
+  test:
+    sources:
+      - test/**
+      - $package$
+      - lib/**
+    builders:
+      velix|registry_builder:
+        generate_for:
+          - test/*.dart
+          - test/**/*.dart
+          - "!test/**/*.g.dart"
+          - "!test/**/*.part.dart"
+      velix|registry_aggregator:
+        options:
+          prefix: "test"
+        generate_for:
+          - test/type_descriptor_test.dart

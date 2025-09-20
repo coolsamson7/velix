@@ -17,7 +17,7 @@ class Money {
 void main() {
   // register types
 
-  registerAllDescriptors();
+  registerTypes();
   
   // create some data
   

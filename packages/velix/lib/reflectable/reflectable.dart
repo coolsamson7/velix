@@ -12,7 +12,8 @@ class ClassAnnotation {
   /// [type] the [TypeDescriptor] of the annotated class
   void apply(TypeDescriptor type){}
 }
-/// A `MethodAnnotation` can be used as the base class for metzhod annotations
+
+/// A `MethodAnnotation` can be used as the base class for method annotations
 /// that will get its `apply` method executed by the infrastructure.
 class MethodAnnotation {
   const MethodAnnotation();
@@ -21,6 +22,17 @@ class MethodAnnotation {
   /// [type] the [TypeDescriptor] of the annotated class
   /// [method] the [MethodDescriptor] of the annotated method
   void apply(TypeDescriptor type, MethodDescriptor method){}
+}
+
+/// A `FieldAnnotation` can be used as the base class for field annotations
+/// that will get its `apply` method executed by the infrastructure.
+class FieldAnnotation {
+  const FieldAnnotation();
+
+  /// callback executed by the type infrastructure
+  /// [type] the [TypeDescriptor] of the annotated class
+  /// [method] the [FieldDescriptor] of the annotated field
+  void apply(TypeDescriptor type, FieldDescriptor field){}
 }
 
 /// decorator used to mark classes that should emit meta-data
@@ -47,7 +59,7 @@ class FieldDescriptor<T, V> {
   final Type? elementType;
   final Function? factoryConstructor;
 
-  final AbstractType<V, AbstractType> type;
+  AbstractType<V, AbstractType> type;
   final Getter<T, V> getter;
   final Setter<T, V>? setter;
   late TypeDescriptor typeDescriptor;
@@ -71,8 +83,8 @@ class FieldDescriptor<T, V> {
 
   // public
 
-  A? find_annotation<A>() {
-    return findElement(annotations, (annotation) => annotation is T) as A?;
+  A? findAnnotation<A>() {
+    return findElement(annotations, (annotation) => annotation is A) as A?;
   }
 
   bool isWriteable() {
@@ -188,7 +200,9 @@ class TypeDescriptor<T> {
   static TypeDescriptor forType<T>(T type) {
     final descriptor = _byType[type];
     if (descriptor == null) {
-      throw StateError("No TypeDescriptor registered for type: $type");
+      return TypeDescriptor<T>.lazy();
+
+      //throw StateError("No TypeDescriptor registered for type: $type");
     }
 
     return descriptor;
@@ -267,23 +281,40 @@ class TypeDescriptor<T> {
 
   // instance data
 
-  final String location;
+  bool lazy = false;
+  String location;
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
   final Map<String, MethodDescriptor> _methods = {};
-  final Constructor<T>? constructor;
-  final FromMapConstructor<T>? fromMapConstructor;
-  final FromArrayConstructor<T>? fromArrayConstructor;
-  final List<ParameterDescriptor> constructorParameters;
-  final List<Object> annotations;
-  final List<T>? enumValues;
-  final bool isAbstract;
+  Constructor<T>? constructor;
+  FromMapConstructor<T>? fromMapConstructor;
+  FromArrayConstructor<T>? fromArrayConstructor;
+  List<ParameterDescriptor> constructorParameters;
+  List<Object> annotations;
+  List<T>? enumValues;
+  bool isAbstract;
   late ObjectType<T> objectType;
 
   TypeDescriptor? superClass;
   List<TypeDescriptor> childClasses = [];
 
   // constructor
+
+  TypeDescriptor.lazy() :this(
+      location: "",
+      constructor: null,
+      fromMapConstructor: null,
+      fromArrayConstructor: null,
+      constructorParameters: [],
+      fields: [],
+      methods: null,
+      annotations: [],
+      lazy: true
+  ) ;
+
+  // type<Bla>(field<Bla>))
+  // field legt typedesciptor an, leer
+  // type<Bal> kommt hinterher und befüllt instanz, muss aber die late version zurückgeben
 
   TypeDescriptor({
     required this.location,
@@ -293,13 +324,41 @@ class TypeDescriptor<T> {
     required this.constructorParameters,
     required List<FieldDescriptor> fields,
     List<MethodDescriptor>? methods,
-    required this. annotations,
+    required this.annotations,
     this.isAbstract = false,
     this.superClass,
-    this.enumValues
+    this.enumValues,
+    this.lazy = false
   }) {
     type = nonNullableOf<T>();
+
+    var existing = _byType[T];
+
+    if ( existing != null) {
+      existing.location = location;
+      existing.constructor = constructor;
+      existing.fromMapConstructor = fromMapConstructor;
+      existing.fromArrayConstructor = fromArrayConstructor;
+      existing.constructorParameters = constructorParameters;
+      existing.annotations = annotations;
+      existing.isAbstract = isAbstract;
+      existing.superClass = superClass;
+      existing.enumValues = enumValues;
+      existing.lazy = false;
+
+      existing.setup(fields, methods);
+    }
+    else {
+      TypeDescriptor.register(this);
+
+      if ( !lazy )
+        setup(fields, methods);
+    }
+  }
+
+  void setup(List<FieldDescriptor> fields, List<MethodDescriptor>? methods) {
     objectType = ObjectType(this);
+
     // super class
 
     if ( superClass != null) {
@@ -332,17 +391,18 @@ class TypeDescriptor<T> {
             annotation.apply(this, method);
       } // for
 
-
     // own fields
 
     for (var field in fields) {
-        field.typeDescriptor = this; // marker for a local field
-        _fields[field.name] = field;
+      field.typeDescriptor = this; // marker for a local field
+      _fields[field.name] = field;
+
+      // run annotations
+
+      for ( var annotation in field.annotations)
+        if ( annotation is FieldAnnotation)
+          annotation.apply(this, field);
     } // for
-
-    // automatically register
-
-    TypeDescriptor.register(this);
 
     // run class annotations
 
@@ -350,8 +410,6 @@ class TypeDescriptor<T> {
       if ( annotation is ClassAnnotation)
         annotation.apply(this);
   }
-
-  //
 
   void validate(T instance) {
     objectType.validate(instance);
@@ -503,7 +561,11 @@ TypeDescriptor<T> type<T>({
   List<Object>? annotations,
   bool isAbstract = false
 }) {
-  return TypeDescriptor<T>(location: location, isAbstract: isAbstract, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
+   TypeDescriptor<T>(location: location, isAbstract: isAbstract, constructor: constructor, fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, annotations: annotations ?? [], constructorParameters: params ?? [], fields: fields ?? [], methods: methods, superClass: superClass);
+
+   // it could be the lazy type
+
+   return TypeDescriptor._byType[T]! as TypeDescriptor<T>;
 }
 
 TypeDescriptor<T> enumeration<T extends Enum>({

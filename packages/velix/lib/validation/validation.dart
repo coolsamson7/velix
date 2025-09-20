@@ -745,9 +745,54 @@ class DateTimeType extends AbstractType<DateTime, DateTimeType> {
   }
 }
 
+typedef ResolveFunction = void Function(AbstractType type);
+
+class LazyObjectType<T> extends AbstractType<T, ObjectType<T>> {
+  // instance data
+
+  ResolveFunction resolveFunc;
+
+  // constructor
+
+  LazyObjectType(ResolveFunction func) : resolveFunc = func, super(type: T);
+
+  // public
+
+  void resolve() {
+    resolveFunc(ObjectType<T>(TypeDescriptor.forType(T)));
+  }
+
+  // static
+
+  static final List<LazyObjectType<dynamic>> instances = [];
+
+  static void resolveTypes() {
+    for (var type in instances) {
+      type.resolve();
+    }
+    instances.clear();
+  }
+
+  static LazyObjectType<T> create<T>(ResolveFunction resolve) {
+    var instance = LazyObjectType<T>(resolve);
+    instances.add(instance);
+    return instance;
+  }
+}
+
+
 /// Type specification for class values of a certain type.
 /// [T] the corresponding type
 class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
+  // static
+
+  static AbstractType create<T>(ResolveFunction? resolve) {
+    if (TypeDescriptor.hasType(T))
+      return ObjectType<T>(TypeDescriptor.forType(T));
+    else
+      return LazyObjectType.create<T>(resolve!);
+  }
+
   // static data
 
   static final Map<String, MethodSpec> methods = {

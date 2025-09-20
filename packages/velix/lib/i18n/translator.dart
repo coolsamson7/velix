@@ -15,7 +15,9 @@ abstract class Translator {
 
   // constructor
 
-  const Translator();
+  Translator() {
+    instance = this;
+  }
 
   // public
 
@@ -24,7 +26,7 @@ abstract class Translator {
 
 /// @internal
 class NoTranslator extends Translator {
-  const NoTranslator();
+   NoTranslator();
 
   @override
   String translate(String key, {Map<String, String> args = const {}}) {
@@ -32,7 +34,7 @@ class NoTranslator extends Translator {
   }
 }
 
-const Translator noTranslator = NoTranslator();
+Translator noTranslator = NoTranslator();
 
 /// A [TranslationProvider] is able to translate a specific object type
 /// [T] the object type

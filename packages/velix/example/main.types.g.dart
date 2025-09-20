@@ -6,7 +6,7 @@ import 'package:velix/velix.dart';
 import 'main.dart';
 import 'package:velix/reflectable/reflectable.dart';
 
-void registerAllDescriptors() {
+void registerTypes() {
   type<Money>(
     location: 'asset:velix/example/main.dart:5:1',
     params: [
@@ -14,6 +14,7 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',

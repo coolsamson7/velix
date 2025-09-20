@@ -39,9 +39,13 @@ class PanelHeader extends StatelessWidget {
 
 /// Example wrapper that uses the header above a panel body
 class PanelContainer extends StatelessWidget {
+  // instance data
+
   final String title;
   final Widget child;
   final VoidCallback? onClose;
+
+  // constructor
 
   const PanelContainer({
     super.key,
@@ -53,9 +57,18 @@ class PanelContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch, // ✅ makes content stretch full width
       children: [
         PanelHeader(title: title, onClose: onClose),
-        Expanded(child: child),
+        Expanded(
+          child: Container(
+            alignment: Alignment.topLeft, // ✅ force top-left alignment
+            //color: const Color(0xFF1E1E1E), // ✅ dark background
+            child: SizedBox.expand(
+                child: child
+            ),
+          ),
+        ),
       ],
     );
   }

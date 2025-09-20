@@ -1,3 +1,7 @@
+## 1.0.1
+
+- bumb velix version
+
 ## 1.0.0
 
 - release version

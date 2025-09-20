@@ -1,6 +1,6 @@
 name: velix_i18n
 description: "a flutter i18n framework offering translation and interpolation capabilities."
-version: 1.0.0
+version: 1.0.1
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

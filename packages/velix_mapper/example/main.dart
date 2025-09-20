@@ -43,7 +43,7 @@ class Money {
 void main() {
   // Initialize or register all descriptors
 
-  registerAllDescriptors();
+  registerTypes();
 
   // manual mapping
 
@@ -83,7 +83,7 @@ void main() {
 
   JSON(
       validate: false,
-      converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+      converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
       factories: [Enum2StringFactory()]);
 
   var json = JSON.serialize(input);

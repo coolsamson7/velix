@@ -6,13 +6,17 @@ import 'mapper.dart';
 import 'operation_builder.dart';
 
 
+// annotations
+
 /// decorator used to influence the json serialization
 class JsonSerializable {
   final bool includeNull;
+  final String discriminator;
+  final String discriminatorField;
 
   /// Create a JsonSerializable
   /// [includeNull] if true, nulls will be serialized.
-  const JsonSerializable({this.includeNull = true});
+  const JsonSerializable({this.includeNull = true, this.discriminator = "", this.discriminatorField = ""});
 }
 
 /// decorator used to influence json serialization for fields
@@ -22,6 +26,7 @@ class Json {
   final bool includeNull;
   final bool required;
   final Object? defaultValue;
+  final Type? converter;
 
   /// Create a Json
   /// [name] name override
@@ -29,7 +34,7 @@ class Json {
   /// [includeNull]  if true, nulls will be serialized.
   /// [required] if true, the JSON is expected to have a value
   /// [defaultValue] default in case of a not supplied json value
-  const Json({this.name = "", this.ignore = false, this.includeNull = true, this.required = true, this.defaultValue});
+  const Json({this.name = "", this.converter,  this.ignore = false, this.includeNull = true, this.required = true, this.defaultValue});
 }
 
 /// @internal
@@ -189,8 +194,16 @@ class JSONMapper {
     // local function
 
     void check(Type type) {
-      if (!mappings.containsKey(type))
+      // own class
+
+      if (!mappings.containsKey(type)) {
         queue.add(type);
+
+        // check subclasses as well
+
+        for ( var sub in TypeDescriptor.forType(type).childClasses)
+          check(sub.type);
+      }
     }
 
     MappingDefinition process(Type type) {
@@ -204,7 +217,7 @@ class JSONMapper {
       // process fields
 
       for (var field in typeDescriptor.getFields()) {
-        var json = field.find_annotation<Json>() ?? Json(name: field.name, defaultValue: null);
+        var json = field.findAnnotation<Json>() ?? Json(name: field.name, defaultValue: null);
         var includeNull = jsonSerializable.includeNull && json.includeNull != false;
 
         if ( json.ignore)
@@ -237,19 +250,29 @@ class JSONMapper {
 
             check(target);
 
+            Convert? convert ;
+            if ( json.converter != null) {
+              convert = JSON.getConvert4(json.converter!);
+            }
+
             typeMapping.map(
+                convert: convert,
                 from: field.name,
                 to: JSONAccessor(name: json.name, type: Map<String, dynamic>, includeNull: includeNull),
                 deep: true); // index?
           }
         } // if
         else {
-          Convert? convertSource = JSON.instance.getConvert(field.type.type);
+          Convert? convert ;
+          if ( json.converter != null) {
+            convert = JSON.getConvert4(json.converter!);
+          }
+          else convert = JSON.instance.getConvert(field.type.type);
 
           typeMapping.map(from: field.name,
               to: JSONAccessor(name: json.name,
                   type: field.type.type,
-                  convert: convertSource?.sourceConverter(),
+                  convert: convert?.sourceConverter(),
                   includeNull: includeNull));
         }
       }
@@ -291,14 +314,20 @@ class JSONMapper {
       mappings[type] = typeMapping;
 
       void check(Type type) {
-        if (!mappings.containsKey(type))
+        if (!mappings.containsKey(type)) {
           queue.add(type);
+
+          // check all subclasses as well
+
+          for ( var sub in TypeDescriptor.forType(type).childClasses)
+            check(sub.type);
+        }
       }
 
       // process fields
 
       for ( var field in typeDescriptor.getFields()) {
-        var json = field.find_annotation<Json>() ?? Json(name: field.name, defaultValue: null);
+        var json = field.findAnnotation<Json>() ?? Json(name: field.name, defaultValue: null);
 
         var includeNull = jsonSerializable.includeNull && json.includeNull != false;
 
@@ -339,11 +368,11 @@ class JSONMapper {
                 deep: true);
           }
           else {
-            Convert? convertSource = JSON.instance.getConvert(field.type.type);
+            Convert? convert = JSON.instance.getConvert(field.type.type);
 
             typeMapping.map(from: JSONAccessor(name: json.name,
                 type: field.type.type,
-                convert: convertSource?.targetConverter(),
+                convert: convert?.targetConverter(),
                 includeNull: includeNull,
                 defaultValue: defaultValue),
                 to: field.name,
@@ -352,11 +381,15 @@ class JSONMapper {
 
         } // if
         else {
-          Convert? convertSource = JSON.instance.getConvert(field.type.type);
+          Convert? convert ;
+          if ( json.converter != null) {
+            convert = JSON.getConvert4(json.converter!);
+          }
+          else convert = JSON.instance.getConvert(field.type.type);
 
           typeMapping.map(from: JSONAccessor(name: json.name,
               type: field.type.type,
-              convert: convertSource?.targetConverter(),
+              convert: convert?.targetConverter(),
               includeNull: includeNull,
               defaultValue: defaultValue),
               to: field.name,
@@ -388,7 +421,30 @@ class JSONMapper {
     return serializer.map(instance, mapping: serializerMapping);
   }
 
+  V _deserialize<V>(Map<String,dynamic> json) {
+    return deserializer.map(json, mapping: deserializerMapping);
+  }
+
   V deserialize<V>(Map<String,dynamic> json) {
+    // TODO wrong spot it will happen i a list as well fuck
+
+    var baseDesc = TypeDescriptor.forType(V);
+    var discField = baseDesc.findAnnotation<JsonSerializable>()?.discriminatorField;
+
+    if (discField != null && discField.isNotEmpty) {
+      String key = json[discField];
+
+      // find concrete type with matching discriminator value
+
+      var subtype = baseDesc.childClasses.firstWhere(
+              (t) => t.findAnnotation<JsonSerializable>()?.discriminator == key
+      );
+
+      return JSON.instance.getMapper(subtype.type)._deserialize<V>(json);
+    }
+
+    // TODO
+
     return deserializer.map(json, mapping: deserializerMapping);
   }
 }
@@ -431,7 +487,7 @@ class Enum2StringFactory<T extends Enum> extends EnumConvertFactory<T, String> {
         mappings[e.name] = e;
 
       result = Convert<T, String>(
-              (value) => (value as Enum).name,
+            convertSource: (value) => (value as Enum).name,
             convertTarget: (str) => mappings[str]!,
             sourceType: sourceType,
             targetType: String
@@ -495,6 +551,26 @@ class JSON {
 
   static JSON instance = JSON(validate: false);
 
+  static Map<Type,Convert>  type2Converters = {};
+
+  static Convert getConvert4(Type type) {
+    Convert? result = type2Converters[type];
+
+    if ( result == null) {
+      var descriptor = TypeDescriptor.forType(type);
+      var instance = descriptor.constructor!();
+
+      if (instance is Convert) {
+        result = instance;
+        type2Converters[type] = instance;
+      }
+      else
+        throw Exception("not a convert");
+    }
+
+    return result;
+  }
+
   // instance data
 
   final bool validate;
@@ -509,8 +585,8 @@ class JSON {
 
     // ugly... we need a type descriptor
 
-    var fromMapConstructor = (Map<String,dynamic> args) => HashMap<String,dynamic>() ;
-    var fromArrayConstructor = (List<dynamic> args) => HashMap<String,dynamic>() ;// TODO
+    var fromMapConstructor = (Map<String,dynamic> args) => HashMap<String,dynamic>();
+    var fromArrayConstructor = (List<dynamic> args) => HashMap<String,dynamic>();
 
     TypeDescriptor<Map<String, dynamic>>(location: "json" , annotations: [], fromArrayConstructor: fromArrayConstructor, fromMapConstructor: fromMapConstructor, constructor: ()=>HashMap<String,dynamic>(), constructorParameters: [], fields: []);
   }

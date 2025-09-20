@@ -1,6 +1,7 @@
 
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_mapper/mapper/mapper.dart';
 
 
 @Dataclass()
@@ -54,12 +55,25 @@ class Invoice {
 }
 
 @Dataclass()
+class MyConverter extends Convert<String,String> {
+  @override
+  String convertSource(String source) {
+    return source;
+  }
+
+  @override
+  String convertTarget(String source) {
+    return source;
+  }
+}
+
+@Dataclass()
 @JsonSerializable(includeNull: true)
 class Money {
   // instance data
 
   @Attribute(type: "maxLength 7")
-  @Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
+  @Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false, converter: MyConverter)
   final String currency;
   @Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
   @Attribute(type: "greaterThan 0")
@@ -69,17 +83,20 @@ class Money {
 }
 
 @Dataclass()
+@JsonSerializable(includeNull: true, discriminatorField: "type", discriminator: "derived")
 class Base {
+  final String type;
   final String name;
 
-  Base(this.name);
+  Base({required this.name, this.type = "base"});
 }
 
 @Dataclass()
+@JsonSerializable(includeNull: true, discriminator: "derived")
 class Derived extends Base {
   final int number;
 
-  Derived(super.name, {required this.number});
+  Derived({required super.name, required this.number, super.type = "derived"});
 }
 
 @Dataclass()

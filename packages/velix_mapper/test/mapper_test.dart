@@ -7,7 +7,7 @@ import 'model.types.g.dart';
 void main() {
   group('mapper', () {
 
-    registerAllDescriptors();
+    registerTypes();
 
     test('map conversion', () {
       var mapper = Mapper([
@@ -30,6 +30,7 @@ void main() {
 
     test('map inheritance', () {
       var baseMapping = mapping<Base,Base>()
+          .map(from: "type", to: "type")
           .map(from: "name", to: "name");
 
       var derivedMapping = mapping<Derived,Derived>()
@@ -40,7 +41,7 @@ void main() {
         derivedMapping
       ]);
 
-      var input = Derived("derived", number: 1);
+      var input = Derived(name: "derived", number: 1);
 
       Derived result = mapper.map(input);
 
@@ -59,7 +60,7 @@ void main() {
 
       var source = Collections(prices: [Money(currency: "EU", value: 1)]);
 
-       mapper.map(source);
+      var result = mapper.map(source);
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();
@@ -130,7 +131,7 @@ void main() {
 
       var mapper = Mapper([
         mapping<Immutable, Immutable>()
-            .map(from: "id", to: "id", convert: Convert<String,String>((v) => "${v}XXX"))
+            .map(from: "id", to: "id", convert: Convert<String,String>(convertSource: (v) => "${v}XXX"))
             .map(from: "price", to: "price", deep: true),
 
         mapping<Money, Money>()

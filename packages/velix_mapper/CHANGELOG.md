@@ -1,3 +1,7 @@
+## 1.1.0
+
+- Add a Convert class to the Json annotation
+
 ## 1.0.0
 
 - Release version

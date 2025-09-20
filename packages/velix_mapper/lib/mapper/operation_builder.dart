@@ -21,10 +21,20 @@ class MapList2List extends MapperProperty {
   final Mapper mapper;
   Mapping? mapping;
 
+  bool polymorphic = false;
+
   // constructor
 
   MapList2List({required this.mapper, required this.sourceType, required this.targetType, required this.property, required this.factory}) {
-    //mapping = mapper.getMappingX(sourceType, targetType);
+    // check if polymorphic
+    if ( TypeDescriptor.hasType(sourceType)) {
+      for ( var childClass in TypeDescriptor.forType(sourceType).childClasses) {
+        if (mapper.hasDefinition(childClass.type, targetType)) {
+          polymorphic = true;
+          break;
+        }
+      }
+    }
   }
 
   // override
@@ -36,10 +46,20 @@ class MapList2List extends MapperProperty {
       var len = list.length;
       var result = factory();
 
-      var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetType)); // TODO...
+      if ( polymorphic ) {
+        // TODO: hier kommt dasselbe problem, dass ich eine Unterklasse erwischen könnte fuck!
+        //var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetType)); // TODO...
 
-      for (var i = 0; i < len; i++) {
-        result.add(mapper.map(list[i], context: context, mapping: m));
+        for (var i = 0; i < len; i++) {
+          result.add(mapper.map(list[i], context: context, mapping: mapper.getMappingX(list[i].runtimeType, targetType)));
+        }
+      }
+      else {
+        mapping ??= mapper.getMappingX(sourceType, targetType);
+
+        for (var i = 0; i < len; i++) {
+          result.add(mapper.map(list[i], context: context, mapping: mapping));
+        }
       }
 
       property.set(instance, result, context);
@@ -82,7 +102,7 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetProperty.getType())); // TODO
+    var m = mapper.getMappingX(sourceType, targetProperty.getType()); // TODO
     targetProperty.set(instance, mapper.map(value, context: context, mapping: m), context); // recursive call!
   }
 
@@ -573,7 +593,7 @@ class TargetNode {
       if ( to != targetType)
         throw MapperException("conversion target type $to does not match $targetType");
 
-      result = conversion.get();
+      result = conversion.sourceConverter();
     }
     else if (sourceType != targetType && /* !sourceType.isSubclassOf(targetType)*/ !deep )
       result = tryConvert(sourceType, targetType); // try automatic conversion for low-level types
@@ -809,14 +829,14 @@ class OperationBuilder {
     var targetTree = TargetTree(definition.targetClass, matches);
 
     var operations = targetTree.makeOperations(sourceTree, mapper, definition);
-    Function constructor;
+    Function? constructor;
     if ( targetTree.root.resultDefinition != null ) {
       constructor = targetTree.root.resultDefinition!.constructor;
     }
     else {
-      constructor = TypeDescriptor.forType(definition.targetClass).constructor!; // hmmm
+      constructor = TypeDescriptor.forType(definition.targetClass).constructor; // hmmm
     }
 
-    return OperationResult(operations: operations, constructor: constructor, stackSize: sourceTree.stackSize);
+    return OperationResult(operations: operations, constructor: constructor ?? () => {} , stackSize: sourceTree.stackSize);
   }
 }

@@ -1,6 +1,6 @@
 name: velix_mapper
 description: "a flutter mapping framework for class to class and json."
-version: 1.0.0
+version: 1.1.0
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

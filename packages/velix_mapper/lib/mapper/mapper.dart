@@ -15,27 +15,29 @@ typedef Converter<S,T> = T Function(S);
 class Convert<S, T> {
   // instance data
 
-  final Converter<S, T> convertSource;
-  final Converter<T, S>? convertTarget;
+  final Converter<S, T>? convertSourceFunc;
+  final Converter<T, S>? convertTargetFunc;
 
-  Type sourceType;
-  Type targetType;
+  final Type sourceType;
+  final Type targetType;
 
   // constructor
 
   /// Create a new [Convert] instance
   /// [convert] the [Converter]
-  Convert(this.convertSource, {this.convertTarget, Type? sourceType, Type? targetType}) : sourceType = sourceType ?? S,  targetType = targetType ?? T;
+  const Convert({Converter<S, T>? convertSource,  Converter<T, S>? convertTarget, Type? sourceType, Type? targetType})
+      : sourceType = sourceType ?? S, targetType = targetType ?? T,
+        convertSourceFunc = convertSource,
+        convertTargetFunc = convertTarget;
 
   // public
 
-  T convert(S source) {
-    return convertSource(source);
+  T convertSource(S source) {
+    return convertSourceFunc!(source);
   }
 
-  /// return the wrapped [Converter]
-  Converter<dynamic, dynamic> get() {
-    return (dynamic s) => convertSource(s);
+  S convertTarget(T source) {
+    return convertTargetFunc!(source);
   }
 
   Converter<dynamic, dynamic> sourceConverter() {
@@ -43,7 +45,7 @@ class Convert<S, T> {
   }
 
   Converter<dynamic, dynamic> targetConverter() {
-    return (dynamic s) => convertTarget!(s);
+    return (dynamic s) => convertTarget(s);
   }
 }
 
@@ -105,7 +107,7 @@ class TypeConversions {
   // internal
 
   void register(Convert converter) {
-    _converters[TypeKey(converter.sourceType, converter.targetType)] = converter.get();
+    _converters[TypeKey(converter.sourceType, converter.targetType)] = converter.sourceConverter();
   }
 
   // public
@@ -891,6 +893,14 @@ class Mapper {
 
   void registerMapping(Mapping mapping) {
     mappings[MappingKey(source: mapping.definition.sourceClass, target: mapping.definition.targetClass)] = mapping;
+  }
+
+  bool hasDefinition(Type source, Type target) {
+    for ( var definition in mappingDefinitions)
+      if ( definition.sourceClass == source && definition.targetClass == target)
+        return true;
+
+    return false;
   }
 
   Mapping getMappingX(Type source, Type target) {

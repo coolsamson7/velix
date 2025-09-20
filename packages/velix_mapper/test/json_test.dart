@@ -10,11 +10,11 @@ void main() {
   group('json', () {
     // register types
 
-    registerAllDescriptors();
+    registerTypes();
 
     JSON(
         validate: false,
-        converters: [Convert<DateTime,String>((value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+        converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
         factories: [Enum2StringFactory()]);
 
     test('map immutable json', () {
@@ -24,6 +24,17 @@ void main() {
       var result = JSON.deserialize<Money>(json);
 
       final isEqual = TypeDescriptor.deepEquals(input, result);
+      expect(isEqual, isTrue);
+    });
+
+    test('map inheritance', () {
+      var base = Base(name: "base");
+      var derived = Derived(name: "derived", number: 1);
+
+      var json = JSON.serialize(derived);
+      var result = JSON.deserialize<Base>(json);
+
+      final isEqual = TypeDescriptor.deepEquals(derived, result);
       expect(isEqual, isTrue);
     });
 

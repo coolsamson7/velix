@@ -7,7 +7,7 @@ import 'main.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-void registerAllDescriptors() {
+void registerTypes() {
   type<Invoice>(
     location: 'asset:velix_mapper/example/main.dart:20:1',
     params: [
@@ -15,6 +15,7 @@ void registerAllDescriptors() {
       param<DateTime>('date', isNamed: true, isRequired: true)
     ],
     constructor: ({required List<Product> products, required DateTime date}) => Invoice(products: products, date: date),
+    fromMapConstructor: (Map<String,dynamic> args) => Invoice(products: args['products'] as List<Product>, date: args['date'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
@@ -28,7 +29,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var MoneyDescriptor =  type<Money>(
+  type<Money>(
     location: 'asset:velix_mapper/example/main.dart:28:1',
     annotations: [
       JsonSerializable(includeNull: true)
@@ -38,6 +39,7 @@ void registerAllDescriptors() {
       param<int>('value', isNamed: true, isRequired: true)
     ],
     constructor: ({String currency = '', int value = 0}) => Money(currency: currency, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Money(currency: args['currency'] as String? ?? '', value: args['value'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
@@ -57,7 +59,7 @@ void registerAllDescriptors() {
     ]
   );
 
-  var StatusDescriptor =  enumeration<Status>(
+  enumeration<Status>(
     name: 'asset:velix_mapper/example/main.dart.Status',
     values: Status.values
   );
@@ -70,6 +72,7 @@ void registerAllDescriptors() {
       param<Status>('status', isNamed: true, isRequired: true)
     ],
     constructor: ({String name = '', required Money price, required Status status}) => Product(name: name, price: price, status: status),
+    fromMapConstructor: (Map<String,dynamic> args) => Product(name: args['name'] as String? ?? '', price: args['price'] as Money, status: args['status'] as Status),
     fromArrayConstructor: (List<dynamic> args) => Product(name: args[0] as String? ?? '', price: args[1] as Money, status: args[2] as Status),
     fields: [
       field<Product,String>('name',

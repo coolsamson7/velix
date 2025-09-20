@@ -64,11 +64,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (int i = 0; i < data.children.length; i++) ...[
-                EditWidget(
-                  model: data.children[i],
-                  meta: typeRegistry[data.children[i].type],
-                  parent: data,
-                ),
+                EditWidget(model: data.children[i]),
                 // Add spacing between children except for the last one
                 if (i < data.children.length - 1)
                   const SizedBox(height: 8),

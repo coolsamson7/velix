@@ -52,50 +52,28 @@ class _EditorCanvasState extends State<EditorCanvas> {
   Widget build(BuildContext context) {
     typeRegistry ??= EnvironmentProvider.of(context).get<TypeRegistry>();
 
-    return DragTarget<Object>(
-      onWillAccept: (_) => true,
-      onAccept: (incoming) {
+    return DragTarget<WidgetData>(
+      onWillAccept: (_) => widget.models.isEmpty,
+      onAccept: (w) {
         // palette
 
-        if (incoming is String) {
-          WidgetData newWidget = typeRegistry![incoming].create();
-
-          setState(() => widget.models.add(newWidget));
-        }
-        // reparenting
-        else if (incoming is WidgetData) {
-          _removeFromParent(incoming);
-
-          setState(() => widget.models.add(incoming));
-        }
+        widget.models.add(w);
+        setState(() {});
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
           color: Colors.grey.shade200,
           child: ListView(
             children: widget.models
-                .map(
-                  (m) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: EditWidget(
-                  model: m,
-                  meta: widget.metadata[m.type]!,
-                ),
-              ),
+                .map((m) => Padding(
+                      padding: const EdgeInsets.all(8.0), // TODO?
+                      child: EditWidget(model: m),
+                    ),
             )
                 .toList(),
           ),
         );
       },
     );
-  }
-
-  void _removeFromParent(WidgetData widget) {
-    void removeRecursive(WidgetData container) {
-      container.children.remove(widget);
-      for (var child in container.children) {
-        removeRecursive(child);
-      }
-    }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide WidgetBuilder;
+import 'package:flutter/material.dart' hide WidgetBuilder, Padding;
 import 'package:velix_di/di/di.dart';
 
 import '../../metadata/widgets/button.dart';
@@ -22,6 +22,16 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
     else return null;
   }
 
+  EdgeInsets? edgeInsets(Padding? padding) {
+    if ( padding != null)
+      return EdgeInsets.only(
+        left: padding.left.toDouble(),
+        top: padding.top.toDouble(),
+        right: padding.right.toDouble(),
+        bottom: padding.bottom.toDouble(),
+      );
+    else return null;
+  }
 
   // override
 
@@ -30,8 +40,8 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
     return ElevatedButton(
       onPressed: () {  }, // TODO
       style: ElevatedButton.styleFrom(
-          textStyle: textStyle(data.font)
-        //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          textStyle: textStyle(data.font),
+          padding: edgeInsets(data.padding)
       ),
       child: Text(data.label),
     );
@@ -58,6 +68,17 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
 
   // override
 
+  EdgeInsets? edgeInsets(Padding? padding) {
+    if ( padding != null)
+      return EdgeInsets.only(
+        left: padding.left.toDouble(),
+        top: padding.top.toDouble(),
+        right: padding.right.toDouble(),
+        bottom: padding.bottom.toDouble(),
+      );
+    else return null;
+  }
+
   @override
   Widget create(ButtonWidgetData data, Environment environment) {
     // In edit mode, make the button non-interactive
@@ -66,8 +87,8 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
       child: ElevatedButton(
         onPressed: () {  }, // This won't be called due to IgnorePointer
         style: ElevatedButton.styleFrom(
-          textStyle: textStyle(data.font)
-          //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10), TODO
+          textStyle: textStyle(data.font),
+          padding: edgeInsets(data.padding)
         ),
         child: Text(data.label),
       ),

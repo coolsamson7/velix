@@ -69,7 +69,7 @@ class WidgetDescriptor {
     // fetch defaults
 
     for (var property in properties)
-      args[property.name] = property.createDefault();
+      args[property.name] = property.field.isNullable ? null : property.createDefault();
 
     // done
 

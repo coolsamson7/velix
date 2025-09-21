@@ -6,6 +6,7 @@ import 'package:velix_mapper/mapper/mapper.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
+@Dataclass()
 class FontWeightConvert extends Convert<FontWeight,int> {
   @override
   int convertSource(FontWeight source) {
@@ -19,6 +20,7 @@ class FontWeightConvert extends Convert<FontWeight,int> {
   }
 }
 
+@Dataclass()
 class FontStyleConvert extends Convert<FontStyle,String> {
   @override
   String convertSource(FontStyle source) {
@@ -31,6 +33,33 @@ class FontStyleConvert extends Convert<FontStyle,String> {
   }
 }
 
+@Dataclass()
+class PaddingConvert extends Convert<Padding,Map<String,dynamic>> {
+  @override
+  Map<String,dynamic> convertSource(Padding source) {
+    return {};
+  }
+
+  @override
+  Padding convertTarget(Map<String,dynamic> source) {
+    return Padding(); // TODO
+  }
+}
+
+@Dataclass()
+class Padding {
+  int left;
+  int top;
+  int right;
+  int bottom;
+
+  Padding({
+    this.left = 0,
+    this.top = 0,
+    this.right = 0,
+    this.bottom = 0,
+  });
+}
 
 @Dataclass()
 class Font {
@@ -58,8 +87,10 @@ class ButtonWidgetData extends WidgetData {
   String label;
   @DeclareProperty(group: "Font Properties")
   Font? font;
+  @DeclareProperty(group: "Layout Properties")
+  Padding? padding;
 
   // constructor
 
-  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font});
+  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.padding});
 }

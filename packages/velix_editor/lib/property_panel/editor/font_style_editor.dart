@@ -81,11 +81,11 @@ class _FontStyleEditorStatefulState extends State<_FontStyleEditorStateful> {
           children: const [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('Regular'),
+              child: Icon(Icons.text_fields), // Normal (regular)
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('Italic'),
+              child: Icon(Icons.format_italic), // Italic
             ),
           ],
         ),

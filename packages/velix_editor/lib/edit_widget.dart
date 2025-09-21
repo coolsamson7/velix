@@ -172,8 +172,8 @@ class _EditWidgetState extends State<EditWidget> {
             ),
           ),
 
-          // Delete button - small red square inside widget bounds
-          if (selected)
+          // Delete button - only visible on hover
+          if (selected && isHovered)
             Positioned(
               top: 4,
               right: 4,

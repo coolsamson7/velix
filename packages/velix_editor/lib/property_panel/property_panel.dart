@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/property_panel/compound_property_editor.dart';
 
 import '../commands/command.dart';
 import '../commands/command_stack.dart';
@@ -27,7 +29,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
   WidgetDescriptor? widgetDescriptor;
   late final MessageBus bus;
   late final CommandStack commandStack;
-  late final PropertyEditorRegistry editorRegistry;
+  late final PropertyEditorBuilderFactory editorRegistry;
   StreamSubscription? subscription;
   late final TypeRegistry typeRegistry;
   final Map<String, bool> _expandedGroups = {};
@@ -46,7 +48,8 @@ class _PropertyPanelState extends State<PropertyPanel> {
     if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
       currentCommand = commandStack.execute(PropertyChangeCommand(
         bus: bus,
-        descriptor: widgetDescriptor!,
+        widget: selected!,
+        descriptor: widgetDescriptor!.type,
         target: selected!,
         property: property,
         newValue: value,
@@ -74,7 +77,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     bus = environment.get<MessageBus>();
     typeRegistry = environment.get<TypeRegistry>();
-    editorRegistry = environment.get<PropertyEditorRegistry>();
+    editorRegistry = environment.get<PropertyEditorBuilderFactory>();
     commandStack = environment.get<CommandStack>();
 
     commandStack.addListener(() => setState(() {}));
@@ -152,19 +155,32 @@ class _PropertyPanelState extends State<PropertyPanel> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Column(
                     children: props.map((prop) {
-                      final editorBuilder = editorRegistry.resolve(prop.type);
+                      final isCompound = TypeDescriptor.hasType(prop.type);
+                      final editorBuilder = isCompound ? null : editorRegistry.getBuilder(prop.type);
                       final value = widgetDescriptor!.get(selected!, prop.name);
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
+                        child: isCompound
+                            ? CompoundPropertyEditor(
+                          property: prop,
+                          label: prop.name,
+                          value: value,
+                          target: selected!,
+                          descriptor: widgetDescriptor!,
+                          editorRegistry: editorRegistry,
+                          bus: bus,
+                          commandStack: commandStack,
+                        )
+                            : Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
                               width: 100,
                               child: Row(
                                 children: [
-                                  Text(prop.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                  Text(prop.name,
+                                      style: const TextStyle(fontWeight: FontWeight.w500)),
                                   const SizedBox(width: 4),
                                   if (isPropertyDirty(prop))
                                     GestureDetector(
@@ -187,7 +203,8 @@ class _PropertyPanelState extends State<PropertyPanel> {
                                   ? editorBuilder.buildEditor(
                                 label: prop.name,
                                 value: value,
-                                onChanged: (newVal) => changedProperty(prop.name, newVal),
+                                onChanged: (newVal) =>
+                                    changedProperty(prop.name, newVal),
                               )
                                   : Text("No editor for ${prop.name}"),
                             ),

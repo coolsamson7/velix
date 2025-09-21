@@ -33,7 +33,7 @@ class DeclareProperty extends FieldAnnotation {
 
   // constructor
 
-  const DeclareProperty({required this.group, this.hide = false});
+  const DeclareProperty({this.group = "", this.hide = false});
 
   // override
 

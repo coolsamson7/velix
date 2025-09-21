@@ -8,7 +8,7 @@ abstract class PropertyEditorBuilder<T> {
   // lifecycle
 
   @Inject()
-  void setup(PropertyEditorRegistry registry) {
+  void setup(PropertyEditorBuilderFactory registry) {
     registry.register<T>(this);
   }
 

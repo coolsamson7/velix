@@ -1,7 +1,8 @@
 
 
+import 'package:velix/reflectable/reflectable.dart';
+
 import '../event/events.dart';
-import '../metadata/metadata.dart';
 import '../metadata/widget_data.dart';
 import '../util/message_bus.dart';
 import 'command.dart';
@@ -10,20 +11,21 @@ class PropertyChangeCommand<T> extends Command {
   // instance data
 
   final MessageBus bus;
-  final WidgetDescriptor descriptor;
+  final WidgetData widget;
+  final TypeDescriptor descriptor;
   final Object target;
   final String property;
   final T oldValue;
   late T _newValue;
 
+  PropertyChangeCommand? parent;
+  List<PropertyChangeCommand> children = [];
+
   set value(dynamic value) {
     _newValue = value;
     descriptor.set(target, property, value);
 
-    bus.publish(
-      "property-changed",
-      PropertyChangeEvent(widget: target as WidgetData, source: this),
-    );
+    bus.publish("property-changed", PropertyChangeEvent(widget: widget, source: this));
   }
 
   // constructor
@@ -31,6 +33,7 @@ class PropertyChangeCommand<T> extends Command {
   PropertyChangeCommand({
     required this.bus,
     required this.descriptor,
+    required this.widget,
     required this.target,
     required this.property,
     required dynamic newValue,
@@ -49,10 +52,7 @@ class PropertyChangeCommand<T> extends Command {
   void undo({bool deleteOnly = false}) {
     descriptor.set(target, property, oldValue);
 
-    bus.publish(
-      "property-changed",
-      PropertyChangeEvent(widget: target as WidgetData, source: this),
-    );
+    bus.publish("property-changed", PropertyChangeEvent(widget: widget, source: this));
 
     super.undo(deleteOnly: deleteOnly);
   }

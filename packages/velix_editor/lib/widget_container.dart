@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide MetaData;
+import 'package:flutter/material.dart';
 
 import './dynamic_widget.dart';
 import './metadata/type_registry.dart';

@@ -16,5 +16,5 @@ class TextWidgetData extends WidgetData {
 
   // constructor
 
-  TextWidgetData({required this.label, super.type = "text"});
+  TextWidgetData({super.type = "text", super.children = const [], required this.label});
 }

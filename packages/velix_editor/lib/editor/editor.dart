@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide MetaData;
+import 'package:flutter/material.dart';
 
 import 'package:velix_di/di/di.dart';
 import 'package:velix_ui/commands/command.dart';
@@ -97,7 +97,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   void updateCommandState() {
     setCommandEnabled("play", true);
     setCommandEnabled("undo", commandStack.isDirty());
-    //setCommandEnabled("revert", true);
+    setCommandEnabled("revert", commandStack.isDirty());
   }
 
   @override
@@ -117,6 +117,8 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
     WidgetsBinding.instance.addPostFrameCallback((_) =>
         bus.publish("load", LoadEvent(widget: widget.models.first, source: this)));
+
+    updateCommandState();
   }
 
   @override
@@ -135,7 +137,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                 button("open"),
                 button("save"),
                 button("revert"),
-                button("save"),
+                button("undo"),
 
                 IconButton(
                   tooltip: edit ? "Play" : "Stop",

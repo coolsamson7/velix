@@ -85,11 +85,16 @@ void registerEditorTypes() {
     annotations: [
       JsonSerializable(discriminatorField: "type")
     ],
-    isAbstract: true,
+    params: [
+      param<String>('type', isNamed: true, isRequired: true), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
+    ],
+    constructor: ({String type = '', List<WidgetData> children = const []}) => WidgetData(type: type, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => WidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>? ?? const []),
+    fromArrayConstructor: (List<dynamic> args) => WidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>? ?? const []),
     fields: [
       field<WidgetData,String>('type',
         getter: (obj) => obj.type,
-        setter: (obj, value) => (obj as WidgetData).type = value,
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
@@ -187,14 +192,15 @@ void registerEditorTypes() {
       JsonSerializable(discriminator: "button")
     ],
     params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
       param<int>('number', isNamed: true, isRequired: true), 
-      param<bool>('isCool', isNamed: true, isRequired: true), 
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "button")
+      param<bool>('isCool', isNamed: true, isRequired: true)
     ],
-    constructor: ({String label = '', int number = 0, bool isCool = false, String type = "button"}) => ButtonWidgetData(label: label, number: number, isCool: isCool, type: type),
-    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(label: args['label'] as String? ?? '', number: args['number'] as int? ?? 0, isCool: args['isCool'] as bool? ?? false, type: args['type'] as String? ?? "button"),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(label: args[0] as String? ?? '', number: args[1] as int? ?? 0, isCool: args[2] as bool? ?? false, type: args[3] as String? ?? "button"),
+    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', int number = 0, bool isCool = false}) => ButtonWidgetData(type: type, children: children, label: label, number: number, isCool: isCool),
+    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', number: args['number'] as int? ?? 0, isCool: args['isCool'] as bool? ?? false),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', number: args[3] as int? ?? 0, isCool: args[4] as bool? ?? false),
     fields: [
       field<ButtonWidgetData,String>('label',
         annotations: [
@@ -228,12 +234,12 @@ void registerEditorTypes() {
       JsonSerializable(discriminator: "container")
     ],
     params: [
-      param<List<WidgetData>>('children', isNamed: true, isRequired: true), 
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "container")
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "container"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
     ],
-    constructor: ({required List<WidgetData> children, String type = "container"}) => ContainerWidgetData(children: children, type: type),
-    fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetData(children: args['children'] as List<WidgetData>, type: args['type'] as String? ?? "container"),
-    fromArrayConstructor: (List<dynamic> args) => ContainerWidgetData(children: args[0] as List<WidgetData>, type: args[1] as String? ?? "container"),
+    constructor: ({String type = "container", List<WidgetData> children = const []}) => ContainerWidgetData(type: type, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetData(type: args['type'] as String? ?? "container", children: args['children'] as List<WidgetData>? ?? const []),
+    fromArrayConstructor: (List<dynamic> args) => ContainerWidgetData(type: args[0] as String? ?? "container", children: args[1] as List<WidgetData>? ?? const []),
   );
 
   type<TextWidgetData>(
@@ -244,12 +250,13 @@ void registerEditorTypes() {
       JsonSerializable(discriminator: "text")
     ],
     params: [
-      param<String>('label', isNamed: true, isRequired: true), 
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text")
+      param<String>('type', isNamed: true, isRequired: true), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true)
     ],
-    constructor: ({String label = '', String type = "text"}) => TextWidgetData(label: label, type: type),
-    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(label: args['label'] as String? ?? '', type: args['type'] as String? ?? "text"),
-    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(label: args[0] as String? ?? '', type: args[1] as String? ?? "text"),
+    constructor: ({String type = '', List<WidgetData> children = const [], String label = ''}) => TextWidgetData(type: type, children: children, label: label),
+    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? ''),
     fields: [
       field<TextWidgetData,String>('label',
         annotations: [

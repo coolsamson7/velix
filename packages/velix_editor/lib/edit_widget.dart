@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart' hide Theme;
+import 'package:flutter/material.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
 import 'package:velix_editor/event/events.dart';

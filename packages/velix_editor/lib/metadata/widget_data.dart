@@ -5,10 +5,10 @@ import 'package:velix_mapper/mapper/json.dart';
 
 @Dataclass()
 @JsonSerializable(discriminatorField: "type")
-abstract class WidgetData {
+/*abstract*/ class WidgetData {
   // instance data
 
-  String type;
+  final String type;
   @DeclareProperty(group: "general", hide: true)
   List<WidgetData> children;
   @Json(ignore: true)

@@ -1,5 +1,5 @@
 
-import 'package:flutter/material.dart' hide Theme;
+import 'package:flutter/material.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../metadata/widget_data.dart';

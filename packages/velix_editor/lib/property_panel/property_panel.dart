@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart' hide MetaData;
+import 'package:flutter/material.dart';
 
 import '../commands/command.dart';
 import '../commands/command_stack.dart';
@@ -24,7 +24,7 @@ class PropertyPanel extends StatefulWidget {
 
 class _PropertyPanelState extends State<PropertyPanel> {
   WidgetData? selected;
-  WidgetDescriptor? metaData;
+  WidgetDescriptor? widgetDescriptor;
   late final MessageBus bus;
   late final CommandStack commandStack;
   late final PropertyEditorRegistry editorRegistry;
@@ -46,7 +46,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
     if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
       currentCommand = commandStack.execute(PropertyChangeCommand(
         bus: bus,
-        metaData: metaData!,
+        descriptor: widgetDescriptor!,
         target: selected!,
         property: property,
         newValue: value,
@@ -93,15 +93,15 @@ class _PropertyPanelState extends State<PropertyPanel> {
   @override
   Widget build(BuildContext context) {
     if (selected == null) {
-      metaData = null;
+      widgetDescriptor = null;
       return const Center(child: Text("No selection"));
     }
 
-    metaData = typeRegistry[selected!.type];
+    widgetDescriptor = typeRegistry[selected!.type];
 
     // Group properties by group
     final groupedProps = <String, List<Property>>{};
-    for (var prop in metaData!.properties) {
+    for (var prop in widgetDescriptor!.properties) {
       if (!prop.hide) {
         groupedProps.putIfAbsent(prop.group, () => []).add(prop);
       }
@@ -153,7 +153,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                   child: Column(
                     children: props.map((prop) {
                       final editorBuilder = editorRegistry.resolve(prop.type);
-                      final value = metaData!.get(selected!, prop.name);
+                      final value = widgetDescriptor!.get(selected!, prop.name);
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),

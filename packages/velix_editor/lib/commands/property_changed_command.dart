@@ -10,7 +10,7 @@ class PropertyChangeCommand<T> extends Command {
   // instance data
 
   final MessageBus bus;
-  final WidgetDescriptor metaData;
+  final WidgetDescriptor descriptor;
   final Object target;
   final String property;
   final T oldValue;
@@ -18,7 +18,7 @@ class PropertyChangeCommand<T> extends Command {
 
   set value(dynamic value) {
     _newValue = value;
-    metaData.set(target, property, value);
+    descriptor.set(target, property, value);
 
     bus.publish(
       "property-changed",
@@ -30,11 +30,11 @@ class PropertyChangeCommand<T> extends Command {
 
   PropertyChangeCommand({
     required this.bus,
-    required this.metaData,
+    required this.descriptor,
     required this.target,
     required this.property,
     required dynamic newValue,
-  }) : oldValue = metaData.get(target, property) as T {
+  }) : oldValue = descriptor.get(target, property) as T {
     _newValue = newValue;
   }
 
@@ -47,7 +47,7 @@ class PropertyChangeCommand<T> extends Command {
 
   @override
   void undo({bool deleteOnly = false}) {
-    metaData.set(target, property, oldValue);
+    descriptor.set(target, property, oldValue);
 
     bus.publish(
       "property-changed",

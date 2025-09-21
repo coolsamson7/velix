@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide MetaData;
+import 'package:flutter/material.dart';
 
 import '../components/panel_header.dart';
 import '../metadata/metadata.dart';
@@ -67,7 +67,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
   void initState() {
     super.initState();
     // initially expand all groups
-    for (var group in widget.typeRegistry.metaData.values.map((e) => e.group).toSet()) {
+    for (var group in widget.typeRegistry.descriptor.values.map((e) => e.group).toSet()) {
       _expandedGroups[group] = true;
     }
   }
@@ -76,7 +76,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
   Widget build(BuildContext context) {
     // Group widgets by group name
     final Map<String, List<WidgetDescriptor>> groupedWidgets = {};
-    for (var meta in widget.typeRegistry.metaData.values) {
+    for (var meta in widget.typeRegistry.descriptor.values) {
       groupedWidgets.putIfAbsent(meta.group, () => []).add(meta);
     }
 

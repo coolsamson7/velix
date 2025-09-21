@@ -20,7 +20,7 @@ class TypeRegistry {
 
   // instance data
 
-  Map<String, WidgetDescriptor> metaData = {};
+  Map<String, WidgetDescriptor> descriptor = {};
   Map<Type, WidgetDescriptor> byType = {};
 
   // constructor
@@ -42,7 +42,7 @@ class TypeRegistry {
         }
       }
 
-      var widgetMetaData = WidgetDescriptor(
+      var widgetDescriptor = WidgetDescriptor(
         name: declareWidget.name,
         icon: declareWidget.icon,
         group: declareWidget.group,
@@ -50,7 +50,7 @@ class TypeRegistry {
         properties: properties,
       );
 
-      register(widgetMetaData);
+      register(widgetDescriptor);
     }
   }
 
@@ -59,21 +59,21 @@ class TypeRegistry {
   T parse<T>(Map<String, dynamic> data) {
     var type = data["type"]!;
 
-    return metaData[type]!.parse<T>(data);
+    return descriptor[type]!.parse<T>(data);
   }
 
-  TypeRegistry register(WidgetDescriptor metaData) {
-    this.metaData[metaData.name] = metaData;
-    this.byType[metaData.type.type] = metaData;
+  TypeRegistry register(WidgetDescriptor descriptor) {
+    this.descriptor[descriptor.name] = descriptor;
+    byType[descriptor.type.type] = descriptor;
 
     return this;
   }
 
-  WidgetDescriptor getMetaData(WidgetData data) {
+  WidgetDescriptor getDescriptor(WidgetData data) {
     return byType[data.runtimeType]!;
   }
 
   WidgetDescriptor operator [](String type) {
-    return metaData[type]!;
+    return descriptor[type]!;
   }
 }

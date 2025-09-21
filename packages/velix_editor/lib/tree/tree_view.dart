@@ -242,18 +242,7 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
 
   /// Helper: icon per node type
   IconData _getIconForNode(WidgetData node) {
-    final meta = environment.get<TypeRegistry>().getMetaData(node);
-    if (meta.icon != null) return meta.icon!;
-    switch (node.type) {
-      case "container":
-        return Icons.view_column;
-      case "text":
-        return Icons.text_fields;
-      case "button":
-        return Icons.smart_button;
-      default:
-        return Icons.widgets;
-    }
+    return environment.get<TypeRegistry>().getDescriptor(node).icon!;
   }
 }
 

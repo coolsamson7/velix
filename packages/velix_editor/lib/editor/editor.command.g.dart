@@ -14,7 +14,7 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
   void initCommands() {
     addCommand("open", _open, label: 'Open', icon: Icons.folder_open);
     addCommand("save", _save, label: 'Save', icon: Icons.save);
-    addCommand("revert", _revert, label: 'Revert', icon: Icons.undo);
+    addCommand("revert", _revert, label: 'Revert', icon: Icons.restore);
     addCommand("undo", _undo, label: 'Undo', icon: Icons.undo);
     addCommand("play", _play, label: 'Play', icon: Icons.play_arrow);
   }

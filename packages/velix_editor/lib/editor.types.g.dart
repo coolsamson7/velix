@@ -80,7 +80,7 @@ void registerEditorTypes() {
     ],
   );
 
-  var WidgetDataDescriptor =  type<WidgetData>(
+  var widgetDataDescriptor =  type<WidgetData>(
     location: 'package:velix_editor/metadata/widget_data.dart:6:1',
     annotations: [
       JsonSerializable(discriminatorField: "type")
@@ -98,7 +98,8 @@ void registerEditorTypes() {
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          DeclareProperty(group: "general", hide: true)
+          DeclareProperty(group: "general", hide: true),
+          Json(required: false)
         ],
         elementType: WidgetData,
         factoryConstructor: () => <WidgetData>[],
@@ -116,7 +117,7 @@ void registerEditorTypes() {
     ]
   );
 
-  var PropertyEditorBuilderDescriptor =  type<PropertyEditorBuilder>(
+  var propertyEditorBuilderDescriptor =  type<PropertyEditorBuilder>(
     location: 'package:velix_editor/property_panel/editor_builder.dart:6:1',
     annotations: [
       Injectable()
@@ -155,7 +156,7 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => WidgetFactory(),
   );
 
-  var WidgetBuilderDescriptor =  type<WidgetBuilder>(
+  var widgetBuilderDescriptor =  type<WidgetBuilder>(
     location: 'package:velix_editor/theme/widget_builder.dart:8:1',
     annotations: [
       Injectable(factory: false, eager: false)
@@ -186,7 +187,7 @@ void registerEditorTypes() {
 
   type<ButtonWidgetData>(
     location: 'package:velix_editor/metadata/widgets/button.dart:8:1',
-    superClass: WidgetDataDescriptor,
+    superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "button", group: "Widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "button")
@@ -228,7 +229,7 @@ void registerEditorTypes() {
 
   type<ContainerWidgetData>(
     location: 'package:velix_editor/metadata/widgets/container.dart:9:1',
-    superClass: WidgetDataDescriptor,
+    superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "container", group: "Container", icon: Icons.view_column),
       JsonSerializable(discriminator: "container")
@@ -244,19 +245,19 @@ void registerEditorTypes() {
 
   type<TextWidgetData>(
     location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
-    superClass: WidgetDataDescriptor,
+    superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "text", group: "Widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "text")
     ],
     params: [
-      param<String>('type', isNamed: true, isRequired: true), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = '', List<WidgetData> children = const [], String label = ''}) => TextWidgetData(type: type, children: children, label: label),
-    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? ''),
+    constructor: ({String type = "text", List<WidgetData> children = const [], String label = ''}) => TextWidgetData(type: type, children: children, label: label),
+    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? ''),
     fields: [
       field<TextWidgetData,String>('label',
         annotations: [
@@ -270,7 +271,7 @@ void registerEditorTypes() {
 
   type<BooleanEditorBuilder>(
     location: 'package:velix_editor/property_panel/editor/bool_editor.dart:6:1',
-    superClass: PropertyEditorBuilderDescriptor,
+    superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -281,7 +282,7 @@ void registerEditorTypes() {
 
   type<IntEditorBuilder>(
     location: 'package:velix_editor/property_panel/editor/int_editor.dart:7:1',
-    superClass: PropertyEditorBuilderDescriptor,
+    superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -292,7 +293,7 @@ void registerEditorTypes() {
 
   type<StringEditorBuilder>(
     location: 'package:velix_editor/property_panel/editor/string_editor.dart:6:1',
-    superClass: PropertyEditorBuilderDescriptor,
+    superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -303,7 +304,7 @@ void registerEditorTypes() {
 
   type<ButtonWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/button_widget.dart:7:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -314,7 +315,7 @@ void registerEditorTypes() {
 
   type<ButtonEditWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/button_widget.dart:20:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -325,7 +326,7 @@ void registerEditorTypes() {
 
   type<ContainerEditWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/container_widget.dart:15:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -339,7 +340,7 @@ void registerEditorTypes() {
 
   type<ContainerWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/container_widget.dart:91:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -353,7 +354,7 @@ void registerEditorTypes() {
 
   type<TextWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/text_widget.dart:7:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
@@ -364,7 +365,7 @@ void registerEditorTypes() {
 
   type<TextEditWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/text_widget.dart:17:1',
-    superClass: WidgetBuilderDescriptor,
+    superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],

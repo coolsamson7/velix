@@ -10,6 +10,7 @@ import 'package:velix_mapper/mapper/json.dart';
 
   final String type;
   @DeclareProperty(group: "general", hide: true)
+  @Json(required: false)
   List<WidgetData> children;
   @Json(ignore: true)
   WidgetData? parent;

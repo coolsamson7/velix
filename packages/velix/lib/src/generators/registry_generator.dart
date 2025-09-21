@@ -78,6 +78,12 @@ bool hasAnnotation(ClassElement element, String annotationName) {
   });
 }
 
+String variableName(String className) {
+  final lowerFirst = className[0].toLowerCase() + className.substring(1);
+
+  return "${lowerFirst}Descriptor";
+}
+
 abstract class CodeGenerator<T extends InterfaceElement> {
   // instance data
 
@@ -132,7 +138,33 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     return result;
   }
 
+  /// Inspect annotation string or structure to find class types and add their import
+  void addAnnotationImports(List<ElementAnnotation> elementAnnotations) {
+    for (final annotation in elementAnnotations) {
+      final obj = annotation.computeConstantValue();
+      if (obj == null) continue;
+
+      final type = obj.type!;
+      final element = type.element;
+
+      if (element is ClassElement) {
+        addImport(element.library.identifier);
+
+        // inspect fields
+        for (final field in element.fields) {
+          final fieldValue = obj.getField(field.name!);
+          if (fieldValue != null && fieldValue.type?.element is ClassElement) {
+            final classElement = fieldValue.type!.element as ClassElement;
+            addImport(classElement.library.identifier);
+          }
+        }
+      }
+    }
+  }
+
   void generateAnnotations(List<ElementAnnotation> elementAnnotations) {
+    //addAnnotationImports(elementAnnotations);
+
     var annotations = readAnnotations(elementAnnotations);
 
     if ( annotations.isNotEmpty ) {
@@ -300,6 +332,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     return null;
   }
+
 
   String fieldType(FieldElement field) {
     var nullable = false;
@@ -849,14 +882,14 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     tab();
     if (variable)
-      write("  var ${className}Descriptor =");
+      write("  var ${variableName(className!)} =");
 
     writeln("type<$className>(").indent(1);
     tab().writeln("location: '$qualifiedName',");
 
     var superClass = getSuperclass(element);
     if (superClass != null) {
-      tab().writeln("superClass: ${superClass}Descriptor,");
+      tab().writeln("superClass: ${variableName(superClass)},");
     }
 
     if (element.metadata.annotations.isNotEmpty) {
@@ -1017,7 +1050,7 @@ class Element {
       var colon = name.lastIndexOf(":");
       var className = name.substring(colon + 1);
 
-      buffer.write("  var ${className}Descriptor =");
+      buffer.write("  var ${variableName(className)} =");
     }
 
     // emit

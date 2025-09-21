@@ -124,13 +124,13 @@ void registerEditorTypes() {
   type<Font>(
     location: 'package:velix_editor/metadata/widgets/button.dart:35:1',
     params: [
-      param<FontWeight>('weight', isNamed: true, isRequired: true), 
-      param<FontStyle>('style', isNamed: true, isRequired: true), 
-      param<int>('size', isNamed: true, isRequired: true)
+      param<FontWeight>('weight', isNamed: true, isNullable: true, defaultValue: FontWeight.normal), 
+      param<FontStyle>('style', isNamed: true, isNullable: true, defaultValue: FontStyle.normal), 
+      param<int>('size', isNamed: true, isNullable: true, defaultValue: 16)
     ],
-    constructor: ({required FontWeight weight, required FontStyle style, int size = 0}) => Font(weight: weight, style: style, size: size),
-    fromMapConstructor: (Map<String,dynamic> args) => Font(weight: args['weight'] as FontWeight, style: args['style'] as FontStyle, size: args['size'] as int? ?? 0),
-    fromArrayConstructor: (List<dynamic> args) => Font(weight: args[0] as FontWeight, style: args[1] as FontStyle, size: args[2] as int? ?? 0),
+    constructor: ({FontWeight weight = FontWeight.normal, FontStyle style = FontStyle.normal, int size = 16}) => Font(weight: weight, style: style, size: size),
+    fromMapConstructor: (Map<String,dynamic> args) => Font(weight: args['weight'] as FontWeight? ?? FontWeight.normal, style: args['style'] as FontStyle? ?? FontStyle.normal, size: args['size'] as int? ?? 16),
+    fromArrayConstructor: (List<dynamic> args) => Font(weight: args[0] as FontWeight? ?? FontWeight.normal, style: args[1] as FontStyle? ?? FontStyle.normal, size: args[2] as int? ?? 16),
     fields: [
       field<Font,FontWeight>('weight',
         annotations: [
@@ -279,7 +279,7 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
-      param<Font>('font', isNamed: true, isRequired: true)
+      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null)
     ],
     constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font}) => ButtonWidgetData(type: type, children: children, label: label, font: font),
     fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font),
@@ -370,7 +370,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:28:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:41:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

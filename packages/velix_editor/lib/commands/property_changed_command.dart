@@ -18,9 +18,6 @@ class PropertyChangeCommand<T> extends Command {
   final T oldValue;
   late T _newValue;
 
-  PropertyChangeCommand? parent;
-  List<PropertyChangeCommand> children = [];
-
   set value(dynamic value) {
     _newValue = value;
     descriptor.set(target, property, value);
@@ -36,9 +33,11 @@ class PropertyChangeCommand<T> extends Command {
     required this.widget,
     required this.target,
     required this.property,
+    super.parent,
     required dynamic newValue,
   }) : oldValue = descriptor.get(target, property) as T {
     _newValue = newValue;
+
   }
 
   // override

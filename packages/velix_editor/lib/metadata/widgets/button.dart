@@ -45,7 +45,7 @@ class Font {
   @DeclareProperty()
   int size;
 
-  Font({required this.weight, required this.style, required this.size});
+  Font({this.weight = FontWeight.normal, this.style = FontStyle.normal, this.size = 16});
 }
 
 @Dataclass()
@@ -61,5 +61,5 @@ class ButtonWidgetData extends WidgetData {
 
   // constructor
 
-  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, required this.font});
+  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font});
 }

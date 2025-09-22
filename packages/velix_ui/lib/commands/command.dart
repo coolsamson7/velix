@@ -45,6 +45,8 @@ class CommandDescriptor extends ChangeNotifier {
   final String name;
   final String? i18n;
   late String? label;
+  late String? shortcut;
+  late String? tooltip;
   late IconData? icon;
   final LockType lock;
   final List<CommandInterceptor> _interceptors = [];
@@ -63,7 +65,7 @@ class CommandDescriptor extends ChangeNotifier {
 
   // constructor
 
-  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.lock = LockType.command});
+  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.shortcut, this.tooltip, this.lock = LockType.command});
 
   // administrative
 
@@ -167,14 +169,22 @@ class CommandManager {
   CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType lock = LockType.command}) {
     if ( label == null) {
       if (i18n != null) {
-        label = Translator.instance.translate(i18n);
+        label = Translator.tr("$i18n.label");
       }
       else {
         label = name;
       }
     }
 
-    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon, lock: lock);
+    var shortcut = "";
+    var tooltip = "";
+
+    if ( i18n != null) {
+      shortcut = Translator.tr("$i18n.shortcut", defaultValue: "");
+      tooltip = Translator.tr("$i18n.tooltip", defaultValue: "");
+    }
+
+    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, shortcut: shortcut, tooltip: tooltip, label: label, icon: icon, lock: lock);
 
     // add standard interceptors
 

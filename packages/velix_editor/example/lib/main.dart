@@ -5,10 +5,12 @@ import 'package:velix/velix.dart' hide Property;
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/editor_module.dart';
+import 'package:velix_editor/metadata/properties/properties.dart';
 
 import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
+import 'package:velix_editor/metadata/widgets/label.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
@@ -80,37 +82,42 @@ void main() async {
       localeManager: localeManager,
       loader: AssetTranslationLoader(
         namespacePackageMap: {
-          "validation": "velix"
+          "validation": "velix",
+          "editor": "velix_editor"
         }
       ),
       missingKeyHandler: (key) => '##$key##',
-      preloadNamespaces: ["validation", "example"]
+      preloadNamespaces: ["validation", "example", "editor"]
   );
 
-  /*var json = {
+  var json = {
     "type": "container",
     "children": [
       {
         "type": "text",
+        "children": [],
         "label": "Hello World"
       },
       {
         "type": "button",
+        "children": [],
         "number": 1,
         "isCool": true
       },
       {
         "type": "text",
+        "children": [],
         "label": "Second Text"
       }
     ]
   };
 
-  var widget = JSON.deserialize<WidgetData>(json); // TEST TODO */
+  //var widget = JSON.deserialize<WidgetData>(json); // TEST TODO */
 
   var widgets = ContainerWidgetData(children: [
     TextWidgetData(label: "eins"),
-    ButtonWidgetData(label: "zwei", number: 2, isCool: true),
+    ButtonWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
+    LabelWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
     TextWidgetData(label: "zwei"),
     ContainerWidgetData(children: [
       TextWidgetData(label: "drei"),
@@ -177,7 +184,9 @@ class EditorApp extends StatelessWidget {
 
                     // main screen
 
-                    home: Scaffold(body: EditorScreen(models: widgets)),
+                    home: Scaffold(
+                        body: EditorScreen(models: widgets)
+                    ),
                   );
                 }
             )

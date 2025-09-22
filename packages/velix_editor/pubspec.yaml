@@ -37,9 +37,9 @@ dev_dependencies:
   glob: ^2.1.3
 
 flutter:
-  #assets:
-    #- assets/locales/en/example.json
-    #- assets/locales/de/example.json
+  assets:
+    - assets/locales/en/editor.json
+    - assets/locales/de/editor.json
     #- packages/velix/assets/locales/en/velix.json
     #- packages/velix/assets/locales/de/velix.json
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
+import 'package:velix_editor/metadata/annotations.dart';
 import '../commands/command.dart';
 import '../commands/command_stack.dart';
 import '../commands/property_changed_command.dart';
@@ -51,6 +53,27 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
   dynamic value;
 
   // internal
+
+  static Map<TypeDescriptor,Map<String,String>> labels = {};
+
+  Map<String,String> getLabels(TypeDescriptor descriptor) {
+    var result =  labels[descriptor];
+    if ( result == null) {
+      result = {};
+
+      for ( var field in descriptor.getFields()) {
+        var annotation = field.findAnnotation<DeclareProperty>();
+
+        if ( annotation != null && annotation.i18n != null)
+          result[field.name] = Translator.tr(annotation.i18n!);
+        else
+          result[field.name] = field.name;
+      }
+    }
+
+
+    return result!;
+  }
 
   TypeDescriptor getCompoundDescriptor() {
     return (widget.property.field.type as ObjectType).typeDescriptor;
@@ -157,7 +180,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
               Expanded(
                 child: editorBuilder != null
                     ? editorBuilder.buildEditor(
-                  label: field.name,
+                  label: getLabels(compoundDescriptor)[field.name]!,
                   value: value,
                   onChanged: (newVal) => changedProperty(field.name, newVal),
                 )

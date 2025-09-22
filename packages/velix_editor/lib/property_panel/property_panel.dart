@@ -25,6 +25,8 @@ class PropertyPanel extends StatefulWidget {
 }
 
 class _PropertyPanelState extends State<PropertyPanel> {
+  //instance data
+
   WidgetData? selected;
   WidgetDescriptor? widgetDescriptor;
   late final MessageBus bus;
@@ -34,6 +36,8 @@ class _PropertyPanelState extends State<PropertyPanel> {
   late final TypeRegistry typeRegistry;
   final Map<String, bool> _expandedGroups = {};
   Command? currentCommand;
+
+  // internal
 
   bool isPropertyChangeCommand(Command command, String property) {
     if (command is PropertyChangeCommand) {
@@ -164,7 +168,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                         child: isCompound
                             ? CompoundPropertyEditor(
                           property: prop,
-                          label: prop.name,
+                          label: prop.label,
                           value: value,
                           target: selected!,
                           descriptor: widgetDescriptor!,
@@ -179,7 +183,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                               width: 100,
                               child: Row(
                                 children: [
-                                  Text(prop.name,
+                                  Text(prop.label,
                                       style: const TextStyle(fontWeight: FontWeight.w500)),
                                   const SizedBox(width: 4),
                                   if (isPropertyDirty(prop))

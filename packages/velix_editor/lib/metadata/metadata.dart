@@ -11,6 +11,7 @@ class Property {
   // instance data
 
   final String name;
+  final String label;
   final FieldDescriptor field;
   final String group;
   final bool hide;
@@ -19,7 +20,7 @@ class Property {
 
   // constructor
 
-  Property({required this.name, required this.field, required this.group, required this.hide});
+  Property({required this.name, required this.field, required this.label, required this.group, required this.hide});
 
   // public
 

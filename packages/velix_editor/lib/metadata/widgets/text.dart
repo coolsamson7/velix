@@ -6,7 +6,7 @@ import '../annotations.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "text", group: "Widgets", icon: Icons.text_fields)
+@DeclareWidget(name: "text", i18n: "widgets:text", group: "widgets", icon: Icons.text_fields)
 @JsonSerializable(discriminator: "text")
 class TextWidgetData extends WidgetData {
   // instance data

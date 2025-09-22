@@ -1,4 +1,5 @@
 
+import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -38,7 +39,17 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(Property(name: field.name, group: property.group, field: field, hide: property.hide));
+          var label = field.name;
+          if (property.i18n != null) {
+            label = Translator.instance.translate("${property.i18n}.label");
+          }
+
+          var group = property.group;
+          if (property.groupI18N != null) {
+            label = Translator.instance.translate("${property.groupI18N}.label");
+          }
+
+          properties.add(Property(name: field.name, label: label, group: group, field: field, hide: property.hide));
         }
       }
 

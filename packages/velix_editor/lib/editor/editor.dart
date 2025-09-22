@@ -64,7 +64,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
   // commands
 
-  @Command(label: "Open", icon: Icons.folder_open)
+  @Command(i18n: "commands.open", icon: Icons.folder_open)
   @override
   void _open() {}
 

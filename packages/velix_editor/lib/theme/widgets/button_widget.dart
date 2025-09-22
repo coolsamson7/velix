@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, Padding;
 import 'package:velix_di/di/di.dart';
 
+import '../../metadata/properties/properties.dart';
 import '../../metadata/widgets/button.dart';
 import '../widget_builder.dart';
 
@@ -11,27 +12,6 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   ButtonWidgetBuilder() : super(name: "button");
 
   // internal
-
-  TextStyle? textStyle(Font? font) {
-    if (font != null)
-      return TextStyle(
-        fontSize: font.size.toDouble(),
-        fontWeight: font.weight,
-        fontStyle: font.style,
-      );
-    else return null;
-  }
-
-  EdgeInsets? edgeInsets(Padding? padding) {
-    if ( padding != null)
-      return EdgeInsets.only(
-        left: padding.left.toDouble(),
-        top: padding.top.toDouble(),
-        right: padding.right.toDouble(),
-        bottom: padding.bottom.toDouble(),
-      );
-    else return null;
-  }
 
   // override
 
@@ -54,30 +34,7 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
 
   ButtonEditWidgetBuilder() : super(name: "button", edit: true);
 
-  // internal
-
-  TextStyle? textStyle(Font? font) {
-    if (font != null)
-      return TextStyle(
-        fontSize: font.size.toDouble(),
-        fontWeight: font.weight,
-        fontStyle: font.style,
-      );
-    else return null;
-  }
-
   // override
-
-  EdgeInsets? edgeInsets(Padding? padding) {
-    if ( padding != null)
-      return EdgeInsets.only(
-        left: padding.left.toDouble(),
-        top: padding.top.toDouble(),
-        right: padding.right.toDouble(),
-        bottom: padding.bottom.toDouble(),
-      );
-    else return null;
-  }
 
   @override
   Widget create(ButtonWidgetData data, Environment environment) {

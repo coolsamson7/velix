@@ -1,0 +1,50 @@
+{
+  "commands": {
+    "save": {
+      "label": "Save"
+    },
+    "open":  {
+      "label": "Open"
+    },
+    "revert":  {
+      "label": "Revert"
+    },
+    "undo":  {
+      "label": "Undo"
+    }
+  },
+  "groups": {
+    "general": {
+      "label": "General"
+    }
+  },
+  "properties": {
+    "font:": {
+      "seize": {"label":  "Size"},
+      "weight": {"label":  "Weight"},
+      "style": {"label":  "Style"}
+    },
+    "padding": {
+      "left": {"label":  "Left"},
+      "top": {"label":  "Top"},
+      "right": {"label":  "Right"},
+      "bottom": {"label":  "Bottom"}
+    }
+  },
+  "widgets": {
+    "button": {
+      "label": {
+        "label": "Button"
+      },
+      "weight": {
+        "label":  "Weight"
+      },
+      "size": {
+        "label":  "Size"
+      },
+      "style": {
+        "label":  "Style"
+      }
+    }
+  }
+}

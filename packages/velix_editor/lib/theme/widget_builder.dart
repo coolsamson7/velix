@@ -1,7 +1,8 @@
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Padding;
 import 'package:velix_di/di/di.dart';
 
+import '../metadata/properties/properties.dart';
 import '../metadata/widget_data.dart';
 import 'theme.dart';
 
@@ -22,6 +23,30 @@ abstract class WidgetBuilder<T extends WidgetData> {
   void setThema(WidgetFactory theme) {
     theme.register(this, name, edit);
   }
+
+  // common functions
+
+  TextStyle? textStyle(Font? font) {
+    if (font != null)
+      return TextStyle(
+        fontSize: font.size.toDouble(),
+        fontWeight: font.weight,
+        fontStyle: font.style,
+      );
+    else return null;
+  }
+
+  EdgeInsets? edgeInsets(Padding? padding) {
+    if ( padding != null)
+      return EdgeInsets.only(
+        left: padding.left.toDouble(),
+        top: padding.top.toDouble(),
+        right: padding.right.toDouble(),
+        bottom: padding.bottom.toDouble(),
+      );
+    else return null;
+  }
+
 
   // abstract
 

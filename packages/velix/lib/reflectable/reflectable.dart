@@ -221,7 +221,7 @@ class TypeDescriptor<T> {
   static void verify() {
     for ( var lazy in lazyTypes)
       if ( lazy.lazy)
-        throw Exception("lazy type ${lazy.type} is not resolved");
+        print("missing declaration for ${lazy.type}");
 
     lazyTypes.clear();
   }

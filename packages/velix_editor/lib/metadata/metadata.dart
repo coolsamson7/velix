@@ -14,13 +14,14 @@ class Property {
   final String label;
   final FieldDescriptor field;
   final String group;
+  final Type? editor;
   final bool hide;
 
   Type get type => field.type.type;
 
   // constructor
 
-  Property({required this.name, required this.field, required this.label, required this.group, required this.hide});
+  Property({required this.name, required this.field, required this.label, required this.group, required this.hide, this.editor});
 
   // public
 

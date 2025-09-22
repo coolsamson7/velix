@@ -49,7 +49,7 @@ class TypeRegistry {
             label = Translator.instance.translate("${property.groupI18N}.label");
           }
 
-          properties.add(Property(name: field.name, label: label, group: group, field: field, hide: property.hide));
+          properties.add(Property(name: field.name, label: label, group: group, field: field, hide: property.hide, editor: property.editor));
         }
       }
 

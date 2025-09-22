@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
+import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/annotations.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 import '../commands/command.dart';
 import '../commands/command_stack.dart';
 import '../commands/property_changed_command.dart';
 import '../metadata/metadata.dart';
 import '../metadata/widget_data.dart';
 import '../util/message_bus.dart';
+import 'editor_builder.dart';
 import 'editor_registry.dart';
 
 /// A generic editor for compound/class properties (like TextStyle)
@@ -49,6 +52,8 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
 
   Command? currentCommand;
   Command? parentCommand;
+
+  late final Environment environment;
 
   dynamic value;
 
@@ -130,7 +135,21 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
     setState(() {});
   }
 
+  PropertyEditorBuilder getBuilder(Property property) {
+    if ( property.editor != null)
+      return environment.get(type: property.editor);
+    else
+      return widget.editorRegistry.getBuilder(property.type)!;
+  }
+
   // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    environment = EnvironmentProvider.of(context);
+  }
 
   @override
   void initState() {

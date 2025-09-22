@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/property_panel/compound_property_editor.dart';
 
 import '../commands/command.dart';
@@ -13,6 +14,7 @@ import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
+import 'editor_builder.dart';
 import 'editor_registry.dart';
 
 class PropertyPanel extends StatefulWidget {
@@ -29,6 +31,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
   WidgetData? selected;
   WidgetDescriptor? widgetDescriptor;
+  late final Environment environment;
   late final MessageBus bus;
   late final CommandStack commandStack;
   late final PropertyEditorBuilderFactory editorRegistry;
@@ -74,11 +77,20 @@ class _PropertyPanelState extends State<PropertyPanel> {
     return commandStack.propertyIsDirty(selected, property.name);
   }
 
+  PropertyEditorBuilder getBuilder(Property property) {
+    if ( property.editor != null)
+      return environment.get(type: property.editor);
+    else
+      return editorRegistry.getBuilder(property.type)!;
+  }
+
+  // override
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    var environment = EnvironmentProvider.of(context);
 
+    environment = EnvironmentProvider.of(context);
     bus = environment.get<MessageBus>();
     typeRegistry = environment.get<TypeRegistry>();
     editorRegistry = environment.get<PropertyEditorBuilderFactory>();
@@ -160,7 +172,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                   child: Column(
                     children: props.map((prop) {
                       final isCompound = TypeDescriptor.hasType(prop.type);
-                      final editorBuilder = isCompound ? null : editorRegistry.getBuilder(prop.type);
+                      final editorBuilder = isCompound ? null : getBuilder(prop);
                       final value = widgetDescriptor!.get(selected!, prop.name);
 
                       return Padding(

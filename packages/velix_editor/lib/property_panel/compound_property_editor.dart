@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
@@ -62,9 +64,9 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
   static Map<TypeDescriptor,Map<String,String>> labels = {};
 
   Map<String,String> getLabels(TypeDescriptor descriptor) {
-    var result =  labels[descriptor];
+    var result = null;// TODO  labels[descriptor];
     if ( result == null) {
-      result = {};
+      result = HashMap<String,String>();
 
       for ( var field in descriptor.getFields()) {
         var annotation = field.findAnnotation<DeclareProperty>();
@@ -162,6 +164,8 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
   Widget build(BuildContext context) {
     var compoundDescriptor = getCompoundDescriptor();
 
+    var labels = getLabels(compoundDescriptor);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: compoundDescriptor.getFields().map((field) {
@@ -178,7 +182,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
                 width: 100,
                 child: Row(
                   children: [
-                    Text(field.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Text(labels[field.name]!, style: const TextStyle(fontWeight: FontWeight.w500)),
                     const SizedBox(width: 4),
                     if (isDirty)
                       GestureDetector(
@@ -199,7 +203,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
               Expanded(
                 child: editorBuilder != null
                     ? editorBuilder.buildEditor(
-                  label: getLabels(compoundDescriptor)[field.name]!,
+                  label: labels[field.name]!,
                   value: value,
                   onChanged: (newVal) => changedProperty(field.name, newVal),
                 )

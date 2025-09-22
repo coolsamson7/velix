@@ -6,6 +6,7 @@ import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
+import 'package:velix_editor/metadata/type_registry.dart';
 
 import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';
@@ -153,7 +154,9 @@ class EditorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final localeManager = context.watch<LocaleManager>();
+    localeManager.addListener(() =>
+        environment.get<TypeRegistry>().changedLocale(localeManager.locale)
+    );
 
     return ChangeNotifierProvider.value(
         value: localeManager,

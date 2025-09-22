@@ -84,24 +84,32 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1E1E1E), // ✅ dark background
+      color: const Color(0xFF1E1E1E), // dark background
       child: PanelContainer(
         title: "JSON",
         onClose: widget.onClose,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal, // ✅ prevent wrapping
-          child: Align(
-            alignment: Alignment.topLeft, // ✅ left aligned
-            child: HighlightView(
-              jsonString,
-              language: 'json',
-              theme: monokaiSublimeTheme, // ✅ dark theme
-              padding: const EdgeInsets.all(12),
-              textStyle: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 14,
+        child: SizedBox.expand(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width,
+                ),
+                child: HighlightView(
+                  jsonString,
+                  language: 'json',
+                  theme: monokaiSublimeTheme,
+                  padding: const EdgeInsets.all(12),
+                  textStyle: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ),

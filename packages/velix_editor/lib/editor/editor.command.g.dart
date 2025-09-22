@@ -12,7 +12,12 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
 
   @override
   void initCommands() {
-    addCommand("open", _open, i18n: 'editor:commands.open', icon: Icons.folder_open);
+    addCommand(
+      "open",
+      _open,
+      i18n: 'editor:commands.open',
+      icon: Icons.folder_open,
+    );
     addCommand("save", _save, label: 'Save', icon: Icons.save);
     addCommand("revert", _revert, label: 'Revert', icon: Icons.restore);
     addCommand("undo", _undo, label: 'Undo', icon: Icons.undo);

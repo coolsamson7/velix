@@ -2,6 +2,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -11,9 +12,12 @@ class Property {
   // instance data
 
   final String name;
-  final String label;
+  final String? i18n;
+  final String? groupI18n;
+  String label;
   final FieldDescriptor field;
   final String group;
+  String groupLabel;
   final Type? editor;
   final bool hide;
 
@@ -21,9 +25,19 @@ class Property {
 
   // constructor
 
-  Property({required this.name, required this.field, required this.label, required this.group, required this.hide, this.editor});
+  Property({required this.name, required this.field, required this.i18n, required this.group, required this.groupI18n, required this.hide, this.editor}) : label = name, groupLabel = group {
+    updateI18n();
+  }
 
   // public
+
+  void updateI18n() {
+    if ( i18n != null)
+      label = Translator.tr("$i18n.label");
+
+    if ( groupI18n != null)
+      groupLabel = Translator.tr("$groupI18n.label");
+  }
 
   dynamic createDefault() {
     switch (type) {
@@ -46,14 +60,19 @@ class WidgetDescriptor {
   // instance data
 
   final String name;
+  final String? i18n;
+  String label;
   final String group;
+  String groupLabel;
   final IconData? icon;
   final TypeDescriptor type;
   List<Property> properties;
 
   // constructor
 
-  WidgetDescriptor({required this.name, required this.group, required this.type, required this.properties, required this.icon});
+  WidgetDescriptor({required this.name, required this.group, required this.type, required this.properties, required this.icon, required this.i18n}) : label = name, groupLabel = group {
+    updateI18n();
+  }
 
   // public
 
@@ -63,6 +82,14 @@ class WidgetDescriptor {
 
   void set(dynamic instance, String property, dynamic value) {
     type.set(instance, property, value);
+  }
+
+  void updateI18n() {
+    if ( i18n!= null)
+      label = Translator.tr(i18n!);
+
+    for ( var property in properties)
+      property.updateI18n();
   }
 
   WidgetData create() {

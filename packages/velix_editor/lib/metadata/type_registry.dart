@@ -1,4 +1,6 @@
 
+import 'dart:ui';
+
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -39,22 +41,13 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          var label = field.name;
-          if (property.i18n != null) {
-            label = Translator.tr("${property.i18n}.label");
-          }
-
-          var group = property.group;
-          if (property.groupI18N != null) {
-            label = Translator.tr("${property.groupI18N}.label");
-          }
-
-          properties.add(Property(name: field.name, label: label, group: group, field: field, hide: property.hide, editor: property.editor));
+          properties.add(Property(name: field.name, i18n: property.i18n, group: property.group, field: field, hide: property.hide, editor: property.editor, groupI18n: property.groupI18N));
         }
       }
 
       var widgetDescriptor = WidgetDescriptor(
         name: declareWidget.name,
+        i18n: declareWidget.i18n,
         icon: declareWidget.icon,
         group: declareWidget.group,
         type: widgetType,
@@ -63,6 +56,13 @@ class TypeRegistry {
 
       register(widgetDescriptor);
     }
+  }
+
+  // internal
+
+  void changedLocale(Locale locale) {
+   for ( var descriptor in this.descriptor.values)
+     descriptor.updateI18n();
   }
 
   // public

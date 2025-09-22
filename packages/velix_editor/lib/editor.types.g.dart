@@ -162,7 +162,7 @@ void registerEditorTypes() {
   );
 
   type<TypeRegistry>(
-    location: 'package:velix_editor/metadata/type_registry.dart:10:1',
+    location: 'package:velix_editor/metadata/type_registry.dart:12:1',
     annotations: [
       Injectable()
     ],
@@ -288,7 +288,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/button.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "button", i18n: "widgets:button", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "button", i18n: "editor:widgets.button.title", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "button")
     ],
     params: [
@@ -332,7 +332,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/container.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "container", i18n: "widgets:container", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "container", i18n: "editor:widgets.container.title", group: "container", icon: Icons.view_column),
       JsonSerializable(discriminator: "container")
     ],
     params: [
@@ -348,7 +348,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/label.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "label", i18n: "widgets:label", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "label", i18n: "editor:widgets.label.title", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "label")
     ],
     params: [
@@ -383,7 +383,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "text", i18n: "widgets:text", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "text", i18n: "editor:widgets.text.title", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "text")
     ],
     params: [

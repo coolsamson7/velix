@@ -76,17 +76,17 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   @override
   void _open() {}
 
-  @Command(label: "Save", icon: Icons.save)
+  @Command(label: "editor:commands.save", icon: Icons.save)
   @override
   void _save() {}
 
-  @Command(label: "Revert", icon: Icons.restore)
+  @Command(label: "editor:commands.revert", icon: Icons.restore)
   @override
   void _revert() {
     commandStack.undo();
   }
 
-  @Command(label: "Undo", icon: Icons.undo)
+  @Command(label: "editor:commands.undo", icon: Icons.undo)
   @override
   void _undo() {
     commandStack.undo();

@@ -7,7 +7,7 @@ import '../properties/properties.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "button", i18n: "widgets:button", group: "widgets", icon: Icons.text_fields)
+@DeclareWidget(name: "button", i18n: "editor:widgets.button.title", group: "widgets", icon: Icons.text_fields)
 @JsonSerializable(discriminator: "button")
 class ButtonWidgetData extends WidgetData {
   // instance data

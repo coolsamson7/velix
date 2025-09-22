@@ -7,7 +7,7 @@ import '../widget_data.dart';
 
 
 @Dataclass()
-@DeclareWidget(name: "container", i18n: "widgets:container", group: "container", icon: Icons.view_column)
+@DeclareWidget(name: "container", i18n: "editor:widgets.container.title", group: "container", icon: Icons.view_column)
 @JsonSerializable(discriminator: "container")
 class ContainerWidgetData extends WidgetData {
   // instance data

@@ -32,9 +32,40 @@
     }
   },
   "widgets": {
+    "label": {
+      "title": "Label",
+      "weight": {
+        "label":  "Weight"
+      },
+      "size": {
+        "label":  "Size"
+      },
+      "style": {
+        "label":  "Style"
+      }
+    },
+
+    "container": {
+      "title": "Container"
+    },
+
+    "text": {
+      "title": "Text",
+      "weight": {
+        "label":  "Weight"
+      },
+      "size": {
+        "label":  "Size"
+      },
+      "style": {
+        "label":  "Style"
+      }
+    },
+
     "button": {
+      "title": "Button",
       "label": {
-        "label": "Button"
+        "label": "Das Label"
       },
       "weight": {
         "label":  "Weight"

@@ -118,7 +118,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
         parent: parentCommand,
         widget: widget.target,
         descriptor: getCompoundDescriptor(),
-        target: widget.value,
+        target: this.value,
         property: property,
         newValue: value,
       ));
@@ -167,7 +167,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
       children: compoundDescriptor.getFields().map((field) {
         final editorBuilder = widget.editorRegistry.getBuilder(field.type.type);
         final value = compoundDescriptor.get(this.value, field.name);
-        final isDirty = widget.commandStack.propertyIsDirty(value, field.name);
+        final isDirty = widget.commandStack.propertyIsDirty(this.value, field.name);
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),

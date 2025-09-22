@@ -200,12 +200,30 @@ class TypeDescriptor<T> {
   static TypeDescriptor forType<T>([Type? type]) {
     final descriptor = _byType[type ?? T];
     if (descriptor == null) {
-      return TypeDescriptor<T>.lazy();
-
-      //throw StateError("No TypeDescriptor registered for type: $type");
+      throw StateError("No TypeDescriptor registered for type: $type");
     }
 
     return descriptor;
+  }
+
+  static List<TypeDescriptor> lazyTypes = [];
+
+  static TypeDescriptor _checkType<T>([Type? type]) {
+    var descriptor = _byType[type ?? T];
+    if (descriptor == null) {
+      descriptor = TypeDescriptor<T>.lazy();
+      lazyTypes.add(descriptor);
+    }
+
+    return descriptor;
+  }
+
+  static void verify() {
+    for ( var lazy in lazyTypes)
+      if ( lazy.lazy)
+        throw Exception("lazy type ${lazy.type} is not resolved");
+
+    lazyTypes.clear();
   }
 
   static bool hasType(Type type) {
@@ -613,7 +631,7 @@ dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
         result = (result as dynamic).optional();
     }
     else {
-      result = ObjectType(TypeDescriptor.forType<T>());
+      result = ObjectType(TypeDescriptor._checkType<T>());
       if ( isNullable )
         result = (result as dynamic).optional();
     }

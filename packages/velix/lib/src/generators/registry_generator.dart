@@ -1290,6 +1290,8 @@ class RegistryAggregator extends Builder {
         }
       }
 
+      buffer.writeln("  TypeDescriptor.verify();");
+
       buffer.writeln('}');
 
       final outputId = buildStep.inputId.changeExtension('.types.g.dart');

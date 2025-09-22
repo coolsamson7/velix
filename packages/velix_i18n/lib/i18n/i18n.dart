@@ -139,12 +139,16 @@ class I18N {
     return fallbackLocales;
   }
 
+  bool isMap(dynamic entry) {
+    return entry.runtimeType.toString().contains("Map");
+  }
+
   T? get<T>(dynamic object, String key, [T? defaultValue]) {
     final path = key.split('.');
     var current = object;
 
     for (final segment in path) {
-      if (current is Map<String, dynamic> && current.containsKey(segment)) {
+      if (/*isMap(current) &&*/ current.containsKey(segment)) {
         current = current[segment];
       }
       else {
@@ -210,12 +214,13 @@ class I18N {
   /// translate a key
   /// [key] a key
   /// [args] any parameters that may be used for interpolation
-  String translate(String key, {Map<String, dynamic>? args}) {
+  String translate(String key, {String? defaultValue, Map<String, dynamic>? args}) {
     var (namespace, path) = _extractNamespace(key);
 
     if (!isLoaded(namespace)) {
       _loadTranslations(namespace, locales);
-      return _missingKeyHandler!(key);
+
+      return defaultValue ?? _missingKeyHandler!(key);
     }
 
     var value = get(_namespaces[namespace], path);
@@ -224,7 +229,7 @@ class I18N {
       return interpolate(value, args: args);
     }
     else
-      return _missingKeyHandler!(key);
+      return defaultValue ?? _missingKeyHandler!(key);
   }
 
   /// translate a key async and wait for the result in case of missing namespaces

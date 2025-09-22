@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:velix_di/di/di.dart';
+import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_ui/commands/command.dart';
 
 
@@ -44,6 +46,8 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   late final CommandStack commandStack;
   bool edit = true;
 
+  late final LocaleManager localeManager;
+
   // internal
 
   bool isDirty() {
@@ -62,9 +66,13 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
     );
   }
 
+  void switchLocale(String locale) {
+    Provider.of<LocaleManager>(context, listen: false).locale = Locale(locale);
+  }
+
   // commands
 
-  @Command(i18n: "commands.open", icon: Icons.folder_open)
+  @Command(i18n: "editor:commands.open", icon: Icons.folder_open)
   @override
   void _open() {}
 
@@ -123,6 +131,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
   @override
   Widget build(BuildContext context) {
+
     return EnvironmentProvider(
       environment: environment,
       child: Column(
@@ -147,8 +156,26 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                   },
                 ),
                 const Spacer(),
-                // Optional: add extra buttons or status indicators
-                Text("Status: Ready", style: TextStyle(color: Colors.grey.shade700)),
+
+                // === Locale Switcher ===
+                Row(
+                  children: [
+                    IconButton(
+                      tooltip: "English",
+                      icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
+                      onPressed: () {
+                        switchLocale("en");
+                      },
+                    ),
+                    IconButton(
+                      tooltip: "Deutsch",
+                      icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
+                      onPressed: () {
+                        switchLocale("en");
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

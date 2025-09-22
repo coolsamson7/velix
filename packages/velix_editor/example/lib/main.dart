@@ -74,6 +74,8 @@ void main() async {
 
   // translation
 
+  VelixTranslator();
+
   TypeViolationTranslationProvider();
 
   var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
@@ -87,7 +89,7 @@ void main() async {
         }
       ),
       missingKeyHandler: (key) => '##$key##',
-      preloadNamespaces: ["validation", "example", "editor"]
+      preloadNamespaces: ["validation", "editor"]
   );
 
   var json = {
@@ -117,7 +119,7 @@ void main() async {
   var widgets = ContainerWidgetData(children: [
     TextWidgetData(label: "eins"),
     ButtonWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
-    LabelWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
+    //LabelWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
     TextWidgetData(label: "zwei"),
     ContainerWidgetData(children: [
       TextWidgetData(label: "drei"),

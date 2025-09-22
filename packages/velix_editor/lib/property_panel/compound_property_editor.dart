@@ -70,7 +70,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
         var annotation = field.findAnnotation<DeclareProperty>();
 
         if ( annotation != null && annotation.i18n != null)
-          result[field.name] = Translator.tr(annotation.i18n!);
+          result[field.name] = Translator.tr("${annotation.i18n}.label");
         else
           result[field.name] = field.name;
       }

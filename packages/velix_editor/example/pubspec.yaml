@@ -41,8 +41,6 @@ flutter:
   assets:
     - assets/locales/en/sample.json
     - assets/locales/de/sample.json
-    #- packages/velix_editor/assets/locales/en/editor.json
-    #- packages/velix_editor/assets/locales/de/editor.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -41,12 +41,12 @@ class TypeRegistry {
         if (property != null) {
           var label = field.name;
           if (property.i18n != null) {
-            label = Translator.instance.translate("${property.i18n}.label");
+            label = Translator.tr("${property.i18n}.label");
           }
 
           var group = property.group;
           if (property.groupI18N != null) {
-            label = Translator.instance.translate("${property.groupI18N}.label");
+            label = Translator.tr("${property.groupI18N}.label");
           }
 
           properties.add(Property(name: field.name, label: label, group: group, field: field, hide: property.hide, editor: property.editor));

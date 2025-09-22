@@ -19,8 +19,8 @@
     }
   },
   "properties": {
-    "font:": {
-      "seize": {"label":  "Size"},
+    "font": {
+      "size": {"label":  "Size"},
       "weight": {"label":  "Weight"},
       "style": {"label":  "Style"}
     },

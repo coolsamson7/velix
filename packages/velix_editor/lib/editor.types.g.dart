@@ -138,7 +138,6 @@ void registerEditorTypes() {
       field<Font,FontWeight>('weight',
         annotations: [
           DeclareProperty(i18n: "editor:properties.font.weight"),
-          Json(converter: FontWeightConvert)
         ],
         getter: (obj) => obj.weight,
         setter: (obj, value) => (obj as Font).weight = value,
@@ -146,7 +145,6 @@ void registerEditorTypes() {
       field<Font,FontStyle>('style',
         annotations: [
           DeclareProperty(i18n: "editor:properties.font.style"),
-          Json(converter: FontStyleConvert)
         ],
         getter: (obj) => obj.style,
         setter: (obj, value) => (obj as Font).style = value,

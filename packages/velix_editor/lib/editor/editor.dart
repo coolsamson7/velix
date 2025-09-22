@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:provider/provider.dart';
 
 import 'package:velix_di/di/di.dart';
@@ -39,6 +40,60 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
+// TEST
+
+LogicalKeySet? parseShortcut(String shortcut) {
+  final parts = shortcut.toLowerCase().split('+').map((s) => s.trim()).toList();
+
+  final keys = <LogicalKeyboardKey>[];
+
+  for (var part in parts) {
+    switch (part) {
+      case 'ctrl':
+      case 'control':
+        keys.add(LogicalKeyboardKey.control);
+        break;
+      case 'shift':
+        keys.add(LogicalKeyboardKey.shift);
+        break;
+      case 'alt':
+        keys.add(LogicalKeyboardKey.alt);
+        break;
+      case 'meta':
+      case 'cmd':
+      case 'command':
+        keys.add(LogicalKeyboardKey.meta);
+        break;
+      default:
+        final letter = part.toUpperCase();
+        if (letter.length == 1) {
+          keys.add(LogicalKeyboardKey(letter.codeUnitAt(0)));
+        } else {
+          // fallback: try lookup by name
+          final key = LogicalKeyboardKey.findKeyByKeyId(letter.hashCode);
+          if (key != null) keys.add(key);
+        }
+    }
+  }
+
+  if (keys.isEmpty) return null;
+  return LogicalKeySet.fromSet(keys.toSet());
+}
+
+class CommandIntent extends Intent {
+  final CommandDescriptor command;
+  const CommandIntent(this.command);
+}
+
+class CommandAction extends Action<CommandIntent> {
+  @override
+  Object? invoke(CommandIntent intent) {
+    return intent.command.execute([]);
+  }
+}
+
+// TEST
+
 class _EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, _EditorScreenStateCommands, TickerProviderStateMixin  {
   // instance data
 
@@ -76,17 +131,17 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   @override
   void _open() {}
 
-  @Command(label: "editor:commands.save", icon: Icons.save)
+  @Command(i18n: "editor:commands.save", icon: Icons.save)
   @override
   void _save() {}
 
-  @Command(label: "editor:commands.revert", icon: Icons.restore)
+  @Command(i18n: "editor:commands.revert", icon: Icons.restore)
   @override
   void _revert() {
     commandStack.undo();
   }
 
-  @Command(label: "editor:commands.undo", icon: Icons.undo)
+  @Command(i18n: "editor:commands.undo", icon: Icons.undo)
   @override
   void _undo() {
     commandStack.undo();
@@ -97,6 +152,16 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   void _play() {
     edit = !edit;
     setState(() {});
+  }
+
+  //
+
+  Map<ShortcutActivator, Intent> computeShortcuts() {
+    return {
+      for (var cmd in getCommands())
+        if (cmd.shortcut != null && parseShortcut(cmd.shortcut!) != null)
+          parseShortcut(cmd.shortcut!)! : CommandIntent(cmd),
+    };
   }
 
   // override
@@ -131,122 +196,132 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
   @override
   Widget build(BuildContext context) {
-
     return EnvironmentProvider(
       environment: environment,
-      child: Column(
-        children: [
-          // ===== Toolbar =====
-          Container(
-            height: 48,
-            color: Colors.grey.shade200,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
+      child: Shortcuts(
+        shortcuts: computeShortcuts(),
+        child: Actions(
+          actions: {
+            CommandIntent: CommandAction(), // a generic action that runs whatever CommandIntent carries
+          },
+          child: FocusScope(
+            autofocus: true,
+            child: Column(
               children: [
-                button("open"),
-                button("save"),
-                button("revert"),
-                button("undo"),
-
-                IconButton(
-                  tooltip: edit ? "Play" : "Stop",
-                  icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
-                  onPressed: () {
-                    play();
-                  },
-                ),
-                const Spacer(),
-
-                // === Locale Switcher ===
-                Row(
-                  children: [
-                    IconButton(
-                      tooltip: "English",
-                      icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
-                      onPressed: () {
-                        switchLocale("en");
-                      },
-                    ),
-                    IconButton(
-                      tooltip: "Deutsch",
-                      icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
-                      onPressed: () {
-                        switchLocale("en");
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // ===== Main Editor =====
-          Expanded(
-            child: Row(
-              children: [
-                DockedPanelSwitcher(
-                  side: DockSide.left,
-                  panels: {
-                    "tree": (onClose) => WidgetTreePanel(models: widget.models, onClose: onClose),
-                    "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
-                    "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
-                  },
-                  icons: {
-                    "tree": Icons.account_tree,
-                    "palette": Icons.widgets,
-                    "json": Icons.code,
-                  },
-                  initialPanel: "tree",
-                ),
-
-                Expanded(
-                  flex: 2,
-                  child: Column(
+                // ===== Toolbar =====
+                Container(
+                  height: 48,
+                  color: Colors.grey.shade200,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
                     children: [
-                      Expanded(
-                        child: edit ?
-                          EditorCanvas(
-                            models: widget.models,
-                            typeRegistry: environment.get<TypeRegistry>(),
-                          ) :
-                          WidgetContainer(
-                            models: widget.models,
-                            typeRegistry: environment.get<TypeRegistry>()
-                          ),
+                      button("open"),
+                      button("save"),
+                      button("revert"),
+                      button("undo"),
+
+                      IconButton(
+                        tooltip: edit ? "Play" : "Stop",
+                        icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
+                        onPressed: () {
+                          play();
+                        },
                       ),
-                      Container(
-                        height: 32,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border(
-                            top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                      const Spacer(),
+
+                      // === Locale Switcher ===
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: "English",
+                            icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
+                            onPressed: () {
+                              switchLocale("en");
+                            },
                           ),
-                        ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: WidgetBreadcrumbWidget(),
-                        ),
+                          IconButton(
+                            tooltip: "Deutsch",
+                            icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
+                            onPressed: () {
+                              switchLocale("de");
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                //Container(width: 300, color: Colors.white, child: PropertyPanel()),
-                DockedPanelSwitcher(
-                  side: DockSide.right,
-                  panels: {
-                    "properties": (onClose) => PropertyPanel(onClose: onClose),
-                  },
-                  icons: {
-                    "properties": Icons.tune,
-                  },
-                  initialPanel: "properties",
-                )
+
+                // ===== Main Editor =====
+                Expanded(
+                  child: Row(
+                    children: [
+                      DockedPanelSwitcher(
+                        side: DockSide.left,
+                        panels: {
+                          "tree": (onClose) => WidgetTreePanel(models: widget.models, onClose: onClose),
+                          "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
+                          "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                        },
+                        icons: {
+                          "tree": Icons.account_tree,
+                          "palette": Icons.widgets,
+                          "json": Icons.code,
+                        },
+                        initialPanel: "tree",
+                      ),
+
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: edit ?
+                              EditorCanvas(
+                                models: widget.models,
+                                typeRegistry: environment.get<TypeRegistry>(),
+                              ) :
+                              WidgetContainer(
+                                  models: widget.models,
+                                  typeRegistry: environment.get<TypeRegistry>()
+                              ),
+                            ),
+                            Container(
+                              height: 32,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: WidgetBreadcrumbWidget(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //Container(width: 300, color: Colors.white, child: PropertyPanel()),
+                      DockedPanelSwitcher(
+                        side: DockSide.right,
+                        panels: {
+                          "properties": (onClose) => PropertyPanel(onClose: onClose),
+                        },
+                        icons: {
+                          "properties": Icons.tune,
+                        },
+                        initialPanel: "properties",
+                      )
+                    ],
+                  ),
+                ),
               ],
-            ),
+            ), // your editor/panel/etc
           ),
-        ],
-      ),
+        ),
+      )
     );
   }
 }

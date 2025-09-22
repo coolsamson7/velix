@@ -55,11 +55,9 @@ class Padding {
 @Dataclass()
 class Font {
   @DeclareProperty(i18n: "editor:properties.font.weight")
-  @Json(converter: FontWeightConvert)
   FontWeight weight;
 
   @DeclareProperty(i18n: "editor:properties.font.style")
-  @Json(converter: FontStyleConvert)
   FontStyle style;
 
   @DeclareProperty(i18n: "editor:properties.font.size")

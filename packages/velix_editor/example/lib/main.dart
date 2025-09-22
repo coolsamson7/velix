@@ -31,8 +31,8 @@ class VelixTranslator extends Translator {
   // implement
 
   @override
-  String translate(String key, {Map<String, dynamic>  args = const {}}) {
-    return I18N.instance.translate(key, args: args);
+  String translate(String key, {String? defaultValue, Map<String, dynamic>  args = const {}}) {
+    return I18N.instance.translate(key, defaultValue: defaultValue, args: args);
   }
 }
 
@@ -70,7 +70,11 @@ void main() async {
 
   JSON(
       validate: false,
-      converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
+      converters: [
+        FontWeightConvert(),
+        FontStyleConvert(),
+        Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))
+      ],
       factories: [Enum2StringFactory()]);
 
   // translation
@@ -79,9 +83,9 @@ void main() async {
 
   TypeViolationTranslationProvider();
 
-  var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
+  var localeManager = LocaleManager(Locale('en'), supportedLocales: [Locale('en'), Locale('de')]);
   var i18n = I18N(
-      fallbackLocale: Locale("en", "EN"),
+      fallbackLocale: Locale("en"),
       localeManager: localeManager,
       loader: AssetTranslationLoader(
         namespacePackageMap: {

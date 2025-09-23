@@ -86,6 +86,7 @@ void main() {
 
       var mapper = Mapper([
         mapping<Polymorph,Polymorph>()
+            .map(from: "base", to: "base", deep: true) // TODO if i forget that, i get runtime errors
             .map(from: "bases", to: "bases", deep: true),
 
         derivedMapping,

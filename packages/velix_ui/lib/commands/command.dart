@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -80,7 +81,7 @@ class CommandDescriptor extends ChangeNotifier {
   // public
 
   /// Always returns a Future, regardless of whether the function is sync or async
-  Future<dynamic> execute(List<dynamic> args) async {
+  Future<dynamic> execute([List<dynamic> args = const []]) async {
     final invocation = Invocation(command: this, args: args);
 
     FutureOr<dynamic> callNext(int index) {
@@ -199,6 +200,56 @@ class CommandManager {
   }
 }
 
+class CommandIntent extends Intent {
+  final CommandDescriptor command;
+  const CommandIntent(this.command);
+}
+
+class CommandAction extends Action<CommandIntent> {
+  @override
+  Object? invoke(CommandIntent intent) {
+    return intent.command.execute();
+  }
+}
+
+LogicalKeySet? parseShortcut(String shortcut) {
+  final parts = shortcut.toLowerCase().split('+').map((s) => s.trim()).toList();
+
+  final keys = <LogicalKeyboardKey>[];
+
+  for (var part in parts) {
+    switch (part) {
+      case 'ctrl':
+      case 'control':
+        keys.add(LogicalKeyboardKey.control);
+        break;
+      case 'shift':
+        keys.add(LogicalKeyboardKey.shift);
+        break;
+      case 'alt':
+        keys.add(LogicalKeyboardKey.alt);
+        break;
+      case 'meta':
+      case 'cmd':
+      case 'command':
+        keys.add(LogicalKeyboardKey.meta);
+        break;
+      default:
+        final letter = part.toUpperCase();
+        if (letter.length == 1) {
+          keys.add(LogicalKeyboardKey(letter.codeUnitAt(0)));
+        } else {
+          // fallback: try lookup by name
+          final key = LogicalKeyboardKey.findKeyByKeyId(letter.hashCode);
+          if (key != null) keys.add(key);
+        }
+    }
+  }
+
+  if (keys.isEmpty) return null;
+  return LogicalKeySet.fromSet(keys.toSet());
+}
+
 /// Mixin class that adds the ability to handle commands
 mixin CommandController<T extends StatefulWidget> on State<T> {
   // instance data
@@ -207,6 +258,14 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
   late CommandManager commandManager;
 
   // public
+
+  Map<ShortcutActivator, Intent> computeShortcuts() {
+    return {
+      for (var cmd in getCommands())
+        if (cmd.shortcut != null && parseShortcut(cmd.shortcut!) != null)
+          parseShortcut(cmd.shortcut!)! : CommandIntent(cmd),
+    };
+  }
 
   /// @internal
   List<CommandDescriptor> getCommands() {

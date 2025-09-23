@@ -27,3 +27,7 @@ export './databinding/widgets/material/registry.dart';
 // provider
 
 export './provider/environment_provider.dart';
+
+// util
+
+export './util/ordered_async_value_notifier.dart';

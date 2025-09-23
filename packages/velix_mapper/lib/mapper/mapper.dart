@@ -904,6 +904,15 @@ class Mapper {
   }
 
   Mapping getMappingX(Type source, Type target) {
+    // TODO
+    bool isMapType(Type t) {
+      return t == Map || t.toString().startsWith('_Map<');
+    }
+
+    if (isMapType(source))
+      source = Map<String,dynamic>;
+
+    // TODO
     var key = MappingKey(source: source, target: target);
     var mapping = mappings[key];
     if (mapping == null) {
@@ -912,6 +921,7 @@ class Mapper {
 
     return mapping;
   }
+
 
   Mapping<S,T> getMapping<S,T>() {
     var key = MappingKey(source: S, target: T);

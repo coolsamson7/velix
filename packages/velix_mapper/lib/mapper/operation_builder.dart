@@ -47,11 +47,10 @@ class MapList2List extends MapperProperty {
       var result = factory();
 
       if ( polymorphic ) {
-        // TODO: hier kommt dasselbe problem, dass ich eine Unterklasse erwischen könnte fuck!
-        //var m = mapping ?? (mapping = mapper.getMappingX(sourceType, targetType)); // TODO...
-
         for (var i = 0; i < len; i++) {
-          result.add(mapper.map(list[i], context: context, mapping: mapper.getMappingX(list[i].runtimeType, targetType)));
+          var element = list[i];
+
+          result.add(mapper.map(element, context: context, mapping: mapper.getMappingX(element.runtimeType, targetType)));
         }
       }
       else {

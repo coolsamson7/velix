@@ -1,7 +1,6 @@
 
 import 'dart:ui';
 
-import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -35,13 +34,13 @@ class TypeRegistry {
     for (var widgetType in types) {
       var declareWidget = widgetType.getAnnotation<DeclareWidget>()!;
 
-      List<Property> properties = [];
+      List<PropertyDescriptor> properties = [];
 
       for (var field in widgetType.getFields()) {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(Property(name: field.name, i18n: property.i18n, group: property.group, field: field, hide: property.hide, editor: property.editor, groupI18n: property.groupI18N));
+          properties.add(PropertyDescriptor(name: field.name, i18n: property.i18n, group: property.group, field: field, hide: property.hide, editor: property.editor, groupI18n: property.groupI18N));
         }
       }
 

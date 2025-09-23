@@ -1,23 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../commands/command.dart';
+import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
 import '../../metadata/properties/properties.dart' as m show Padding;
 
+import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
 @Injectable()
-class PaddingEditorBuilder extends PropertyEditorBuilder<EdgeInsets> {
+class PaddingEditorBuilder extends PropertyEditorBuilder<m.Padding> {
+  // override
+
   @override
   Widget buildEditor({
+    required MessageBus messageBus,
+    required CommandStack commandStack,
+    required FieldDescriptor property,
     required String label,
+    required dynamic object,
     required dynamic value,
     required ValueChanged<dynamic> onChanged,
   }) {
     return PaddingEditor(
+      messageBus: messageBus,
+      commandStack: commandStack,
       label: label,
+      object: object,
+      property: property,
       value: value,
       onChanged: onChanged,
     );
@@ -28,13 +41,22 @@ class PaddingEditor extends StatefulWidget {
   // instance data
 
   final String label;
-  final m.Padding value;
+  final m.Padding? value;
   final ValueChanged<EdgeInsets> onChanged;
+
+  final FieldDescriptor property;
+  final dynamic object;
+  final CommandStack commandStack;
+  final MessageBus messageBus;
 
   // constructor
 
   const PaddingEditor({
     Key? key,
+    required this.messageBus,
+    required this.commandStack,
+    required this.property,
+    required this.object,
     required this.label,
     required this.value,
     required this.onChanged,
@@ -62,9 +84,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
   Command? currentCommand;
   Command? parentCommand;
 
-  late final Environment environment;
-
-  dynamic value;
+  late m.Padding value;
 
   // internal
 
@@ -78,19 +98,21 @@ class _PaddingEditorState extends State<PaddingEditor> {
     return false;
   }
 
-  void changedProperty(String property, dynamic value) {
-    /*set the value
+  void changedProperty(String property) {
+    value = createPadding();
 
-    if ( widget.descriptor.get(widget.target, widget.property.name) == null) {
+    // set the value
+
+    if ( widget.property.get(widget.object) == null) {
       // value is null, set the constructed compound
 
       parentCommand = widget.commandStack.execute(PropertyChangeCommand(
-        bus: widget.bus,
-        widget: widget.target,
-        descriptor: widget.descriptor.type,
-        target: widget.target,
-        property: widget.property.name, // the compound name!
-        newValue: this.value, // the created compound
+        bus: widget.messageBus,
+        widget: widget.object,
+        descriptor: widget.property.typeDescriptor,
+        target: widget.object,
+        property: widget.property.name,
+        newValue: value,
       ));
 
       // how to remember as the new parent?
@@ -98,29 +120,22 @@ class _PaddingEditorState extends State<PaddingEditor> {
 
     if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
       currentCommand = widget.commandStack.execute(PropertyChangeCommand(
-        bus: widget.bus,
+        bus: widget.messageBus,
         parent: parentCommand,
-        widget: widget.target,
-        descriptor: getCompoundDescriptor(),
-        target: this.value,
+        widget: widget.object,
+        descriptor: widget.property.typeDescriptor,
+        target: widget.object,
         property: property,
         newValue: value,
       ));
     }
     else {
       (currentCommand as PropertyChangeCommand).value = value;
-    }*/
-    setState(() {});
-  }
-
-  void _resetProperty(String property) {
-    currentCommand = null;
-    //widget.commandStack.revert(value, property);
+    }
     setState(() {});
   }
 
   // override
-
 
   @override
   void initState() {
@@ -128,10 +143,10 @@ class _PaddingEditorState extends State<PaddingEditor> {
 
     value = widget.value ?? m.Padding();
 
-    topController = TextEditingController(text: widget.value.top.toString());
-    leftController = TextEditingController(text: widget.value.left.toString());
-    rightController = TextEditingController(text: widget.value.right.toString());
-    bottomController = TextEditingController(text: widget.value.bottom.toString());
+    topController = TextEditingController(text: value.top.toString());
+    leftController = TextEditingController(text: value.left.toString());
+    rightController = TextEditingController(text: value.right.toString());
+    bottomController = TextEditingController(text: value.bottom.toString());
 
     topFocus = FocusNode();
     leftFocus = FocusNode();
@@ -144,10 +159,10 @@ class _PaddingEditorState extends State<PaddingEditor> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.value != oldWidget.value) {
-      topController.text = widget.value.top.toString();
-      leftController.text = widget.value.left.toString();
-      rightController.text = widget.value.right.toString();
-      bottomController.text = widget.value.bottom.toString();
+      topController.text = value.top.toString();
+      leftController.text = value.left.toString();
+      rightController.text = value.right.toString();
+      bottomController.text = value.bottom.toString();
     }
   }
 
@@ -166,18 +181,17 @@ class _PaddingEditorState extends State<PaddingEditor> {
     super.dispose();
   }
 
-  void _updatePadding() {
+  m.Padding createPadding() {
     final top = int.tryParse(topController.text) ?? 0;
     final left = int.tryParse(leftController.text) ?? 0;
     final right = int.tryParse(rightController.text) ?? 0;
     final bottom = int.tryParse(bottomController.text) ?? 0;
 
-    final newPadding = m.Padding(left: left, top: top, right: right, bottom: bottom);
-
-    //widget.onChanged(newPadding);
+    return m.Padding(left: left, top: top, right: right, bottom: bottom);
   }
 
   Widget _buildPaddingField({
+    required String name,
     required String prefix,
     required TextEditingController controller,
     required FocusNode focusNode,
@@ -222,8 +236,8 @@ class _PaddingEditorState extends State<PaddingEditor> {
                   ),
                 ),
               ),
-              onChanged: (_) => _updatePadding(),
-              onSubmitted: (_) => _updatePadding(),
+              onChanged: (_) => changedProperty(name),
+              onSubmitted: (_) => changedProperty(name),
             ),
           ),
         ],
@@ -237,42 +251,33 @@ class _PaddingEditorState extends State<PaddingEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Label
-        if (widget.label.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              widget.label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-              ),
-            ),
-          ),
-
         // Padding fields in a row
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildPaddingField(
+              name: "top",
               prefix: 'T',
               controller: topController,
               focusNode: topFocus,
             ),
             const SizedBox(width: 8),
             _buildPaddingField(
+              name: "left",
               prefix: 'L',
               controller: leftController,
               focusNode: leftFocus,
             ),
             const SizedBox(width: 8),
             _buildPaddingField(
+              name: "right",
               prefix: 'R',
               controller: rightController,
               focusNode: rightFocus,
             ),
             const SizedBox(width: 8),
             _buildPaddingField(
+              name: "bottom",
               prefix: 'B',
               controller: bottomController,
               focusNode: bottomFocus,

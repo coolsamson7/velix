@@ -8,7 +8,7 @@ import 'package:velix_mapper/mapper/json.dart';
 
 import 'widget_data.dart';
 
-class Property {
+class PropertyDescriptor {
   // instance data
 
   final String name;
@@ -25,7 +25,7 @@ class Property {
 
   // constructor
 
-  Property({required this.name, required this.field, required this.i18n, required this.group, required this.groupI18n, required this.hide, this.editor}) : label = name, groupLabel = group {
+  PropertyDescriptor({required this.name, required this.field, required this.i18n, required this.group, required this.groupI18n, required this.hide, this.editor}) : label = name, groupLabel = group {
     updateI18n();
   }
 
@@ -66,7 +66,7 @@ class WidgetDescriptor {
   String groupLabel;
   final IconData? icon;
   final TypeDescriptor type;
-  List<Property> properties;
+  List<PropertyDescriptor> properties;
 
   // constructor
 

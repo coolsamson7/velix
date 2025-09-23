@@ -202,6 +202,7 @@ class CommandManager {
 
 class CommandIntent extends Intent {
   final CommandDescriptor command;
+
   const CommandIntent(this.command);
 }
 
@@ -234,21 +235,65 @@ LogicalKeySet? parseShortcut(String shortcut) {
       case 'command':
         keys.add(LogicalKeyboardKey.meta);
         break;
+
+    // arrow keys
+      case 'up':
+      case 'arrowup':
+        keys.add(LogicalKeyboardKey.arrowUp);
+        break;
+      case 'down':
+      case 'arrowdown':
+        keys.add(LogicalKeyboardKey.arrowDown);
+        break;
+      case 'left':
+      case 'arrowleft':
+        keys.add(LogicalKeyboardKey.arrowLeft);
+        break;
+      case 'right':
+      case 'arrowright':
+        keys.add(LogicalKeyboardKey.arrowRight);
+        break;
+
+    // escape, enter, space etc.
+      case 'esc':
+      case 'escape':
+        keys.add(LogicalKeyboardKey.escape);
+        break;
+      case 'enter':
+      case 'return':
+        keys.add(LogicalKeyboardKey.enter);
+        break;
+      case 'space':
+      case 'spacebar':
+        keys.add(LogicalKeyboardKey.space);
+        break;
+
       default:
-        final letter = part.toUpperCase();
-        if (letter.length == 1) {
-          keys.add(LogicalKeyboardKey(letter.codeUnitAt(0)));
-        } else {
-          // fallback: try lookup by name
-          final key = LogicalKeyboardKey.findKeyByKeyId(letter.hashCode);
-          if (key != null) keys.add(key);
+      // check for single character (letters, digits)
+        if (part.length == 1) {
+          final code = part.toUpperCase().codeUnitAt(0);
+          final key = LogicalKeyboardKey(code);
+          keys.add(key);
+        }
+        else {
+          // Fallback: try lookup by keyLabel
+          final match = LogicalKeyboardKey.knownLogicalKeys.firstWhere(
+                (k) => k.keyLabel.toLowerCase() == part,
+            orElse: () => LogicalKeyboardKey.camera, // TODO
+          );
+          if (match != LogicalKeyboardKey.camera) {
+            keys.add(match);
+          }
         }
     }
   }
 
-  if (keys.isEmpty) return null;
+  if (keys.isEmpty)
+    return null;
+
   return LogicalKeySet.fromSet(keys.toSet());
 }
+
 
 /// Mixin class that adds the ability to handle commands
 mixin CommandController<T extends StatefulWidget> on State<T> {

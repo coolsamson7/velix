@@ -83,6 +83,10 @@ class FieldDescriptor<T, V> {
 
   // public
 
+  V get(T object) {
+    return getter(object);
+  }
+
   A? findAnnotation<A>() {
     return findElement(annotations, (annotation) => annotation is A) as A?;
   }

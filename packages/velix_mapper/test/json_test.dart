@@ -14,8 +14,14 @@ void main() {
 
     JSON(
         validate: false,
-        converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
-        factories: [Enum2StringFactory()]);
+        converters: [
+          Convert<DateTime,String>(
+              convertSource: (value) => value.toIso8601String(),
+              convertTarget: (str) => DateTime.parse(str))
+        ],
+        factories: [
+          Enum2StringFactory()
+        ]);
 
     test('map immutable json', () {
       var input = Money(currency: "EU", value: 1);
@@ -27,6 +33,23 @@ void main() {
       expect(isEqual, isTrue);
     });
 
+    test('map enum & date', () {
+      var input = Invoice(
+          date: DateTime.now(),
+          products: [
+            Product(name: "p1", price: Money(currency: "EU", value: 1), status: Status.available),
+          ]
+      );
+
+      // warm up
+
+      var json = JSON.serialize(input);
+
+      var result = JSON.deserialize<Invoice>(json);
+
+      print(result);
+    });
+
     test('map inheritance', () {
       var base = Base(name: "base");
       var derived = Derived(name: "derived", number: 1);
@@ -36,6 +59,15 @@ void main() {
 
       final isEqual = TypeDescriptor.deepEquals(derived, result);
       expect(isEqual, isTrue);
+    });
+
+    test('map polymorph collection', () {
+      var source = PolymorphCollections(bases: [Base(type: "base", name: "base"), Derived(type: "derived", name: "derived", number: 1)]);
+
+      var json = JSON.serialize(source);
+      var result = JSON.deserialize<PolymorphCollections>(json);
+
+      expect(result.bases.length, equals(source.bases.length));
     });
 
     test('map mutable json', () {

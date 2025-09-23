@@ -83,10 +83,10 @@ void registerTypes() {
     ]
   );
 
-  var BaseDescriptor =  type<Base>(
+  var baseDescriptor =  type<Base>(
     location: 'asset:velix_mapper/test/model.dart:85:1',
     annotations: [
-      JsonSerializable(includeNull: true, discriminatorField: "type", discriminator: "derived")
+      JsonSerializable(includeNull: true, discriminatorField: "type", discriminator: "base")
     ],
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
@@ -105,8 +105,25 @@ void registerTypes() {
     ]
   );
 
-  type<Types>(
+  type<PolymorphCollections>(
     location: 'asset:velix_mapper/test/model.dart:102:1',
+    params: [
+      param<List<Base>>('bases', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required List<Base> bases}) => PolymorphCollections(bases: bases),
+    fromMapConstructor: (Map<String,dynamic> args) => PolymorphCollections(bases: args['bases'] as List<Base>),
+    fromArrayConstructor: (List<dynamic> args) => PolymorphCollections(bases: args[0] as List<Base>),
+    fields: [
+      field<PolymorphCollections,List<Base>>('bases',
+        elementType: Base,
+        factoryConstructor: () => <Base>[],
+        getter: (obj) => obj.bases,
+      )
+    ]
+  );
+
+  type<Types>(
+    location: 'asset:velix_mapper/test/model.dart:112:1',
     params: [
       param<int>('int_var', isNamed: true, isRequired: true), 
       param<double>('double_var', isNamed: true, isRequired: true), 
@@ -167,7 +184,7 @@ void registerTypes() {
   );
 
   type<Immutable>(
-    location: 'asset:velix_mapper/test/model.dart:113:1',
+    location: 'asset:velix_mapper/test/model.dart:123:1',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true)
@@ -188,7 +205,7 @@ void registerTypes() {
 
   type<Derived>(
     location: 'asset:velix_mapper/test/model.dart:94:1',
-    superClass: BaseDescriptor,
+    superClass: baseDescriptor,
     annotations: [
       JsonSerializable(includeNull: true, discriminator: "derived")
     ],

@@ -75,6 +75,36 @@ void main() {
       //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
 
+    test('map polymorph collections', () {
+      var baseMapping = mapping<Base,Base>()
+          .map(from: "type", to: "type")
+          .map(from: "name", to: "name");
+
+      var derivedMapping = mapping<Derived,Derived>()
+          .derives(baseMapping)
+          .map(from: "number", to: "number");
+
+      var mapper = Mapper([
+        mapping<PolymorphCollections,PolymorphCollections>()
+            .map(from: "bases", to: "bases", deep: true),
+
+        derivedMapping,
+
+        baseMapping
+      ]);
+
+      var source = PolymorphCollections(bases: [
+        Base(type: "base", name: "base"),
+        Derived(type: "derived", name: "derived", number: 1)
+      ]);
+
+      var result = mapper.map<PolymorphCollections,PolymorphCollections>(source);
+
+      expect(result!.bases.length, equals(2));
+      expect(result.bases[0].runtimeType, equals(Base));
+      expect(result.bases[1].runtimeType, equals(Derived));
+    });
+
     test('map mutable root', () {
       var mapper = Mapper([
         mapping<Mutable,Mutable>()

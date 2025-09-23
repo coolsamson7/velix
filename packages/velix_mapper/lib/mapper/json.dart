@@ -368,7 +368,9 @@ class JSONMapper {
                     includeNull: includeNull,
                     //convert: convert?.sourceConverter()
                 ),
-                deep: convert == null); // index?
+                deep: convert == null,
+                validate: validate
+            ); // index?
           }
         } // if
         else {
@@ -385,7 +387,8 @@ class JSONMapper {
                   type: field.type.type,
                   convert: convert?.sourceConverter(),
                   includeNull: includeNull
-              )
+              ),
+              validate: validate
           );
         }
       }
@@ -419,11 +422,6 @@ class JSONMapper {
 
       var jsonSerializable = typeDescriptor.findAnnotation<JsonSerializable>() ?? JsonSerializable();
 
-      // TEST
-
-
-      // TST
-
       MappingDefinition typeMapping;
 
       if (jsonSerializable.discriminatorField.isNotEmpty)
@@ -432,6 +430,8 @@ class JSONMapper {
         typeMapping = MappingDefinition(sourceClass: Map<String, dynamic>, targetClass: type);
 
       mappings[type] = typeMapping;
+
+      // local function
 
       void check(Type type) {
         if ( !TypeDescriptor.hasType(type) || TypeDescriptor.forType(type).lazy)
@@ -460,6 +460,10 @@ class JSONMapper {
         if ( json.ignore)
           continue;
 
+        var jsonField = json.name;
+        if (jsonField.isEmpty)
+          jsonField = field.name;
+
         Object? defaultValue = JSONAccessor;
         if ( !json.required) {
           defaultValue = json.defaultValue;
@@ -475,7 +479,7 @@ class JSONMapper {
 
           typeMapping.map(
               from: JSONAccessor(
-                  name: json.name,
+                  name: jsonField,
                   type: List<dynamic>,
                   includeNull: includeNull,
                   defaultValue: defaultValue,
@@ -495,20 +499,37 @@ class JSONMapper {
             check(target);
 
             typeMapping.map(
-                from: JSONAccessor(name: json.name, type: Map<String, dynamic>, includeNull: includeNull, defaultValue: defaultValue),
+                from: JSONAccessor(
+                    name: jsonField,
+                    type: Map<String, dynamic>,
+                    includeNull: includeNull,
+                    defaultValue: defaultValue
+                ),
                 to: field.name,
                 deep: true);
           }
           else {
-            Convert? convert = JSON.instance.getConvert(field.type.type);
+            // manual converter?
 
-            typeMapping.map(from: JSONAccessor(name: json.name,
-                type: field.type.type,
-                convert: convert?.targetConverter(),
-                includeNull: includeNull,
-                defaultValue: defaultValue),
+            Convert? convert ;
+            if ( json.converter != null) {
+              convert = JSON.getConvert4(json.converter!);
+            }
+            else convert = JSON.instance.getConvert(field.type.type);
+
+            typeMapping.map(
+                convert: convert,
+                from: JSONAccessor(
+                    name: jsonField,
+                    type: field.type.type,
+                    //convert: convert?.targetConverter(),
+                    includeNull: includeNull,
+                    defaultValue: defaultValue
+                ),
                 to: field.name,
-                validate: validate);
+                deep: convert == null,
+                validate: validate
+            );
           }
 
         } // if
@@ -519,13 +540,17 @@ class JSONMapper {
           }
           else convert = JSON.instance.getConvert(field.type.type);
 
-          typeMapping.map(from: JSONAccessor(name: json.name,
-              type: field.type.type,
-              convert: convert?.targetConverter(),
-              includeNull: includeNull,
-              defaultValue: defaultValue),
+          typeMapping.map(
+              from: JSONAccessor(
+                  name: jsonField,
+                  type: field.type.type,
+                  convert: convert?.targetConverter(),
+                  includeNull: includeNull,
+                  defaultValue: defaultValue
+              ),
               to: field.name,
-            validate: validate);
+              validate: validate
+          );
         }
       }
 

@@ -27,16 +27,17 @@ class EditorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    localeManager.addListener(() =>
+    i18n.addListenerAsync((state) =>
         environment.get<TypeRegistry>().changedLocale(localeManager.locale)
     );
 
     return ChangeNotifierProvider.value(
-        value: localeManager,
+        value: i18n,
         child: EnvironmentProvider(
             environment: environment,
             child:  MultiProvider(
                 providers: [
+                  Provider<LocaleManager>(create: (_) => localeManager),
                   Provider<CommandManager>(create: (_) => CommandManager(
                       interceptors: [
                         LockCommandInterceptor(),
@@ -44,8 +45,8 @@ class EditorApp extends StatelessWidget {
                       ]
                   )),
                 ],
-                child: Consumer<LocaleManager>(
-                    builder: (BuildContext context, LocaleManager value, Widget? child) {
+                child: Consumer<I18N>(
+                    builder: (BuildContext context, I18N value, Widget? child) {
                       return MaterialApp(
                         title: 'Editor',
 

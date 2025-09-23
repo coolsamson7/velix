@@ -193,8 +193,12 @@ class WidgetTreeView extends StatefulWidget {
 }
 
 class _WidgetTreeViewState extends State<WidgetTreeView> {
-  late final Environment environment;
+  // instance data
+
+  late Environment environment;
   final FocusNode _focusNode = FocusNode();
+
+  // override
 
   @override
   void initState() {

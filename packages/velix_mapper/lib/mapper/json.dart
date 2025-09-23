@@ -388,7 +388,7 @@ class JSONMapper {
                   convert: convert?.sourceConverter(),
                   includeNull: includeNull
               ),
-              validate: validate
+              //validate: validate
           );
         }
       }
@@ -506,7 +506,8 @@ class JSONMapper {
                     defaultValue: defaultValue
                 ),
                 to: field.name,
-                deep: true);
+                deep: true
+            );
           }
           else {
             // manual converter?
@@ -518,17 +519,17 @@ class JSONMapper {
             else convert = JSON.instance.getConvert(field.type.type);
 
             typeMapping.map(
-                convert: convert,
+                //convert: convert,
                 from: JSONAccessor(
                     name: jsonField,
                     type: field.type.type,
-                    //convert: convert?.targetConverter(),
+                    convert: convert?.targetConverter(),
                     includeNull: includeNull,
                     defaultValue: defaultValue
                 ),
                 to: field.name,
                 deep: convert == null,
-                validate: validate
+                //validate: validate
             );
           }
 
@@ -549,6 +550,7 @@ class JSONMapper {
                   defaultValue: defaultValue
               ),
               to: field.name,
+              //convert: convert,
               validate: validate
           );
         }
@@ -576,10 +578,6 @@ class JSONMapper {
 
   Map<String,dynamic> serialize(dynamic instance) {
     return serializer.map(instance, mapping: serializerMapping);
-  }
-
-  V _deserialize<V>(Map<String,dynamic> json) {
-    return deserializer.map(json, mapping: deserializerMapping);
   }
 
   V deserialize<V>(Map<String,dynamic> json) {

@@ -62,10 +62,15 @@ void main() {
     });
 
     test('map polymorph collection', () {
-      var source = PolymorphCollections(bases: [Base(type: "base", name: "base"), Derived(type: "derived", name: "derived", number: 1)]);
+      var source = Polymorph(
+          base: Derived(type: "derived", name: "d1", number: 1),
+          bases: [
+            Base(type: "base", name: "base"),
+            Derived(type: "derived", name: "d2", number: 1)
+          ]);
 
       var json = JSON.serialize(source);
-      var result = JSON.deserialize<PolymorphCollections>(json);
+      var result = JSON.deserialize<Polymorph>(json);
 
       expect(result.bases.length, equals(source.bases.length));
     });

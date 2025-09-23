@@ -105,25 +105,8 @@ void registerTypes() {
     ]
   );
 
-  type<PolymorphCollections>(
-    location: 'asset:velix_mapper/test/model.dart:102:1',
-    params: [
-      param<List<Base>>('bases', isNamed: true, isRequired: true)
-    ],
-    constructor: ({required List<Base> bases}) => PolymorphCollections(bases: bases),
-    fromMapConstructor: (Map<String,dynamic> args) => PolymorphCollections(bases: args['bases'] as List<Base>),
-    fromArrayConstructor: (List<dynamic> args) => PolymorphCollections(bases: args[0] as List<Base>),
-    fields: [
-      field<PolymorphCollections,List<Base>>('bases',
-        elementType: Base,
-        factoryConstructor: () => <Base>[],
-        getter: (obj) => obj.bases,
-      )
-    ]
-  );
-
   type<Types>(
-    location: 'asset:velix_mapper/test/model.dart:112:1',
+    location: 'asset:velix_mapper/test/model.dart:114:1',
     params: [
       param<int>('int_var', isNamed: true, isRequired: true), 
       param<double>('double_var', isNamed: true, isRequired: true), 
@@ -184,7 +167,7 @@ void registerTypes() {
   );
 
   type<Immutable>(
-    location: 'asset:velix_mapper/test/model.dart:123:1',
+    location: 'asset:velix_mapper/test/model.dart:125:1',
     params: [
       param<String>('id', isNamed: true, isRequired: true), 
       param<Money>('price', isNamed: true, isRequired: true)
@@ -224,6 +207,27 @@ void registerTypes() {
     ]
   );
 
+  type<Polymorph>(
+    location: 'asset:velix_mapper/test/model.dart:102:1',
+    params: [
+      param<List<Base>>('bases', isNamed: true, isRequired: true), 
+      param<Base>('base', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required List<Base> bases, required Base base}) => Polymorph(bases: bases, base: base),
+    fromMapConstructor: (Map<String,dynamic> args) => Polymorph(bases: args['bases'] as List<Base>, base: args['base'] as Base),
+    fromArrayConstructor: (List<dynamic> args) => Polymorph(bases: args[0] as List<Base>, base: args[1] as Base),
+    fields: [
+      field<Polymorph,List<Base>>('bases',
+        elementType: Base,
+        factoryConstructor: () => <Base>[],
+        getter: (obj) => obj.bases,
+      ), 
+      field<Polymorph,Base>('base',
+        getter: (obj) => obj.base,
+      )
+    ]
+  );
+
   type<Product>(
     location: 'asset:velix_mapper/test/model.dart:40:1',
     params: [
@@ -250,4 +254,5 @@ void registerTypes() {
     ]
   );
 
+  TypeDescriptor.verify();
 }

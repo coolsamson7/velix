@@ -100,13 +100,15 @@ class Derived extends Base {
 }
 
 @Dataclass()
-class PolymorphCollections {
+class Polymorph {
   // instance data
 
   @Attribute()
   final List<Base> bases;
+  @Attribute()
+  final Base base;
 
-  const PolymorphCollections({required this.bases});
+  const Polymorph({required this.bases, required this.base});
 }
 
 @Dataclass()

@@ -439,8 +439,8 @@ class JSONMapper {
         if ( !json.required) {
           defaultValue = json.defaultValue;
 
-          if ( !field.type.isValid(defaultValue))
-            throw MapperException("the default $defaultValue for ${field.name} is not valid");
+          //if ( !field.type.isValid(defaultValue))
+          //  throw MapperException("the default $defaultValue for ${field.name} is not valid");
         }
 
         if (field.type is ListType) {
@@ -449,7 +449,13 @@ class JSONMapper {
           check(elementType!);
 
           typeMapping.map(
-              from: JSONAccessor(name: json.name, type: List<dynamic>, includeNull: includeNull, defaultValue: defaultValue, containerConstructor: () => []),
+              from: JSONAccessor(
+                  name: json.name,
+                  type: List<dynamic>,
+                  includeNull: includeNull,
+                  defaultValue: defaultValue,
+                  containerConstructor: () => []
+              ),
               to: field.name,
               deep: true,
               validate: validate

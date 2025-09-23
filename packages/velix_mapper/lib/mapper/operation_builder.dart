@@ -27,13 +27,9 @@ class MapList2List extends MapperProperty {
 
   MapList2List({required this.mapper, required this.sourceType, required this.targetType, required this.property, required this.factory}) {
     // check if polymorphic
+
     if ( TypeDescriptor.hasType(sourceType)) {
-      for ( var childClass in TypeDescriptor.forType(sourceType).childClasses) {
-        if (mapper.hasDefinition(childClass.type, targetType)) {
-          polymorphic = true;
-          break;
-        }
-      }
+      polymorphic = TypeDescriptor.forType(sourceType).childClasses.isNotEmpty;
     }
   }
 
@@ -50,7 +46,7 @@ class MapList2List extends MapperProperty {
         for (var i = 0; i < len; i++) {
           var element = list[i];
 
-          result.add(mapper.map(element, context: context, mapping: mapper.getMappingX(element.runtimeType, targetType)));
+          result.add(mapper.map(element, context: context, mapping: mapper.getSourceMapping(element.runtimeType))); // TODO validate target?
         }
       }
       else {
@@ -84,13 +80,14 @@ class MapDeep extends MapperProperty {
   final MapperProperty targetProperty;
   final Mapper mapper;
   Mapping? mapping;
+  bool polymorph = false;
 
   // constructor
 
   MapDeep({required this.mapper, required this.sourceType, required this.targetProperty}) {
-    //mapping = mapper.getMappingX(sourceType, targetProperty.getType());
+    if ( TypeDescriptor.hasType(sourceType))
+      polymorph = TypeDescriptor.forType(sourceType).childClasses.isNotEmpty;
   }
-
 
   // override AccessorValue
 
@@ -101,8 +98,18 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    var m = mapper.getMappingX(sourceType, targetProperty.getType()); // TODO
-    targetProperty.set(instance, mapper.map(value, context: context, mapping: m), context); // recursive call!
+    if (polymorph) {
+      var m = mapper.getSourceMapping(value.runtimeType); // TODO: validate target type?
+      targetProperty.set(
+          instance, mapper.map(value, context: context, mapping: m),
+          context); // recursive call!
+    }
+    else {
+      mapping ??= mapper.getMappingX(sourceType, targetProperty.getType());
+      targetProperty.set(
+          instance, mapper.map(value, context: context, mapping: mapping),
+          context); // recursive call!
+    }
   }
 
   @override

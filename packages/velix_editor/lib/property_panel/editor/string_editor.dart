@@ -3,8 +3,6 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
-import '../../metadata/metadata.dart';
-import '../../metadata/widget_data.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 

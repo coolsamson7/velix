@@ -95,7 +95,7 @@ class I18N {
         _missingKeyHandler = missingKeyHandler {
     instance = this;
 
-    localeManager.addListener(() => _reloadTranslations());
+    localeManager.addListener(() => load());
 
     // remember preload namespaces
 
@@ -179,7 +179,7 @@ class I18N {
     return _namespaces[namespace] != null;
   }
 
-  Future<void> _reloadTranslations() async {
+  Future<void> load() async {
     locales = _buildFallbackLocales(locale, fallbackLocale);
     final futures = _namespaces.keys.map((ns) => _loadTranslations(ns, locales).catchError((e) { /* TODO */}));
 
@@ -271,7 +271,7 @@ class I18nDelegate extends LocalizationsDelegate<I18N> {
 
   @override
   Future<I18N> load(Locale locale) async {
-    await i18n._reloadTranslations();
+    await i18n.load();
 
     return i18n;
   }

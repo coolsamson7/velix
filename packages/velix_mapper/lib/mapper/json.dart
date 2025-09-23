@@ -277,6 +277,9 @@ class JSONMapper {
     // local function
 
     void check(Type type) {
+      if ( !TypeDescriptor.hasType(type) || TypeDescriptor.forType(type).lazy)
+        return;
+
       // own class
 
       if (!mappings.containsKey(type)) {
@@ -306,6 +309,10 @@ class JSONMapper {
         if ( json.ignore)
           continue;
 
+        var jsonField = json.name;
+        if (jsonField.isEmpty)
+          jsonField = field.name;
+
         if (field.type is ListType) {
           var elementType = field.elementType;
 
@@ -313,8 +320,14 @@ class JSONMapper {
 
           typeMapping.map(
               from: field.name,
-              to: JSONAccessor(name: json.name, type: Map<String, dynamic>, includeNull: includeNull, containerConstructor: () => []),
-              deep: true); // index?
+              to: JSONAccessor(
+                  name: jsonField,
+                  type: Map<String, dynamic>,
+                  includeNull: includeNull,
+                  containerConstructor: () => []
+              ),
+              deep: true
+          ); // index?
         }
         else if ( field.type is ObjectType) {
           var objectType = field.type as ObjectType;
@@ -322,16 +335,18 @@ class JSONMapper {
           if ( objectType.typeDescriptor.isEnum()) {
             Convert? convertSource = JSON.instance.getConvert(field.type.type);
 
-            typeMapping.map(from: field.name,
-                to: JSONAccessor(name: json.name,
+            typeMapping.map(
+                from: field.name,
+                to: JSONAccessor(
+                    name: jsonField,
                     type: field.type.type,
                     convert: convertSource?.sourceConverter(),
-                    includeNull: includeNull));
+                    includeNull: includeNull
+                )
+            );
           }
           else {
             var target = objectType.type;
-
-            check(target);
 
             // manual converter?
 
@@ -339,18 +354,21 @@ class JSONMapper {
             if ( json.converter != null) {
               convert = JSON.getConvert4(json.converter!);
             }
+            else convert = JSON.instance.getConvert(field.type.type);
 
-            // TODO : what the fuck, whet does the convert go?
+            if ( convert == null)
+              check(target);
+
             typeMapping.map(
-                //convert: convert,
+                convert: convert,
                 from: field.name,
                 to: JSONAccessor(
-                    name: json.name,
+                    name: jsonField,
                     type: Map<String, dynamic>,
                     includeNull: includeNull,
-                    convert: convert?.sourceConverter()
+                    //convert: convert?.sourceConverter()
                 ),
-                deep: true); // index?
+                deep: convert == null); // index?
           }
         } // if
         else {
@@ -360,11 +378,15 @@ class JSONMapper {
           }
           else convert = JSON.instance.getConvert(field.type.type);
 
-          typeMapping.map(from: field.name,
-              to: JSONAccessor(name: json.name,
+          typeMapping.map(
+              from: field.name,
+              to: JSONAccessor(
+                  name: jsonField,
                   type: field.type.type,
                   convert: convert?.sourceConverter(),
-                  includeNull: includeNull));
+                  includeNull: includeNull
+              )
+          );
         }
       }
 
@@ -412,6 +434,9 @@ class JSONMapper {
       mappings[type] = typeMapping;
 
       void check(Type type) {
+        if ( !TypeDescriptor.hasType(type) || TypeDescriptor.forType(type).lazy)
+          return;
+
         if (!mappings.containsKey(type)) {
           queue.add(type);
 

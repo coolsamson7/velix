@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/validation/validation.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../commands/command.dart';
@@ -125,7 +126,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
         widget: widget.object,
         descriptor: widget.property.typeDescriptor,
         target: widget.object,
-        property: property,
+        property: widget.property.name,
         newValue: value,
       ));
     }
@@ -159,6 +160,11 @@ class _PaddingEditorState extends State<PaddingEditor> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.value != oldWidget.value) {
+      value = widget.value ?? m.Padding();
+
+      parentCommand = null;
+      currentCommand = null;
+
       topController.text = value.top.toString();
       leftController.text = value.left.toString();
       rightController.text = value.right.toString();

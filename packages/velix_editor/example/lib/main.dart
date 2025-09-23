@@ -11,7 +11,6 @@ import 'package:velix_editor/metadata/type_registry.dart';
 import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
-import 'package:velix_editor/metadata/widgets/label.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';

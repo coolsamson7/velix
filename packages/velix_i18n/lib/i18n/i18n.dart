@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:velix/util/ordered_async_value_notifier.dart';
 import 'interpolator.dart';
 import 'locale.dart';
 
@@ -50,8 +51,14 @@ abstract class TranslationLoader {
   Future<Map<String, dynamic>> load(List<Locale> locales, String namespace);
 }
 
+class I18NState {
+  I18N? i18n;
+
+  I18NState({required this.i18n});
+}
+
 ///  I18n is a central singleton that controls the overall localization process.
-class I18N {
+class I18N extends OrderedAsyncValueNotifier<I18NState> {
   // static data
 
   /// the singleton instance
@@ -92,7 +99,7 @@ class I18N {
       :_interpolator = Interpolator(cacheSize: cacheSize, formatters: formatters),
         _localeManager = localeManager,
         _loader = loader,
-        _missingKeyHandler = missingKeyHandler {
+        _missingKeyHandler = missingKeyHandler , super(I18NState(i18n: null)){
     instance = this;
 
     localeManager.addListener(() => load());
@@ -184,6 +191,8 @@ class I18N {
     final futures = _namespaces.keys.map((ns) => _loadTranslations(ns, locales).catchError((e) { /* TODO */}));
 
     await Future.wait(futures);
+
+    await updateValue(I18NState(i18n: this));
   }
 
   Future<void> _loadTranslations(String namespace, List<Locale> locales) async {

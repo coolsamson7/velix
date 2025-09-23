@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:velix/util/tracer.dart';
 
-/// A [LocaleManager] keeps track of the current locale abd can notify listeners about changes,.
+/// A [LocaleManager] keeps track of the current locale and can notify listeners about changes,.
 class LocaleManager extends ChangeNotifier {
   // instance data
 
@@ -17,7 +17,7 @@ class LocaleManager extends ChangeNotifier {
   /// [supportedLocales] optional list of supported locales
   LocaleManager(Locale locale, {List<Locale>? supportedLocales }) : _currentLocale = locale, supportedLocales = supportedLocales ?? [] {
     Intl.defaultLocale = _currentLocale.toString();
-}
+  }
 
   // public
 

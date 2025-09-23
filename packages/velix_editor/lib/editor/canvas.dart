@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../edit_widget.dart';
 import '../metadata/type_registry.dart';
@@ -44,8 +45,35 @@ class _EditorCanvasState extends State<EditorCanvas> {
   // instance data
 
   TypeRegistry? typeRegistry;
+  final FocusNode _focusNode = FocusNode();
+
+  // internal
+
+  void _handleKey(RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      final logicalKey = event.logicalKey;
+
+      if (logicalKey == LogicalKeyboardKey.arrowUp) {
+        print("Arrow Up pressed");
+      } else if (logicalKey == LogicalKeyboardKey.arrowDown) {
+        print("Arrow Down pressed");
+      } else if (logicalKey == LogicalKeyboardKey.arrowLeft) {
+        print("Arrow Left pressed");
+      } else if (logicalKey == LogicalKeyboardKey.arrowRight) {
+        print("Arrow Right pressed");
+      }
+    }
+  }
 
   // override
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +88,20 @@ class _EditorCanvasState extends State<EditorCanvas> {
         setState(() {});
       },
       builder: (context, candidateData, rejectedData) {
-        return Container(
-          color: Colors.grey.shade200,
-          child: ListView(
-            children: widget.models
-                .map((m) => Padding(
+        return RawKeyboardListener(
+            focusNode: _focusNode,
+            autofocus: true,
+            onKey: _handleKey,
+            child: Container(
+              color: Colors.grey.shade200,
+              child: ListView(
+              children: widget.models.map((m) => Padding(
                       padding: const EdgeInsets.all(8.0), // TODO?
                       child: EditWidget(model: m),
                     ),
-            )
-                .toList(),
+              ).toList(),
           ),
+        )
         );
       },
     );

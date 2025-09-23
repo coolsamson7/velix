@@ -493,7 +493,13 @@ class JSONMapper {
         else if ( field.type is ObjectType) {
           var objectType = field.type as ObjectType;
 
-          if ( !objectType.typeDescriptor.isEnum()) {
+          Convert? convert ;
+          if ( json.converter != null) {
+            convert = JSON.getConvert4(json.converter!);
+          }
+          else convert = JSON.instance.getConvert(field.type.type);
+
+          if ( !objectType.typeDescriptor.isEnum() && convert == null) {
             var target = objectType.type;
 
             check(target);
@@ -511,12 +517,6 @@ class JSONMapper {
           }
           else {
             // manual converter?
-
-            Convert? convert ;
-            if ( json.converter != null) {
-              convert = JSON.getConvert4(json.converter!);
-            }
-            else convert = JSON.instance.getConvert(field.type.type);
 
             typeMapping.map(
                 //convert: convert,

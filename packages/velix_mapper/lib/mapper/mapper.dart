@@ -871,6 +871,7 @@ class Mapper {
 
   List<MappingDefinition> mappingDefinitions;
   Map<MappingKey, Mapping> mappings = HashMap<MappingKey,Mapping>();
+  Map<Type, Mapping> bySourceTypeMappings = HashMap<Type,Mapping>();
   bool checkCycles = false;
 
   // constructor
@@ -903,7 +904,47 @@ class Mapper {
     return false;
   }
 
+  Mapping getSourceMapping(Type source) {
+    /* TODO
+
+    bool isMapType(Type t) {
+      return t == Map || t.toString().startsWith('_Map<');
+    }
+
+    if (isMapType(source))
+      source = Map<String,dynamic>;
+
+    */
+
+    var mapping = bySourceTypeMappings[source];
+    if (mapping == null) {
+      for ( var m in mappings.values) {
+        if (m.definition.sourceClass == source) {
+          bySourceTypeMappings[source] = m;
+
+          return m;
+        }
+      } // for
+
+      throw MapperException("no mapping for source type $source");
+    }
+    else return mapping;
+
+
+  }
+
   Mapping getMappingX(Type source, Type target) {
+    // TODO
+
+    bool isMapType(Type t) {
+      return t == Map || t.toString().startsWith('_Map<');
+    }
+
+    if (isMapType(source))
+      source = Map<String,dynamic>;
+
+    // TODO
+
     var key = MappingKey(source: source, target: target);
     var mapping = mappings[key];
     if (mapping == null) {
@@ -912,6 +953,7 @@ class Mapper {
 
     return mapping;
   }
+
 
   Mapping<S,T> getMapping<S,T>() {
     var key = MappingKey(source: S, target: T);

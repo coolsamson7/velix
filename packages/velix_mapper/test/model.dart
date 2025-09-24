@@ -83,7 +83,7 @@ class Money {
 }
 
 @Dataclass()
-@JsonSerializable(includeNull: true, discriminatorField: "type", discriminator: "derived")
+@JsonSerializable(includeNull: true, discriminatorField: "type", discriminator: "base")
 class Base {
   final String type;
   final String name;
@@ -97,6 +97,18 @@ class Derived extends Base {
   final int number;
 
   Derived({required super.name, required this.number, super.type = "derived"});
+}
+
+@Dataclass()
+class Polymorph {
+  // instance data
+
+  @Attribute()
+  final List<Base> bases;
+  @Attribute()
+  final Base base;
+
+  const Polymorph({required this.bases, required this.base});
 }
 
 @Dataclass()

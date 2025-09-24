@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -45,6 +46,8 @@ class CommandDescriptor extends ChangeNotifier {
   final String name;
   final String? i18n;
   late String? label;
+  late String? shortcut;
+  late String? tooltip;
   late IconData? icon;
   final LockType lock;
   final List<CommandInterceptor> _interceptors = [];
@@ -63,7 +66,7 @@ class CommandDescriptor extends ChangeNotifier {
 
   // constructor
 
-  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.lock = LockType.command});
+  CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.shortcut, this.tooltip, this.lock = LockType.command});
 
   // administrative
 
@@ -78,7 +81,7 @@ class CommandDescriptor extends ChangeNotifier {
   // public
 
   /// Always returns a Future, regardless of whether the function is sync or async
-  Future<dynamic> execute(List<dynamic> args) async {
+  Future<dynamic> execute([List<dynamic> args = const []]) async {
     final invocation = Invocation(command: this, args: args);
 
     FutureOr<dynamic> callNext(int index) {
@@ -167,14 +170,22 @@ class CommandManager {
   CommandDescriptor createCommand(String name, Function function, {String? i18n, String? label, IconData? icon, LockType lock = LockType.command}) {
     if ( label == null) {
       if (i18n != null) {
-        label = Translator.instance.translate(i18n);
+        label = Translator.tr("$i18n.label");
       }
       else {
         label = name;
       }
     }
 
-    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, label: label, icon: icon, lock: lock);
+    var shortcut = "";
+    var tooltip = "";
+
+    if ( i18n != null) {
+      shortcut = Translator.tr("$i18n.shortcut", defaultValue: "");
+      tooltip = Translator.tr("$i18n.tooltip", defaultValue: "");
+    }
+
+    CommandDescriptor command = CommandDescriptor(name: name, function: function, i18n: i18n, shortcut: shortcut, tooltip: tooltip, label: label, icon: icon, lock: lock);
 
     // add standard interceptors
 
@@ -189,6 +200,101 @@ class CommandManager {
   }
 }
 
+class CommandIntent extends Intent {
+  final CommandDescriptor command;
+
+  const CommandIntent(this.command);
+}
+
+class CommandAction extends Action<CommandIntent> {
+  @override
+  Object? invoke(CommandIntent intent) {
+    return intent.command.execute();
+  }
+}
+
+LogicalKeySet? parseShortcut(String shortcut) {
+  final parts = shortcut.toLowerCase().split('+').map((s) => s.trim()).toList();
+
+  final keys = <LogicalKeyboardKey>[];
+
+  for (var part in parts) {
+    switch (part) {
+      case 'ctrl':
+      case 'control':
+        keys.add(LogicalKeyboardKey.control);
+        break;
+      case 'shift':
+        keys.add(LogicalKeyboardKey.shift);
+        break;
+      case 'alt':
+        keys.add(LogicalKeyboardKey.alt);
+        break;
+      case 'meta':
+      case 'cmd':
+      case 'command':
+        keys.add(LogicalKeyboardKey.meta);
+        break;
+
+    // arrow keys
+      case 'up':
+      case 'arrowup':
+        keys.add(LogicalKeyboardKey.arrowUp);
+        break;
+      case 'down':
+      case 'arrowdown':
+        keys.add(LogicalKeyboardKey.arrowDown);
+        break;
+      case 'left':
+      case 'arrowleft':
+        keys.add(LogicalKeyboardKey.arrowLeft);
+        break;
+      case 'right':
+      case 'arrowright':
+        keys.add(LogicalKeyboardKey.arrowRight);
+        break;
+
+    // escape, enter, space etc.
+      case 'esc':
+      case 'escape':
+        keys.add(LogicalKeyboardKey.escape);
+        break;
+      case 'enter':
+      case 'return':
+        keys.add(LogicalKeyboardKey.enter);
+        break;
+      case 'space':
+      case 'spacebar':
+        keys.add(LogicalKeyboardKey.space);
+        break;
+
+      default:
+      // check for single character (letters, digits)
+        if (part.length == 1) {
+          final code = part.toUpperCase().codeUnitAt(0);
+          final key = LogicalKeyboardKey(code);
+          keys.add(key);
+        }
+        else {
+          // Fallback: try lookup by keyLabel
+          final match = LogicalKeyboardKey.knownLogicalKeys.firstWhere(
+                (k) => k.keyLabel.toLowerCase() == part,
+            orElse: () => LogicalKeyboardKey.camera, // TODO
+          );
+          if (match != LogicalKeyboardKey.camera) {
+            keys.add(match);
+          }
+        }
+    }
+  }
+
+  if (keys.isEmpty)
+    return null;
+
+  return LogicalKeySet.fromSet(keys.toSet());
+}
+
+
 /// Mixin class that adds the ability to handle commands
 mixin CommandController<T extends StatefulWidget> on State<T> {
   // instance data
@@ -197,6 +303,14 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
   late CommandManager commandManager;
 
   // public
+
+  Map<ShortcutActivator, Intent> computeShortcuts() {
+    return {
+      for (var cmd in getCommands())
+        if (cmd.shortcut != null && parseShortcut(cmd.shortcut!) != null)
+          parseShortcut(cmd.shortcut!)! : CommandIntent(cmd),
+    };
+  }
 
   /// @internal
   List<CommandDescriptor> getCommands() {

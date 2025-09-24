@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, Padding;
 import 'package:velix_di/di/di.dart';
 
-import '../../metadata/properties/properties.dart';
 import '../../metadata/widgets/button.dart';
 import '../widget_builder.dart';
 

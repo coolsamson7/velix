@@ -67,21 +67,21 @@ class _PropertyPanelState extends State<PropertyPanel> {
     setState(() {});
   }
 
-  void _resetProperty(Property property) {
+  void _resetProperty(PropertyDescriptor property) {
     currentCommand = null;
     commandStack.revert(selected, property.name);
     setState(() {});
   }
 
-  bool isPropertyDirty(Property property) {
+  bool isPropertyDirty(PropertyDescriptor property) {
     return commandStack.propertyIsDirty(selected, property.name);
   }
 
-  PropertyEditorBuilder getBuilder(Property property) {
+  PropertyEditorBuilder? getBuilder(PropertyDescriptor property) {
     if ( property.editor != null)
       return environment.get(type: property.editor);
     else
-      return editorRegistry.getBuilder(property.type)!;
+      return editorRegistry.getBuilder(property.type);
   }
 
   // override
@@ -119,7 +119,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
     widgetDescriptor = typeRegistry[selected!.type];
 
     // Group properties by group
-    final groupedProps = <String, List<Property>>{};
+    final groupedProps = <String, List<PropertyDescriptor>>{};
     for (var prop in widgetDescriptor!.properties) {
       if (!prop.hide) {
         groupedProps.putIfAbsent(prop.group, () => []).add(prop);
@@ -171,9 +171,10 @@ class _PropertyPanelState extends State<PropertyPanel> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Column(
                     children: props.map((prop) {
-                      final isCompound = TypeDescriptor.hasType(prop.type);
-                      final editorBuilder = isCompound ? null : getBuilder(prop);
+                      final editorBuilder = getBuilder(prop);
+                      final isCompound = editorBuilder == null && TypeDescriptor.hasType(prop.type);
                       final value = widgetDescriptor!.get(selected!, prop.name);
+                      final property = widgetDescriptor!.type.getField(prop.name);
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -215,9 +216,12 @@ class _PropertyPanelState extends State<PropertyPanel> {
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: editorBuilder != null
-                                  ? editorBuilder.buildEditor(
+                              child: editorBuilder != null ? editorBuilder.buildEditor(
+                                messageBus: bus,
+                                commandStack: commandStack,
                                 label: prop.name,
+                                object: selected,
+                                property: property,
                                 value: value,
                                 onChanged: (newVal) =>
                                     changedProperty(prop.name, newVal),

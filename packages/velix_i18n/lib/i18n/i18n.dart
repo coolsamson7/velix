@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:velix/util/ordered_async_value_notifier.dart';
 import 'interpolator.dart';
 import 'locale.dart';
 
@@ -50,8 +51,14 @@ abstract class TranslationLoader {
   Future<Map<String, dynamic>> load(List<Locale> locales, String namespace);
 }
 
+class I18NState {
+  I18N? i18n;
+
+  I18NState({required this.i18n});
+}
+
 ///  I18n is a central singleton that controls the overall localization process.
-class I18N {
+class I18N extends OrderedAsyncValueNotifier<I18NState> {
   // static data
 
   /// the singleton instance
@@ -92,10 +99,10 @@ class I18N {
       :_interpolator = Interpolator(cacheSize: cacheSize, formatters: formatters),
         _localeManager = localeManager,
         _loader = loader,
-        _missingKeyHandler = missingKeyHandler {
+        _missingKeyHandler = missingKeyHandler , super(I18NState(i18n: null)){
     instance = this;
 
-    localeManager.addListener(() => _reloadTranslations());
+    localeManager.addListener(() => load());
 
     // remember preload namespaces
 
@@ -139,12 +146,16 @@ class I18N {
     return fallbackLocales;
   }
 
+  bool isMap(dynamic entry) {
+    return entry.runtimeType.toString().contains("Map");
+  }
+
   T? get<T>(dynamic object, String key, [T? defaultValue]) {
     final path = key.split('.');
     var current = object;
 
     for (final segment in path) {
-      if (current is Map<String, dynamic> && current.containsKey(segment)) {
+      if (/*isMap(current) &&*/ current.containsKey(segment)) {
         current = current[segment];
       }
       else {
@@ -175,11 +186,13 @@ class I18N {
     return _namespaces[namespace] != null;
   }
 
-  Future<void> _reloadTranslations() async {
+  Future<void> load() async {
     locales = _buildFallbackLocales(locale, fallbackLocale);
     final futures = _namespaces.keys.map((ns) => _loadTranslations(ns, locales).catchError((e) { /* TODO */}));
 
     await Future.wait(futures);
+
+    await updateValue(I18NState(i18n: this));
   }
 
   Future<void> _loadTranslations(String namespace, List<Locale> locales) async {
@@ -210,12 +223,13 @@ class I18N {
   /// translate a key
   /// [key] a key
   /// [args] any parameters that may be used for interpolation
-  String translate(String key, {Map<String, dynamic>? args}) {
+  String translate(String key, {String? defaultValue, Map<String, dynamic>? args}) {
     var (namespace, path) = _extractNamespace(key);
 
     if (!isLoaded(namespace)) {
       _loadTranslations(namespace, locales);
-      return _missingKeyHandler!(key);
+
+      return defaultValue ?? _missingKeyHandler!(key);
     }
 
     var value = get(_namespaces[namespace], path);
@@ -224,7 +238,7 @@ class I18N {
       return interpolate(value, args: args);
     }
     else
-      return _missingKeyHandler!(key);
+      return defaultValue ?? _missingKeyHandler!(key);
   }
 
   /// translate a key async and wait for the result in case of missing namespaces
@@ -266,7 +280,7 @@ class I18nDelegate extends LocalizationsDelegate<I18N> {
 
   @override
   Future<I18N> load(Locale locale) async {
-    await i18n._reloadTranslations();
+    await i18n.load();
 
     return i18n;
   }

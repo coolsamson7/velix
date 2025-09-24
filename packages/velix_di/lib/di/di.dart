@@ -973,17 +973,20 @@ class Environment {
     RegExp buildModuleRegex(String modulePath, {bool includeChildren = false, bool includeSiblings = false}) {
       final lastSlash = modulePath.lastIndexOf('/');
       final dir = lastSlash >= 0 ? modulePath.substring(0, lastSlash) : '';
-      final fileOrDir = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
+      //final fileOrDir = lastSlash >= 0 ? modulePath.substring(lastSlash + 1) : modulePath;
 
       String pattern;
 
       if (!includeChildren && !includeSiblings) {
         pattern = '^' + RegExp.escape(modulePath) + r'$';
-      } else if (includeSiblings && !includeChildren) {
+      }
+      else if (includeSiblings && !includeChildren) {
         pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'[^/]+$';
-      } else if (!includeSiblings && includeChildren) {
+      }
+      else if (!includeSiblings && includeChildren) {
         pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'.+$';
-      } else {
+      }
+      else {
         // both children and siblings
         pattern = '^' + (dir.isNotEmpty ? RegExp.escape(dir) + '/' : '') + r'.+$';
       }

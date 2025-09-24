@@ -7,6 +7,7 @@ import 'command.dart';
 import 'property_changed_command.dart';
 
 // Stack manager class
+
 @Injectable(scope: "environment", eager: false)
 class CommandStack extends ChangeNotifier {
   // instance data

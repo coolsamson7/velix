@@ -39,7 +39,8 @@ class AssetTranslationLoader implements TranslationLoader {
       try {
         final jsonString = await rootBundle.loadString(path);
 
-        Tracer.trace("i18n", TraceLevel.high, "load $path");
+        if ( Tracer.enabled)
+          Tracer.trace("i18n", TraceLevel.high, "load $path");
 
         final Map<String, dynamic> map = json.decode(jsonString);
 

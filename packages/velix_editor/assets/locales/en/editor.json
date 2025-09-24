@@ -1,7 +1,9 @@
 {
   "commands": {
     "save": {
-      "label": "Save"
+      "label": "Save",
+      "tooltip": "Save tooltip",
+      "shortcut": "ctrl+s"
     },
     "open":  {
       "label": "Open"

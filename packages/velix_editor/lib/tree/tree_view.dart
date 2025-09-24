@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
 
@@ -61,6 +62,100 @@ class WidgetTreeController extends ChangeNotifier {
   }
 
   // --------------------
+  // Keyboard Navigation
+  // --------------------
+
+  List<WidgetData> _getFlattenedNodes() {
+    List<WidgetData> flattened = [];
+
+    void addNodesRecursively(List<WidgetData> nodes, int depth) {
+      for (var node in nodes) {
+        flattened.add(node);
+        if (isExpanded(node) && node.children.isNotEmpty) {
+          addNodesRecursively(node.children, depth + 1);
+        }
+      }
+    }
+
+    addNodesRecursively(roots, 0);
+    return flattened;
+  }
+
+  void navigateUp() {
+    if (selectedNode == null) {
+      if (roots.isNotEmpty) selectNode(roots.first);
+      return;
+    }
+
+    final flattened = _getFlattenedNodes();
+    final currentIndex = flattened.indexOf(selectedNode!);
+    if (currentIndex > 0) {
+      selectNode(flattened[currentIndex - 1]);
+    }
+  }
+
+  void navigateDown() {
+    if (selectedNode == null) {
+      if (roots.isNotEmpty) selectNode(roots.first);
+      return;
+    }
+
+    final flattened = _getFlattenedNodes();
+    final currentIndex = flattened.indexOf(selectedNode!);
+    if (currentIndex >= 0 && currentIndex < flattened.length - 1) {
+      selectNode(flattened[currentIndex + 1]);
+    }
+  }
+
+  void expandOrMoveRight() {
+    if (selectedNode == null) return;
+
+    if (selectedNode!.children.isNotEmpty) {
+      if (!isExpanded(selectedNode!)) {
+        toggleExpanded(selectedNode!);
+      } else {
+        // Move to first child
+        selectNode(selectedNode!.children.first);
+      }
+    }
+  }
+
+  void collapseOrMoveLeft() {
+    if (selectedNode == null) return;
+
+    if (selectedNode!.children.isNotEmpty && isExpanded(selectedNode!)) {
+      toggleExpanded(selectedNode!);
+    } else {
+      // Move to parent
+      final parent = _findParent(selectedNode!);
+      if (parent != null) {
+        selectNode(parent);
+      }
+    }
+  }
+
+  WidgetData? _findParent(WidgetData target) {
+    WidgetData? findParentRecursive(List<WidgetData> nodes, WidgetData? currentParent) {
+      for (var node in nodes) {
+        if (node.children.contains(target)) {
+          return node;
+        }
+        final result = findParentRecursive(node.children, node);
+        if (result != null) return result;
+      }
+      return null;
+    }
+
+    return findParentRecursive(roots, null);
+  }
+
+  void deleteSelected() {
+    if (selectedNode != null) {
+      bus.publish("delete", DeleteEvent(widget: selectedNode!, source: this));
+    }
+  }
+
+  // --------------------
   // Public API
   // --------------------
 
@@ -98,7 +193,12 @@ class WidgetTreeView extends StatefulWidget {
 }
 
 class _WidgetTreeViewState extends State<WidgetTreeView> {
-  late final Environment environment;
+  // instance data
+
+  late Environment environment;
+  final FocusNode _focusNode = FocusNode();
+
+  // override
 
   @override
   void initState() {
@@ -117,14 +217,56 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
   @override
   void dispose() {
     widget.controller.removeListener(_onControllerUpdate);
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _handleKeyPress(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowUp:
+          widget.controller.navigateUp();
+        case LogicalKeyboardKey.arrowDown:
+          widget.controller.navigateDown();
+        case LogicalKeyboardKey.arrowRight:
+          widget.controller.expandOrMoveRight();
+        case LogicalKeyboardKey.arrowLeft:
+          widget.controller.collapseOrMoveLeft();
+        case LogicalKeyboardKey.delete:
+        case LogicalKeyboardKey.backspace:
+          widget.controller.deleteSelected();
+        case LogicalKeyboardKey.enter:
+        case LogicalKeyboardKey.space:
+          if (widget.controller.selectedNode != null) {
+            widget.controller.toggleExpanded(widget.controller.selectedNode!);
+          }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children:
-      widget.controller.roots.map((node) => _buildNode(node, 0)).toList(),
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: (node, event) {
+        _handleKeyPress(event);
+        return KeyEventResult.handled;
+      },
+      child: GestureDetector(
+        onTap: () => _focusNode.requestFocus(),
+        child: Container(
+          decoration: BoxDecoration(
+            border: _focusNode.hasFocus
+                ? Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3))
+                : null,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: ListView(
+            padding: const EdgeInsets.all(8),
+            children: widget.controller.roots.map((node) => _buildNode(node, 0)).toList(),
+          ),
+        ),
+      ),
     );
   }
 
@@ -132,6 +274,7 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
     final isExpanded = widget.controller.isExpanded(node);
     final isSelected = widget.controller.selectedNode == node;
     final hasChildren = node.children.isNotEmpty;
+    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,92 +291,166 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
           builder: (context, candidateData, rejectedData) {
             final isHovering = candidateData.isNotEmpty;
 
-            return GestureDetector(
-              onTap: () => widget.controller.selectNode(node),
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.blue.withOpacity(0.2)
-                      : isHovering
-                      ? Colors.green.withOpacity(0.2)
-                      : null,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.only(bottom: 2),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.colorScheme.primary.withOpacity(0.12)
+                    : isHovering
+                    ? theme.colorScheme.secondary.withOpacity(0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: isSelected
+                    ? Border.all(color: theme.colorScheme.primary.withOpacity(0.3))
+                    : null,
+              ),
+              child: InkWell(
+                onTap: () => widget.controller.selectNode(node),
+                borderRadius: BorderRadius.circular(6),
                 child: Row(
                   children: [
-                    SizedBox(width: depth * 16),
-                    if (hasChildren)
-                      TweenAnimationBuilder<double>(
-                        tween: Tween<double>(
-                          begin: 0,
-                          end: isExpanded ? 0.25 : 0, // 0° → 90° turns
-                        ),
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        builder: (context, value, child) {
-                          return Transform.rotate(
-                            angle: value * 2 * 3.1416,
-                            child: IconButton(
-                              icon: const Icon(Icons.chevron_right, size: 16),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () =>
-                                  widget.controller.toggleExpanded(node),
+                    SizedBox(width: depth * 20),
+
+                    // Expand/Collapse button
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: hasChildren
+                          ? Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => widget.controller.toggleExpanded(node),
+                          borderRadius: BorderRadius.circular(12),
+                          child: AnimatedRotation(
+                            turns: isExpanded ? 0.25 : 0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Icon(
+                              Icons.chevron_right,
+                              size: 18,
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       )
-                    else
-                      const SizedBox(width: 16),
-                    const SizedBox(width: 4),
-                    Icon(
-                      _getIconForNode(node),
-                      size: 16,
+                          : const SizedBox(),
                     ),
-                    const SizedBox(width: 4),
+
+                    const SizedBox(width: 8),
+
+                    // Node icon
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? theme.colorScheme.primary.withOpacity(0.1)
+                            : theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Icon(
+                        _getIconForNode(node),
+                        size: 16,
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface.withOpacity(0.8),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    // Draggable text
                     Expanded(
                       child: Draggable<WidgetData>(
                         data: node,
                         feedback: Material(
-                          color: Colors.transparent,
+                          elevation: 4,
+                          borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            padding: const EdgeInsets.all(4),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(4),
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(_getIconForNode(node), size: 16),
-                                const SizedBox(width: 4),
-                                Text(node.type),
+                                const SizedBox(width: 8),
+                                Text(
+                                  node.type,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ),
                         childWhenDragging: Opacity(
-                          opacity: 0.5,
-                          child: Text(node.type),
+                          opacity: 0.4,
+                          child: Text(
+                            node.type,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            ),
+                          ),
                         ),
-                        child: Text(node.type),
+                        child: Text(
+                          node.type,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
                       ),
                     ),
+
+                    // Children count badge
+                    if (hasChildren)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${node.children.length}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
             );
           },
         ),
+
+        // Children
         if (hasChildren && isExpanded)
-          Padding(
-            padding: const EdgeInsets.only(left: 24),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-              node.children.map((c) => _buildNode(c, depth + 1)).toList(),
+              children: node.children.map((c) => _buildNode(c, depth + 1)).toList(),
             ),
           ),
       ],
@@ -272,9 +489,40 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
   @override
   Widget build(BuildContext context) {
     return PanelContainer(
-        title: "Tree",
-        onClose: widget.onClose,
-        child: WidgetTreeView(controller: controller)
+      title: "Widget Tree",
+      onClose: widget.onClose,
+      child: Column(
+        children: [
+          // Keyboard shortcuts hint
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              'Use ↑↓ to navigate, ←→ to expand/collapse, Del to delete, Space/Enter to toggle',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ),
+
+          // Tree view
+          Expanded(
+            child: WidgetTreeView(controller: controller),
+          ),
+        ],
+      ),
     );
   }
+}
+
+// Delete event for consistency
+class DeleteEvent {
+  final WidgetData widget;
+  final Object source;
+
+  DeleteEvent({required this.widget, required this.source});
 }

@@ -1,25 +1,20 @@
-import 'package:editor_sample/main.types.g.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:velix/velix.dart' hide Property;
+
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+
+import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
-import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
-import 'package:velix_editor/metadata/type_registry.dart';
-
 import 'package:velix_editor/metadata/widget_data.dart';
-import 'package:velix_editor/metadata/widgets/button.dart';
-import 'package:velix_editor/metadata/widgets/container.dart';
-import 'package:velix_editor/metadata/widgets/label.dart';
-import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
 import 'package:velix_ui/velix_ui.dart';
 
-import 'package:provider/provider.dart';
-
+import 'main.types.g.dart';
+import 'application.dart';
 
 class VelixTranslator extends Translator {
   // constructor
@@ -31,8 +26,8 @@ class VelixTranslator extends Translator {
   // implement
 
   @override
-  String translate(String key, {Map<String, dynamic>  args = const {}}) {
-    return I18N.instance.translate(key, args: args);
+  String translate(String key, {String? defaultValue, Map<String, dynamic>  args = const {}}) {
+    return I18N.instance.translate(key, defaultValue: defaultValue, args: args);
   }
 }
 
@@ -70,8 +65,17 @@ void main() async {
 
   JSON(
       validate: false,
-      converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
-      factories: [Enum2StringFactory()]);
+      converters: [
+        FontWeightConvert(),
+        FontStyleConvert(),
+        Convert<DateTime,String>(
+            convertSource: (value) => value.toIso8601String(),
+            convertTarget: (str) => DateTime.parse(str)
+        )
+      ],
+      factories: [
+        Enum2StringFactory()
+      ]);
 
   // translation
 
@@ -79,9 +83,10 @@ void main() async {
 
   TypeViolationTranslationProvider();
 
-  var localeManager = LocaleManager(Locale('en', "EN"), supportedLocales: [Locale('en', "EN"), Locale('de', "DE")]);
+  var localeManager = LocaleManager(Locale('en'), supportedLocales: [Locale('en'), Locale('de')]);
+
   var i18n = I18N(
-      fallbackLocale: Locale("en", "EN"),
+      fallbackLocale: Locale("en"),
       localeManager: localeManager,
       loader: AssetTranslationLoader(
         namespacePackageMap: {
@@ -93,41 +98,15 @@ void main() async {
       preloadNamespaces: ["validation", "editor"]
   );
 
-  var json = {
-    "type": "container",
-    "children": [
-      {
-        "type": "text",
-        "children": [],
-        "label": "Hello World"
-      },
-      {
-        "type": "button",
-        "children": [],
-        "number": 1,
-        "isCool": true
-      },
-      {
-        "type": "text",
-        "children": [],
-        "label": "Second Text"
-      }
-    ]
-  };
+  await i18n.load();
 
-  //var widget = JSON.deserialize<WidgetData>(json); // TEST TODO */
+  // load json
 
-  var widgets = ContainerWidgetData(children: [
-    TextWidgetData(label: "eins"),
-    ButtonWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
-    //LabelWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
-    TextWidgetData(label: "zwei"),
-    ContainerWidgetData(children: [
-      TextWidgetData(label: "drei"),
-      TextWidgetData(label: "vier"),
-    ])
-  ]);
+  final jsonString = await rootBundle.loadString('assets/widgets.json');
 
+  var json = jsonDecode(jsonString);
+
+  var widget = JSON.deserialize<WidgetData>(json);
 
   // boot environment
 
@@ -135,68 +114,11 @@ void main() async {
 
   // load namespaces
 
-  runApp(EditorApp(environment: environment, i18n: i18n, localeManager: localeManager, widgets: [widgets]));
+  runApp(EditorApp(
+      environment: environment,
+      i18n: i18n,
+      localeManager: localeManager,
+      widgets: [widget]
+  ));
 }
 
-class EditorApp extends StatelessWidget {
-  // instance data
-
-  final I18N i18n;
-  final LocaleManager localeManager;
-  final Environment environment;
-  final List<WidgetData> widgets;
-  
-  // constructor
-
-  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment, required this.widgets});
-  
-  // override
-
-  @override
-  Widget build(BuildContext context) {
-    localeManager.addListener(() =>
-        environment.get<TypeRegistry>().changedLocale(localeManager.locale)
-    );
-
-    return ChangeNotifierProvider.value(
-        value: localeManager,
-        child: EnvironmentProvider(
-          environment: environment,
-          child:  MultiProvider(
-            providers: [
-              Provider<CommandManager>(create: (_) => CommandManager(
-                  interceptors: [
-                    LockCommandInterceptor(),
-                    TracingCommandInterceptor()
-                  ]
-              )),
-            ],
-            child: Consumer<LocaleManager>(
-                builder: (BuildContext context, LocaleManager value, Widget? child) {
-                  return MaterialApp(
-                    title: 'Editor',
-
-                    //theme: const CupertinoThemeData(
-                    //  brightness: Brightness.light,
-                    //  primaryColor: CupertinoColors.activeBlue,
-                    //),
-
-                    // localization
-
-                    localizationsDelegates: [I18nDelegate(i18n: i18n), GlobalCupertinoLocalizations.delegate,],//...context.localizationDelegates,
-                    supportedLocales: localeManager.supportedLocales,
-                    locale: localeManager.locale,
-
-                    // main screen
-
-                    home: Scaffold(
-                        body: EditorScreen(models: widgets)
-                    ),
-                  );
-                }
-            )
-        )
-      )
-    );
-  }
-}

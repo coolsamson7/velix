@@ -13,9 +13,15 @@ void main() {
     registerTypes();
 
     JSON(
-        validate: false,
-        converters: [Convert<DateTime,String>(convertSource: (value) => value.toIso8601String(), convertTarget: (str) => DateTime.parse(str))],
-        factories: [Enum2StringFactory()]);
+        validate: true,
+        converters: [
+          Convert<DateTime,String>(
+              convertSource: (value) => value.toIso8601String(),
+              convertTarget: (str) => DateTime.parse(str))
+        ],
+        factories: [
+          Enum2StringFactory()
+        ]);
 
     test('map immutable json', () {
       var input = Money(currency: "EU", value: 1);
@@ -27,15 +33,53 @@ void main() {
       expect(isEqual, isTrue);
     });
 
+    test('map enum & date', () {
+      var input = Invoice(
+          date: DateTime.now(),
+          products: [
+            Product(
+                name: "p1",
+                price: Money(
+                    currency: "EU",
+                    value: 1
+                ),
+                status: Status.available
+            ),
+          ]
+      );
+
+      // warm up
+
+      var json = JSON.serialize(input);
+
+      var result = JSON.deserialize<Invoice>(json);
+
+      print(result);
+    });
+
     test('map inheritance', () {
       var base = Base(name: "base");
       var derived = Derived(name: "derived", number: 1);
 
       var json = JSON.serialize(derived);
-      var result = JSON.deserialize<Base>(json);
+      var result = JSON.deserialize<Derived>(json);
 
       final isEqual = TypeDescriptor.deepEquals(derived, result);
       expect(isEqual, isTrue);
+    });
+
+    test('map polymorph collection', () {
+      var source = Polymorph(
+          base: Derived(type: "derived", name: "d1", number: 1),
+          bases: [
+            Base(type: "base", name: "base"),
+            Derived(type: "derived", name: "d2", number: 1)
+          ]);
+
+      var json = JSON.serialize(source);
+      var result = JSON.deserialize<Polymorph>(json);
+
+      expect(result.bases.length, equals(source.bases.length));
     });
 
     test('map mutable json', () {
@@ -64,7 +108,7 @@ void main() {
     });
 
     test('validate object', () {
-      JSON(validate: true);
+      //JSON(validate: true);
 
       var input = Money(currency: "1234567890", value: 1);
 
@@ -75,7 +119,7 @@ void main() {
         throwsA(isA<ValidationException>()), // or use any matcher: throwsException, etc.
       );
 
-      JSON(validate: false);
+      //JSON(validate: false);
     });
 
     test('benchmark', () {

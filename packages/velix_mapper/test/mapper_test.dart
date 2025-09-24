@@ -75,6 +75,40 @@ void main() {
       //expect(() => type.validate(""), throwsA(isA<ValidationException>()));
     });
 
+    test('map polymorph', () {
+      var baseMapping = mapping<Base,Base>()
+          .map(from: "type", to: "type")
+          .map(from: "name", to: "name");
+
+      var derivedMapping = mapping<Derived,Derived>()
+          .derives(baseMapping)
+          .map(from: "number", to: "number");
+
+      var mapper = Mapper([
+        mapping<Polymorph,Polymorph>()
+            .map(from: "base", to: "base", deep: true) // TODO if i forget that, i get runtime errors
+            .map(from: "bases", to: "bases", deep: true),
+
+        derivedMapping,
+
+        baseMapping
+      ]);
+
+      var source = Polymorph(
+          base: Base(type: "base", name: "b1"),
+          bases: [
+            Base(type: "base", name: "b2"),
+            Derived(type: "derived", name: "derived", number: 1)
+          ]
+      );
+
+      var result = mapper.map<Polymorph,Polymorph>(source);
+
+      expect(result!.bases.length, equals(2));
+      expect(result.bases[0].runtimeType, equals(Base));
+      expect(result.bases[1].runtimeType, equals(Derived));
+    });
+
     test('map mutable root', () {
       var mapper = Mapper([
         mapping<Mutable,Mutable>()

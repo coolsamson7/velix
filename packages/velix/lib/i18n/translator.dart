@@ -9,8 +9,8 @@ abstract class Translator {
   /// translate the given key and possible named arguments that will be interpolated
   /// [key] the key
   /// [args] and named arguments
-  static String tr(String key, {Map<String, String> args = const {}}) {
-    return instance.translate(key,  args: args);
+  static String tr(String key, {String? defaultValue, Map<String, String> args = const {}}) {
+    return instance.translate(key, defaultValue: defaultValue, args: args);
   }
 
   // constructor
@@ -21,7 +21,7 @@ abstract class Translator {
 
   // public
 
-  String translate(String key, {Map<String, String> args = const {}});
+  String translate(String key, {String? defaultValue, Map<String, String> args = const {}});
 }
 
 /// @internal
@@ -29,7 +29,7 @@ class NoTranslator extends Translator {
    NoTranslator();
 
   @override
-  String translate(String key, {Map<String, String> args = const {}}) {
+  String translate(String key, {String? defaultValue, Map<String, String> args = const {}}) {
     return key;
   }
 }

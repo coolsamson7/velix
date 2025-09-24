@@ -20,7 +20,7 @@ import 'editor_registry.dart';
 class CompoundPropertyEditor extends StatefulWidget {
   // instance data
 
-  final Property property;
+  final PropertyDescriptor property;
   final String label;
   final dynamic value;
   final WidgetData target;
@@ -137,7 +137,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
     setState(() {});
   }
 
-  PropertyEditorBuilder getBuilder(Property property) {
+  PropertyEditorBuilder getBuilder(PropertyDescriptor property) {
     if ( property.editor != null)
       return environment.get(type: property.editor);
     else
@@ -201,8 +201,11 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: editorBuilder != null
-                    ? editorBuilder.buildEditor(
+                child: editorBuilder != null ? editorBuilder.buildEditor(
+                  messageBus: widget.bus,
+                  commandStack: widget.commandStack,
+                  object: this.value,
+                  property: field,
                   label: labels[field.name]!,
                   value: value,
                   onChanged: (newVal) => changedProperty(field.name, newVal),

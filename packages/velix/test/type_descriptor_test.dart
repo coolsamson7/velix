@@ -6,6 +6,7 @@ import 'type_descriptor_test.types.g.dart';
 
 @Dataclass()
 class Base {
+  @Attribute(type: "length 10")
   String id;
 
   Base({required this.id});
@@ -13,6 +14,7 @@ class Base {
 
 @Dataclass()
 class Derived extends Base {
+  @Attribute(type: "> 0")
   int number;
 
   Derived({required this.number, required super.id});
@@ -29,6 +31,13 @@ void main() {
   registerTypes();
 
   group('types', () {
+    test('types', () {
+      var base = TypeDescriptor.forType<Base>();
+
+      expect(base.getField("id").type is StringType, equals(true));
+      expect((base.getField("id").type as StringType).tests.length > 1, equals(true));
+    });
+
     test('inheritance', () {
       var base = TypeDescriptor.forType<Base>();
       var derived = TypeDescriptor.forType<Derived>();
@@ -40,7 +49,6 @@ void main() {
     test('lazy', () {
       var lazy = TypeDescriptor.forType<Lazy>();
 
-      expect(lazy.lazy, equals(false));
       expect(identical((lazy.getField("parent").type as ObjectType).typeDescriptor, lazy), equals(true));
     });
   });

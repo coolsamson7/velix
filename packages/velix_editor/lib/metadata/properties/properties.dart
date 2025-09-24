@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
 
 import '../annotations.dart';
@@ -55,11 +54,9 @@ class Padding {
 @Dataclass()
 class Font {
   @DeclareProperty(i18n: "editor:properties.font.weight")
-  @Json(converter: FontWeightConvert)
   FontWeight weight;
 
   @DeclareProperty(i18n: "editor:properties.font.style")
-  @Json(converter: FontStyleConvert)
   FontStyle style;
 
   @DeclareProperty(i18n: "editor:properties.font.size")

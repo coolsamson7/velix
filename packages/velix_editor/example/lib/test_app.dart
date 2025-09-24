@@ -68,6 +68,7 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     super.initState();
     controller.addListener(_onTextChanged);
     focusNode.addListener(_onFocusChanged);
+    RawKeyboard.instance.addListener(_handleRawKeyEvent);
   }
 
   @override
@@ -76,6 +77,7 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     focusNode.dispose();
     _debounceTimer?.cancel();
     _removeOverlay();
+    RawKeyboard.instance.removeListener(_handleRawKeyEvent);
     super.dispose();
   }
 
@@ -151,7 +153,9 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                   final suggestion = suggestions[index];
                   final parts = suggestion.split('.');
                   final isMethod = parts.length == 2 &&
-                      classMetadata[parts[0]]?['methods']?.containsKey(parts[1]) == true;
+                      classMetadata[parts[0]]?['methods']
+                          ?.containsKey(parts[1]) ==
+                          true;
                   final isSelected = index == selectedSuggestionIndex;
 
                   return Container(
@@ -161,7 +165,9 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                       leading: Icon(
                         isMethod
                             ? Icons.functions
-                            : (parts.length == 2 ? Icons.data_object : Icons.class_),
+                            : (parts.length == 2
+                            ? Icons.data_object
+                            : Icons.class_),
                         size: 16,
                         color: isMethod
                             ? Colors.purple
@@ -173,7 +179,9 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                           fontFamily: 'monospace',
                           fontSize: 13,
                           color: isSelected ? Colors.blue.shade800 : null,
-                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.w500
+                              : FontWeight.normal,
                         ),
                       ),
                       subtitle: _getSubtitle(suggestion),
@@ -225,18 +233,20 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
 
   void _insertSuggestion(String suggestion) {
     final text = controller.text;
-    final selection = controller.selection;
-    final caret = selection.baseOffset;
-    int start = caret - 1;
-    while (start > 0 && !" .\n()[]{}+\\-*/=<>!&|,".contains(text[start - 1])) {
+    final caret = controller.selection.baseOffset;
+
+    int start = caret;
+    while (start > 0 && !' .\n()[]{}+\\-*/=<>!&|,'.contains(text[start - 1])) {
       start--;
     }
+
     final before = text.substring(0, start);
     final after = text.substring(caret);
 
     controller.value = TextEditingValue(
       text: before + suggestion + after,
-      selection: TextSelection.collapsed(offset: before.length + suggestion.length),
+      selection:
+      TextSelection.collapsed(offset: before.length + suggestion.length),
     );
 
     _removeOverlay();
@@ -244,31 +254,31 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     _validateExpression(controller.text);
   }
 
-  void _handleKeyEvent(KeyEvent event) {
-    if (event is KeyDownEvent && suggestions.isNotEmpty) {
-      switch (event.logicalKey) {
-        case LogicalKeyboardKey.arrowDown:
+  void _handleRawKeyEvent(RawKeyEvent event) {
+    if (event is RawKeyDownEvent && suggestions.isNotEmpty) {
+      switch (event.logicalKey.keyId) {
+        case 0x100070052: // Arrow Down
           setState(() {
-            selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.length;
+            selectedSuggestionIndex =
+                (selectedSuggestionIndex + 1) % suggestions.length;
           });
           _showOverlay();
           break;
-        case LogicalKeyboardKey.arrowUp:
+        case 0x100070050: // Arrow Up
           setState(() {
-            selectedSuggestionIndex = (selectedSuggestionIndex - 1) % suggestions.length;
-            if (selectedSuggestionIndex < 0) {
-              selectedSuggestionIndex = suggestions.length - 1;
-            }
+            selectedSuggestionIndex =
+                (selectedSuggestionIndex - 1 + suggestions.length) %
+                    suggestions.length;
           });
           _showOverlay();
           break;
-        case LogicalKeyboardKey.enter:
-        case LogicalKeyboardKey.tab:
+        case 0x100000028: // Enter
+        case 0x100000029: // Tab
           if (selectedSuggestionIndex >= 0) {
             _insertSuggestion(suggestions[selectedSuggestionIndex]);
           }
           break;
-        case LogicalKeyboardKey.escape:
+        case 0x100000029: // Escape
           _removeOverlay();
           break;
       }
@@ -377,36 +387,24 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
             ),
           ),
 
-        // Expression input with syntax highlighting colors
+        // Expression input
         Expanded(
           child: CompositedTransformTarget(
             link: layerLink,
-            child: Focus(
-              onKeyEvent: (node, event) {
-                _handleKeyEvent(event);
-                return KeyEventResult.handled;
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  style: const TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 14,
-                  ),
-                  decoration: const InputDecoration.collapsed(
-                    hintText: 'Type expressions like: User.name + " is " + User.age',
-                  ),
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                ),
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 14,
               ),
+              decoration: const InputDecoration(
+                hintText:
+                'Type expressions like: User.name + " is " + User.age',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
             ),
           ),
         ),

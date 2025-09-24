@@ -13,7 +13,7 @@ void main() {
     registerTypes();
 
     JSON(
-        validate: false,
+        validate: true,
         converters: [
           Convert<DateTime,String>(
               convertSource: (value) => value.toIso8601String(),
@@ -108,7 +108,7 @@ void main() {
     });
 
     test('validate object', () {
-      JSON(validate: true);
+      //JSON(validate: true);
 
       var input = Money(currency: "1234567890", value: 1);
 
@@ -119,7 +119,7 @@ void main() {
         throwsA(isA<ValidationException>()), // or use any matcher: throwsException, etc.
       );
 
-      JSON(validate: false);
+      //JSON(validate: false);
     });
 
     test('benchmark', () {

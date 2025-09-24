@@ -279,7 +279,7 @@ class JSONMapper {
     // local function
 
     void check(Type type) {
-      if ( !TypeDescriptor.hasType(type) || TypeDescriptor.forType(type).lazy)
+      if ( !TypeDescriptor.hasType(type))
         return;
 
       // own class
@@ -390,7 +390,7 @@ class JSONMapper {
                   convert: convert?.sourceConverter(),
                   includeNull: includeNull
               ),
-              //validate: validate
+              validate: validate
           );
         }
       }
@@ -436,7 +436,7 @@ class JSONMapper {
       // local function
 
       void check(Type type) {
-        if ( !TypeDescriptor.hasType(type) || TypeDescriptor.forType(type).lazy)
+        if ( !TypeDescriptor.hasType(type))
           return;
 
         if (!mappings.containsKey(type)) {
@@ -471,7 +471,7 @@ class JSONMapper {
           defaultValue = json.defaultValue;
 
           //if ( !field.type.isValid(defaultValue))
-          //  throw MapperException("the default $defaultValue for ${field.name} is not valid");
+          //  throw MapperException("the default $defaultValue for ${field.name} is not valid"); // TODO?
         }
 
         if (field.type is ListType) {
@@ -513,6 +513,7 @@ class JSONMapper {
                     includeNull: includeNull,
                     defaultValue: defaultValue
                 ),
+                //validate: validate,
                 to: field.name,
                 deep: true
             );
@@ -527,14 +528,13 @@ class JSONMapper {
                     type: field.type.type,
                     convert: convert?.targetConverter(),
                     includeNull: includeNull,
-                    defaultValue: defaultValue
+                    defaultValue: defaultValue,
                 ),
                 to: field.name,
                 deep: convert == null,
-                //validate: validate
+                validate: validate
             );
           }
-
         } // if
         else {
           Convert? convert ;

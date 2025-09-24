@@ -19,6 +19,9 @@ On the other hand it still offers all of the typical features of a wysiwyg edito
 - i18n
 - shortcuts
 
+<img width="2278" height="1688" alt="image" src="https://github.com/user-attachments/assets/76a3cdfd-2816-4446-9047-8bbe4ada7da8" />
+
+
 Currently the approach is to be able to design individual pages only.
 
 ## Model Based

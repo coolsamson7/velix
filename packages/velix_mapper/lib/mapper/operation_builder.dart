@@ -21,7 +21,7 @@ class MapList2List extends MapperProperty {
   final Mapper mapper;
   Mapping? mapping;
 
-  bool polymorphic = false; // TODO
+  bool polymorphic = false;
 
   // constructor
 
@@ -46,7 +46,7 @@ class MapList2List extends MapperProperty {
         for (var i = 0; i < len; i++) {
           var element = list[i];
 
-          result.add(mapper.map(element, context: context, mapping: mapper.getSourceMapping(element.runtimeType))); // TODO validate target?
+          result.add(mapper.map(element, context: context, mapping: mapper.getSourceMapping(element.runtimeType)));
         }
       }
       else {
@@ -80,13 +80,13 @@ class MapDeep extends MapperProperty {
   final MapperProperty targetProperty;
   final Mapper mapper;
   Mapping? mapping;
-  bool polymorph = true; // TODO
+  bool polymorphic = true; // TODO
 
   // constructor
 
   MapDeep({required this.mapper, required this.sourceType, required this.targetProperty}) {
     if ( TypeDescriptor.hasType(sourceType))
-      polymorph = TypeDescriptor.forType(sourceType).childClasses.isNotEmpty;
+      polymorphic = TypeDescriptor.forType(sourceType).childClasses.isNotEmpty;
   }
 
   // override AccessorValue
@@ -98,10 +98,9 @@ class MapDeep extends MapperProperty {
 
   @override
   void set(dynamic instance,dynamic  value, MappingContext context) {
-    if (polymorph) {
-      var m = mapper.getSourceMapping(value.runtimeType); // TODO: validate target type?
+    if (polymorphic) {
       targetProperty.set(
-          instance, mapper.map(value, context: context, mapping: m),
+          instance, mapper.map(value, context: context, mapping: mapper.getSourceMapping(value.runtimeType)),
           context); // recursive call!
     }
     else {
@@ -596,8 +595,8 @@ class TargetNode {
       if ( from != sourceType)
         throw MapperException("conversion source type $from does not match $sourceType");
 
-      //JUST A TEST TODOif ( to != targetType)
-      //  throw MapperException("conversion target type $to does not match $targetType");
+      if ( to != targetType)
+        throw MapperException("conversion target type $to does not match $targetType");
 
       result = conversion.sourceConverter();
     }

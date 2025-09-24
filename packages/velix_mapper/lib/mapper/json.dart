@@ -56,14 +56,14 @@ class JSONAccessor extends Accessor {
   MapperProperty makeTransformerProperty(bool write) {
     if ( defaultValue != JSONAccessor) {
       if ( convert != null)
-        return ConvertingJSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue, convert: convert!, type: this.type); // TODO
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, defaultValue: defaultValue, convert: convert!, type: this.type);
       else
         return JSONProperty(
           name: name, includeNull: includeNull, defaultValue: defaultValue, type: this.type);
     }
     else {
       if ( convert != null)
-        return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!, type: this.type); // TODO
+        return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!, type: this.type);
       else
         return JSONProperty(name: name, includeNull: includeNull,type: this.type);
     }
@@ -165,8 +165,6 @@ class JSONProperty extends MapperProperty {
     return type;
   }
 }
-
-// TODO TEST
 
 class PolymorphicMapping extends Mapping<Map<String, dynamic>,dynamic> {
   // instance data

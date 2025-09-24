@@ -79,7 +79,10 @@ void main() {
       var json = JSON.serialize(source);
       var result = JSON.deserialize<Polymorph>(json);
 
+      expect(result.base is Derived, equals(true));
       expect(result.bases.length, equals(source.bases.length));
+      expect(result.bases[0] is Base, equals(true));
+      expect(result.bases[1] is Derived, equals(true));
     });
 
     test('map mutable json', () {

@@ -64,6 +64,12 @@ class I18N extends OrderedAsyncValueNotifier<I18NState> {
   /// the singleton instance
   static late I18N instance;
 
+  // static methods
+
+  static String tr(String key, {String? defaultValue, Map<String, dynamic>? args}) {
+    return instance.translate(key, defaultValue: defaultValue, args: args);
+  }
+
   // instance data
 
   final LocaleManager _localeManager;

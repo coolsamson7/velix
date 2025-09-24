@@ -1,3 +1,14 @@
+## 1.2.0
+
+ - **FIX**: all tests green.
+ - **FIX**: polymorphic json mapping.
+ - **FIX**: deserializer.
+ - **FIX**: deserializer.
+ - **FIX**: deserializer.
+ - **FIX**: @json and field name.
+ - **FEAT**: TypeDescriptor lazy fix requiring api change.
+ - **DOCS**: changelogs.
+
 ## 1.1.2
 
 -  velix version bump

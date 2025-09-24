@@ -1,3 +1,10 @@
+## 1.1.0
+
+ - **FIX**: all type registries are updated.
+ - **FEAT**: different default function name.
+ - **FEAT**: less variable names.
+ - **DOCS**: changelogs.
+
 ## 1.0.3
 
 - **FEAT**: velix version bump

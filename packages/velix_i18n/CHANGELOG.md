@@ -1,3 +1,9 @@
+## 1.1.0
+
+ - **FIX**: i18n must be listener.
+ - **FEAT**: expose load.
+ - **DOCS**: changelogs.
+
 ## 1.0.1
 
 - bumb velix version

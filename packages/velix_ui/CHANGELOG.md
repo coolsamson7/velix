@@ -1,3 +1,12 @@
+## 1.2.0
+
+ - **FIX**: all type registries are updated.
+ - **FIX**: added async value notifier -> velix.
+ - **FEAT**: added async value notifier.
+ - **FEAT**: shortcut action & intent.
+ - **FEAT**: shortcuts.
+ - **DOCS**: changelogs.
+
 ## 1.1.2
 
 - version fix

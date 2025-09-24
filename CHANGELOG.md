@@ -3,6 +3,89 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-09-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`velix` - `v0.91.2`](#velix---v0912)
+ - [`velix_di` - `v1.1.0`](#velix_di---v110)
+ - [`velix_editor` - `v0.1.2`](#velix_editor---v012)
+ - [`velix_i18n` - `v1.1.0`](#velix_i18n---v110)
+ - [`velix_mapper` - `v1.2.0`](#velix_mapper---v120)
+ - [`velix_ui` - `v1.2.0`](#velix_ui---v120)
+
+---
+
+#### `velix` - `v0.91.2`
+
+ - **FIX**: all type registries are updated.
+ - **FIX**: lazy types work as expected.
+ - **FIX**: i18n must be listener.
+ - **FEAT**: added async value notifier.
+ - **FEAT**: TypeDescriptor lazy fix requiring api change.
+ - **FEAT**: different default function name.
+ - **FEAT**: less variable names.
+ - **DOCS**: changelogs.
+
+#### `velix_di` - `v1.1.0`
+
+ - **FIX**: all type registries are updated.
+ - **FEAT**: different default function name.
+ - **FEAT**: less variable names.
+ - **DOCS**: changelogs.
+
+#### `velix_editor` - `v0.1.2`
+
+ - **FIX**: test rename.
+ - **FIX**: all type registries are updated.
+ - **FIX**: locale switch.
+ - **FIX**: added async value notifier -> velix.
+ - **FIX**: load initial i18n.
+ - **FIX**: padding editor.
+ - **FEAT**: added dependencies for code editor.
+ - **FEAT**: padding editor.
+ - **FEAT**: json test.
+ - **FEAT**: svg icons.
+ - **FEAT**: up down arrow.
+ - **FEAT**: shortcuts.
+ - **FEAT**: TypeDescriptor lazy fix requiring api change.
+ - **DOCS**: readme.
+
+#### `velix_i18n` - `v1.1.0`
+
+ - **FIX**: i18n must be listener.
+ - **FEAT**: expose load.
+ - **DOCS**: changelogs.
+
+#### `velix_mapper` - `v1.2.0`
+
+ - **FIX**: all tests green.
+ - **FIX**: polymorphic json mapping.
+ - **FIX**: deserializer.
+ - **FIX**: deserializer.
+ - **FIX**: deserializer.
+ - **FIX**: @json and field name.
+ - **FEAT**: TypeDescriptor lazy fix requiring api change.
+ - **DOCS**: changelogs.
+
+#### `velix_ui` - `v1.2.0`
+
+ - **FIX**: all type registries are updated.
+ - **FIX**: added async value notifier -> velix.
+ - **FEAT**: added async value notifier.
+ - **FEAT**: shortcut action & intent.
+ - **FEAT**: shortcuts.
+ - **DOCS**: changelogs.
+
+
 ## 2025-09-15
 
 ### Changes

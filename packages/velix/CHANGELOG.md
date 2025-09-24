@@ -1,3 +1,14 @@
+## 0.91.2
+
+ - **FIX**: all type registries are updated.
+ - **FIX**: lazy types work as expected.
+ - **FIX**: i18n must be listener.
+ - **FEAT**: added async value notifier.
+ - **FEAT**: TypeDescriptor lazy fix requiring api change.
+ - **FEAT**: different default function name.
+ - **FEAT**: less variable names.
+ - **DOCS**: changelogs.
+
 ## 0.92.0
 
 - **FEAT**: new class type.

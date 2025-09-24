@@ -5,7 +5,7 @@ homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix
 
 resolution: workspace
-version: 0.1.1
+version: 0.1.2
 
 environment:
   sdk: ^3.9.0
@@ -22,11 +22,11 @@ dependencies:
   build: ^3.0.0
   easy_localization: ^3.0.8
   cupertino_icons: ^1.0.8
-  velix: ^0.91.1
-  velix_di: ^1.0.2
-  velix_mapper: ^1.1.2
-  velix_i18n: ^1.0.1
-  velix_ui: ^1.1.2
+  velix: ^0.91.2
+  velix_di: ^1.1.0
+  velix_mapper: ^1.2.0
+  velix_i18n: ^1.1.0
+  velix_ui: ^1.2.0
   highlight: ^0.7.0
   flutter_highlight: ^0.7.0
   flutter_svg: ^2.1.1

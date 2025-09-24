@@ -18,4 +18,5 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => ApplicationModule(),
   );
 
+  TypeDescriptor.verify();
 }

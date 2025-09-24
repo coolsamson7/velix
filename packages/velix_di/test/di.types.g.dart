@@ -182,7 +182,7 @@ void registerTypes() {
     ]
   );
 
-  var BaseDescriptor =  type<Base>(
+  var baseDescriptor =  type<Base>(
     location: 'asset:velix_di/test/di.dart:128:1',
     params: [
       param<String>('name', isRequired: true)
@@ -197,7 +197,7 @@ void registerTypes() {
     ]
   );
 
-  var ConditionalBaseDescriptor =  type<ConditionalBase>(
+  var conditionalBaseDescriptor =  type<ConditionalBase>(
     location: 'asset:velix_di/test/di.dart:142:1',
     annotations: [
       Injectable()
@@ -219,7 +219,7 @@ void registerTypes() {
     ],
   );
 
-  var RootTypeDescriptor =  type<RootType>(
+  var rootTypeDescriptor =  type<RootType>(
     location: 'asset:velix_di/test/di.dart:184:1',
     annotations: [
       Injectable()
@@ -378,7 +378,7 @@ void registerTypes() {
 
   type<Derived>(
     location: 'asset:velix_di/test/di.dart:135:1',
-    superClass: BaseDescriptor,
+    superClass: baseDescriptor,
     params: [
       param<String>('name', isRequired: true), 
       param<int>('number', isNamed: true, isRequired: true)
@@ -395,7 +395,7 @@ void registerTypes() {
 
   type<ConditionalProd>(
     location: 'asset:velix_di/test/di.dart:157:1',
-    superClass: ConditionalBaseDescriptor,
+    superClass: conditionalBaseDescriptor,
     annotations: [
       Injectable(scope: "request"),
       Conditional(requires: feature("prod"))
@@ -427,7 +427,7 @@ void registerTypes() {
 
   type<ConditionalDev>(
     location: 'asset:velix_di/test/di.dart:178:1',
-    superClass: ConditionalBaseDescriptor,
+    superClass: conditionalBaseDescriptor,
     annotations: [
       Injectable(),
       Conditional(requires: feature("dev"))
@@ -439,7 +439,7 @@ void registerTypes() {
 
   type<MockBase>(
     location: 'asset:velix_di/test/mock/mock.dart:9:1',
-    superClass: ConditionalBaseDescriptor,
+    superClass: conditionalBaseDescriptor,
     annotations: [
       Injectable(replace: true)
     ],
@@ -450,7 +450,7 @@ void registerTypes() {
 
   type<DerivedType>(
     location: 'asset:velix_di/test/di.dart:189:1',
-    superClass: RootTypeDescriptor,
+    superClass: rootTypeDescriptor,
     annotations: [
       Injectable()
     ],
@@ -566,4 +566,5 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => CycleTarget(args[0] as CycleSource),
   );
 
+  TypeDescriptor.verify();
 }

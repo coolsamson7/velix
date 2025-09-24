@@ -422,9 +422,9 @@ class TypeDescriptor<T> {
   }) {
     type = nonNullableOf<T>();
 
-    setup(fields, methods);
-
     TypeDescriptor.register(this);
+
+    setup(fields, methods);
   }
 
   void setup(List<FieldDescriptor> fields, List<MethodDescriptor>? methods) {

@@ -16,7 +16,7 @@ void registerVelixDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => ConfigurationManager(),
   );
 
-  var ConfigurationSourceDescriptor =  type<ConfigurationSource>(
+  var configurationSourceDescriptor =  type<ConfigurationSource>(
     location: 'package:velix_di/configuration/configuration.dart:140:1',
     annotations: [
       Injectable(factory: false)
@@ -106,7 +106,7 @@ void registerVelixDescriptors() {
   );
 
   type<Boot>(
-    location: 'package:velix_di/di/di.dart:1465:1',
+    location: 'package:velix_di/di/di.dart:1468:1',
     annotations: [
       Module()
     ],
@@ -117,7 +117,7 @@ void registerVelixDescriptors() {
 
   type<ConfigurationValues>(
     location: 'package:velix_di/configuration/configuration.dart:152:1',
-    superClass: ConfigurationSourceDescriptor,
+    superClass: configurationSourceDescriptor,
     annotations: [
       Injectable(factory: false)
     ],
@@ -131,7 +131,7 @@ void registerVelixDescriptors() {
 
   type<JsonFileConfigurationSource>(
     location: 'package:velix_di/configuration/source/json_source.dart:7:1',
-    superClass: ConfigurationSourceDescriptor,
+    superClass: configurationSourceDescriptor,
     annotations: [
       Injectable(factory: false)
     ],
@@ -143,4 +143,5 @@ void registerVelixDescriptors() {
     fromArrayConstructor: (List<dynamic> args) => JsonFileConfigurationSource(args[0] as String),
   );
 
+  TypeDescriptor.verify();
 }

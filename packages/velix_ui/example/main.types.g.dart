@@ -113,4 +113,5 @@ void registerAllDescriptors() {
     ]
   );
 
+  TypeDescriptor.verify();
 }

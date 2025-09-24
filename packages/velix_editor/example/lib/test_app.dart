@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter/services.dart';
 import 'package:expressions/expressions.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
-import 'package:highlight/languages/dart.dart';
 
 void main() => runApp(const MyApp());
 
@@ -34,7 +32,6 @@ final Map<String, dynamic> classMetadata = {
   }
 };
 
-// Sample data for evaluation
 final Map<String, dynamic> sampleData = {
   "User": {
     "name": "John Doe",
@@ -50,56 +47,64 @@ final Map<String, dynamic> sampleData = {
 
 class DotAccessExpressionEditor extends StatefulWidget {
   const DotAccessExpressionEditor({super.key});
-
   @override
   State<DotAccessExpressionEditor> createState() =>
       _DotAccessExpressionEditorState();
 }
 
 class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
-  final controller = CodeController(text: '', language: dart);
-  final GlobalKey _codeFieldKey = GlobalKey();
-  String? error;
+  final TextEditingController controller = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+  final LayerLink layerLink = LayerLink();
+
   List<String> suggestions = [];
   OverlayEntry? _overlayEntry;
   Timer? _debounceTimer;
+  String? error;
+  int selectedSuggestionIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    // No controller listener - we'll use onChanged instead
+    controller.addListener(_onTextChanged);
+    focusNode.addListener(_onFocusChanged);
   }
 
   @override
   void dispose() {
     controller.dispose();
+    focusNode.dispose();
     _debounceTimer?.cancel();
     _removeOverlay();
     super.dispose();
   }
 
+  void _onTextChanged() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _showSuggestionsIfNeeded();
+      }
+    });
+    _validateExpression(controller.text);
+  }
+
+  void _onFocusChanged() {
+    if (!focusNode.hasFocus) {
+      _removeOverlay();
+    }
+  }
+
   String get _caretWord {
     final text = controller.text;
-    final offset = controller.selection.base.offset;
+    final offset = controller.selection.baseOffset;
     if (offset <= 0) return '';
 
     int start = offset - 1;
-    while (start > 0 && !" .\n()[]{}+\-*/=<>!&|,".contains(text[start - 1])) {
+    while (start > 0 && !" .\n()[]{}+\\-*/=<>!&|,".contains(text[start - 1])) {
       start--;
     }
     return text.substring(start, offset);
-  }
-
-  void _onTextChanged(String text) {
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    // Debounce to avoid too many suggestion updates
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      _showSuggestionsIfNeeded();
-    });
-
-    _validateExpression(text);
   }
 
   void _showSuggestionsIfNeeded() {
@@ -109,8 +114,9 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
       return;
     }
     final s = _getSuggestions(word);
-    if (s.isNotEmpty) {
+    if (s.isNotEmpty && focusNode.hasFocus) {
       suggestions = s;
+      selectedSuggestionIndex = 0;
       _showOverlay();
     } else {
       _removeOverlay();
@@ -118,28 +124,15 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   }
 
   void _showOverlay() {
-    final overlay = Overlay.of(context);
     _removeOverlay();
 
-    // Get the RenderBox of the CodeField widget
-    final RenderBox? renderBox = _codeFieldKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-
-    final offset = renderBox.localToGlobal(Offset.zero);
-    final size = renderBox.size;
-
-    // Calculate cursor position (approximation)
-    final lines = controller.text.substring(0, controller.selection.base.offset).split('\n');
-    final currentLine = lines.length - 1;
-    final lineHeight = 20.0; // Approximate line height
-    final cursorY = currentLine * lineHeight;
-
     _overlayEntry = OverlayEntry(
-      builder: (context) {
-        return Positioned(
-          left: offset.dx + 20, // Small offset from left edge
-          top: offset.dy + cursorY + 30, // Position near cursor
-          width: 280,
+      builder: (context) => Positioned(
+        width: 300,
+        child: CompositedTransformFollower(
+          link: layerLink,
+          showWhenUnlinked: false,
+          offset: const Offset(0, 40),
           child: Material(
             elevation: 8,
             borderRadius: BorderRadius.circular(8),
@@ -159,34 +152,43 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                   final parts = suggestion.split('.');
                   final isMethod = parts.length == 2 &&
                       classMetadata[parts[0]]?['methods']?.containsKey(parts[1]) == true;
+                  final isSelected = index == selectedSuggestionIndex;
 
-                  return ListTile(
-                    dense: true,
-                    leading: Icon(
-                      isMethod ? Icons.functions :
-                      (parts.length == 2 ? Icons.data_object : Icons.class_),
-                      size: 16,
-                      color: isMethod ? Colors.purple :
-                      (parts.length == 2 ? Colors.blue : Colors.green),
-                    ),
-                    title: Text(
-                      suggestion,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 13,
+                  return Container(
+                    color: isSelected ? Colors.blue.shade50 : null,
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(
+                        isMethod
+                            ? Icons.functions
+                            : (parts.length == 2 ? Icons.data_object : Icons.class_),
+                        size: 16,
+                        color: isMethod
+                            ? Colors.purple
+                            : (parts.length == 2 ? Colors.blue : Colors.green),
                       ),
+                      title: Text(
+                        suggestion,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 13,
+                          color: isSelected ? Colors.blue.shade800 : null,
+                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                        ),
+                      ),
+                      subtitle: _getSubtitle(suggestion),
+                      onTap: () => _insertSuggestion(suggestion),
                     ),
-                    subtitle: _getSubtitle(suggestion),
-                    onTap: () => _insertSuggestion(suggestion),
                   );
                 },
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
-    overlay.insert(_overlayEntry!);
+
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
   Widget? _getSubtitle(String suggestion) {
@@ -224,19 +226,53 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   void _insertSuggestion(String suggestion) {
     final text = controller.text;
     final selection = controller.selection;
-    final caret = selection.base.offset;
+    final caret = selection.baseOffset;
     int start = caret - 1;
-    while (start > 0 && !" .\n()[]{}+\-*/=<>!&|,".contains(text[start - 1])) {
+    while (start > 0 && !" .\n()[]{}+\\-*/=<>!&|,".contains(text[start - 1])) {
       start--;
     }
     final before = text.substring(0, start);
     final after = text.substring(caret);
-    setState(() {
-      controller.text = before + suggestion + after;
-      controller.selection = TextSelection.collapsed(offset: before.length + suggestion.length);
-    });
+
+    controller.value = TextEditingValue(
+      text: before + suggestion + after,
+      selection: TextSelection.collapsed(offset: before.length + suggestion.length),
+    );
+
     _removeOverlay();
+    focusNode.requestFocus();
     _validateExpression(controller.text);
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent && suggestions.isNotEmpty) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowDown:
+          setState(() {
+            selectedSuggestionIndex = (selectedSuggestionIndex + 1) % suggestions.length;
+          });
+          _showOverlay();
+          break;
+        case LogicalKeyboardKey.arrowUp:
+          setState(() {
+            selectedSuggestionIndex = (selectedSuggestionIndex - 1) % suggestions.length;
+            if (selectedSuggestionIndex < 0) {
+              selectedSuggestionIndex = suggestions.length - 1;
+            }
+          });
+          _showOverlay();
+          break;
+        case LogicalKeyboardKey.enter:
+        case LogicalKeyboardKey.tab:
+          if (selectedSuggestionIndex >= 0) {
+            _insertSuggestion(suggestions[selectedSuggestionIndex]);
+          }
+          break;
+        case LogicalKeyboardKey.escape:
+          _removeOverlay();
+          break;
+      }
+    }
   }
 
   void _validateExpression(String input) {
@@ -249,27 +285,18 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
       final expression = Expression.parse(input);
       final evaluator = const ExpressionEvaluator();
 
-      // Create evaluation context with sample data
       final context = <String, dynamic>{};
-
-      // Add flattened access to sample data
       for (final entry in sampleData.entries) {
         final className = entry.key;
         final classInstance = entry.value as Map<String, dynamic>;
-
-        // Add direct class reference
         context[className] = classInstance;
-
-        // Add dot-notation access
         for (final member in classInstance.entries) {
           context['$className.${member.key}'] = member.value;
         }
       }
 
-      // Try to evaluate the expression
       final result = evaluator.eval(expression, context);
       setState(() => error = 'Result: $result');
-
     } catch (e) {
       setState(() => error = 'Error: $e');
     }
@@ -285,14 +312,11 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
         final classData = classMetadata[className]!;
         final suggestions = <String>[];
 
-        // Add field suggestions
         for (var f in (classData['fields'] as Map).keys) {
           if (f.startsWith(partial)) {
             suggestions.add('$className.$f');
           }
         }
-
-        // Add method suggestions
         for (var m in (classData['methods'] as Map).keys) {
           if (m.startsWith(partial)) {
             suggestions.add('$className.$m');
@@ -353,25 +377,34 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
             ),
           ),
 
-        // Code editor
+        // Expression input with syntax highlighting colors
         Expanded(
-          child: Container(
-            key: _codeFieldKey,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: GestureDetector(
-              onTap: _removeOverlay,
-              child: CodeTheme(
-                data: CodeThemeData(styles: monokaiSublimeTheme),
-                child: CodeField(
+          child: CompositedTransformTarget(
+            link: layerLink,
+            child: Focus(
+              onKeyEvent: (node, event) {
+                _handleKeyEvent(event);
+                return KeyEventResult.handled;
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: TextField(
                   controller: controller,
-                  textStyle: const TextStyle(fontFamily: 'monospace'),
-                  onChanged: _onTextChanged,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
+                  focusNode: focusNode,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 14,
                   ),
+                  decoration: const InputDecoration.collapsed(
+                    hintText: 'Type expressions like: User.name + " is " + User.age',
+                  ),
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
                 ),
               ),
             ),
@@ -380,7 +413,7 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
 
         const SizedBox(height: 16),
 
-        // Help text
+        // Help card
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -399,7 +432,8 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                       'User.age = 25\n'
                       'Car.brand = "Toyota"\n'
                       'Car.speed = 80.5\n\n'
-                      'Try: User.name + " is " + User.age + " years old"',
+                      'Try: User.name + " is " + User.age + " years old"\n'
+                      'Use ↑↓ to navigate suggestions, Enter/Tab to accept',
                   style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                 ),
               ],

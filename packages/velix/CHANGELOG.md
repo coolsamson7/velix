@@ -1,3 +1,7 @@
+## 0.92.0
+
+- **FEAT**: new class type.
+
 ## 0.91.1
 
 - **FIX**: Lazy type descriptors fix.

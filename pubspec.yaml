@@ -32,3 +32,6 @@ scripts:
   test:
     run: melos exec --dir-exists=test -- "flutter test"
     description: Run `flutter test` in every package that has a test directory
+  bootstrap:
+    run: flutter pub get
+    run_in: all

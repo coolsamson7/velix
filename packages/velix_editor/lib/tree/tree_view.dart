@@ -493,22 +493,6 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
       onClose: widget.onClose,
       child: Column(
         children: [
-          // Keyboard shortcuts hint
-          Container(
-            padding: const EdgeInsets.all(8),
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              'Use ↑↓ to navigate, ←→ to expand/collapse, Del to delete, Space/Enter to toggle',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-          ),
-
           // Tree view
           Expanded(
             child: WidgetTreeView(controller: controller),

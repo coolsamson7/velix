@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:velix/velix.dart';
 import 'package:velix_editor/editor.types.g.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';

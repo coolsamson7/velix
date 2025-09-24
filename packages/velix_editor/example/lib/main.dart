@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor_module.dart';
@@ -99,41 +102,13 @@ void main() async {
 
   await i18n.load();
 
-  var json = {
-    "type": "container",
-    "children": [
-      {
-        "type": "text",
-        "children": [],
-        "label": "Hello World"
-      },
-      {
-        "type": "button",
-        "children": [],
-        "number": 1,
-        "isCool": true
-      },
-      {
-        "type": "text",
-        "children": [],
-        "label": "Second Text"
-      }
-    ]
-  };
+  // load json
 
-  //var widget = JSON.deserialize<WidgetData>(json); // TEST TODO */
+  final jsonString = await rootBundle.loadString('assets/widgets.json');
 
-  var widgets = ContainerWidgetData(children: [
-    TextWidgetData(label: "eins"),
-    ButtonWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
-    //LabelWidgetData(label: "zwei", font: Font(weight: FontWeight.normal, style: FontStyle.normal, size: 16)),
-    TextWidgetData(label: "zwei"),
-    ContainerWidgetData(children: [
-      TextWidgetData(label: "drei"),
-      TextWidgetData(label: "vier"),
-    ])
-  ]);
+  var json = jsonDecode(jsonString);
 
+  var widget = JSON.deserialize<ContainerWidgetData>(json);
 
   // boot environment
 
@@ -145,7 +120,7 @@ void main() async {
       environment: environment,
       i18n: i18n,
       localeManager: localeManager,
-      widgets: [widgets]
+      widgets: [widget]
   ));
 }
 

@@ -1,0 +1,31 @@
+{
+  "type": "container",
+  "children": [
+    {
+    "type": "text",
+    "children": [],
+    "label": "Hello World"
+    },
+    {
+    "type": "button",
+    "children": [],
+    "label": "PRESS",
+    "font": {
+      "size": 12,
+      "weight": 100,
+      "style": "normal"
+      },
+    "padding": {
+      "left": 1,
+      "top": 1,
+      "right": 1,
+      "bottom": 1
+      }
+    },
+    {
+    "type": "text",
+    "children": [],
+    "label": "Second Text"
+    }
+  ]
+}

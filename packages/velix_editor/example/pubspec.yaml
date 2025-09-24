@@ -41,6 +41,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - assets/widgets.json
     - assets/locales/en/sample.json
     - assets/locales/de/sample.json
 

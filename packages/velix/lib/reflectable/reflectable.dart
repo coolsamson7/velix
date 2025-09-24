@@ -59,9 +59,9 @@ class FieldDescriptor<T, V> {
   final Type? elementType;
   final Function? factoryConstructor;
 
-  AbstractType<V, AbstractType> type;
-  final Getter<T, V> getter;
-  final Setter<T, V>? setter;
+  late AbstractType<dynamic, AbstractType> type;
+  final Getter getter;
+  final Setter? setter;
   late TypeDescriptor typeDescriptor;
   final bool isNullable;
 
@@ -71,14 +71,65 @@ class FieldDescriptor<T, V> {
 
   FieldDescriptor({
     required this.name,
-    required this.type,
     required this.getter,
     required this.annotations,
     this.elementType,
     this.factoryConstructor,
     this.setter,
     this.isNullable = false,
-  });
+    AbstractType<dynamic, AbstractType>? type
+  }) {
+    if ( type != null)
+      this.type = type;
+    else
+      inferType();
+  }
+
+  // internal
+
+  void inferType() {
+    final type = nonNullableOf<V>();
+
+    final Map<Type, AbstractType> types = {
+      String: StringType(),    // default unconstrained
+      int: IntType(),
+      double: DoubleType(),
+      bool: BoolType(),
+      DateTime: DateTimeType()
+    };
+
+    final Map<Type, AbstractType> nullableTypes = {
+      String: StringType().optional(),    // default unconstrained
+      int: IntType().optional(),
+      double: DoubleType().optional(),
+      bool: BoolType().optional(),
+      DateTime: DateTimeType().optional()
+    };
+
+    var result = isNullable ? nullableTypes[type] : types[type];
+
+    if ( result == null)
+      if ( type.toString().startsWith("List<")) {
+        result = ListType(type);
+        if ( isNullable )
+          result = (result as dynamic).optional();
+      }
+      else {
+        if ( TypeDescriptor.hasType(type)) {
+          result = ObjectType(TypeDescriptor.forType<V>());
+          if ( isNullable )
+            result = result.optional() as AbstractType<dynamic, AbstractType>?;
+        }
+        else {
+          // it could be a class type or a object type that hasn't been constructed yet...
+
+          TypePatch(type: type, applyFunc: (resolvedType) => this.type = resolvedType as dynamic);
+          return;
+        }
+      }
+
+    this.type = result as dynamic;
+  }
 
 
   // public
@@ -184,6 +235,57 @@ typedef Constructor<T> = Function;// T Function(Map<String, dynamic> args);//
 typedef FromMapConstructor<T> = T Function(Map<String, dynamic> args);
 typedef FromArrayConstructor<T> = T Function(List<dynamic> args);
 
+typedef ApplyFunc<T> = Function(T arg);
+
+abstract class Patch<T> {
+  static List<Patch> patches = [];
+
+  static void resolvePatches() {
+    for ( var patch in patches)
+      patch.apply();
+
+    patches.clear();
+  }
+
+  // instance data
+
+  ApplyFunc<T> applyFunc;
+
+  // constructor
+
+  Patch({required this.applyFunc}) {
+    patches.add(this);
+  }
+
+  // public
+
+  void apply() {
+    applyFunc(resolve());
+  }
+
+  // abstract
+
+  T resolve();
+}
+
+class TypePatch extends Patch<AbstractType> {
+  Type type;
+
+  // constructor
+
+  TypePatch({required this.type, required super.applyFunc});
+
+  // implement
+
+  @override
+  AbstractType resolve() {
+    if (TypeDescriptor.hasType(type))
+      return ObjectType(TypeDescriptor.forType(type));
+    else
+      return ClassType(type);
+  }
+}
+
 /// Class covering the meta-data of a type.
 /// [T] the reflected type
 ///
@@ -210,24 +312,8 @@ class TypeDescriptor<T> {
     return descriptor;
   }
 
-  static List<TypeDescriptor> lazyTypes = [];
-
-  static TypeDescriptor _checkType<T>([Type? type]) {
-    var descriptor = _byType[type ?? T];
-    if (descriptor == null) {
-      descriptor = TypeDescriptor<T>.lazy();
-      lazyTypes.add(descriptor);
-    }
-
-    return descriptor;
-  }
-
   static void verify() {
-    for ( var lazy in lazyTypes)
-      if ( lazy.lazy)
-        print("missing declaration for ${lazy.type}");
-
-    lazyTypes.clear();
+    Patch.resolvePatches();
   }
 
   static bool hasType(Type type) {
@@ -303,7 +389,6 @@ class TypeDescriptor<T> {
 
   // instance data
 
-  bool lazy = false;
   String location;
   late Type type;
   final Map<String, FieldDescriptor> _fields = {};
@@ -322,18 +407,6 @@ class TypeDescriptor<T> {
 
   // constructor
 
-  TypeDescriptor.lazy() :this(
-      location: "",
-      constructor: null,
-      fromMapConstructor: null,
-      fromArrayConstructor: null,
-      constructorParameters: [],
-      fields: [],
-      methods: null,
-      annotations: [],
-      lazy: true
-  ) ;
-
   TypeDescriptor({
     required this.location,
     required this.constructor,
@@ -346,32 +419,12 @@ class TypeDescriptor<T> {
     this.isAbstract = false,
     this.superClass,
     this.enumValues,
-    this.lazy = false
   }) {
     type = nonNullableOf<T>();
 
-    var existing = _byType[T];
+    setup(fields, methods);
 
-    if ( existing != null) {
-      existing.location = location;
-      existing.constructor = constructor;
-      existing.fromMapConstructor = fromMapConstructor;
-      existing.fromArrayConstructor = fromArrayConstructor;
-      existing.constructorParameters = constructorParameters;
-      existing.annotations = annotations;
-      existing.isAbstract = isAbstract;
-      existing.superClass = superClass;
-      existing.enumValues = enumValues;
-      existing.lazy = false;
-
-      existing.setup(fields, methods);
-    }
-    else {
-      TypeDescriptor.register(this);
-
-      if ( !lazy )
-        setup(fields, methods);
-    }
+    TypeDescriptor.register(this);
   }
 
   void setup(List<FieldDescriptor> fields, List<MethodDescriptor>? methods) {
@@ -463,8 +516,8 @@ class TypeDescriptor<T> {
     return int.parse(location.substring(index + 1));
   }
 
-  T? getAnnotation<T>() {
-    return findElement(annotations, (annotation) => annotation.runtimeType == T) as T?;
+  A? getAnnotation<A>() {
+    return findElement(annotations, (annotation) => annotation.runtimeType == A) as A?;
   }
 
   String get module {
@@ -603,46 +656,6 @@ ParameterDescriptor param<T>(String name, {
   return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue, annotations: annotations ?? []);
 }
 
-/// @internal
-dynamic inferType<T>(AbstractType<T,AbstractType>? t, bool isNullable) {
-  if ( t != null)
-    return t;
-
-  final type = nonNullableOf<T>();
-
-  final Map<Type, AbstractType> types = {
-    String: StringType(),    // default unconstrained
-    int: IntType(),
-    double: DoubleType(),
-    bool: BoolType(),
-    DateTime: DateTimeType()
-  };
-
-  final Map<Type, AbstractType> nullableTypes = {
-    String: StringType().optional(),    // default unconstrained
-    int: IntType().optional(),
-    double: DoubleType().optional(),
-    bool: BoolType().optional(),
-    DateTime: DateTimeType().optional()
-  };
-
-  var result = isNullable ? nullableTypes[type] : types[type];
-
-  if ( result == null)
-    if ( type.toString().startsWith("List<")) {
-      result = ListType(type);
-      if ( isNullable )
-        result = (result as dynamic).optional();
-    }
-    else {
-      result = ObjectType(TypeDescriptor._checkType<T>());
-      if ( isNullable )
-        result = (result as dynamic).optional();
-    }
-
-   return result as dynamic;
-}
-
 MethodDescriptor method<T,R>(String name, {List<ParameterDescriptor>? parameters, bool isAsync = false,
   bool isStatic = false,
   annotations = const [],
@@ -660,5 +673,5 @@ FieldDescriptor field<T,V>(String name, {
   bool isFinal = false,
   bool isNullable = false
 }) {
-  return FieldDescriptor(name: name, type: inferType<V>(type, isNullable), annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isNullable: isNullable);
+  return FieldDescriptor<T,V>(name: name, type: type, annotations: annotations ?? [], elementType: elementType, factoryConstructor: factoryConstructor, getter: getter, setter: setter, isNullable: isNullable);
 }

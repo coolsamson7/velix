@@ -780,6 +780,13 @@ class LazyObjectType<T> extends AbstractType<T, ObjectType<T>> {
   }
 }
 
+class ClassType<T> extends AbstractType<T, ClassType<T>> {
+  /// Create a new [ClassType]
+  ClassType([Type? type]) : super(type: type ?? T) {
+    baseType<T>(type ?? T);
+  }
+}
+
 
 /// Type specification for class values of a certain type.
 /// [T] the corresponding type
@@ -825,7 +832,7 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
       for (FieldDescriptor field in typeDescriptor.getFields()) {
         context.path = path.isEmpty ? field.name :  "$path.${field.name}";
 
-        field.type.check(field.getter(object), context);
+        field.type!.check(field.getter(object), context);
       }
       
       context.path = path;

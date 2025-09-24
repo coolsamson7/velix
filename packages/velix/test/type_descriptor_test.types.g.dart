@@ -7,8 +7,8 @@ import 'type_descriptor_test.dart';
 import 'package:velix/reflectable/reflectable.dart';
 
 void registerTypes() {
-  var BaseDescriptor =  type<Base>(
-    location: 'asset:velix/test/type_descriptor_test.dart:5:1',
+  var baseDescriptor =  type<Base>(
+    location: 'asset:velix/test/type_descriptor_test.dart:7:1',
     params: [
       param<String>('id', isNamed: true, isRequired: true)
     ],
@@ -17,6 +17,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Base(id: args[0] as String? ?? ''),
     fields: [
       field<Base,String>('id',
+        type: StringType().minLength(10).maxLength(10),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Base).id = value,
       )
@@ -24,8 +25,8 @@ void registerTypes() {
   );
 
   type<Derived>(
-    location: 'asset:velix/test/type_descriptor_test.dart:12:1',
-    superClass: BaseDescriptor,
+    location: 'asset:velix/test/type_descriptor_test.dart:15:1',
+    superClass: baseDescriptor,
     params: [
       param<int>('number', isNamed: true, isRequired: true), 
       param<String>('id', isNamed: true, isRequired: true)
@@ -35,6 +36,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Derived(number: args[0] as int? ?? 0, id: args[1] as String? ?? ''),
     fields: [
       field<Derived,int>('number',
+        type: IntType().greaterThan(0),
         getter: (obj) => obj.number,
         setter: (obj, value) => (obj as Derived).number = value,
       )
@@ -43,7 +45,7 @@ void registerTypes() {
 
   // watchout: is part of a cycle
   type<Lazy>(
-    location: 'asset:velix/test/type_descriptor_test.dart:19:1',
+    location: 'asset:velix/test/type_descriptor_test.dart:23:1',
     params: [
       param<Lazy>('parent', isNamed: true, isRequired: true)
     ],
@@ -59,4 +61,5 @@ void registerTypes() {
     ]
   );
 
+  TypeDescriptor.verify();
 }

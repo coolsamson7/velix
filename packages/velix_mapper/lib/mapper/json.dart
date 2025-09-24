@@ -211,8 +211,10 @@ class PolymorphicMapping extends Mapping<Map<String, dynamic>,dynamic> {
 
     if ( mapping == this)
        super.transformTarget(source, target, context);
-    else
-       mapping.transformTarget(source, target, context);
+    else {
+      mapping.setupContext(context);
+      mapping.transformTarget(source, target, context);
+    }
   }
 }
 

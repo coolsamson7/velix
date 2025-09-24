@@ -37,7 +37,14 @@ void main() {
       var input = Invoice(
           date: DateTime.now(),
           products: [
-            Product(name: "p1", price: Money(currency: "EU", value: 1), status: Status.available),
+            Product(
+                name: "p1",
+                price: Money(
+                    currency: "EU",
+                    value: 1
+                ),
+                status: Status.available
+            ),
           ]
       );
 
@@ -55,7 +62,7 @@ void main() {
       var derived = Derived(name: "derived", number: 1);
 
       var json = JSON.serialize(derived);
-      var result = JSON.deserialize<Base>(json);
+      var result = JSON.deserialize<Derived>(json);
 
       final isEqual = TypeDescriptor.deepEquals(derived, result);
       expect(isEqual, isTrue);

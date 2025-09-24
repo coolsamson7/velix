@@ -90,4 +90,5 @@ void registerTypes() {
     ]
   );
 
+  TypeDescriptor.verify();
 }

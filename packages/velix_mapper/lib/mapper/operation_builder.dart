@@ -21,7 +21,7 @@ class MapList2List extends MapperProperty {
   final Mapper mapper;
   Mapping? mapping;
 
-  bool polymorphic = false;
+  bool polymorphic = false; // TODO
 
   // constructor
 
@@ -80,7 +80,7 @@ class MapDeep extends MapperProperty {
   final MapperProperty targetProperty;
   final Mapper mapper;
   Mapping? mapping;
-  bool polymorph = false;
+  bool polymorph = true; // TODO
 
   // constructor
 
@@ -596,8 +596,8 @@ class TargetNode {
       if ( from != sourceType)
         throw MapperException("conversion source type $from does not match $sourceType");
 
-      if ( to != targetType)
-        throw MapperException("conversion target type $to does not match $targetType");
+      //JUST A TEST TODOif ( to != targetType)
+      //  throw MapperException("conversion target type $to does not match $targetType");
 
       result = conversion.sourceConverter();
     }

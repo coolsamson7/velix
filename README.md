@@ -9,7 +9,7 @@
 # Introduction
 
 Velix is Dart/Flutter library implementing some of the core parts required in every Flutter application:
-- type meta data
+- type meta data extraction
 - specification and validation of type constraints
 - general purpose mapping framework
 - json mapper
@@ -17,6 +17,7 @@ Velix is Dart/Flutter library implementing some of the core parts required in ev
 - i18n
 - dependency injection container
 - command pattern for ui actions
+- ui editor and rendering engine
 
 Check out some articles on Medium:
 
@@ -27,11 +28,12 @@ Check out some articles on Medium:
 Detailed information can be found in the corresponding [Wiki](https://github.com/coolsamson7/velix/wiki).
 
 This is a melos mono-repo. Checkout the different packages:
-- [velix](https://github.com/coolsamson7/velix/tree/main/packages/velix)
-- [velix_di](https://github.com/coolsamson7/velix/tree/main/packages/velix_di)
-- [velix_mapper](https://github.com/coolsamson7/velix/tree/main/packages/velix_mapper)
-- [velix_i18n](https://github.com/coolsamson7/velix/tree/main/packages/velix_i18n)
-- [velix_ui](https://github.com/coolsamson7/velix/tree/main/packages/velix_ui)
+- [velix](https://github.com/coolsamson7/velix/tree/main/packages/velix/README.md)
+- [velix_di](https://github.com/coolsamson7/velix/tree/main/packages/velix_di/README.md)
+- [velix_mapper](https://github.com/coolsamson7/velix/tree/main/packages/velix_mapper/README.md)
+- [velix_i18n](https://github.com/coolsamson7/velix/tree/main/packages/velix_i18n/README.md)
+- [velix_ui](https://github.com/coolsamson7/velix/tree/main/packages/velix_ui/README.md)
+- [velix_editor](https://github.com/coolsamson7/velix/tree/main/packages/velix_editor/README.md)
 
 Lets get a quick overview on the topics.
 

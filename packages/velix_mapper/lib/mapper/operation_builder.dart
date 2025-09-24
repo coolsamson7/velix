@@ -80,7 +80,7 @@ class MapDeep extends MapperProperty {
   final MapperProperty targetProperty;
   final Mapper mapper;
   Mapping? mapping;
-  bool polymorphic = true; // TODO
+  bool polymorphic = false;
 
   // constructor
 

@@ -250,24 +250,45 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     final text = controller.text;
     final caret = controller.selection.baseOffset;
 
+    // Find start of word before caret
     int start = caret;
-    while (start > 0 && !' .\n()[]{}+\\-*/=<>!&|,'.contains(text[start - 1])) {
+    while (start > 0 && !" .\n()[]{}+\\-*/=<>!&|,".contains(text[start - 1])) {
       start--;
     }
+    final word = text.substring(start, caret);
 
-    final before = text.substring(0, start);
+    // If the 'word' is a partial like "Car." or "Car.b", find the last dot
+    int dotIndex = word.lastIndexOf('.');
+    String prefix = '';
+    if (dotIndex >= 0) {
+      // The prefix includes the class, e.g. "Car."
+      prefix = word.substring(0, dotIndex + 1);
+    }
+
+    // If user's input already matches the suggestion's prefix, insert only the remaining part
+    String suggestionToInsert;
+    if (suggestion.startsWith(prefix)) {
+      suggestionToInsert = suggestion.substring(prefix.length);
+    } else {
+      // Fallback: insert the full suggestion
+      suggestionToInsert = suggestion;
+    }
+
+    final before = text.substring(0, start + prefix.length);
     final after = text.substring(caret);
 
     controller.value = TextEditingValue(
-      text: before + suggestion + after,
-      selection:
-      TextSelection.collapsed(offset: before.length + suggestion.length),
+      text: before + suggestionToInsert + after,
+      selection: TextSelection.collapsed(offset: before.length + suggestionToInsert.length),
     );
 
     _removeOverlay();
     focusNode.requestFocus();
     _validateExpression(controller.text);
   }
+
+
+
 
   void _handleRawKeyEvent(RawKeyEvent event) {
     if (event is RawKeyDownEvent && suggestions.isNotEmpty && focusNode.hasFocus) {

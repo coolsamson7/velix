@@ -306,133 +306,77 @@ class ExpressionParser {
     expression = SettableParser<Expression>(undefined<Expression>());
     token = SettableParser<Expression>(undefined<Expression>());
 
-    token.set(literal().or(unaryExpression()).or(variable()).cast());
+    token.set(
+      literal()
+          .or(unaryExpression())
+          .or(variable())
+          .or(partialVariable())
+          .cast<Expression>(),
+    );
 
     expression.set(
       binaryExpression()
           .seq(conditionArguments().optional())
           .map((l) {
-        if (l[1] == null) {
-          return l[0];
-        } else {
-          final result = ConditionalExpression(l[0], l[1][0], l[1][1]);
-          result.start = l[0].start;
-          result.end = l[1][1].end;
-          return result;
-        }
+        if (l[1] == null) return l[0];
+        return ConditionalExpression(l[0], l[1][0], l[1][1])
+          ..start = l[0].start
+          ..end = l[1][1].end;
       }),
     );
   }
 
-  Parser<Expression> literal() =>
-      numericLiteral().or(stringLiteral()).or(boolLiteral()).or(nullLiteral()).cast<Expression>();
+  // ---------------------
+  // Partial variable (for autocomplete)
+  // ---------------------
+  Parser<Expression> partialVariable() =>
+      partialIdentifier().map((id) => Variable(id)..start = id.start..end = id.end);
 
-  Parser<Expression> numericLiteral() =>
-      digit().plus().flatten().mapWithPosition(
-              (value, start, end) => Literal(int.parse(value), value)
-            ..start = start
-            ..end = end);
+  Parser<Identifier> partialIdentifier() =>
+      (letter() & (word() | char(r'$')).star())
+          .flatten()
+          .mapWithPosition((v, start, end) => Identifier(v)..start = start..end = end);
 
-  Parser<Expression> stringLiteral() =>
-      (char('"') & pattern('^"').star().flatten() & char('"'))
-          .pick(1)
-          .mapWithPosition((value, start, end) => Literal(value, '"$value"')
-        ..start = start
-        ..end = end);
-
-  Parser<Expression> boolLiteral() =>
-      (string('true').or(string('false')))
-          .mapWithPosition((value, start, end) => Literal(value == 'true', value)
-        ..start = start
-        ..end = end);
-
-  Parser<Expression> nullLiteral() =>
-      string('null')
-          .mapWithPosition((value, start, end) => Literal(null, 'null')
-        ..start = start
-        ..end = end);
-
-  Parser<Expression> unaryExpression() {
-    final ops = ['-', '+', '!', '~'];
-    return ops
-        .map(string)
-        .reduce((a, b) => a.or(b).cast<String>())
-        .trim()
-        .seq(token)
-        .mapWithPosition((list, start, end) {
-      return UnaryExpression(list[0], list[1])
-        ..start = start
-        ..end = end;
-    });
-  }
-
+  // ---------------------
+  // Regular variable + member/index/call
+  // ---------------------
   Parser<Expression> variable() =>
       groupOrIdentifier()
-          .seq((memberArgument().or(indexArgument()).or(callArgument())).star())
+          .seq((memberAccess().or(indexArgument()).or(callArgument())).star())
           .mapWithPosition((list, start, end) {
         Expression obj = list[0];
-
-        // propagate offsets from identifier or inner expression
-        if (obj is Variable) {
-          obj.start = obj.identifier.start;
-          obj.end = obj.identifier.end;
-        }
-
         final args = list[1] as List;
         for (var arg in args) {
-          if (arg is Identifier) {
-            obj = MemberExpression(obj, arg)
-              ..start = obj.start
-              ..end = arg.end;
-          } else if (arg is Expression) {
-            obj = IndexExpression(obj, arg)
-              ..start = obj.start
-              ..end = arg.end;
-          } else if (arg is List<Expression>) {
-            obj = CallExpression(obj, arg)
-              ..start = obj.start
-              ..end = arg.isNotEmpty ? arg.last.end : obj.end;
-          }
+          if (arg is Identifier) obj = MemberExpression(obj, arg)..end = end;
+          else if (arg is Expression) obj = IndexExpression(obj, arg)..end = end;
+          else if (arg is List<Expression>) obj = CallExpression(obj, arg)..end = end;
         }
-
         obj.start = start;
         obj.end = end;
         return obj;
       });
 
-  Parser<Expression> group() =>
-      (char('(').trim() & expression.trim() & char(')').trim())
-          .pick(1)
-          .mapWithPosition((e, start, end) {
-        e.start = start;
-        e.end = end;
-        return e;
+  Parser<Expression> memberAccess() =>
+      (char('.') & partialIdentifier().optional()).pick(1).map((id) {
+        return id ?? Identifier(''); // empty identifier for dangling dot
       });
-
-  Parser<Expression> groupOrIdentifier() =>
-      group()
-          .or(thisExpression())
-          .or(identifier().map((v) => Variable(v)))
-          .cast<Expression>();
-
-  Parser<Identifier> identifier() =>
-      (letter() & (word() | char(r'$')).star())
-          .flatten()
-          .mapWithPosition((value, start, end) {
-        final id = Identifier(value);
-        id.start = start;
-        id.end = end;
-        return id;
-      });
-
-  Parser<Identifier> memberArgument() =>
-      (char('.') & identifier()).pick(1).cast<Identifier>();
 
   Parser<Expression> indexArgument() =>
-      (char('[') & expression.trim() & char(']')).pick(1).cast<Expression>();
+      (char('[') & expression & char(']')).pick(1).cast<Expression>();
 
   Parser<List<Expression>> callArgument() =>
-      (char('(') & arguments.trim() & char(')')).pick(1).cast<List<Expression>>();
+      (char('(') & arguments & char(')')).pick(1).cast();
+
+  Parser<Expression> group() =>
+      (char('(') & expression & char(')')).pick(1).cast();
+
+  Parser<Expression> groupOrIdentifier() =>
+      group().or(thisExpression()).or(identifier().map((v) => Variable(v))).cast();
+
+  Parser<Identifier> identifier({bool partial = false}) =>
+      (letter() & (word() | char(r'$')).star())
+          .flatten()
+          .mapWithPosition((v, start, end) => Identifier(v)..start = start..end = end);
 
   Parser<Expression> thisExpression() =>
       string('this').mapWithPosition((_, start, end) {
@@ -443,17 +387,41 @@ class ExpressionParser {
       });
 
   Parser<List<Expression>> get arguments =>
-      expression
-          .plusSeparated(char(',').trim())
-          .map((sl) => sl.elements)
-          .optionalWith([])
-          .cast<List<Expression>>();
+      expression.plusSeparated(char(',').trim()).map((sl) => sl.elements).optionalWith([]);
 
   Parser<List<Expression>> conditionArguments() =>
-      (char('?') & expression.trim() & char(':') & expression)
+      (char('?') & expression & char(':') & expression).pick(1).seq(expression)
+          .map((l) => [l[0], l[1]]);
+
+  Parser<Expression> literal() =>
+      numericLiteral().or(stringLiteral()).or(boolLiteral()).or(nullLiteral()).cast();
+
+  Parser<Expression> numericLiteral() =>
+      digit().plus().flatten().mapWithPosition((v, start, end) =>
+      Literal(int.parse(v), v)..start = start..end = end);
+
+  Parser<Expression> stringLiteral() =>
+      (char('"') & pattern('^"').star().flatten() & char('"'))
           .pick(1)
-          .seq(expression)
-          .mapWithPosition((list, start, end) => [list[0], list[1]]);
+          .mapWithPosition((v, start, end) =>
+      Literal(v, '"$v"')..start = start..end = end);
+
+  Parser<Expression> boolLiteral() =>
+      (string('true').or(string('false')))
+          .mapWithPosition((v, start, end) =>
+      Literal(v == 'true', v)..start = start..end = end);
+
+  Parser<Expression> nullLiteral() =>
+      string('null').mapWithPosition((_, start, end) =>
+      Literal(null, 'null')..start = start..end = end);
+
+  Parser<Expression> unaryExpression() {
+    final ops = ['-', '+', '!', '~'];
+    return ops.map(string).reduce((a, b) => a.or(b).cast<String>())
+        .trim()
+        .seq(token)
+        .mapWithPosition((list, start, end) => UnaryExpression(list[0], list[1])..start = start..end = end);
+  }
 
   Parser<Expression> binaryExpression() =>
       token.plusSeparated(binaryOperation())
@@ -463,9 +431,7 @@ class ExpressionParser {
         for (int i = 1; i < elements.length; i += 2) {
           final op = elements[i] as String;
           final right = elements[i + 1] as Expression;
-          left = BinaryExpression(op, left, right)
-            ..start = left.start
-            ..end = right.end;
+          left = BinaryExpression(op, left, right)..start = left.start..end = right.end;
         }
         return left;
       });
@@ -476,6 +442,8 @@ class ExpressionParser {
           .reduce((a, b) => a.or(b).cast<String>())
           .trim();
 }
+
+
 
 // auto
 
@@ -570,7 +538,7 @@ void main() {
 
   // autohotkey
 
-  input = "inner.";
+  input = "inn";
   result = parser.expression.parse(input);
 
   if (result is Success<Expression>) {

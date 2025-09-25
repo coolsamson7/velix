@@ -127,9 +127,11 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     }
     final s = _getSuggestions(word);
     if (s.isNotEmpty && focusNode.hasFocus) {
-      suggestions = s;
-      selectedSuggestionIndex = 0;
-      _showOverlay();
+      setState(() {
+        suggestions = s;
+        selectedSuggestionIndex = 0;
+        _showOverlay();
+      });
     } else {
       _removeOverlay();
     }
@@ -168,34 +170,37 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                           true;
                   final isSelected = index == selectedSuggestionIndex;
 
-                  return Container(
-                    color: isSelected ? Colors.blue.shade50 : null,
-                    child: ListTile(
-                      dense: true,
-                      leading: Icon(
-                        isMethod
-                            ? Icons.functions
-                            : (parts.length == 2
-                            ? Icons.data_object
-                            : Icons.class_),
-                        size: 16,
-                        color: isMethod
-                            ? Colors.purple
-                            : (parts.length == 2 ? Colors.blue : Colors.green),
-                      ),
-                      title: Text(
-                        suggestion,
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          color: isSelected ? Colors.blue.shade800 : null,
-                          fontWeight: isSelected
-                              ? FontWeight.w500
-                              : FontWeight.normal,
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _insertSuggestion(suggestion),
+                    child: Container(
+                      color: isSelected ? Colors.blue.shade50 : null,
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(
+                          isMethod
+                              ? Icons.functions
+                              : (parts.length == 2
+                              ? Icons.data_object
+                              : Icons.class_),
+                          size: 16,
+                          color: isMethod
+                              ? Colors.purple
+                              : (parts.length == 2 ? Colors.blue : Colors.green),
                         ),
+                        title: Text(
+                          suggestion,
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                            color: isSelected ? Colors.blue.shade800 : null,
+                            fontWeight: isSelected
+                                ? FontWeight.w500
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        subtitle: _getSubtitle(suggestion),
                       ),
-                      subtitle: _getSubtitle(suggestion),
-                      onTap: () => _insertSuggestion(suggestion),
                     ),
                   );
                 },
@@ -265,32 +270,27 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   }
 
   void _handleRawKeyEvent(RawKeyEvent event) {
-    if (event is RawKeyDownEvent && suggestions.isNotEmpty) {
-      switch (event.logicalKey.keyId) {
-        case 0x100070052: // Arrow Down
-          setState(() {
-            selectedSuggestionIndex =
-                (selectedSuggestionIndex + 1) % suggestions.length;
-          });
+    if (event is RawKeyDownEvent && suggestions.isNotEmpty && focusNode.hasFocus) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        setState(() {
+          selectedSuggestionIndex =
+              (selectedSuggestionIndex + 1) % suggestions.length;
           _showOverlay();
-          break;
-        case 0x100070050: // Arrow Up
-          setState(() {
-            selectedSuggestionIndex =
-                (selectedSuggestionIndex - 1 + suggestions.length) %
-                    suggestions.length;
-          });
+        });
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        setState(() {
+          selectedSuggestionIndex =
+              (selectedSuggestionIndex - 1 + suggestions.length) %
+                  suggestions.length;
           _showOverlay();
-          break;
-        case 0x100000028: // Enter
-        case 0x100000029: // Tab
-          if (selectedSuggestionIndex >= 0) {
-            _insertSuggestion(suggestions[selectedSuggestionIndex]);
-          }
-          break;
-        case 0x100000029: // Escape
-          _removeOverlay();
-          break;
+        });
+      } else if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.tab) {
+        if (selectedSuggestionIndex >= 0) {
+          _insertSuggestion(suggestions[selectedSuggestionIndex]);
+        }
+      } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+        _removeOverlay();
       }
     }
   }
@@ -354,7 +354,6 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Error/Result display
         if (error != null)
           Container(
             width: double.infinity,
@@ -397,7 +396,6 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
             ),
           ),
 
-        // Expression input
         Expanded(
           child: CompositedTransformTarget(
             link: layerLink,
@@ -421,7 +419,6 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
 
         const SizedBox(height: 16),
 
-        // Help card
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),

@@ -45,6 +45,16 @@ final Map<String, dynamic> sampleData = {
   }
 };
 
+class MyEvaluator extends ExpressionEvaluator {
+  const MyEvaluator();
+
+  @override
+  dynamic evalMemberExpression(MemberExpression expression, Map<String, dynamic> context) {
+    var object = eval(expression.object, context).toJson();
+    return object[expression.property.name];
+  }
+}
+
 class DotAccessExpressionEditor extends StatefulWidget {
   const DotAccessExpressionEditor({super.key});
   @override
@@ -293,7 +303,7 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
 
     try {
       final expression = Expression.parse(input);
-      final evaluator = const ExpressionEvaluator();
+      final evaluator = const MyEvaluator();
 
       final context = <String, dynamic>{};
       for (final entry in sampleData.entries) {

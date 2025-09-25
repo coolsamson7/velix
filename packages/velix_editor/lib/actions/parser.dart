@@ -277,6 +277,35 @@ class TypeInferencer implements ExpressionVisitor<ClassDescriptor> {
 /// =======================
 /// Expression Parser
 /// =======================
+
+
+
+extension MapWithPositionExt<T> on Parser<T> {
+  Parser<R> mapWithPosition<R>(R Function(T value, int start, int end) mapper) {
+    return (position() & this.flatten()).map((values) {
+      final start = values[0] as int;
+      final text = values[1] as String;
+      final end = start + text.length;
+
+      // Parse the inner parser again to get the value
+      final innerResult = this.parse(text);
+      if (innerResult is Success) {
+        return mapper(innerResult.value, start, end);
+      }
+      else {
+        throw innerResult; // propagate failure
+      }
+    });
+  }
+}
+
+
+
+
+
+/// =======================
+/// Expression Parser with Offsets
+/// =======================
 class ExpressionParser {
   late final SettableParser<Expression> expression;
   late final SettableParser<Expression> token;
@@ -290,10 +319,25 @@ class ExpressionParser {
     expression.set(
       binaryExpression()
           .seq(conditionArguments().optional())
-          .map((l) => l[1] == null
-          ? l[0]
-          : ConditionalExpression(l[0], l[1][0], l[1][1])),
+          .map((l) {
+        if (l[1] == null) {
+          return l[0];
+        } else {
+          final result = ConditionalExpression(l[0], l[1][0], l[1][1]);
+          _assignOffsets(result, l);
+          return result;
+        }
+      }),
     );
+  }
+
+  void _assignOffsets(Expression expr, List<dynamic> source) {
+    expr.start = (source[0] as Expression).start;
+    if (source.length > 1 && source[1] is List && (source[1] as List).length > 1) {
+      expr.end = (source[1] as List)[1].end;
+    } else {
+      expr.end = expr.start;
+    }
   }
 
   Parser<Expression> literal() => numericLiteral()
@@ -303,18 +347,31 @@ class ExpressionParser {
       .cast<Expression>();
 
   Parser<Expression> numericLiteral() =>
-      digit().plus().flatten().map((v) => Literal(int.parse(v), v));
+      digit()
+          .plus()
+          .flatten()
+          .mapWithPosition((value, start, end) => Literal(int.parse(value), value)
+        ..start = start
+        ..end = end);
 
   Parser<Expression> stringLiteral() =>
       (char('"') & pattern('^"').star().flatten() & char('"'))
           .pick(1)
-          .map((v) => Literal(v, '"$v"'));
+          .mapWithPosition((value, start, end) => Literal(value, '"$value"')
+        ..start = start
+        ..end = end);
 
   Parser<Expression> boolLiteral() =>
       (string('true').or(string('false')))
-          .map((v) => Literal(v == 'true', v));
+          .mapWithPosition((value, start, end) => Literal(value == 'true', value)
+        ..start = start
+        ..end = end);
 
-  Parser<Expression> nullLiteral() => string('null').map((_) => Literal(null, 'null'));
+  Parser<Expression> nullLiteral() =>
+      string('null')
+          .mapWithPosition((value, start, end) => Literal(null, 'null')
+        ..start = start
+        ..end = end);
 
   Parser<Expression> unaryExpression() {
     final ops = ['-', '+', '!', '~'];
@@ -323,54 +380,87 @@ class ExpressionParser {
         .reduce((a, b) => a.or(b).cast<String>())
         .trim()
         .seq(token)
-        .map((l) => UnaryExpression(l[0], l[1]));
+        .mapWithPosition((list, start, end) {
+      final expr = UnaryExpression(list[0], list[1])
+        ..start = start
+        ..end = end;
+      return expr;
+    });
   }
 
   Parser<Expression> variable() =>
-      groupOrIdentifier().seq((memberArgument().or(indexArgument()).or(callArgument())).star())
-          .map((l) {
-        Expression obj = l[0];
-        final args = l[1] as List;
+      groupOrIdentifier()
+          .seq(
+        (memberArgument().or(indexArgument()).or(callArgument())).star(),
+      )
+          .mapWithPosition((list, start, end) {
+        Expression obj = list[0];
+        final args = list[1] as List;
         for (var arg in args) {
           if (arg is Identifier) obj = MemberExpression(obj, arg);
           else if (arg is Expression) obj = IndexExpression(obj, arg);
           else if (arg is List<Expression>) obj = CallExpression(obj, arg);
         }
+        obj.start = start;
+        obj.end = end;
         return obj;
       });
 
-  Parser<Expression> group() => (char('(') & expression.trim() & char(')')).pick(1).cast<Expression>();
+  Parser<Expression> group() =>
+      (char('(').trim() & expression.trim() & char(')').trim()).pick(1).cast<Expression>();
 
   Parser<Expression> groupOrIdentifier() =>
-      group().or(thisExpression()).or(identifier().map((v) => Variable(v))).cast<Expression>();
+      group()
+          .or(thisExpression())
+          .or(identifier().map((v) => Variable(v)))
+          .cast();
 
   Parser<Identifier> identifier() =>
-      (letter() & (word() | char(r'$')).star()).flatten().map((v) => Identifier(v));
+      (letter() & (word() | char(r'$')).star()).flatten().mapWithPosition((value, start, end) {
+        final id = Identifier(value);
+        id.start = start;
+        id.end = end;
+        return id;
+      });
 
-  Parser<Identifier> memberArgument() => (char('.') & identifier()).pick(1).cast<Identifier>();
+  Parser<Identifier> memberArgument() =>
+      (char('.') & identifier()).pick(1).cast<Identifier>();
 
-  Parser<Expression> indexArgument() => (char('[') & expression.trim() & char(']')).pick(1).cast<Expression>();
+  Parser<Expression> indexArgument() =>
+      (char('[') & expression.trim() & char(']')).pick(1).cast<Expression>();
 
   Parser<List<Expression>> callArgument() =>
-      (char('(') & arguments.trim() & char(')')).pick(1).cast<List<Expression>>();
+      (char('(') &
+      arguments.trim() &
+      char(')'))
+          .pick(1)
+          .cast<List<Expression>>();
 
-  Parser<Expression> thisExpression() => string('this').map((_) => ThisExpression());
+  Parser<Expression> thisExpression() =>
+      string('this').mapWithPosition((value, start, end) {
+        final thisExpr = ThisExpression();
+        thisExpr.start = start;
+        thisExpr.end = end;
+        return thisExpr;
+      });
 
   Parser<List<Expression>> get arguments =>
-    expression
-        .plusSeparated(char(',').trim())
-        .map((sl) => sl.elements) // <-- extract the List<Expression>
-        .optionalWith([])          // <-- still returns List<Expression>
-        .cast<List<Expression>>();
+      expression
+          .plusSeparated(char(',').trim())
+          .map((sl) => sl.elements)
+          .optionalWith([])
+          .cast<List<Expression>>();
 
   Parser<List<Expression>> conditionArguments() =>
       (char('?') & expression.trim() & char(':') & expression)
           .pick(1)
           .seq(expression)
-          .map((l) => [l[0], l[1]]);
+          .mapWithPosition((list, start, end) => [list[0], list[1]]);
 
   Parser<Expression> binaryExpression() =>
-      token.plusSeparated(binaryOperation()).map((sl) {
+      token
+          .plusSeparated(binaryOperation())
+          .map((sl) {
         final elements = sl.elements;
         Expression left = elements[0];
         for (int i = 1; i < elements.length; i += 2) {
@@ -387,6 +477,7 @@ class ExpressionParser {
           .reduce((a, b) => a.or(b).cast<String>())
           .trim();
 }
+
 
 /// =======================
 /// Main

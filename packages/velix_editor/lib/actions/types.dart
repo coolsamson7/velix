@@ -2,7 +2,7 @@
 class ClassDesc extends Desc {
   // static
 
-  static final  int_type     = ClassDesc("int");
+  static final  int_type    = ClassDesc("int");
   static final double_type  = ClassDesc("double");
   static final string_type  = ClassDesc("String");
   static final bool_type    = ClassDesc("bool");
@@ -10,7 +10,7 @@ class ClassDesc extends Desc {
 
   // static
 
-  static getType(String name) {
+  static ClassDesc getType(String name) {
     final literalTypes = {
       "String": string_type,
       "int": int_type,
@@ -18,7 +18,7 @@ class ClassDesc extends Desc {
       "bool": bool_type,
     };
 
-    return literalTypes[name]; // TODO
+    return literalTypes[name]!; // TODO
   }
 
   // instance data

@@ -5,6 +5,7 @@ import 'package:velix_editor/actions/action_evaluator.dart';
 import 'package:velix_editor/actions/action_parser.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/types.dart';
 
 import 'action_test.types.g.dart';
@@ -138,6 +139,25 @@ void main() {
       var expression = parser.parse(code);
 
       expect(expression, isNotNull);
+    });
+  });
+
+  // auto completion
+
+  group('autocompletion', () {
+    var autocomplete = Autocomplete(pageClass);
+    
+    test('variable ', () {
+      var suggestions = autocomplete.suggest("user");
+
+      suggestions = autocomplete.suggest("user");
+
+      suggestions = autocomplete.suggest("user.");
+
+      suggestions = autocomplete.suggest("user.c");
+
+      print("suggestions");
+      //expect(value, equals("andi"));
     });
   });
 

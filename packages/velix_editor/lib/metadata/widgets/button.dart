@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Padding;
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/property_panel/editor/code_editor.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../annotations.dart';
@@ -18,6 +19,8 @@ class ButtonWidgetData extends WidgetData {
   Font? font;
   @DeclareProperty(group: "Layout Properties")
   Padding? padding;
+  @DeclareProperty(group: "General Properties", editor: CodeEditor)
+  String? onClick;
 
   // constructor
 

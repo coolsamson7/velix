@@ -1,3 +1,5 @@
+import 'package:velix_editor/actions/action_parser.dart';
+
 import 'expressions.dart';
 import 'infer_types.dart';
 import 'types.dart';
@@ -7,23 +9,33 @@ class Autocomplete {
 
   final ClassDesc root;
   final TypeResolver typeResolver;
+  final ActionParser parser = ActionParser();
+  late TypeChecker typeChecker;
 
   // constructor
 
-  Autocomplete(this.root) :typeResolver = ClassDescTypeResolver(root: root);
+  Autocomplete(this.root) :typeResolver = ClassDescTypeResolver(root: root) {
+    typeChecker = TypeChecker(typeResolver);
+  }
 
   // public
 
   /// Returns autocomplete suggestions at cursor position in `expr`.
-  List<String> suggest(Expression expr, int cursorOffset, [String fullInput = '']) {
+  List<String> suggest(String input, {int cursorOffset = -1, String fullInput = ""}) {
+    if ( cursorOffset == -1)
+      cursorOffset = input.length;
+
+    var expr = parser.parse(input);
+    
     // check types
 
-    expr.accept(TypeInferencer(typeResolver)); // TODO
+    expr.accept(typeChecker);
 
     // Find the deepest node at the cursor
 
     final node = _findNodeAt(expr, cursorOffset);
-    if (node == null) return [];
+    if (node == null)
+      return [];
 
     // Determine if there is a dot prefix before the cursor
     String prefix = '';

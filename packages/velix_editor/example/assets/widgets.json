@@ -10,6 +10,7 @@
     "type": "button",
     "children": [],
     "label": "PRESS",
+    "onClick": "user.hello(\"world\")",
     "font": {
       "size": 12,
       "weight": 100,

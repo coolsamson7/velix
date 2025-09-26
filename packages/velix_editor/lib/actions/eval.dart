@@ -5,7 +5,6 @@
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
 import 'package:velix_editor/actions/infer_types.dart';
-import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';

@@ -111,18 +111,15 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   }
 }
 
-/// =======================
-/// Type Inferencer
-/// =======================
 
-class TypeInferencer implements ExpressionVisitor<TypeInfo> {
+class TypeChecker implements ExpressionVisitor<TypeInfo> {
   // instance data
 
   final TypeResolver resolver;
 
   // constructor
 
-  TypeInferencer(this.resolver);
+  TypeChecker(this.resolver);
 
   // override
 
@@ -132,7 +129,7 @@ class TypeInferencer implements ExpressionVisitor<TypeInfo> {
   }
 
   @override
-  TypeInfo visitIdentifier(Identifier expr) => expr.type = resolver.resolveType(String); // TODO
+  TypeInfo visitIdentifier(Identifier expr) => expr.type = resolver.resolveType(String);
 
   @override
   TypeInfo visitVariable(Variable expr) {
@@ -182,6 +179,11 @@ class TypeInferencer implements ExpressionVisitor<TypeInfo> {
   TypeInfo visitCall(CallExpression expr) { // callee, arguments
     expr.callee.accept(this);
 
+    // resolve arguments
+
+    for ( var argument in expr.arguments)
+      argument.accept(this);
+
     if (expr.callee is Variable) {
       expr.type = resolver.resolve((expr.callee as Variable).identifier.name);
     }
@@ -191,6 +193,7 @@ class TypeInferencer implements ExpressionVisitor<TypeInfo> {
       final objType = member.object.type;
 
       if (objType != null) {
+        // TODO we need to check if the arguments are ok, both number and type!
         expr.type = resolver.resolve(member.property.name, parent: objType);
       }
     }

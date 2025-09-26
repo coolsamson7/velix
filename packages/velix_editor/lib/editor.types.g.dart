@@ -125,7 +125,7 @@ void registerEditorTypes() {
         getter: (obj) => obj.bottom,
         setter: (obj, value) => (obj as Padding).bottom = value,
       )
-    ]
+    ],
   );
 
   type<Font>(
@@ -160,7 +160,7 @@ void registerEditorTypes() {
         getter: (obj) => obj.size,
         setter: (obj, value) => (obj as Font).size = value,
       )
-    ]
+    ],
   );
 
   type<TypeRegistry>(
@@ -215,7 +215,7 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as WidgetData).parent = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   type<User>(
@@ -337,7 +337,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/button.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/button.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "button", i18n: "editor:widgets.button.title", group: "widgets", icon: Icons.text_fields),
@@ -376,8 +376,17 @@ void registerEditorTypes() {
         getter: (obj) => obj.padding,
         setter: (obj, value) => (obj as ButtonWidgetData).padding = value,
         isNullable: true
+      ), 
+      field<ButtonWidgetData,String>('onClick',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.onClick,
+        setter: (obj, value) => (obj as ButtonWidgetData).onClick = value,
+        isNullable: true
       )
-    ]
+    ],
   );
 
   type<ContainerWidgetData>(
@@ -428,7 +437,7 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as LabelWidgetData).font = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   type<TextWidgetData>(
@@ -454,7 +463,7 @@ void registerEditorTypes() {
         getter: (obj) => obj.label,
         setter: (obj, value) => (obj as TextWidgetData).label = value,
       )
-    ]
+    ],
   );
 
   type<BooleanEditorBuilder>(

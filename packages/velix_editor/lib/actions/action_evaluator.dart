@@ -4,6 +4,29 @@ import 'package:velix_editor/actions/infer_types.dart';
 import 'action_parser.dart';
 import 'eval.dart';
 
+class ActionCompiler {
+  // instance data
+
+  final parser = ActionParser();
+
+  // public
+
+   Call compile(String input, {required TypeDescriptor context}) {
+     var expression = parser.parse(input);
+
+     // check types
+
+     final checker = TypeChecker(RuntimeTypeTypeResolver(root: context));
+
+     expression.accept(checker);
+
+     // compute call
+
+     var visitor = CallVisitor(context);
+
+     return expression.accept(visitor);
+   }
+}
 
 class ActionEvaluator {
   // instance data
@@ -23,10 +46,9 @@ class ActionEvaluator {
 
     // check types
 
-    final inferencer = TypeInferencer(RuntimeTypeTypeResolver(root: contextType));
-    final type = expression.accept(inferencer);
+    final checker = TypeChecker(RuntimeTypeTypeResolver(root: contextType));
 
-    print(type);
+    expression.accept(checker);
 
     // compute call
 

@@ -3,6 +3,9 @@
 // will generate a call structure
 
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/validation/validation.dart';
+import 'package:velix_editor/actions/infer_types.dart';
+import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';
@@ -63,20 +66,21 @@ class Member extends Call {
   }
 }
 
-class MethodCall extends Call {
+class Method extends Call {
   // instance data
 
+  Call receiver;
   MethodDescriptor method;
 
   // constructor
 
-  MethodCall({required this.method});
+  Method({required this.receiver, required this.method});
 
   // override
 
   @override
   dynamic eval(dynamic value) {
-    return method.invoker!([value]);
+    return method.invoker!([receiver.eval(value)]); // TODO args
   }
 }
 
@@ -120,33 +124,22 @@ class CallVisitor extends ExpressionVisitor<Call> {
   @override
   Call visitMember(MemberExpression expr) {
     var receiver = expr.object.accept(this);
-    var property =  expr.property.accept(this);
+    var type = expr.object.getType<RuntimeTypeInfo>().type as ObjectType;
 
-    return Member(receiver: receiver, field: (property as Field).field);
+    var property =  expr.property.name;
+    var descriptor = type.typeDescriptor.getProperty<AbstractPropertyDescriptor>(property);
+
+    return descriptor.isField() ?
+      Member(receiver: receiver, field: descriptor as FieldDescriptor) :
+      Method(receiver: receiver, method: descriptor as MethodDescriptor);
   }
 
   @override
   Call visitCall(CallExpression expr) {
-    var calee = expr.callee.accept(this); // TODO
+    var callee = expr.callee.accept(this);
 
-    /*if (expr.callee is Variable) {
-      final name = (expr.callee as Variable).identifier.name;
-      final method = rootClass.lookupMethod(name);
-      if (method != null)
-        return expr.type = method.returnType;
-    }
+    // TODO args
 
-    if (expr.callee is MemberExpression) {
-      final member = expr.callee as MemberExpression;
-      final objType = member.object.type;
-      if (objType != null) {
-        final method = objType.lookupMethod(member.property.name);
-        if (method != null) return expr.type = method.returnType;
-      }
-    }*/
-
-    throw Exception("k");
-
-    //return MethodCall(method: null);
+    return callee;
   }
 }

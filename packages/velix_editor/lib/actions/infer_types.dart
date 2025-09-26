@@ -112,15 +112,6 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 }
 
 /// =======================
-/// Visitor Interface
-/// =======================
-
-final classInt = ClassDesc("int");
-final classString = ClassDesc("String");
-final classBool = ClassDesc("bool");
-final classDynamic = ClassDesc("dynamic");
-
-/// =======================
 /// Type Inferencer
 /// =======================
 
@@ -200,7 +191,7 @@ class TypeInferencer implements ExpressionVisitor<TypeInfo> {
       final objType = member.object.type;
 
       if (objType != null) {
-        expr.type = resolver.resolve(member.property.name, parent: (expr.callee as MemberExpression).property.name);
+        expr.type = resolver.resolve(member.property.name, parent: objType);
       }
     }
 

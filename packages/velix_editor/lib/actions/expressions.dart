@@ -10,6 +10,8 @@ abstract class Expression {
   int end = 0;
   TypeInfo? type;
 
+  T getType<T>() => type as T;
+
   T accept<T>(ExpressionVisitor<T> visitor);
 }
 

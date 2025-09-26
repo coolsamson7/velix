@@ -5,42 +5,64 @@ import 'package:velix_editor/actions/action_evaluator.dart';
 import 'package:velix_editor/actions/action_parser.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_editor/actions/parser.dart';
 import 'package:velix_editor/actions/types.dart';
 
 import 'action_test.types.g.dart';
 
 @Dataclass()
-class TestUser {
+class Address {
   // instance data
 
   @Attribute()
-  String name = "";
+  String city = "";
+  @Attribute()
+  String street = "";
 
   // constructor
 
-  TestUser({required this.name});
+  Address({required this.city, required this.street});
 
   // methods
 
   @Inject()
-  String hello() {
+  String hello(String message, ) {
     return "world";
+  }
+}
+
+@Dataclass()
+class User {
+  // instance data
+
+  @Attribute()
+  String name = "";
+  @Attribute()
+  Address address;
+
+  // constructor
+
+  User({required this.name, required this.address});
+
+  // methods
+
+  @Inject()
+  String hello(String message) {
+    return "hello $message";
   }
 }
 
 
 @Injectable()
 @Dataclass()
-class TestPage {
+class Page {
   // instance data
 
   @Attribute()
-  final TestUser user;
+  final User user;
 
   // constructor
 
-  TestPage() : user = TestUser(name: "andi");
+  Page() : user = User(name: "andi", address: Address(city: "Köln", street: "Neumarkt"));
 
   // methods
 
@@ -50,35 +72,26 @@ class TestPage {
   }
 }
 
-// Nested class type
-final innerClass = ClassDesc('Inner',
-  properties: {
-    'value': FieldDesc('value', ClassDesc.int_type),
-    'doubleValue': MethodDesc('doubleValue', [], ClassDesc.double_type)
-  },
-);
-
-// Root class
-final rootClass = ClassDesc('Root',
-  properties: {
-    'x': FieldDesc('x', ClassDesc.int_type),
-    'inner': FieldDesc('inner', innerClass),
-    'sum': MethodDesc('sum', [ClassDesc.int_type, ClassDesc.int_type], ClassDesc.int_type),
-  },
-);
-
-//
+// same thing
 
 final pageClass = ClassDesc('Page',
     properties: {
-      'user': FieldDesc('xúser', userClass),
+      'user': FieldDesc('user', userClass),
     }
 );
 
 final userClass = ClassDesc('User',
   properties: {
     'name': FieldDesc('value', ClassDesc.string_type),
-    'hello': MethodDesc('hello', [], ClassDesc.string_type)
+    'address': FieldDesc('address',  addressClass)
+  },
+);
+
+final addressClass = ClassDesc('Address',
+  properties: {
+    'city': FieldDesc('city', ClassDesc.string_type),
+    'street': FieldDesc('street', ClassDesc.string_type),
+    'hello': MethodDesc('hello', [ClassDesc.string_type], ClassDesc.string_type)
   },
 );
 
@@ -96,7 +109,7 @@ void main() {
   // boot environment
 
   var environment = Environment(forModule: TestModule);
-  var page = environment.get<TestPage>();
+  var page = environment.get<Page>();
 
   // parser tests
 
@@ -111,8 +124,16 @@ void main() {
       expect(expression, isNotNull);
     });
 
+    test('parse recursive member ', () {
+      var code = "user.address.city";
+
+      var expression = parser.parse(code);
+
+      expect(expression, isNotNull);
+    });
+
     test('parse method ', () {
-      var code = "user.hello()";
+      var code = "user.hello(\"world\")";
 
       var expression = parser.parse(code);
 
@@ -123,7 +144,7 @@ void main() {
   // evaluator tests
 
   group('evaluator', () {
-    var evaluator = ActionEvaluator(contextType: TypeDescriptor.forType(TestPage));
+    var evaluator = ActionEvaluator(contextType: TypeDescriptor.forType(Page));
 
     // register types
 
@@ -133,10 +154,22 @@ void main() {
       expect(value, equals("andi"));
     });
 
-    test('eval method call', () {
-      var value = evaluator.call("user.hello()", page);
+    test('eval recursive member ', () {
+      var value = evaluator.call( "user.address.city", page);
 
-      expect(value, equals("world"));
+      expect(value, equals("Köln"));
+    });
+
+    test('eval method call with literal arg', () {
+      var value = evaluator.call("user.hello(\"world\")", page);
+
+      expect(value, equals("hello world"));
+    });
+
+    test('eval method call with complex arg', () {
+      var value = evaluator.call("user.hello(user.name)", page);
+
+      expect(value, equals("hello andi"));
     });
   });
 }

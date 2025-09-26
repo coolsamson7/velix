@@ -27,8 +27,8 @@ class User {
   // methods
 
   @Inject()
-  String hello() {
-    return "world";
+  String hello(String message) {
+    return "hello $message";
   }
 }
 

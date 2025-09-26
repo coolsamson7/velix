@@ -71,6 +71,7 @@ class Method extends Call {
 
   Call receiver;
   MethodDescriptor method;
+  late List<Call> arguments;
 
   // constructor
 
@@ -80,7 +81,9 @@ class Method extends Call {
 
   @override
   dynamic eval(dynamic value) {
-    return method.invoker!([receiver.eval(value)]); // TODO args
+    var args = arguments.map((arg) => arg.eval(value));
+
+    return method.invoker!([receiver.eval(value), ...args]);
   }
 }
 
@@ -136,10 +139,10 @@ class CallVisitor extends ExpressionVisitor<Call> {
 
   @override
   Call visitCall(CallExpression expr) {
-    var callee = expr.callee.accept(this);
+    var method = expr.callee.accept(this) as Method;
 
-    // TODO args
+    method.arguments = expr.arguments.map((arg) => arg.accept(this)).toList();
 
-    return callee;
+    return method;
   }
 }

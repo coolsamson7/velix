@@ -8,61 +8,101 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 void registerTypes() {
-  type<TestUser>(
-    location: 'asset:velix_editor/test/action_test.dart:11:1',
+  type<Address>(
+    location: 'asset:velix_editor/test/action_test.dart:12:1',
     params: [
-      param<String>('name', isNamed: true, isRequired: true)
+      param<String>('city', isNamed: true, isRequired: true), 
+      param<String>('street', isNamed: true, isRequired: true)
     ],
-    constructor: ({String name = ''}) => TestUser(name: name),
-    fromMapConstructor: (Map<String,dynamic> args) => TestUser(name: args['name'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => TestUser(name: args[0] as String? ?? ''),
+    constructor: ({String city = '', String street = ''}) => Address(city: city, street: street),
+    fromMapConstructor: (Map<String,dynamic> args) => Address(city: args['city'] as String? ?? '', street: args['street'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => Address(city: args[0] as String? ?? '', street: args[1] as String? ?? ''),
     fields: [
-      field<TestUser,String>('name',
-        getter: (obj) => obj.name,
-        setter: (obj, value) => (obj as TestUser).name = value,
+      field<Address,String>('city',
+        getter: (obj) => obj.city,
+        setter: (obj, value) => (obj as Address).city = value,
+      ), 
+      field<Address,String>('street',
+        getter: (obj) => obj.street,
+        setter: (obj, value) => (obj as Address).street = value,
       )
     ],
     methods: [
-      method<TestUser,String>('hello',
+      method<Address,String>('hello',
         annotations: [
           Inject()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as TestUser).hello()
+        parameters: [
+          param<String>('message', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Address).hello(args[1])
       )
     ],
   );
 
-  type<TestPage>(
-    location: 'asset:velix_editor/test/action_test.dart:31:1',
+  type<Page>(
+    location: 'asset:velix_editor/test/action_test.dart:55:1',
     annotations: [
       Injectable()
     ],
-    constructor: () => TestPage(),
-    fromMapConstructor: (Map<String,dynamic> args) => TestPage(),
-    fromArrayConstructor: (List<dynamic> args) => TestPage(),
+    constructor: () => Page(),
+    fromMapConstructor: (Map<String,dynamic> args) => Page(),
+    fromArrayConstructor: (List<dynamic> args) => Page(),
     fields: [
-      field<TestPage,TestUser>('user',
+      field<Page,User>('user',
         getter: (obj) => obj.user,
       )
     ],
     methods: [
-      method<TestPage,void>('setup',
+      method<Page,void>('setup',
         annotations: [
           Inject()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as TestPage).setup()
+        invoker: (List<dynamic> args)=> (args[0] as Page).setup()
       )
     ],
   );
 
   type<TestModule>(
-    location: 'asset:velix_editor/test/action_test.dart:51:1',
+    location: 'asset:velix_editor/test/action_test.dart:99:1',
     annotations: [
       Module(includeSiblings: false, includeSubdirectories: false)
     ],
     constructor: () => TestModule(),
     fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
+  );
+
+  type<User>(
+    location: 'asset:velix_editor/test/action_test.dart:33:1',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<Address>('address', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required Address address}) => User(name: name, address: address),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address),
+    fields: [
+      field<User,String>('name',
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as User).name = value,
+      ), 
+      field<User,Address>('address',
+        getter: (obj) => obj.address,
+        setter: (obj, value) => (obj as User).address = value,
+      )
+    ],
+    methods: [
+      method<User,String>('hello',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<String>('message', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as User).hello(args[1])
+      )
+    ],
   );
 
   TypeDescriptor.verify();

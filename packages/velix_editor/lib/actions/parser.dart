@@ -2,10 +2,7 @@ import 'package:petitparser/petitparser.dart';
 
 import 'expressions.dart';
 
-
-/// =======================
-/// Parser Extension for Offsets
-/// =======================
+// Parser Extension for Offsets
 extension MapWithPositionExt<T> on Parser<T> {
   Parser<R> mapWithPosition<R>(R Function(T value, int start, int end) mapper) {
     return (position() & flatten()).map((values) {
@@ -25,12 +22,15 @@ extension MapWithPositionExt<T> on Parser<T> {
   }
 }
 
-/// =======================
-/// Expression Parser
-/// =======================
+// the parser
+
 class ExpressionParser {
+  // instance data
+
   late final SettableParser<Expression> expression;
   late final SettableParser<Expression> token;
+
+  // constructor
 
   ExpressionParser() {
     expression = SettableParser<Expression>(undefined<Expression>());
@@ -56,9 +56,6 @@ class ExpressionParser {
     );
   }
 
-  // ---------------------
-  // Partial variable (for autocomplete)
-  // ---------------------
   Parser<Expression> partialVariable() =>
       partialIdentifier().map((id) => Variable(id)..start = id.start..end = id.end);
 
@@ -67,9 +64,6 @@ class ExpressionParser {
           .flatten()
           .mapWithPosition((v, start, end) => Identifier(v)..start = start..end = end);
 
-  // ---------------------
-  // Regular variable + member/index/call
-  // ---------------------
   Parser<Expression> variable() =>
       groupOrIdentifier()
           .seq((memberAccess().or(indexArgument()).or(callArgument())).star())
@@ -174,5 +168,3 @@ class ExpressionParser {
           .reduce((a, b) => a.or(b).cast<String>())
           .trim();
 }
-
-

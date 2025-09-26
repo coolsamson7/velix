@@ -832,7 +832,7 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
       for (FieldDescriptor field in typeDescriptor.getFields()) {
         context.path = path.isEmpty ? field.name :  "$path.${field.name}";
 
-        field.type!.check(field.getter(object), context);
+        field.type.check(field.getter(object), context);
       }
       
       context.path = path;

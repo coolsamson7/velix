@@ -51,47 +51,42 @@ class Attribute {
 typedef Getter<T, V> = V Function(T instance);
 typedef Setter<T, V> = void Function(T instance, V value);
 
-class FieldDescriptor<T, V> {
+class AbstractDescriptor {
   // instance data
 
   final String name;
-  final List<Object> annotations;
-  final Type? elementType;
-  final Function? factoryConstructor;
-
-  late AbstractType<dynamic, AbstractType> type;
-  final Getter getter;
-  final Setter? setter;
-  late TypeDescriptor typeDescriptor;
-  final bool isNullable;
-
-  bool get isFinal => setter == null;
+  final List<dynamic> annotations;
 
   // constructor
 
-  FieldDescriptor({
-    required this.name,
-    required this.getter,
-    required this.annotations,
-    this.elementType,
-    this.factoryConstructor,
-    this.setter,
-    this.isNullable = false,
-    AbstractType<dynamic, AbstractType>? type
-  }) {
-    if ( type != null)
-      this.type = type;
-    else
-      inferType();
+  AbstractDescriptor({required this.name, required this.annotations});
+
+  // public
+
+  bool hasAnnotation<A>() {
+    return annotations.any((a) => a.runtimeType == A);
   }
+
+  A? findAnnotation<A>() {
+    return annotations.whereType<A>().firstOrNull;
+  }
+}
+
+class AbstractPropertyDescriptor<T> extends AbstractDescriptor {
+  // instance data
+
+  late TypeDescriptor typeDescriptor;
+  late AbstractType<dynamic, AbstractType> type;
+
+  // constructor
+
+  AbstractPropertyDescriptor({required super.name, required super.annotations});
 
   // internal
 
-  void inferType() {
-    final type = nonNullableOf<V>();
-
+  void inferType(Type type, bool isNullable) {
     final Map<Type, AbstractType> types = {
-      String: StringType(),    // default unconstrained
+      String: StringType(), // default unconstrained
       int: IntType(),
       double: DoubleType(),
       bool: BoolType(),
@@ -99,7 +94,7 @@ class FieldDescriptor<T, V> {
     };
 
     final Map<Type, AbstractType> nullableTypes = {
-      String: StringType().optional(),    // default unconstrained
+      String: StringType().optional(), // default unconstrained
       int: IntType().optional(),
       double: DoubleType().optional(),
       bool: BoolType().optional(),
@@ -116,7 +111,7 @@ class FieldDescriptor<T, V> {
       }
       else {
         if ( TypeDescriptor.hasType(type)) {
-          result = ObjectType(TypeDescriptor.forType<V>());
+          result = ObjectType(TypeDescriptor.forType(type));
           if ( isNullable )
             result = result.optional() as AbstractType<dynamic, AbstractType>?;
         }
@@ -131,6 +126,46 @@ class FieldDescriptor<T, V> {
     this.type = result as dynamic;
   }
 
+  // public
+
+  bool isField() => false;
+  bool isMethod() => false;
+}
+
+class FieldDescriptor<T, V> extends AbstractPropertyDescriptor<T> {
+  // instance data
+
+  final Type? elementType;
+  final Function? factoryConstructor;
+
+  final Getter getter;
+  final Setter? setter;
+  final bool isNullable;
+
+  bool get isFinal => setter == null;
+
+  // constructor
+
+  FieldDescriptor({
+    required super.name,
+    required super.annotations,
+    this.elementType,
+    this.factoryConstructor,
+    required this.getter,
+    this.setter,
+    this.isNullable = false,
+    AbstractType<dynamic, AbstractType>? type
+  }) {
+    if ( type != null)
+      this.type = type;
+    else
+      inferType(V, isNullable);
+  }
+
+  // override
+
+  @override
+  bool isField() => true;
 
   // public
 
@@ -138,65 +173,55 @@ class FieldDescriptor<T, V> {
     return getter(object);
   }
 
-  A? findAnnotation<A>() {
-    return findElement(annotations, (annotation) => annotation is A) as A?;
-  }
-
   bool isWriteable() {
     return setter != null;
   }
 }
 
-class MethodDescriptor {
+class MethodDescriptor<T,V> extends AbstractPropertyDescriptor<T> {
   // instance data
 
-  final String name;
-  final Type returnType;
   final List<ParameterDescriptor> parameters;
   final bool isAsync;
   final bool isStatic;
-  final List<dynamic> annotations;
   final Function? invoker;
-  late TypeDescriptor typeDescriptor;
 
   // constructor
 
   MethodDescriptor({
-    required this.name,
-    required this.returnType,
+    required super.name,
+    super.annotations = const [],
+
     required this.parameters,
     this.isAsync = false,
     this.isStatic = false,
-    this.annotations = const [],
     this.invoker,
-  });
-
-  bool hasAnnotation<T>() {
-    return annotations.any((a) => a.runtimeType == T);
+  }) {
+    inferType(V, false);
   }
 
-  T? findAnnotation<T>() {
-    return annotations.whereType<T>().firstOrNull;
-  }
+  // override
+
+  @override
+  bool isMethod() => true;
 }
 
-class ParameterDescriptor {
+class ParameterDescriptor extends AbstractDescriptor {
   // instance data
 
-  final String name;
   final Type type;
   final bool isNamed;
   final bool isRequired;
   final bool isNullable;
   late dynamic defaultValue;
-  final List<dynamic> annotations;
 
   // constructor
 
   ParameterDescriptor({
-    required this.name,
+    required super.name,
+    required super.annotations,
+
     required this.type,
-    required this.annotations,
     this.isNamed = false,
     this.isRequired = true,
     this.isNullable = false,
@@ -212,10 +237,6 @@ class ParameterDescriptor {
 
   bool hasDefault() {
       return defaultValue != this;
-  }
-
-  T? getAnnotation<T>() {
-    return findElement(annotations, (annotation) => annotation.runtimeType == T) as T?;
   }
 }
 
@@ -391,8 +412,9 @@ class TypeDescriptor<T> {
 
   String location;
   late Type type;
-  final Map<String, FieldDescriptor> _fields = {};
-  final Map<String, MethodDescriptor> _methods = {};
+
+  final Map<String, AbstractPropertyDescriptor> _properties = {};
+
   Constructor<T>? constructor;
   FromMapConstructor<T>? fromMapConstructor;
   FromArrayConstructor<T>? fromArrayConstructor;
@@ -435,16 +457,10 @@ class TypeDescriptor<T> {
     if ( superClass != null) {
       superClass!.childClasses.add(this);
 
-      // inherit fields
+      // inherit properties
 
-      for ( var inheritedField in superClass!.getFields()) {
-        _fields[inheritedField.name] = inheritedField;
-      }
-
-      // inherit methods
-
-      for ( var inheritedMethod in superClass!.getMethods()) {
-        _methods[inheritedMethod.name] = inheritedMethod;
+      for ( var inheritedProperty in superClass!.getProperties()) {
+        _properties[inheritedProperty.name] = inheritedProperty;
       }
     }
 
@@ -453,7 +469,7 @@ class TypeDescriptor<T> {
     if ( methods != null)
       for (var method in methods) {
         method.typeDescriptor = this; // marker for a local method
-        _methods[method.name] = method;
+        _properties[method.name] = method;
 
         // run annotations
 
@@ -466,7 +482,7 @@ class TypeDescriptor<T> {
 
     for (var field in fields) {
       field.typeDescriptor = this; // marker for a local field
-      _fields[field.name] = field;
+      _properties[field.name] = field;
 
       // run annotations
 
@@ -526,11 +542,11 @@ class TypeDescriptor<T> {
   }
 
   FieldDescriptor _getField(String name) {
-    final field = _fields[name];
+    final field = _properties[name];
     if (field == null)
       throw ArgumentError("No such field: $name");
 
-    return field;
+    return field as FieldDescriptor;
   }
 
   // public
@@ -558,38 +574,79 @@ class TypeDescriptor<T> {
 
   /// return [true], if the type has at least one final field
   bool isImmutable() {
-    return findElement(_fields.values.toList(), (field) => field.isFinal)!= null;
+    return findElement(getFields(), (field) => field.isFinal) != null;
   }
 
   /// return the field names
-  List<String> getFieldNames() {
-    return _fields.keys.toList();
+  Iterable<String> getFieldNames() {
+    return getFields().map((field) => field.name);
   }
 
   /// return [true], if the type has a named field
   /// [name] the field name
   bool hasField(String name) {
-    return _fields[name] != null;
+    return hasProperty(name);
   }
 
   /// return a named field.
   /// [name] the field name
   FieldDescriptor getField(String name) {
-    var field = _fields[name];
-    if ( field != null)
-      return field;
-    else
-      throw Exception("unknown field $type.$name");
+    return getProperty<FieldDescriptor>(name);
+  }
+
+  /// return a named field.
+  /// [name] the field name
+  FieldDescriptor? findField(String name) {
+    return findProperty<FieldDescriptor>(name);
+  }
+
+  /// return all properties
+  Iterable<AbstractPropertyDescriptor> getProperties() {
+    return _properties.values;
   }
 
   /// return all fields
   Iterable<FieldDescriptor> getFields() {
-    return _fields.values;
+    return _properties.values.whereType<FieldDescriptor>();
   }
 
-  /// return all fields
+  /// return all methods
   Iterable<MethodDescriptor> getMethods() {
-    return _methods.values;
+    return _properties.values.whereType<MethodDescriptor>();
+  }
+
+  /// return a named property.
+  /// [name] the field name
+  P? findProperty<P>(String name) {
+    return _properties[name] as P?;
+  }
+
+  /// return a named property.
+  /// [name] the field name
+  P getProperty<P>(String name) {
+    var property =  _properties[name];
+    if ( property != null)
+      return property as P;
+    else
+      throw Exception("unknown property $name");
+  }
+
+  /// return [true], if the type has a named property
+  /// [name] the property name
+  bool hasProperty<P>(String name) {
+    return _properties[name] != null;
+  }
+
+  /// return [true], if the type has a named method
+  /// [name] the method name
+  bool hasMethod(String name) {
+    return hasProperty<MethodDescriptor>(name);
+  }
+
+  /// return a named field.
+  /// [name] the field name
+  MethodDescriptor getMethod(String name) {
+    return getProperty<MethodDescriptor>(name);
   }
 
   /// return the getter function of a specific field
@@ -660,7 +717,7 @@ MethodDescriptor method<T,R>(String name, {List<ParameterDescriptor>? parameters
   bool isStatic = false,
   annotations = const [],
   required Function invoker}) {
-  return MethodDescriptor(name: name, returnType: R, parameters: parameters ?? [], annotations: annotations, invoker: invoker);
+  return MethodDescriptor<T,R>(name: name, parameters: parameters ?? [], annotations: annotations, invoker: invoker);
 }
 
 FieldDescriptor field<T,V>(String name, {

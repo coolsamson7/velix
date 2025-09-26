@@ -1,4 +1,4 @@
-T? findElement<T>(List<T> list, bool Function(T element) test ) {
+T? findElement<T>(Iterable<T> list, bool Function(T element) test ) {
   for ( var element in list) {
     if ( test(element)) {
       return element;

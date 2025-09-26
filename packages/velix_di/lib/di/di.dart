@@ -1410,7 +1410,7 @@ class FunctionInstanceProvider<T> extends InstanceProvider<T> {
         bool eager = true,
         bool replace = false,
         String scope = "singleton",
-      }) : super(type: method.returnType, host: clazz, eager: eager, scope: scope, replace: replace);
+      }) : super(type: method.type.type, host: clazz, eager: eager, scope: scope, replace: replace);
 
   // override
 

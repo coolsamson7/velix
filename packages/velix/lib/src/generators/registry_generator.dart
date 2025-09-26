@@ -623,7 +623,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       i++;
     } // for
 
-    indent(-1).tab().writeln("]");
+    indent(-1).tab().writeln("],");
   }
 
   void generateFromMapConstructor(ClassElement element) {

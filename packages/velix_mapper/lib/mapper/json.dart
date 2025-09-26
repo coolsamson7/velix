@@ -225,6 +225,7 @@ class PolymorphicMappingDefinition extends MappingDefinition<Map<String, dynamic
 
   // override
 
+  @override
   Mapping<Map<String, dynamic>,dynamic> createMapping(Mapper mapper) {
     var result = createOperations(mapper);
 

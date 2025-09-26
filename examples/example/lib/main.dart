@@ -20,7 +20,7 @@ class EasyLocalizationTranslator extends Translator {
 
   @override
   String translate(String key, {String? defaultValue, Map<String, dynamic> args = const {}}) {
-    return I18N.instance.translate(key, defaultValue: defaultValue, args: args);
+    return I18N.tr(key, defaultValue: defaultValue, args: args);
   }
 }
 

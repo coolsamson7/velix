@@ -1,5 +1,4 @@
 import 'package:petitparser/petitparser.dart';
-import 'package:velix/reflectable/reflectable.dart';
 
 import 'expressions.dart';
 
@@ -9,13 +8,13 @@ import 'expressions.dart';
 /// =======================
 extension MapWithPositionExt<T> on Parser<T> {
   Parser<R> mapWithPosition<R>(R Function(T value, int start, int end) mapper) {
-    return (position() & this.flatten()).map((values) {
+    return (position() & flatten()).map((values) {
       final start = values[0] as int;
       final text = values[1] as String;
       final end = start + text.length;
 
       // Parse the inner parser again to get the value
-      final innerResult = this.parse(text);
+      final innerResult = parse(text);
       if (innerResult is Success) {
         return mapper(innerResult.value, start, end);
       }

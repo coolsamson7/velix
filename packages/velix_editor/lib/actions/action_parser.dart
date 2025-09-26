@@ -1,7 +1,12 @@
-import 'package:expressions/expressions.dart';
+import 'package:petitparser/petitparser.dart';
+
+import 'expressions.dart';
+import 'parser.dart';
 
 class ActionParser {
   // instance data
+
+  final parser = ExpressionParser();
 
   // constructor
 
@@ -10,6 +15,15 @@ class ActionParser {
   // public
 
   Expression parse(String input) {
-    return Expression.parse(input);
+    var result = parser.expression.parse(input);
+
+    if (result is Success<Expression>) {
+      final expr = result.value;
+
+      return expr;
+    }
+    else {
+      throw Exception("ouch");
+    }
   }
 }

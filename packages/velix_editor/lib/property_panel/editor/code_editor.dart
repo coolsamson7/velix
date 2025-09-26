@@ -1,68 +1,103 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:expressions/expressions.dart';
+import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/validation/validation.dart';
+import 'package:velix_di/di/di.dart';
 
-void main() => runApp(const MyApp());
+import 'package:velix_ui/provider/environment_provider.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+import '../../actions/parser.dart';
+import '../../commands/command_stack.dart';
+import '../../util/message_bus.dart';
+import '../editor_builder.dart';
+
+@Dataclass()
+class User {
+  // instance data
+
+  @Attribute()
+  String name = "";
+
+  // constructor
+
+  User({required this.name});
+
+  // methods
+
+  @Inject()
+  String hello() {
+    return "world";
+  }
+}
+
+
+@Injectable()
+@Dataclass()
+class Page {
+  // instance data
+
+  @Attribute()
+  final User user;
+
+  // constructor
+
+  Page() : user = User(name: "andi");
+
+  // methods
+
+  @Inject()
+  void setup() {
+    print("setup");
+  }
+}
+
+
+// we currently need a dummy class so that it doesn't conflict with the real string editor :-(
+class Code {}
+
+@Injectable()
+class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
+  // override
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Dot-Access Expression Editor')),
-        body: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: DotAccessExpressionEditor(),
-        ),
-      ),
+  Widget buildEditor({
+    required MessageBus messageBus,
+    required CommandStack commandStack,
+    required FieldDescriptor property,
+    required String label,
+    required dynamic object,
+    required dynamic value,
+    required ValueChanged<dynamic> onChanged,
+  }) {
+    return CodeEditor(
+      //label: label,
+     // value: value ?? "",
+      onChanged: onChanged,
     );
   }
 }
 
-final Map<String, dynamic> classMetadata = {
-  "User": {
-    "fields": {"name": "String", "age": "int"},
-    "methods": {"greet": {"params": [], "returnType": "String"}}
-  },
-  "Car": {
-    "fields": {"brand": "String", "speed": "double"},
-    "methods": {"accelerate": {"params": ["double"], "returnType": "void"}}
-  }
-};
+class CodeEditor extends StatefulWidget {
+  // instance data
 
-final Map<String, dynamic> sampleData = {
-  "User": {
-    "name": "John Doe",
-    "age": 25,
-    "greet": () => "Hello from John!"
-  },
-  "Car": {
-    "brand": "Toyota",
-    "speed": 80.5,
-    "accelerate": (double amount) => "Accelerating by $amount"
-  }
-};
+  final ValueChanged<dynamic> onChanged;
 
-class MyEvaluator extends ExpressionEvaluator {
-  const MyEvaluator();
+  // constructor
+
+  const CodeEditor({super.key, required this.onChanged});
+
+  // override
 
   @override
-  dynamic evalMemberExpression(MemberExpression expression, Map<String, dynamic> context) {
-    var object = eval(expression.object, context).toJson();
-    return object[expression.property.name];
-  }
+  State<CodeEditor> createState() => _CodeEditorState();
 }
 
-class DotAccessExpressionEditor extends StatefulWidget {
-  const DotAccessExpressionEditor({super.key});
-  @override
-  State<DotAccessExpressionEditor> createState() =>
-      _DotAccessExpressionEditorState();
-}
 
-class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
+class _CodeEditorState extends State<CodeEditor> {
+  // instance data
+
   final TextEditingController controller = TextEditingController();
   final FocusNode focusNode = FocusNode();
   final LayerLink layerLink = LayerLink();
@@ -73,23 +108,13 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   String? error;
   int selectedSuggestionIndex = -1;
 
-  @override
-  void initState() {
-    super.initState();
-    controller.addListener(_onTextChanged);
-    focusNode.addListener(_onFocusChanged);
-    RawKeyboard.instance.addListener(_handleRawKeyEvent);
-  }
+  late Environment environment;// = EnvironmentProvider.of(context);
 
-  @override
-  void dispose() {
-    controller.dispose();
-    focusNode.dispose();
-    _debounceTimer?.cancel();
-    _removeOverlay();
-    RawKeyboard.instance.removeListener(_handleRawKeyEvent);
-    super.dispose();
-  }
+  late TypeDescriptor typeDescriptor;
+
+  final parser = ExpressionParser();
+
+  // internal
 
   void _onTextChanged() {
     _debounceTimer?.cancel();
@@ -164,10 +189,11 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                 itemBuilder: (context, index) {
                   final suggestion = suggestions[index];
                   final parts = suggestion.split('.');
-                  final isMethod = parts.length == 2 &&
-                      classMetadata[parts[0]]?['methods']
-                          ?.containsKey(parts[1]) ==
-                          true;
+
+                  var field = typeDescriptor.findField(parts[0]);
+                  var referencedType = field != null ?  (field.type as ObjectType).typeDescriptor : null;
+
+                  final isMethod = false;// TODO parts.length == 2 && referencedType != null &&  finreferencedType.getMethods().containsKey(parts[1]) == true;
                   final isSelected = index == selectedSuggestionIndex;
 
                   return GestureDetector(
@@ -218,26 +244,23 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     final parts = suggestion.split('.');
     if (parts.length == 2) {
       final className = parts[0];
-      final memberName = parts[1];
-      final classData = classMetadata[className];
-      if (classData != null) {
-        if (classData['methods']?.containsKey(memberName) == true) {
-          final methodData = classData['methods'][memberName];
-          final params = methodData['params'] as List;
-          final returnType = methodData['returnType'];
+
+      var descriptor = typeDescriptor.findField(className);
+      if (descriptor != null) {
+        final memberName = parts[1];
+
+        var field = (descriptor.type as ObjectType).typeDescriptor.findField(memberName);
+
+
+        if (field != null) {
           return Text(
-            'Method: (${params.join(', ')}) → $returnType',
-            style: const TextStyle(fontSize: 11),
-          );
-        } else if (classData['fields']?.containsKey(memberName) == true) {
-          final fieldType = classData['fields'][memberName];
-          return Text(
-            'Field: $fieldType',
+            'Field: ${field.name}',
             style: const TextStyle(fontSize: 11),
           );
         }
       }
-    }
+  }
+
     return null;
   }
 
@@ -288,8 +311,6 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
   }
 
 
-
-
   void _handleRawKeyEvent(RawKeyEvent event) {
     if (event is RawKeyDownEvent && suggestions.isNotEmpty && focusNode.hasFocus) {
       if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
@@ -298,19 +319,22 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
               (selectedSuggestionIndex + 1) % suggestions.length;
           _showOverlay();
         });
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      }
+      else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         setState(() {
           selectedSuggestionIndex =
               (selectedSuggestionIndex - 1 + suggestions.length) %
                   suggestions.length;
           _showOverlay();
         });
-      } else if (event.logicalKey == LogicalKeyboardKey.enter ||
+      }
+      else if (event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.tab) {
         if (selectedSuggestionIndex >= 0) {
           _insertSuggestion(suggestions[selectedSuggestionIndex]);
         }
-      } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+      }
+      else if (event.logicalKey == LogicalKeyboardKey.escape) {
         _removeOverlay();
       }
     }
@@ -323,7 +347,8 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
     }
 
     try {
-      final expression = Expression.parse(input);
+      final expression = parser.expression.parse(input);
+      print(expression);
       /*final evaluator = const MyEvaluator();
 
       final context = <String, dynamic>{};
@@ -350,26 +375,70 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
       if (parts.length == 2) {
         final className = parts[0];
         final partial = parts[1];
-        if (!classMetadata.containsKey(className)) return [];
-        final classData = classMetadata[className]!;
+
+        var field = typeDescriptor.findField(className);
+
+        if (field == null)
+          return [];
+
+        var referencedType = (field.type as ObjectType).typeDescriptor;
+
         final suggestions = <String>[];
 
-        for (var f in (classData['fields'] as Map).keys) {
+        // fields
+
+        for (var f in referencedType.getFieldNames()) {
           if (f.startsWith(partial)) {
             suggestions.add('$className.$f');
           }
         }
-        for (var m in (classData['methods'] as Map).keys) {
-          if (m.startsWith(partial)) {
-            suggestions.add('$className.$m');
+
+        // methods
+
+        for (var m in referencedType.getMethods()) {
+          if (m.name.startsWith(partial)) {
+            suggestions.add('$className.${m.name}');
           }
         }
         return suggestions;
       }
-    } else {
-      return classMetadata.keys.where((c) => c.startsWith(pattern)).toList();
+    }
+    else {
+      return typeDescriptor.getFieldNames().where((c) => c.startsWith(pattern)).toList();
     }
     return [];
+  }
+
+
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    environment = EnvironmentProvider.of(context);
+    typeDescriptor = TypeDescriptor.forType<Page>();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(_onTextChanged);
+    focusNode.addListener(_onFocusChanged);
+
+    RawKeyboard.instance.addListener(_handleRawKeyEvent);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    focusNode.dispose();
+    _debounceTimer?.cancel();
+    _removeOverlay();
+    RawKeyboard.instance.removeListener(_handleRawKeyEvent);
+
+    super.dispose();
   }
 
   @override
@@ -428,42 +497,8 @@ class _DotAccessExpressionEditorState extends State<DotAccessExpressionEditor> {
                 fontFamily: 'monospace',
                 fontSize: 14,
               ),
-              decoration: const InputDecoration(
-                hintText:
-                'Type expressions like: User.name + " is " + User.age',
-                border: OutlineInputBorder(),
-              ),
               maxLines: null,
               keyboardType: TextInputType.multiline,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Available for testing:',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'User.name = "John Doe"\n'
-                      'User.age = 25\n'
-                      'Car.brand = "Toyota"\n'
-                      'Car.speed = 80.5\n\n'
-                      'Try: User.name + " is " + User.age + " years old"\n'
-                      'Use ↑↓ to navigate suggestions, Enter/Tab to accept',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 12),
-                ),
-              ],
             ),
           ),
         ),

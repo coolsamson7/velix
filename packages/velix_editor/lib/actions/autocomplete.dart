@@ -3,13 +3,25 @@ import 'infer_types.dart';
 import 'types.dart';
 
 class Autocomplete {
-  final ClassDesc root;
+  // instance data
 
-  Autocomplete(this.root);
+  final ClassDesc root;
+  final TypeResolver typeResolver;
+
+  // constructor
+
+  Autocomplete(this.root) :typeResolver = ClassDescTypeResolver(root: root);
+
+  // public
 
   /// Returns autocomplete suggestions at cursor position in `expr`.
   List<String> suggest(Expression expr, int cursorOffset, [String fullInput = '']) {
+    // check types
+
+    expr.accept(TypeInferencer(typeResolver)); // TODO
+
     // Find the deepest node at the cursor
+
     final node = _findNodeAt(expr, cursorOffset);
     if (node == null) return [];
 
@@ -27,27 +39,15 @@ class Autocomplete {
     }
 
     // Infer the type of the object for member access
-    ClassDesc? type = root;
-    if (node is MemberExpression) {
-      // cursor may be on property access, get type of object
-      type = node.object.accept(TypeInferencer(root));
-    }
-    else if (node is Variable || node is Identifier) {
-      type = node.accept(TypeInferencer(root));
-    }
-    else if (node is CallExpression) {
-      type = node.accept(TypeInferencer(root));
-    }
-    else {
-      type = root; // fallback
-    }
+    ClassDesc? type = (node.type as ClassDescTypeInfo).type;
 
-    if (type == null) return [];
+    if ( type == null)
+      return [];
 
     // Return matching fields and methods
+
     final suggestions = <String>[];
-    suggestions.addAll(root.fields.keys.where((k) => k.startsWith(prefix))); // TODO
-    suggestions.addAll(root.methods.keys.where((k) => k.startsWith(prefix)));
+    //suggestions.addAll(root._.keys.where((k) => k.startsWith(prefix))); // TODO was type
 
     return suggestions;
   }
@@ -74,6 +74,7 @@ class Autocomplete {
 
       return calleeNode ?? expr;
     }
+
     return expr;
   }
 }

@@ -1,68 +1,41 @@
-import 'package:expressions/expressions.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/actions/infer_types.dart';
 
-class MethodCall {
-  // instance data
+import 'action_parser.dart';
+import 'eval.dart';
 
-  final dynamic instance;
-  final MethodDescriptor method;
 
-  // constructor
-
-  MethodCall({required this.instance, required this.method});
-
-  // public
-
-  dynamic call(List<dynamic> args) {
-    return method.invoker!([instance, ...args]);
-  }
-}
-
-class ActionEvaluator extends ExpressionEvaluator {
+class ActionEvaluator {
   // instance data
 
   dynamic instance;
+  final parser = ActionParser();
   TypeDescriptor contextType;
 
   // constructor
 
-  ActionEvaluator({required this.instance}) : contextType = TypeDescriptor.forType(instance.runtimeType);
-
-  // override
-
-  @override
-  dynamic evalCallExpression(CallExpression expression, Map<String, dynamic> context) {
-    var methodCall = eval(expression.callee, context) as MethodCall;
-
-    return methodCall.call( expression.arguments.map((e) => eval(e, context)).toList());
-  }
-
-  @override
-  dynamic evalVariable(Variable variable, Map<String, dynamic> context) {
-    return contextType.getField(variable.identifier.name).get(instance);
-  }
-
-  @override
-  dynamic evalMemberExpression(MemberExpression expression, Map<String, dynamic> context) {
-    var name = expression.property.name;
-    var object = eval(expression.object, context);
-
-    var type = TypeDescriptor.forType(object.runtimeType);
-    
-    if ( type.hasField(name))
-      return type.get(object, name);
-    else if (type.hasMethod(name)){
-      var method = type.getMethod(name);
-
-      return MethodCall(instance: object, method: method);
-    }
-  }
+  ActionEvaluator({required this.contextType});
 
   // public
 
-  dynamic call(Expression expression) {
-    final context = <String, dynamic>{};
+  dynamic call(String input, dynamic instance) {
+    var expression = parser.parse(input);
 
-    return eval(expression, context);
+    // check types
+
+    final inferencer = TypeInferencer(RuntimeTypeTypeResolver(root: contextType));
+    final type = expression.accept(inferencer);
+
+    print(type);
+
+    // compute call
+
+    var visitor = CallVisitor(contextType);
+
+    var call = expression.accept(visitor);
+
+    // eval
+
+    return call.eval(instance);
   }
 }

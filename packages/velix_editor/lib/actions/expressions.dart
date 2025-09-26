@@ -1,6 +1,6 @@
-// =======================
-import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/visitor.dart';
+
+import 'infer_types.dart';
 
 /// AST Nodes
 /// =======================
@@ -8,7 +8,7 @@ import 'package:velix_editor/actions/visitor.dart';
 abstract class Expression {
   int start = 0;
   int end = 0;
-  ClassDesc? type;
+  TypeInfo? type;
 
   T accept<T>(ExpressionVisitor<T> visitor);
 }

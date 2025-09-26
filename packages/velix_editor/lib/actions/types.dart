@@ -1,78 +1,74 @@
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix/validation/validation.dart';
 
-/// =======================
-/// Type System
-/// =======================
-///
-///
-/// // NEW
+class ClassDesc extends Desc {
+  // static
 
-class TypeInfo {
+  static final  int_type     = ClassDesc("int");
+  static final double_type  = ClassDesc("double");
+  static final string_type  = ClassDesc("String");
+  static final bool_type    = ClassDesc("bool");
+  static final dynamic_type = ClassDesc("dynamic");
 
-}
+  // static
 
-abstract class TypeResolver<T> {
-  T resolve(String name, {T? parent});
+  static getType(String name) {
+    final literalTypes = {
+      "String": string_type,
+      "int": int_type,
+      "double": double_type,
+      "bool": bool_type,
+    };
 
-  T resolveType(Type type);
-}
-
-//class ClassDescTypeResolver extends TypeResolver {
-
-//
-
-class AbstractTypeResolver extends TypeResolver<AbstractType> {
-  TypeDescriptor root;
-
-  AbstractTypeResolver({required this.root});
-
-  @override
-  AbstractType resolve(String name, {AbstractType? parent}) {
-    if ( parent == null)
-      return root.getField(name).type;
-    else
-      return (parent as ObjectType).typeDescriptor.getField(name).type;
+    return literalTypes[name]; // TODO
   }
 
-  @override
-  AbstractType resolveType(Type type) {
-    return ClassType(type); // TODO -> cache string, etc
-  }
+  // instance data
 
-}
+  final Map<String, Desc> _properties;
 
-
-///
-class ClassDesc {
-  final String name;
-  final Map<String, FieldDesc> fields;
-  final Map<String, MethodDesc> methods;
+  // constructor
 
   ClassDesc(
-      this.name, {
-        Map<String, FieldDesc>? fields,
-        Map<String, MethodDesc>? methods,
-      })  : fields = fields ?? {},
-        methods = methods ?? {};
+      super.name, {
+        Map<String, Desc>? properties,
+      })  : _properties = properties ?? {};
 
-  FieldDesc? lookupField(String name) => fields[name];
-  MethodDesc? lookupMethod(String name) => methods[name];
+  // public
+
+  Desc? find(String name) => _properties[name];
+
+  // override
 
   @override
   String toString() => name;
 }
 
-class FieldDesc {
+class Desc {
+  // instance data
+
   final String name;
-  final ClassDesc type;
-  FieldDesc(this.name, this.type);
+
+  // constructor
+
+  Desc(this.name);
 }
 
-class MethodDesc {
-  final String name;
+class FieldDesc extends Desc {
+  // instance data
+
+  final ClassDesc type;
+
+  // constructor
+
+  FieldDesc(String name, this.type) : super(name);
+}
+
+class MethodDesc extends Desc {
+  // instance data
+
   final List<ClassDesc> parameterTypes;
   final ClassDesc returnType;
 
-  MethodDesc(this.name, this.parameterTypes, this.returnType);
+  // constructor
+
+  MethodDesc(String name, this.parameterTypes, this.returnType): super(name);
 }

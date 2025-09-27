@@ -9,7 +9,7 @@ abstract class Expression {
   int end = 0;
   TypeInfo? type;
 
-  T getType<T>() => type as T;
+  T getType<T>() => type!.type as T;
 
   // abstract
 

@@ -4,7 +4,6 @@
 
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
-import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';
@@ -126,7 +125,7 @@ class CallVisitor extends ExpressionVisitor<Call> {
   @override
   Call visitMember(MemberExpression expr) {
     var receiver = expr.object.accept(this);
-    var type = expr.object.getType<RuntimeTypeInfo>().type as ObjectType;
+    var type = expr.object.getType<ObjectType>();
 
     var property =  expr.property.name;
     var descriptor = type.typeDescriptor.getProperty<AbstractPropertyDescriptor>(property);

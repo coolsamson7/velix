@@ -1,8 +1,20 @@
-import 'package:velix_editor/actions/action_parser.dart';
-
+import 'action_parser.dart';
 import 'expressions.dart';
 import 'infer_types.dart';
 import 'types.dart';
+
+class Suggestion {
+  // instance data
+
+  String suggestion;
+  String type;
+  String tooltip;
+
+  // constructor
+
+  Suggestion({required this.suggestion, required this.type, this.tooltip = ""});
+
+}
 
 class Autocomplete {
   // instance data
@@ -21,7 +33,7 @@ class Autocomplete {
   // public
 
   /// Returns autocomplete suggestions at cursor position in `expr`.
-  List<String> suggest(String input, {int cursorOffset = -1, String fullInput = ""}) {
+  Iterable<Suggestion> suggest(String input, {int cursorOffset = -1, String fullInput = ""}) {
     if ( cursorOffset == -1)
       cursorOffset = input.length;
 
@@ -38,30 +50,27 @@ class Autocomplete {
       return [];
 
     // Determine if there is a dot prefix before the cursor
-    String prefix = '';
-    if (fullInput.isNotEmpty) {
-      final beforeCursor = fullInput.substring(0, cursorOffset);
-      final lastDot = beforeCursor.lastIndexOf('.');
-      if (lastDot >= 0) {
-        prefix = beforeCursor.substring(lastDot + 1);
-      }
-      else {
-        prefix = beforeCursor;
+
+    if ( node is Variable) {
+      if ( node.getType<Desc>() is UnknownPropertyDesc) {
+        return node.getType<UnknownPropertyDesc>().suggestions();
       }
     }
 
-    // Infer the type of the object for member access
-    ClassDesc? type = (node.type as ClassDescTypeInfo).type;
+    if ( node is MemberExpression) {
+      var type = node.object.getType<ClassPropertyDesc>().type;
+      var property = node.property.name;
 
-    if ( type == null)
-      return [];
+      if ( type is ClassDesc)
+        return type.properties.values
+            .where((prop) => prop.name.startsWith(property))
+            .map((prop) => Suggestion(
+                suggestion: prop.name,
+                type: prop.isField() ? "field" : "method",
+                tooltip: ""));
+    }
 
-    // Return matching fields and methods
-
-    final suggestions = <String>[];
-    //suggestions.addAll(root._.keys.where((k) => k.startsWith(prefix))); // TODO was type
-
-    return suggestions;
+    return [];
   }
 
   /// Recursively find the deepest AST node containing the cursor

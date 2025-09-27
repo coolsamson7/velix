@@ -77,22 +77,22 @@ class Page {
 
 final pageClass = ClassDesc('Page',
     properties: {
-      'user': FieldDesc('user', userClass),
+      'user': FieldDesc('user', type: userClass),
     }
 );
 
 final userClass = ClassDesc('User',
   properties: {
-    'name': FieldDesc('value', ClassDesc.string_type),
-    'address': FieldDesc('address',  addressClass)
+    'name': FieldDesc('value', type: Desc.string_type),
+    'address': FieldDesc('address',  type: addressClass),
+    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
   },
 );
 
 final addressClass = ClassDesc('Address',
   properties: {
-    'city': FieldDesc('city', ClassDesc.string_type),
-    'street': FieldDesc('street', ClassDesc.string_type),
-    'hello': MethodDesc('hello', [ClassDesc.string_type], ClassDesc.string_type)
+    'city': FieldDesc('city', type: Desc.string_type),
+    'street': FieldDesc('street', type: Desc.string_type)
   },
 );
 
@@ -148,16 +148,29 @@ void main() {
     var autocomplete = Autocomplete(pageClass);
     
     test('variable ', () {
-      var suggestions = autocomplete.suggest("user");
+      var suggestions = autocomplete.suggest("a");
+
+      expect(suggestions.length, equals(0));
+
+      suggestions = autocomplete.suggest("u");
+
+      expect(suggestions.length, equals(1));
 
       suggestions = autocomplete.suggest("user");
 
+      expect(suggestions.length, equals(0));
+
       suggestions = autocomplete.suggest("user.");
 
-      suggestions = autocomplete.suggest("user.c");
+      expect(suggestions.length, equals(3));
 
-      print("suggestions");
-      //expect(value, equals("andi"));
+      suggestions = autocomplete.suggest("user.h");
+
+      expect(suggestions.length, equals(1));
+
+      suggestions = autocomplete.suggest("user.address.");
+
+      expect(suggestions.length, equals(1));
     });
   });
 

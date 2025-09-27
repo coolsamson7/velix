@@ -5,13 +5,18 @@ import 'package:velix/validation/validation.dart';
 import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/visitor.dart';
 
+import 'autocomplete.dart';
 import 'expressions.dart';
 
 // we need a generalized mechanism, since we have to deal with real types ( e.g. TypeDescriptor )
 // as well as the information available from json files with no representation in the runtime. Gosh...
 
-class TypeInfo {
+class TypeInfo<T> {
+  final T type;
 
+  TypeInfo(this.type);
+
+  V getType<V>() => type as V;
 }
 
 abstract class TypeResolver<T> {
@@ -20,14 +25,14 @@ abstract class TypeResolver<T> {
   T resolveType(Type type);
 
   T rootType();
+
+  bool isAssignableFrom(T a, T b);
 }
 
 // this is the implementation for real types
 
-class RuntimeTypeInfo extends TypeInfo {
-  final AbstractType type;
-
-  RuntimeTypeInfo({required this.type});
+class RuntimeTypeInfo extends TypeInfo<AbstractType> {
+  RuntimeTypeInfo(super.type);
 }
 
 class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
@@ -56,58 +61,94 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
 
   @override
   RuntimeTypeInfo rootType() {
-    return RuntimeTypeInfo(type: root.objectType);
+    return RuntimeTypeInfo(root.objectType);
   }
 
   @override
   RuntimeTypeInfo resolve(String name, {RuntimeTypeInfo? parent}) {
     if ( parent == null)
-      return RuntimeTypeInfo(type: root.getProperty(name).type);
+      return RuntimeTypeInfo(root.getProperty(name).type);
     else
-      return RuntimeTypeInfo(type: (parent.type as ObjectType).typeDescriptor.getProperty(name).type);
+      return RuntimeTypeInfo((parent.type as ObjectType).typeDescriptor.getProperty(name).type);
   }
 
   @override
   RuntimeTypeInfo resolveType(Type type) {
-    return RuntimeTypeInfo(type: getTypeFor(type));
+    return RuntimeTypeInfo(getTypeFor(type));
+  }
+
+  @override
+  bool isAssignableFrom(RuntimeTypeInfo a, RuntimeTypeInfo b) {
+    return a.type.type == b.type.type; // TODO
   }
 }
 
 // TODO
 
-class ClassDescTypeInfo extends TypeInfo {
-  ClassDesc type;
+class ClassDescTypeInfo extends TypeInfo<Desc> {
+  // constructor
 
-  ClassDescTypeInfo({required this.type});
+  ClassDescTypeInfo(super.type);
+}
+
+class UnknownPropertyDesc extends Desc {
+  // instance
+
+  Desc parent;
+  String property;
+
+  // constructor
+
+  UnknownPropertyDesc({required this.parent, required this.property})
+      : super('');
+
+  // public
+
+  Iterable<Suggestion> suggestions() {
+    return parent is ClassDesc ? (parent as ClassDesc).properties.values
+        .where((desc) => desc.name.startsWith(property))
+        .map((prop) => Suggestion(
+              suggestion: prop.name,
+              type: prop.isField() ? "field" : "method",
+              tooltip: "")) : [];
+  }
 }
 
 class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   // instance data
 
-  ClassDesc root;
+  ClassDescTypeInfo root;
 
   // constructor
 
-  ClassDescTypeResolver({required this.root});
+  ClassDescTypeResolver({required ClassDesc root}): root = ClassDescTypeInfo(root);
+
+  // internal
 
   // override
 
   @override
   ClassDescTypeInfo resolve(String name, {ClassDescTypeInfo? parent}) {
-    if ( parent == null)
-      return ClassDescTypeInfo(type: root.find(name) as ClassDesc); // TODO
+    var parentType = (parent ?? root).type;
+    if ( parentType is ClassDesc)
+      return ClassDescTypeInfo(parentType.find(name) ?? UnknownPropertyDesc(parent: parentType, property: name));
     else
-      return ClassDescTypeInfo(type: parent.type.find(name) as ClassDesc);
+      return ClassDescTypeInfo(UnknownPropertyDesc(parent: parentType, property: name));
   }
 
   @override
   ClassDescTypeInfo resolveType(Type type) { // who calls that?
-    throw ClassDescTypeInfo(type: ClassDesc.dynamic_type); // TODO
+    throw ClassDescTypeInfo(Desc.dynamic_type); // TODO
   }
 
   @override
   ClassDescTypeInfo rootType() {
-    return ClassDescTypeInfo(type: root);
+    return root;
+  }
+
+  @override
+  bool isAssignableFrom(ClassDescTypeInfo a, ClassDescTypeInfo b) {
+    return a.type.name == b.type.name; // TODO
   }
 }
 

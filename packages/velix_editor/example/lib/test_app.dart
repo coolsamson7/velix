@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(title: const Text('Dot-Access Expression Editor')),
         body: const Padding(
           padding: EdgeInsets.all(16.0),
-          child: IDEAutocompleteInline(options: []),
+          child: CodeEditor(options: []),
         ),
       ),
     );
@@ -47,13 +47,13 @@ class MyApp extends StatelessWidget {
 }
 
 
-class IDEAutocompleteInline extends StatefulWidget {
+class CodeEditor extends StatefulWidget {
   final List<CompletionItem> options;
 
-  const IDEAutocompleteInline({super.key, required this.options});
+  const CodeEditor({super.key, required this.options});
 
   @override
-  State<IDEAutocompleteInline> createState() => _IDEAutocompleteInlineState();
+  State<CodeEditor> createState() => _CodeEditorState();
 }
 
 class CompletionItem {
@@ -63,16 +63,22 @@ class CompletionItem {
   CompletionItem({required this.label, required this.icon});
 }
 
-class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
+class _CodeEditorState extends State<CodeEditor> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   List<CompletionItem> _matches = [];
   int _selectedIndex = 0;
-  bool _isUpdatingCompletion = false; // Prevent infinite loops
+  bool _isUpdatingCompletion = false;
+  String _originalText = '';
+  int _originalCursorPos = 0;
 
   Iterable<CompletionItem> suggestions(String pattern, int offset) {
     try {
-      return autocomplete.suggest(pattern, cursorOffset: offset).map((str) => CompletionItem(label: str, icon: Icons.lightbulb_outline));
+      return autocomplete.suggest(pattern, cursorOffset: offset)
+          .map((suggestion) => CompletionItem(
+            label: suggestion.suggestion,
+            icon: suggestion.type == "field" ? Icons.data_object : Icons.functions
+      ));
     }
     catch (e) {
       return [];
@@ -95,11 +101,14 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
   }
 
   void _onTextChanged() {
-    // Prevent infinite loops when we're programmatically updating the text
     if (_isUpdatingCompletion) return;
 
     final cursorPos = _controller.selection.baseOffset;
     if (cursorPos < 0) return;
+
+    // Store the original state when user types
+    _originalText = _controller.text;
+    _originalCursorPos = cursorPos;
 
     final matches = suggestions(_controller.text, cursorPos).toList();
 
@@ -107,42 +116,63 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
       _matches = matches;
       _selectedIndex = matches.isNotEmpty ? 0 : -1;
     });
+
+    _updateInlineCompletion();
+  }
+
+  void _updateInlineCompletion() {
+    if (_matches.isEmpty || _selectedIndex < 0) {
+      return;
+    }
+
+    final completion = _matches[_selectedIndex].label;
+
+    // Find word start
+    int wordStart = _originalCursorPos;
+    while (wordStart > 0 && _isWordChar(_originalText[wordStart - 1])) {
+      wordStart--;
+    }
+
+    final typedPart = _originalText.substring(wordStart, _originalCursorPos);
+
+    if (completion.toLowerCase().startsWith(typedPart.toLowerCase())) {
+      final beforeWord = _originalText.substring(0, wordStart);
+      final afterCursor = _originalText.substring(_originalCursorPos);
+      final newText = beforeWord + completion + afterCursor;
+
+      _isUpdatingCompletion = true;
+
+      _controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection(
+          baseOffset: wordStart + typedPart.length,
+          extentOffset: wordStart + completion.length,
+        ),
+      );
+
+      _isUpdatingCompletion = false;
+    }
+  }
+
+  bool _isWordChar(String char) {
+    return RegExp(r'[a-zA-Z0-9_]').hasMatch(char);
   }
 
   void _acceptCompletion() {
     if (_matches.isEmpty || _selectedIndex < 0) return;
 
-    _isUpdatingCompletion = true;
-
-    final cursorPos = _controller.selection.baseOffset;
-    final completion = _matches[_selectedIndex].label;
-
-    // Find word start
-    int wordStart = cursorPos;
-    while (wordStart > 0 && _isWordChar(_controller.text[wordStart - 1])) {
-      wordStart--;
+    // Move cursor to end of completion
+    final selection = _controller.selection;
+    if (selection.extentOffset > selection.baseOffset) {
+      _isUpdatingCompletion = true;
+      _controller.selection = TextSelection.collapsed(offset: selection.extentOffset);
+      _isUpdatingCompletion = false;
     }
-
-    final beforeWord = _controller.text.substring(0, wordStart);
-    final afterCursor = _controller.text.substring(cursorPos);
-    final newText = beforeWord + completion + afterCursor;
-    final newCursorPos = wordStart + completion.length;
-
-    _controller.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newCursorPos),
-    );
 
     setState(() {
       _matches = [];
       _selectedIndex = -1;
     });
-
-    _isUpdatingCompletion = false;
-  }
-
-  bool _isWordChar(String char) {
-    return RegExp(r'[a-zA-Z0-9_]').hasMatch(char);
   }
 
   void _selectNext() {
@@ -150,6 +180,7 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
     setState(() {
       _selectedIndex = (_selectedIndex + 1) % _matches.length;
     });
+    _updateInlineCompletion();
   }
 
   void _selectPrevious() {
@@ -157,9 +188,20 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
     setState(() {
       _selectedIndex = (_selectedIndex - 1 + _matches.length) % _matches.length;
     });
+    _updateInlineCompletion();
   }
 
   void _dismissCompletion() {
+    if (_matches.isEmpty) return;
+
+    // Restore original text and cursor position
+    _isUpdatingCompletion = true;
+    _controller.value = TextEditingValue(
+      text: _originalText,
+      selection: TextSelection.collapsed(offset: _originalCursorPos),
+    );
+    _isUpdatingCompletion = false;
+
     setState(() {
       _matches = [];
       _selectedIndex = -1;
@@ -195,7 +237,7 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Clean TextField
+          // TextField with inline completion
           TextField(
             controller: _controller,
             focusNode: _focusNode,
@@ -207,32 +249,28 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
             style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
           ),
 
-          // Elegant completion dropdown
+          // Compact suggestion list
           if (_matches.isNotEmpty)
             Container(
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: 4),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ],
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              constraints: const BoxConstraints(maxHeight: 200),
+              constraints: const BoxConstraints(maxHeight: 150),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: ListView.separated(
+                borderRadius: BorderRadius.circular(6),
+                child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: _matches.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: Colors.grey.shade200,
-                  ),
                   itemBuilder: (context, index) {
                     final item = _matches[index];
                     final isSelected = index == _selectedIndex;
@@ -244,10 +282,11 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
                           setState(() {
                             _selectedIndex = index;
                           });
+                          _updateInlineCompletion();
                           _acceptCompletion();
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected ? Colors.blue.shade50 : null,
                           ),
@@ -255,15 +294,15 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
                             children: [
                               Icon(
                                 item.icon ?? Icons.code,
-                                size: 20,
+                                size: 16,
                                 color: isSelected ? Colors.blue.shade600 : Colors.grey.shade600,
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   item.label,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontFamily: 'monospace',
                                     fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                                     color: isSelected ? Colors.blue.shade800 : Colors.black87,
@@ -273,7 +312,7 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
                               if (isSelected)
                                 Icon(
                                   Icons.keyboard_return,
-                                  size: 16,
+                                  size: 14,
                                   color: Colors.blue.shade400,
                                 ),
                             ],
@@ -286,14 +325,14 @@ class _IDEAutocompleteInlineState extends State<IDEAutocompleteInline> {
               ),
             ),
 
-          // Helpful hint
+          // Compact hint
           if (_matches.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'Use ↑↓ to navigate • Tab/Enter/→ to accept • Esc to cancel',
+                '↑↓ navigate • Tab/Enter/→ accept • Esc cancel',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic,
                 ),

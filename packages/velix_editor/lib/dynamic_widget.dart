@@ -44,6 +44,6 @@ class _DynamicWidgetState extends State<DynamicWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return theme.builder(widget.model.type).create(widget.model, environment);
+    return theme.builder(widget.model.type).create(widget.model, environment, context);
   }
 }

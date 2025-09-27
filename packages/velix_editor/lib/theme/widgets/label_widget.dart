@@ -9,7 +9,7 @@ class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   LabelWidgetBuilder() : super(name: "label");
 
   @override
-  Widget create(LabelWidgetData data, Environment environment) {
+  Widget create(LabelWidgetData data, Environment environment, BuildContext context) {
     return Text(data.label,
         style: textStyle(data.font)
     );
@@ -21,7 +21,7 @@ class EditLabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   EditLabelWidgetBuilder() : super(name: "label", edit: true);
 
   @override
-  Widget create(LabelWidgetData data, Environment environment) {
+  Widget create(LabelWidgetData data, Environment environment, BuildContext context) {
     // In edit mode, make the text field non-interactive
     return IgnorePointer(
       ignoring: true,

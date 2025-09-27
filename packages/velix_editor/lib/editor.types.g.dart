@@ -9,6 +9,7 @@ import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
+import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
@@ -45,6 +46,56 @@ void registerEditorTypes() {
     constructor: () => CommandStack(),
     fromMapConstructor: (Map<String,dynamic> args) => CommandStack(),
     fromArrayConstructor: (List<dynamic> args) => CommandStack(),
+  );
+
+  type<User>(
+    location: 'package:velix_editor/editor/editor.dart:32:1',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = ''}) => User(name: name),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? ''),
+    fields: [
+      field<User,String>('name',
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as User).name = value,
+      )
+    ],
+    methods: [
+      method<User,String>('hello',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<String>('message', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as User).hello(args[1])
+      )
+    ],
+  );
+
+  type<Page>(
+    location: 'package:velix_editor/editor/editor.dart:53:1',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => Page(),
+    fromMapConstructor: (Map<String,dynamic> args) => Page(),
+    fromArrayConstructor: (List<dynamic> args) => Page(),
+    fields: [
+      field<Page,User>('user',
+        getter: (obj) => obj.user,
+      )
+    ],
+    methods: [
+      method<Page,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Page).setup()
+      )
+    ],
   );
 
   type<EditorModule>(
@@ -214,56 +265,6 @@ void registerEditorTypes() {
         getter: (obj) => obj.parent,
         setter: (obj, value) => (obj as WidgetData).parent = value,
         isNullable: true
-      )
-    ],
-  );
-
-  type<User>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:16:1',
-    params: [
-      param<String>('name', isNamed: true, isRequired: true)
-    ],
-    constructor: ({String name = ''}) => User(name: name),
-    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? ''),
-    fields: [
-      field<User,String>('name',
-        getter: (obj) => obj.name,
-        setter: (obj, value) => (obj as User).name = value,
-      )
-    ],
-    methods: [
-      method<User,String>('hello',
-        annotations: [
-          Inject()
-        ],
-        parameters: [
-          param<String>('message', isRequired: true)
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as User).hello(args[1])
-      )
-    ],
-  );
-
-  type<Page>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:36:1',
-    annotations: [
-      Injectable()
-    ],
-    constructor: () => Page(),
-    fromMapConstructor: (Map<String,dynamic> args) => Page(),
-    fromArrayConstructor: (List<dynamic> args) => Page(),
-    fields: [
-      field<Page,User>('user',
-        getter: (obj) => obj.user,
-      )
-    ],
-    methods: [
-      method<Page,void>('setup',
-        annotations: [
-          Inject()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Page).setup()
       )
     ],
   );
@@ -441,7 +442,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
+    location: 'package:velix_editor/metadata/widgets/text.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "text", i18n: "editor:widgets.text.title", group: "widgets", icon: Icons.text_fields),
@@ -450,11 +451,12 @@ void registerEditorTypes() {
     params: [
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true)
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<String>('databinding', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = "text", List<WidgetData> children = const [], String label = ''}) => TextWidgetData(type: type, children: children, label: label),
-    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? ''),
+    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', String databinding = ''}) => TextWidgetData(type: type, children: children, label: label, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', databinding: args[3] as String? ?? ''),
     fields: [
       field<TextWidgetData,String>('label',
         annotations: [
@@ -462,6 +464,15 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.label,
         setter: (obj, value) => (obj as TextWidgetData).label = value,
+      ), 
+      field<TextWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as TextWidgetData).databinding = value,
+        isNullable: true
       )
     ],
   );
@@ -478,7 +489,7 @@ void registerEditorTypes() {
   );
 
   type<CodeEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:60:1',
+    location: 'package:velix_editor/property_panel/editor/code_editor.dart:16:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -544,7 +555,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:7:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:12:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -555,7 +566,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:30:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:54:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

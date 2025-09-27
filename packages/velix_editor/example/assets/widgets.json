@@ -3,6 +3,7 @@
   "children": [
     {
     "type": "text",
+    "databinding": "user.name",
     "children": [],
     "label": "Hello World"
     },
@@ -25,6 +26,7 @@
     },
     {
     "type": "text",
+    "databinding": "user.name",
     "children": [],
     "label": "Second Text"
     }

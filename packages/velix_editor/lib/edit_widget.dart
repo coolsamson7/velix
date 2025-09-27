@@ -79,7 +79,7 @@ class _EditWidgetState extends State<EditWidget> {
   @override
   Widget build(BuildContext context) {
     final visualChild = theme.builder(widget.model.type, edit: true)
-        .create(widget.model, environment);
+        .create(widget.model, environment, context);
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),

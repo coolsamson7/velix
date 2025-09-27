@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:velix/reflectable/reflectable.dart';
 
 import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_ui/commands/command.dart';
 
+import '../actions/types.dart';
 import '../commands/command_stack.dart';
 import '../components/focusable_region.dart';
 import '../event/events.dart';
@@ -23,6 +25,73 @@ import 'panel_switcher.dart';
 import 'widget_breadcrumb.dart';
 
 part "editor.command.g.dart";
+
+// TEST TODO
+
+
+@Dataclass()
+class User {
+  // instance data
+
+  @Attribute()
+  String name = "";
+
+  // constructor
+
+  User({required this.name});
+
+  // methods
+
+  @Inject()
+  String hello(String message) {
+    print("hello $message");
+    return "hello $message";
+  }
+}
+
+
+@Injectable()
+@Dataclass()
+class Page {
+  // instance data
+
+  @Attribute()
+  final User user;
+
+  // constructor
+
+  Page() : user = User(name: "andi");
+
+  // methods
+
+  @Inject()
+  void setup() {
+    print("setup");
+  }
+}
+
+final pageClass = ClassDesc('Page',
+    properties: {
+      'user': FieldDesc('user', type: userClass),
+    }
+);
+
+final userClass = ClassDesc('User',
+  properties: {
+    'name': FieldDesc('value', type: Desc.string_type),
+    'address': FieldDesc('address',  type: addressClass),
+    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
+  },
+);
+
+final addressClass = ClassDesc('Address',
+  properties: {
+    'city': FieldDesc('city', type: Desc.string_type),
+    'street': FieldDesc('street', type: Desc.string_type)
+  },
+);
+
+// TEST
 
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
@@ -134,130 +203,134 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
   Widget build(BuildContext context) {
     return EnvironmentProvider(
       environment: environment,
-      child: FocusScope(
-          autofocus: true,
-          child: Shortcuts(
-            shortcuts: computeShortcuts(),
-            child: Actions(
-              actions: {
-                CommandIntent: CommandAction(),
-              },
-              child: Column(
-                children: [
-                  // ===== Toolbar =====
-                  Container(
-                    height: 48,
-                    color: Colors.grey.shade200,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        button("open"),
-                        button("save"),
-                        button("revert"),
-                        button("undo"),
+      child: Provider<ClassDesc>.value(
+          value: pageClass,
+          child: FocusScope(
+            autofocus: true,
+            child: Shortcuts(
+              shortcuts: computeShortcuts(),
+              child: Actions(
+                actions: {
+                  CommandIntent: CommandAction(),
+                },
+                child: Column(
+                  children: [
+                    // ===== Toolbar =====
+                    Container(
+                      height: 48,
+                      color: Colors.grey.shade200,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          button("open"),
+                          button("save"),
+                          button("revert"),
+                          button("undo"),
 
-                        IconButton(
-                          tooltip: edit ? "Play" : "Stop",
-                          icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
-                          onPressed: () {
-                            play();
-                          },
-                        ),
-                        const Spacer(),
+                          IconButton(
+                            tooltip: edit ? "Play" : "Stop",
+                            icon: edit ? const Icon(Icons.play_arrow) : const Icon(Icons.stop),
+                            onPressed: () {
+                              play();
+                            },
+                          ),
+                          const Spacer(),
 
-                        // === Locale Switcher ===
-                        Row(
-                          children: [
-                            IconButton(
-                              tooltip: "English",
-                              icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
-                              onPressed: () {
-                                switchLocale("en");
-                              },
-                            ),
-                            IconButton(
-                              tooltip: "Deutsch",
-                              icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
-                              onPressed: () {
-                                switchLocale("de");
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ===== Main Editor =====
-                  Expanded(
-                    child: Row(
-                      children: [
-                        DockedPanelSwitcher(
-                          side: DockSide.left,
-                          panels: {
-                            "tree": (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
-                            "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
-                            "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
-                          },
-                          icons: {
-                            "tree": Icons.account_tree,
-                            "palette": Icons.widgets,
-                            "json": Icons.code,
-                          },
-                          initialPanel: "tree",
-                        ),
-
-                        Expanded(
-                          flex: 2,
-                          child: Column(
+                          // === Locale Switcher ===
+                          Row(
                             children: [
-                              Expanded(
-                                child: edit ? FocusableRegion(
-                                    child: EditorCanvas(
-                                      models: widget.models,
-                                      typeRegistry: environment.get<TypeRegistry>(),
-                                    )
-                                ) :
-                                WidgetContainer(
-                                    models: widget.models,
-                                    typeRegistry: environment.get<TypeRegistry>()
-                                ),
+                              IconButton(
+                                tooltip: "English",
+                                icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
+                                onPressed: () {
+                                  switchLocale("en");
+                                },
                               ),
-                              Container(
-                                height: 32,
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  border: Border(
-                                    top: BorderSide(color: Colors.grey.shade400, width: 0.5),
-                                  ),
-                                ),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: WidgetBreadcrumbWidget(),
-                                ),
+                              IconButton(
+                                tooltip: "Deutsch",
+                                icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
+                                onPressed: () {
+                                  switchLocale("de");
+                                },
                               ),
                             ],
                           ),
-                        ),
-                        //Container(width: 300, color: Colors.white, child: PropertyPanel()),
-                        DockedPanelSwitcher(
-                          side: DockSide.right,
-                          panels: {
-                            "properties": (onClose) => PropertyPanel(onClose: onClose),
-                          },
-                          icons: {
-                            "properties": Icons.tune,
-                          },
-                          initialPanel: "properties",
-                        )
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+
+                    // ===== Main Editor =====
+                    Expanded(
+                      child: Row(
+                        children: [
+                          DockedPanelSwitcher(
+                            side: DockSide.left,
+                            panels: {
+                              "tree": (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
+                              "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
+                              "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                            },
+                            icons: {
+                              "tree": Icons.account_tree,
+                              "palette": Icons.widgets,
+                              "json": Icons.code,
+                            },
+                            initialPanel: "tree",
+                          ),
+
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: edit ? FocusableRegion(
+                                      child: EditorCanvas(
+                                        models: widget.models,
+                                        typeRegistry: environment.get<TypeRegistry>(),
+                                      )
+                                  ) :
+                                  WidgetContainer( // TODO
+                                      context: WidgetContext(page: environment.get<Page>()),
+                                      models: widget.models,
+                                      typeRegistry: environment.get<TypeRegistry>()
+                                  ),
+                                ),
+                                Container(
+                                  height: 32,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    border: Border(
+                                      top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                                    ),
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: WidgetBreadcrumbWidget(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //Container(width: 300, color: Colors.white, child: PropertyPanel()),
+                          DockedPanelSwitcher(
+                            side: DockSide.right,
+                            panels: {
+                              "properties": (onClose) => PropertyPanel(onClose: onClose),
+                            },
+                            icons: {
+                              "properties": Icons.tune,
+                            },
+                            initialPanel: "properties",
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
+            )
+        )
       )
     );
   }

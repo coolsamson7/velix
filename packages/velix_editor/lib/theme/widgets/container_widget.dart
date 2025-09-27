@@ -20,7 +20,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       : super(name: "container", edit: true);
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment) {
+  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
     return DragTarget<WidgetData>(
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
@@ -96,7 +96,7 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
       : super(name: "container");
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment) {
+  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(

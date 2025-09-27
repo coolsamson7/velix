@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './dynamic_widget.dart';
 import './metadata/type_registry.dart';
 import './metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
+class WidgetContext {
+  // instance data
+
+  dynamic page;
+
+  // constructor
+
+  WidgetContext({required this.page});
+}
+
 class WidgetContainer extends StatefulWidget {
   // instance data
 
   final List<WidgetData> models;
   final TypeRegistry typeRegistry;
+  final WidgetContext context;
 
   // constructor
 
-  const WidgetContainer({super.key, required this.models, required this.typeRegistry});
+  const WidgetContainer({super.key, required this.models, required this.typeRegistry, required this.context});
 
   // override
 
@@ -32,11 +44,13 @@ class _WidgetContainerState extends State<WidgetContainer> {
   Widget build(BuildContext context) {
     typeRegistry ??= EnvironmentProvider.of(context).get<TypeRegistry>();
 
-    return Container(
-      color: Colors.grey.shade200,
-      child: ListView(
-        children: widget.models.map((m) => DynamicWidget(model: m, meta: typeRegistry![m.type])).toList(),
-      ),
-    );
+    return Provider<WidgetContext>.value(
+        value: widget.context,
+        child: Container(
+          color: Colors.grey.shade200,
+          child: ListView(
+            children: widget.models.map((m) => DynamicWidget(model: m, meta: typeRegistry![m.type])).toList(),
+          ),
+    ));
   }
 }

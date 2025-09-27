@@ -1,60 +1,14 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart' hide Autocomplete;
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
-import 'package:velix_ui/provider/environment_provider.dart';
-
 import '../../actions/autocomplete.dart';
-import '../../actions/parser.dart';
 import '../../actions/types.dart';
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
-
-@Dataclass()
-class User {
-  // instance data
-
-  @Attribute()
-  String name = "";
-
-  // constructor
-
-  User({required this.name});
-
-  // methods
-
-  @Inject()
-  String hello(String message) {
-    print("hello $message");
-    return "hello $message";
-  }
-}
-
-
-@Injectable()
-@Dataclass()
-class Page {
-  // instance data
-
-  @Attribute()
-  final User user;
-
-  // constructor
-
-  Page() : user = User(name: "andi");
-
-  // methods
-
-  @Inject()
-  void setup() {
-    print("setup");
-  }
-}
-
 
 // we currently need a dummy class so that it doesn't conflict with the real string editor :-(
 class Code {}
@@ -74,41 +28,23 @@ class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return CodeEditor(
-      options: [],
-      //label: label,
-     // value: value ?? "",
-      //onChanged: onChanged, TODO
+      value: value ?? "",
+      onChanged: onChanged,
     );
   }
 }
 
-final pageClass = ClassDesc('Page',
-    properties: {
-      'user': FieldDesc('user', type: userClass),
-    }
-);
-
-final userClass = ClassDesc('User',
-  properties: {
-    'name': FieldDesc('value', type: Desc.string_type),
-    'address': FieldDesc('address',  type: addressClass),
-    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
-  },
-);
-
-final addressClass = ClassDesc('Address',
-  properties: {
-    'city': FieldDesc('city', type: Desc.string_type),
-    'street': FieldDesc('street', type: Desc.string_type)
-  },
-);
-
-var autocomplete = Autocomplete(pageClass);
-
 class CodeEditor extends StatefulWidget {
-  final List<CompletionItem> options;
+  // instance data
 
-  const CodeEditor({super.key, required this.options});
+  final dynamic value;
+  final ValueChanged<dynamic> onChanged;
+
+  // constructor
+
+  const CodeEditor({super.key, required this.value, required this.onChanged});
+
+  // override
 
   @override
   State<CodeEditor> createState() => _CodeEditorState();
@@ -122,6 +58,8 @@ class CompletionItem {
 }
 
 class _CodeEditorState extends State<CodeEditor> {
+  // instance data
+
   late TextEditingController _controller;
   late FocusNode _focusNode;
   List<CompletionItem> _matches = [];
@@ -129,10 +67,14 @@ class _CodeEditorState extends State<CodeEditor> {
   bool _isUpdatingCompletion = false;
   String _originalText = '';
   int _originalCursorPos = 0;
+  late Autocomplete autocomplete;
+
+  // internal
 
   Iterable<CompletionItem> suggestions(String pattern, int offset) {
     try {
-      return autocomplete.suggest(pattern, cursorOffset: offset)
+      return autocomplete
+          .suggest(pattern, cursorOffset: offset)
           .map((suggestion) => CompletionItem(
           label: suggestion.suggestion,
           icon: suggestion.type == "field" ? Icons.data_object : Icons.functions
@@ -141,21 +83,6 @@ class _CodeEditorState extends State<CodeEditor> {
     catch (e) {
       return [];
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-    _focusNode = FocusNode();
-    _controller.addListener(_onTextChanged);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
   }
 
   void _onTextChanged() {
@@ -169,6 +96,10 @@ class _CodeEditorState extends State<CodeEditor> {
     _originalCursorPos = cursorPos;
 
     final matches = suggestions(_controller.text, cursorPos).toList();
+
+    // callback
+
+    widget.onChanged(_originalText);
 
     setState(() {
       _matches = matches;
@@ -266,6 +197,32 @@ class _CodeEditorState extends State<CodeEditor> {
     });
   }
 
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    autocomplete = Autocomplete(Provider.of<ClassDesc>(context));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = TextEditingController(text: widget.value);
+    _focusNode = FocusNode();
+    _controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Focus(
@@ -277,19 +234,23 @@ class _CodeEditorState extends State<CodeEditor> {
             case LogicalKeyboardKey.arrowDown:
               _selectNext();
               return KeyEventResult.handled;
+
             case LogicalKeyboardKey.arrowUp:
               _selectPrevious();
               return KeyEventResult.handled;
+
             case LogicalKeyboardKey.tab:
             case LogicalKeyboardKey.enter:
             case LogicalKeyboardKey.arrowRight:
               _acceptCompletion();
               return KeyEventResult.handled;
+
             case LogicalKeyboardKey.escape:
               _dismissCompletion();
               return KeyEventResult.handled;
           }
         }
+
         return KeyEventResult.ignored;
       },
       child: Column(

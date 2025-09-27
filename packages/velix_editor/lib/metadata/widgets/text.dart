@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
+import '../../property_panel/editor/code_editor.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
@@ -13,8 +14,10 @@ class TextWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   String label;
+  @DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+  String? databinding;
 
   // constructor
 
-  TextWidgetData({super.type = "text", super.children = const [], required this.label});
+  TextWidgetData({super.type = "text", super.children = const [], required this.label, required this.databinding});
 }

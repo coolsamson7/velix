@@ -9,7 +9,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   TextWidgetBuilder() : super(name: "text");
 
   @override
-  Widget create(TextWidgetData data, Environment environment) {
+  Widget create(TextWidgetData data, Environment environment, BuildContext context) {
     return TextField(decoration: InputDecoration(labelText: data.label));
   }
 }
@@ -19,7 +19,7 @@ class TextEditWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   TextEditWidgetBuilder() : super(name: "text", edit: true);
 
   @override
-  Widget create(TextWidgetData data, Environment environment) {
+  Widget create(TextWidgetData data, Environment environment, BuildContext context) {
     // In edit mode, make the text field non-interactive
     return IgnorePointer(
       ignoring: true,

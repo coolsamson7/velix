@@ -23,7 +23,9 @@ import '../tree/tree_view.dart';
 import '../util/message_bus.dart';
 import '../widget_container.dart';
 import 'canvas.dart';
+import 'error_messages.dart';
 import 'panel_switcher.dart';
+import 'docking_container.dart';
 import 'widget_breadcrumb.dart';
 
 part "editor.command.g.dart";
@@ -412,71 +414,85 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
 
                     // ===== Main Editor =====
                     Expanded(
-                      child: Row(
-                        children: [
-                          DockedPanelSwitcher(
-                            side: DockSide.left,
-                            panels: {
-                              "tree": (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
-                              "palette": (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
-                              "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
-                            },
-                            icons: {
-                              "tree": Icons.account_tree,
-                              "palette": Icons.widgets,
-                              "json": Icons.code,
-                            },
-                            initialPanel: "tree",
+                      child:
+                DockingContainer(
+                  left: DockConfig(
+                    panels: {
+                      "tree": (onClose) =>
+                          FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
+                      "palette": (onClose) =>
+                          WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
+                      "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                    },
+                    icons: {
+                      "tree": Icons.account_tree,
+                      "palette": Icons.widgets,
+                      "json": Icons.code,
+                    },
+                    initialPanel: "tree",
+                    size: 240,
+                  ),
+                  right: DockConfig(
+                    panels: {
+                      "properties": (onClose) => PropertyPanel(onClose: onClose),
+                    },
+                    icons: {
+                      "properties": Icons.tune,
+                    },
+                    initialPanel: "properties",
+                    size: 280,
+                  ),
+                  bottom: DockConfig(
+                    panels: {
+                      "console": (onClose) => BottomErrorDisplay(errors: [
+                        "Something went wrong",
+                        "Another error occurred",
+                      ]),
+                    },
+                    icons: {
+                      "console": Icons.terminal,
+                    },
+                    initialPanel: "console",
+                    size: 150,
+                    overlay: false, // change to true if you want floating
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child:
+                      edit ? FocusableRegion(
+                          child: EditorCanvas(
+                            models: widget.models,
+                            typeRegistry: environment.get<TypeRegistry>(),
                           ),
-
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: edit ? FocusableRegion(
-                                      child: EditorCanvas(
-                                        models: widget.models,
-                                        typeRegistry: environment.get<TypeRegistry>(),
-                                      )
-                                  ) :
-                                  WidgetContainer( // TODO
-                                      context: WidgetContext(page: environment.get<Page>()),
-                                      models: widget.models,
-                                      typeRegistry: environment.get<TypeRegistry>()
-                                  ),
-                                ),
-                                Container(
-                                  height: 32,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    border: Border(
-                                      top: BorderSide(color: Colors.grey.shade400, width: 0.5),
-                                    ),
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: WidgetBreadcrumbWidget(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          DockedPanelSwitcher(
-                            side: DockSide.right,
-                            panels: {
-                              "properties": (onClose) => PropertyPanel(onClose: onClose),
-                            },
-                            icons: {
-                              "properties": Icons.tune,
-                            },
-                            initialPanel: "properties",
-                          )
-                        ],
+                        )
+                            : WidgetContainer(
+                          context: WidgetContext(page: environment.get<Page>()),
+                          models: widget.models,
+                          typeRegistry: environment.get<TypeRegistry>(),
+                        ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        height: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          border: Border(
+                            top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: WidgetBreadcrumbWidget(),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                )
+
+                    )
+                ],
                 ),
               ),
             )

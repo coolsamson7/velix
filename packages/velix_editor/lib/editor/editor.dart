@@ -444,7 +444,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                   ),
                   bottom: DockConfig(
                     panels: {
-                      "console": (onClose) => BottomErrorDisplay(errors: [
+                      "console": (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
                         "Something went wrong",
                         "Another error occurred",
                       ]),

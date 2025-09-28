@@ -63,12 +63,17 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
 
   void _onDragUpdate(DragUpdateDetails details) {
     final delta = isHorizontal ? details.delta.dx : details.delta.dy;
-    final newSize = panelSize + (widget.position == DockPosition.left || widget.position == DockPosition.top
-        ? delta
-        : -delta);
+    final newSize = panelSize +
+        ((widget.position == DockPosition.left || widget.position == DockPosition.top)
+            ? delta
+            : -delta);
 
-    final clampedSize = newSize.clamp(100.0, 600.0);
+    final screen = MediaQuery.of(context).size;
+    final maxSize = isHorizontal
+        ? screen.width - widget.barSize - 48 // keep some room
+        : screen.height - widget.barSize - 48;
 
+    final clampedSize = newSize.clamp(100.0, maxSize);
     if (clampedSize != panelSize) {
       setState(() => panelSize = clampedSize);
       widget.onSizeChanged?.call(clampedSize);
@@ -76,8 +81,8 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
+    // If no panel selected, show just the bar
     if (selectedPanel == null) {
       return _buildBar();
     }
@@ -100,7 +105,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             bar,
-            SizedBox(width: panelSize, child: panel),
+            Flexible(child: SizedBox(width: panelSize, child: panel)),
             resizeHandle,
           ],
         );
@@ -109,7 +114,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             resizeHandle,
-            SizedBox(width: panelSize, child: panel),
+            Flexible(child: SizedBox(width: panelSize, child: panel)),
             bar,
           ],
         );
@@ -118,7 +123,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             bar,
-            SizedBox(height: panelSize, child: panel),
+            Flexible(child: SizedBox(height: panelSize, child: panel)),
             resizeHandle,
           ],
         );
@@ -127,13 +132,12 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             resizeHandle,
-            SizedBox(height: panelSize, child: panel),
+            Flexible(child: SizedBox(height: panelSize, child: panel)),
             bar,
           ],
         );
     }
   }
-
 
   Widget _buildBar() {
     if (isHorizontal) {

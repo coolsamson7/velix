@@ -358,6 +358,16 @@ class _CodeEditorState extends State<CodeEditor>
   }
 
   @override
+  void didUpdateWidget(covariant CodeEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.value.toString() != _controller.text) {
+      // Update controller text if external value has changed
+      _controller.text = widget.value.toString();
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 

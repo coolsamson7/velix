@@ -50,6 +50,7 @@ class _IntEditorStatefulState extends State<_IntEditorStateful> {
   @override
   void initState() {
     super.initState();
+
     _controller = TextEditingController(text: widget.value.toString());
     _focusNode = FocusNode();
   }
@@ -57,6 +58,7 @@ class _IntEditorStatefulState extends State<_IntEditorStateful> {
   @override
   void didUpdateWidget(covariant _IntEditorStateful oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.value.toString() != _controller.text) {
       // Update controller text if external value has changed
       _controller.text = widget.value.toString();
@@ -77,7 +79,6 @@ class _IntEditorStatefulState extends State<_IntEditorStateful> {
       focusNode: _focusNode,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      //decoration: InputDecoration(labelText: widget.label),
       onChanged: (val) {
         final intValue = int.tryParse(val) ?? 0;
         widget.onChanged(intValue);

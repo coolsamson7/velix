@@ -51,6 +51,7 @@ class _StringEditorStatefulState extends State<_StringEditorStateful> {
   @override
   void initState() {
     super.initState();
+
     _controller = TextEditingController(text: widget.value);
     _focusNode = FocusNode();
   }
@@ -58,6 +59,7 @@ class _StringEditorStatefulState extends State<_StringEditorStateful> {
   @override
   void didUpdateWidget(covariant _StringEditorStateful oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.value != _controller.text) {
       _controller.text = widget.value;
     }
@@ -75,7 +77,6 @@ class _StringEditorStatefulState extends State<_StringEditorStateful> {
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
-      //decoration: InputDecoration(labelText: widget.label),
       onChanged: widget.onChanged,
     );
   }

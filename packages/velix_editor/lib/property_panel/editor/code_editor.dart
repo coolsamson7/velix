@@ -55,21 +55,39 @@ class _CodeEditorState extends State<CodeEditor> {
   String _originalText = '';
   int _originalCursorPos = 0;
   late Autocomplete autocomplete;
+  String? _parseException;
 
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
 
   Iterable<CompletionItem> suggestions(String pattern, int offset) {
     try {
-      return autocomplete
+      final suggestions = autocomplete
           .suggest(pattern, cursorOffset: offset)
           .map((suggestion) => CompletionItem(
           label: suggestion.suggestion,
           icon: suggestion.type == "field"
               ? Icons.data_object
               : Icons.functions));
+
+      // Clear parse exception if suggestions work
+      if (_parseException != null) {
+        setState(() {
+          _parseException = null;
+        });
+      }
+
+      return suggestions;
     } catch (e) {
-      print("caight exception during suggestions $e");
+      print("caught exception during suggestions $e");
+
+      // Update parse exception state
+      if (_parseException != e.toString()) {
+        setState(() {
+          _parseException = e.toString();
+        });
+      }
+
       return [];
     }
   }
@@ -281,6 +299,34 @@ class _CodeEditorState extends State<CodeEditor> {
     _overlayEntry = null;
   }
 
+  Widget _buildStatusIndicator() {
+    if (_parseException == null) {
+      return Tooltip(
+        message: "Code is valid",
+        child: Icon(
+          Icons.check_circle,
+          size: 16,
+          color: Colors.green.shade600,
+        ),
+      );
+    } else {
+      return Tooltip(
+        message: "Parse error: $_parseException",
+        preferBelow: false,
+        textStyle: const TextStyle(fontSize: 12),
+        decoration: BoxDecoration(
+          color: Colors.red.shade800,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(
+          Icons.error,
+          size: 16,
+          color: Colors.red.shade600,
+        ),
+      );
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -311,7 +357,6 @@ class _CodeEditorState extends State<CodeEditor> {
     super.dispose();
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Focus(
@@ -358,18 +403,26 @@ class _CodeEditorState extends State<CodeEditor> {
       },
       child: CompositedTransformTarget(
         link: _layerLink,
-        child: TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          decoration: const InputDecoration(
-            hintText: "Type here for autocompletion...",
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          ),
-          style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
+        child: Stack(
+          children: [
+            TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              decoration: const InputDecoration(
+                hintText: "Type here for autocompletion...",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: _buildStatusIndicator(),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

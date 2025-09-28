@@ -140,7 +140,20 @@ class ExpressionParser {
       });
 
   Parser<List<Expression>> get arguments =>
-      expression.plusSeparated(char(',').trim()).map((sl) => sl.elements).optionalWith([]);
+      (expression & (char(',').trim() & expression).star())
+          .map<List<Expression>>((values) {
+        final first = values[0] as Expression;
+        final rest = values[1] as List;
+        final result = <Expression>[first];
+
+        for (var pair in rest) {
+          // pair[0] is comma, pair[1] is expression
+          result.add(pair[1] as Expression);
+        }
+        return result;
+      })
+          .optional()
+          .map<List<Expression>>((result) => result ?? <Expression>[]);
 
   Parser<List<Expression>> conditionArguments() =>
       (char('?') & expression & char(':') & expression).pick(1).seq(expression)

@@ -8,8 +8,6 @@ import '../editor_builder.dart';
 
 @Injectable()
 class FontWeightEditorBuilder extends PropertyEditorBuilder<FontWeight> {
-  // override
-
   @override
   Widget buildEditor({
     required MessageBus messageBus,
@@ -20,33 +18,28 @@ class FontWeightEditorBuilder extends PropertyEditorBuilder<FontWeight> {
     required dynamic value,
     required ValueChanged<dynamic> onChanged,
   }) {
-    return _FontWeightEditorStateful(
+    return _FontWeightEditor(
       value: value ?? FontWeight.normal,
       onChanged: onChanged,
     );
   }
 }
 
-class _FontWeightEditorStateful extends StatefulWidget {
-  // instance data
-
+class _FontWeightEditor extends StatefulWidget {
   final FontWeight value;
-  final ValueChanged<dynamic> onChanged;
+  final ValueChanged<FontWeight> onChanged;
 
-  // constructor
-
-  const _FontWeightEditorStateful({
+  const _FontWeightEditor({
     Key? key,
     required this.value,
     required this.onChanged,
   }) : super(key: key);
 
   @override
-  State<_FontWeightEditorStateful> createState() =>
-      _FontWeightEditorStatefulState();
+  State<_FontWeightEditor> createState() => _FontWeightEditorState();
 }
 
-class _FontWeightEditorStatefulState extends State<_FontWeightEditorStateful> {
+class _FontWeightEditorState extends State<_FontWeightEditor> {
   late FontWeight _selectedWeight;
 
   static const Map<String, FontWeight> _weights = {
@@ -68,40 +61,47 @@ class _FontWeightEditorStatefulState extends State<_FontWeightEditorStateful> {
   }
 
   @override
-  void didUpdateWidget(covariant _FontWeightEditorStateful oldWidget) {
+  void didUpdateWidget(covariant _FontWeightEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != _selectedWeight) {
-      setState(() {
-        _selectedWeight = widget.value;
-      });
+      setState(() => _selectedWeight = widget.value);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const SizedBox(width: 8),
-        DropdownButton<FontWeight>(
+    return DropdownButtonHideUnderline(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: DropdownButton<FontWeight>(
           value: _selectedWeight,
+          isDense: true,
+          icon: const Icon(Icons.arrow_drop_down, size: 20),
+          style: const TextStyle(color: Colors.black),
           items: _weights.entries
               .map(
                 (e) => DropdownMenuItem<FontWeight>(
               value: e.value,
-              child: Text(e.key),
+              child: Text(
+                e.key,
+                style: TextStyle(fontWeight: e.value),
+              ),
             ),
           )
               .toList(),
           onChanged: (weight) {
             if (weight != null) {
-              setState(() {
-                _selectedWeight = weight;
-              });
+              setState(() => _selectedWeight = weight);
               widget.onChanged(weight);
             }
           },
         ),
-      ],
+      ),
     );
   }
 }

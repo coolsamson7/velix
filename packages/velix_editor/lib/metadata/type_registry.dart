@@ -40,15 +40,13 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(PropertyDescriptor(name: field.name, i18n: property.i18n, group: property.group, field: field, hide: property.hide, editor: property.editor, groupI18n: property.groupI18N));
+          properties.add(PropertyDescriptor(name: field.name, annotation: property, field: field, hide: property.hide, editor: property.editor));
         }
       }
 
       var widgetDescriptor = WidgetDescriptor(
-        name: declareWidget.name,
-        i18n: declareWidget.i18n,
+        annotation: declareWidget,
         icon: declareWidget.icon,
-        group: declareWidget.group,
         type: widgetType,
         properties: properties,
       );

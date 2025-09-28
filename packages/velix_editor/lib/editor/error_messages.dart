@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:velix_i18n/i18n/i18n.dart';
 
 import '../components/panel_header.dart';
 
@@ -13,7 +14,7 @@ class BottomErrorDisplay extends StatelessWidget {
     //if (errors.isEmpty) return const SizedBox.shrink();
 
       return PanelContainer(
-        title: "Errors",
+        title: "editor:docks.errors.label".tr(),
         onClose: onClose,
         child: ListView.separated(
           padding: const EdgeInsets.all(8),

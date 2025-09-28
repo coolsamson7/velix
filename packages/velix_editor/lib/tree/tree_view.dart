@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
+import 'package:velix_i18n/i18n/i18n.dart';
 
 import '../commands/command_stack.dart';
 import '../commands/reparent_command.dart';
@@ -489,7 +490,7 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
   @override
   Widget build(BuildContext context) {
     return PanelContainer(
-      title: "Widget Tree",
+      title: "editor:docks.tree.label".tr(),
       onClose: widget.onClose,
       child: Column(
         children: [

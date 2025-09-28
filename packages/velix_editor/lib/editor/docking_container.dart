@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:velix_editor/editor/panel_switcher.dart';
 
 /// Config for a docking panel
-class DockConfig {
+class Dock {
   final Map<String, Widget Function(VoidCallback onClose)> panels;
   final Map<String, IconData> icons;
   final String? initialPanel;
   final bool overlay;
   final double? size; // width for side, height for bottom
 
-  const DockConfig({
+  const Dock({
     required this.panels,
     required this.icons,
     this.initialPanel,
@@ -21,9 +21,9 @@ class DockConfig {
 /// A container that arranges a central child with optional side/bottom panels
 class DockingContainer extends StatefulWidget {
   final Widget child;
-  final DockConfig? left;
-  final DockConfig? right;
-  final DockConfig? bottom;
+  final Dock? left;
+  final Dock? right;
+  final Dock? bottom;
 
   const DockingContainer({
     super.key,
@@ -92,7 +92,7 @@ class _DockingContainerState extends State<DockingContainer> {
   }
 
   Widget _buildOverlayPanel(
-      DockConfig config, Alignment alignment, String? selectedPanel, double size) {
+      Dock config, Alignment alignment, String? selectedPanel, double size) {
     final isBottom = alignment == Alignment.bottomCenter;
     return Align(
       alignment: alignment,

@@ -20,7 +20,7 @@ import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_editor/metadata/widgets/label.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_editor/property_panel/editor/bool_editor.dart';
-import 'package:velix_editor/property_panel/editor/code_editor.dart';
+import 'package:velix_editor/property_panel/editor/code_editor.dart' show CodeEditorBuilder;
 import 'package:velix_editor/property_panel/editor/font_style_editor.dart';
 import 'package:velix_editor/property_panel/editor/font_weight_editor.dart';
 import 'package:velix_editor/property_panel/editor/int_editor.dart';
@@ -49,7 +49,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:32:1',
+    location: 'package:velix_editor/editor/editor.dart:208:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true)
     ],
@@ -76,7 +76,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:53:1',
+    location: 'package:velix_editor/editor/editor.dart:229:1',
     annotations: [
       Injectable()
     ],
@@ -150,28 +150,28 @@ void registerEditorTypes() {
     fields: [
       field<Padding,int>('left',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.padding.left")
+          DeclareProperty(label: "editor:properties.padding.left")
         ],
         getter: (obj) => obj.left,
         setter: (obj, value) => (obj as Padding).left = value,
       ), 
       field<Padding,int>('top',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.padding.top")
+          DeclareProperty(label: "editor:properties.padding.top")
         ],
         getter: (obj) => obj.top,
         setter: (obj, value) => (obj as Padding).top = value,
       ), 
       field<Padding,int>('right',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.padding.right")
+          DeclareProperty(label: "editor:properties.padding.right")
         ],
         getter: (obj) => obj.right,
         setter: (obj, value) => (obj as Padding).right = value,
       ), 
       field<Padding,int>('bottom',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.padding.bottom")
+          DeclareProperty(label: "editor:properties.padding.bottom")
         ],
         getter: (obj) => obj.bottom,
         setter: (obj, value) => (obj as Padding).bottom = value,
@@ -192,21 +192,21 @@ void registerEditorTypes() {
     fields: [
       field<Font,FontWeight>('weight',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.font.weight")
+          DeclareProperty(label: "editor:properties.font.weight")
         ],
         getter: (obj) => obj.weight,
         setter: (obj, value) => (obj as Font).weight = value,
       ), 
       field<Font,FontStyle>('style',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.font.style")
+          DeclareProperty(label: "editor:properties.font.style")
         ],
         getter: (obj) => obj.style,
         setter: (obj, value) => (obj as Font).style = value,
       ), 
       field<Font,int>('size',
         annotations: [
-          DeclareProperty(i18n: "editor:properties.font.size")
+          DeclareProperty(label: "editor:properties.font.size")
         ],
         getter: (obj) => obj.size,
         setter: (obj, value) => (obj as Font).size = value,
@@ -250,7 +250,7 @@ void registerEditorTypes() {
       ), 
       field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          DeclareProperty(group: "general", hide: true),
+          DeclareProperty(group: "general", label: "editor:groups.general", hide: true),
           Json(required: false)
         ],
         elementType: WidgetData,
@@ -341,7 +341,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/button.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "button", i18n: "editor:widgets.button.title", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "button", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "button")
     ],
     params: [
@@ -357,14 +357,14 @@ void registerEditorTypes() {
     fields: [
       field<ButtonWidgetData,String>('label',
         annotations: [
-          DeclareProperty(groupI18N: "editor:groups.general", i18n: "editor:widgets.button.label")
+          DeclareProperty(group: "general")
         ],
         getter: (obj) => obj.label,
         setter: (obj, value) => (obj as ButtonWidgetData).label = value,
       ), 
       field<ButtonWidgetData,Font>('font',
         annotations: [
-          DeclareProperty(group: "Font Properties")
+          DeclareProperty(group: "font")
         ],
         getter: (obj) => obj.font,
         setter: (obj, value) => (obj as ButtonWidgetData).font = value,
@@ -372,7 +372,7 @@ void registerEditorTypes() {
       ), 
       field<ButtonWidgetData,Padding>('padding',
         annotations: [
-          DeclareProperty(group: "Layout Properties")
+          DeclareProperty(group: "layout")
         ],
         getter: (obj) => obj.padding,
         setter: (obj, value) => (obj as ButtonWidgetData).padding = value,
@@ -381,7 +381,7 @@ void registerEditorTypes() {
       field<ButtonWidgetData,String>('onClick',
         type: StringType().optional(),
         annotations: [
-          DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+          DeclareProperty(group: "events", editor: CodeEditorBuilder)
         ],
         getter: (obj) => obj.onClick,
         setter: (obj, value) => (obj as ButtonWidgetData).onClick = value,
@@ -394,7 +394,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/container.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "container", i18n: "editor:widgets.container.title", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "container", group: "container", icon: Icons.view_column),
       JsonSerializable(discriminator: "container")
     ],
     params: [
@@ -410,7 +410,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/label.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "label", i18n: "editor:widgets.label.title", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "label", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "label")
     ],
     params: [
@@ -445,7 +445,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/text.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "text", i18n: "editor:widgets.text.title", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "text", group: "widgets", icon: Icons.text_fields),
       JsonSerializable(discriminator: "text")
     ],
     params: [
@@ -468,7 +468,7 @@ void registerEditorTypes() {
       field<TextWidgetData,String>('databinding',
         type: StringType().optional(),
         annotations: [
-          DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as TextWidgetData).databinding = value,

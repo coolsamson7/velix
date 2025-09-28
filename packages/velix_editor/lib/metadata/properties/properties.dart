@@ -34,13 +34,13 @@ class FontStyleConvert extends Convert<FontStyle,String> {
 
 @Dataclass()
 class Padding {
-  @DeclareProperty(i18n: "editor:properties.padding.left")
+  @DeclareProperty(label: "editor:properties.padding.left")
   int left;
-  @DeclareProperty(i18n: "editor:properties.padding.top")
+  @DeclareProperty(label: "editor:properties.padding.top")
   int top;
-  @DeclareProperty(i18n: "editor:properties.padding.right")
+  @DeclareProperty(label: "editor:properties.padding.right")
   int right;
-  @DeclareProperty(i18n: "editor:properties.padding.bottom")
+  @DeclareProperty(label: "editor:properties.padding.bottom")
   int bottom;
 
   Padding({
@@ -53,13 +53,13 @@ class Padding {
 
 @Dataclass()
 class Font {
-  @DeclareProperty(i18n: "editor:properties.font.weight")
+  @DeclareProperty(label: "editor:properties.font.weight")
   FontWeight weight;
 
-  @DeclareProperty(i18n: "editor:properties.font.style")
+  @DeclareProperty(label: "editor:properties.font.style")
   FontStyle style;
 
-  @DeclareProperty(i18n: "editor:properties.font.size")
+  @DeclareProperty(label: "editor:properties.font.size")
   int size;
 
   Font({this.weight = FontWeight.normal, this.style = FontStyle.normal, this.size = 16});

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:velix_i18n/i18n/i18n.dart';
 
 import '../components/panel_header.dart';
 import '../metadata/metadata.dart';
@@ -90,7 +91,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
         width: _width,
         color: Colors.grey.shade300,
         child: PanelContainer(
-          title: "Palette",
+          title: "editor:docks.palette.label".tr(),
           onClose: widget.onClose,
           child: ListView(
             children: groupedWidgets.entries.map((entry) {
@@ -172,7 +173,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
           const Icon(Icons.widgets, size: 32), // generic icon
           const SizedBox(height: 4),
           Text(
-            type.name,
+            type.label,
             style: TextStyle(
               fontSize: 12,
               color: highlight ? Colors.white : Colors.black,

@@ -6,18 +6,19 @@ import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
+import 'annotations.dart';
 import 'widget_data.dart';
 
 class PropertyDescriptor {
   // instance data
 
+  final DeclareProperty annotation;
+
   final String name;
-  final String? i18n;
-  final String? groupI18n;
-  String label;
+
+  String label = "";
   final FieldDescriptor field;
-  final String group;
-  String groupLabel;
+  String group = "";
   final Type? editor;
   final bool hide;
 
@@ -25,18 +26,13 @@ class PropertyDescriptor {
 
   // constructor
 
-  PropertyDescriptor({required this.name, required this.field, required this.i18n, required this.group, required this.groupI18n, required this.hide, this.editor}) : label = name, groupLabel = group {
-    updateI18n();
-  }
+  PropertyDescriptor({required this.name,  required this.annotation,  required this.field, required this.hide, this.editor});
 
   // public
 
-  void updateI18n() {
-    if ( i18n != null)
-      label = Translator.tr("$i18n.label");
-
-    if ( groupI18n != null)
-      groupLabel = Translator.tr("$groupI18n.label");
+  void updateI18n(String widget) {
+    label = Translator.tr("editor:widgets.$widget.$name.label");
+    group = Translator.tr("editor:groups.${annotation.group}.label");
   }
 
   dynamic createDefault() {
@@ -59,18 +55,20 @@ class PropertyDescriptor {
 class WidgetDescriptor {
   // instance data
 
-  final String name;
-  final String? i18n;
-  String label;
-  final String group;
-  String groupLabel;
+  DeclareWidget annotation;
+
+  String label = "";
+  String group = "";
+
   final IconData? icon;
   final TypeDescriptor type;
   List<PropertyDescriptor> properties;
 
+  String get name => annotation.name;
+
   // constructor
 
-  WidgetDescriptor({required this.name, required this.group, required this.type, required this.properties, required this.icon, required this.i18n}) : label = name, groupLabel = group {
+  WidgetDescriptor({required this.annotation, required this.type, required this.properties, required this.icon}) {
     updateI18n();
   }
 
@@ -85,11 +83,11 @@ class WidgetDescriptor {
   }
 
   void updateI18n() {
-    if ( i18n!= null)
-      label = Translator.tr(i18n!);
+    label = Translator.tr("editor:widgets.$name.title");
+    group = Translator.tr("editor:widget.groups.${annotation.group}.label");
 
     for ( var property in properties)
-      property.updateI18n();
+      property.updateI18n(name);
   }
 
   WidgetData create() {

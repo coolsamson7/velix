@@ -94,7 +94,10 @@ void main() async {
           "editor": "velix_editor"
         }
       ),
-      missingKeyHandler: (key) => '##$key##',
+      missingKeyHandler: (key) {
+        print("missing i18n: $key");
+        return '##$key##';
+        },
       preloadNamespaces: ["validation", "editor"]
   );
 

@@ -1,4 +1,26 @@
 {
+  "docks": {
+    "palette": {
+      "label": "Palette",
+      "tooltip": "Palette"
+    },
+    "json": {
+      "label": "JSON",
+      "tooltip": "JSON"
+    },
+    "tree": {
+      "label": "Widgets",
+      "tooltip": "Widgets"
+    },
+    "properties": {
+      "label": "Properties",
+      "tooltip": "Properties"
+    },
+    "errors": {
+      "label": "Errors",
+      "tooltip": "Errors"
+    }
+  },
   "commands": {
     "save": {
       "label": "Save"

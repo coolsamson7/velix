@@ -1,4 +1,26 @@
 {
+  "docks": {
+    "palette": {
+      "label": "Palette",
+      "tooltip": "Palette"
+    },
+    "json": {
+      "label": "JSON",
+      "tooltip": "JSON"
+    },
+    "tree": {
+      "label": "Widgets",
+      "tooltip": "Widgets"
+    },
+    "properties": {
+      "label": "Properties",
+      "tooltip": "Properties"
+    },
+    "errors": {
+      "label": "Errors",
+      "tooltip": "Errors"
+    }
+  },
   "commands": {
     "save": {
       "label": "Save",
@@ -15,9 +37,31 @@
       "label": "Undo"
     }
   },
+  "widget": {
+    "groups": {
+      "widgets": {
+        "label": "Widgets"
+      },
+      "container": {
+        "label": "Container"
+      }
+    }
+  },
   "groups": {
+    "widgets": {
+      "label": "Widgets"
+    },
     "general": {
       "label": "General"
+    },
+    "font": {
+      "label": "Font"
+    },
+    "events": {
+      "label": "Events"
+    },
+    "layout": {
+      "label": "Layout"
     }
   },
   "properties": {
@@ -42,6 +86,9 @@
       "size": {
         "label":  "Size"
       },
+      "label": {
+        "label":  "Label"
+      },
       "style": {
         "label":  "Style"
       }
@@ -59,8 +106,14 @@
       "size": {
         "label":  "Size"
       },
+      "databinding": {
+        "label":  "Databinding"
+      },
       "style": {
         "label":  "Style"
+      },
+      "label": {
+        "label":  "Label"
       }
     },
 
@@ -72,8 +125,17 @@
       "weight": {
         "label":  "Weight"
       },
+      "onClick": {
+        "label":  "On Click"
+      },
       "size": {
         "label":  "Size"
+      },
+      "padding": {
+        "label":  "Padding"
+      },
+      "font": {
+        "label":  "Font"
       },
       "style": {
         "label":  "Style"

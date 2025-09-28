@@ -7,14 +7,14 @@ import '../annotations.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "text", i18n: "editor:widgets.text.title", group: "widgets", icon: Icons.text_fields)
+@DeclareWidget(name: "text", group: "widgets", icon: Icons.text_fields)
 @JsonSerializable(discriminator: "text")
 class TextWidgetData extends WidgetData {
   // instance data
 
   @DeclareProperty(group: "general")
   String label;
-  @DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "general", editor: CodeEditorBuilder)
   String? databinding;
 
   // constructor

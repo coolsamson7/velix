@@ -9,7 +9,7 @@ import 'package:velix_mapper/mapper/json.dart';
   // instance data
 
   final String type;
-  @DeclareProperty(group: "general", hide: true)
+  @DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
   @Json(required: false)
   List<WidgetData> children;
   @Json(ignore: true)

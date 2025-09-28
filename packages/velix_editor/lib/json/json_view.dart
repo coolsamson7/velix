@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart'; // ✅ dark theme
+import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../components/panel_header.dart';
@@ -89,7 +90,7 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
     return Container(
       color: const Color(0xFF1E1E1E), // dark background
       child: PanelContainer(
-        title: "JSON",
+        title: "editor:docks.json.label".tr(),
         onClose: widget.onClose,
         child: SizedBox.expand(
           child: SingleChildScrollView(

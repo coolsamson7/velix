@@ -416,7 +416,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     Expanded(
                       child:
                 DockingContainer(
-                  left: DockConfig(
+                  left: Dock(
                     panels: {
                       "tree": (onClose) =>
                           FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
@@ -432,7 +432,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     initialPanel: "tree",
                     size: 240,
                   ),
-                  right: DockConfig(
+                  right: Dock(
                     panels: {
                       "properties": (onClose) => PropertyPanel(onClose: onClose),
                     },
@@ -442,17 +442,17 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     initialPanel: "properties",
                     size: 280,
                   ),
-                  bottom: DockConfig(
+                  bottom: Dock(
                     panels: {
-                      "console": (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
+                      "errors": (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
                         "Something went wrong",
                         "Another error occurred",
                       ]),
                     },
                     icons: {
-                      "console": Icons.terminal,
+                      "errors": Icons.bug_report,
                     },
-                    initialPanel: "console",
+                    initialPanel: "errors",
                     size: 150,
                     overlay: false, // change to true if you want floating
                   ),

@@ -8,18 +8,18 @@ import '../properties/properties.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "button", i18n: "editor:widgets.button.title", group: "widgets", icon: Icons.text_fields)
+@DeclareWidget(name: "button", group: "widgets", icon: Icons.text_fields)
 @JsonSerializable(discriminator: "button")
 class ButtonWidgetData extends WidgetData {
   // instance data
 
-  @DeclareProperty(groupI18N: "editor:groups.general", i18n: "editor:widgets.button.label")
+  @DeclareProperty(group: "general")
   String label;
-  @DeclareProperty(group: "Font Properties")
+  @DeclareProperty(group: "font")
   Font? font;
-  @DeclareProperty(group: "Layout Properties")
+  @DeclareProperty(group: "layout")
   Padding? padding;
-  @DeclareProperty(group: "General Properties", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "events", editor: CodeEditorBuilder)
   String? onClick;
 
   // constructor

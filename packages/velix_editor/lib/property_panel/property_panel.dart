@@ -128,8 +128,10 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     final sortedGroupNames = groupedProps.keys.toList()..sort();
 
+
     return PanelContainer(
       title: selected!.type,
+      icon:  widgetDescriptor?.icon,
       onClose: widget.onClose,
       child: ListView(
         children: sortedGroupNames.map((groupName) {

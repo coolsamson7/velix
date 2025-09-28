@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
 // Reusable panel header with a title and close button
+import 'package:flutter/material.dart';
+
 class PanelHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onClose;
+  final IconData? icon; // optional left-side icon
 
-  const PanelHeader({super.key, required this.title, this.onClose});
+  const PanelHeader({
+    super.key,
+    required this.title,
+    this.onClose,
+    this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +28,10 @@ class PanelHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
+          if (icon != null) ...[
+            Icon(icon, size: 16, color: Colors.grey.shade800),
+            const SizedBox(width: 4),
+          ],
           Text(
             title,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
@@ -29,7 +41,13 @@ class PanelHeader extends StatelessWidget {
             InkWell(
               onTap: onClose,
               borderRadius: BorderRadius.circular(4),
-              child: const Icon(Icons.close, size: 16),
+              child: const SizedBox(
+                width: 16,
+                height: 16,
+                child: Center(
+                  child: Text('×', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+              ),
             ),
         ],
       ),
@@ -42,6 +60,7 @@ class PanelContainer extends StatelessWidget {
   // instance data
 
   final String title;
+  final IconData? icon;
   final Widget child;
   final VoidCallback? onClose;
 
@@ -50,6 +69,7 @@ class PanelContainer extends StatelessWidget {
   const PanelContainer({
     super.key,
     required this.title,
+    this.icon,
     required this.child,
     this.onClose,
   });
@@ -59,7 +79,7 @@ class PanelContainer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch, // ✅ makes content stretch full width
       children: [
-        PanelHeader(title: title, onClose: onClose),
+        PanelHeader(title: title, icon: icon, onClose: onClose),
         Expanded(
           child: Container(
             alignment: Alignment.topLeft, // ✅ force top-left alignment

@@ -81,6 +81,7 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   void dispose() {
     _subscription?.cancel();
     _changeSubscription?.cancel();
+
     super.dispose();
   }
 
@@ -88,7 +89,7 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1E1E1E), // dark background
+      //color: const Color(0xFF1E1E1E), // dark background
       child: PanelContainer(
         title: "editor:docks.json.label".tr(),
         onClose: widget.onClose,

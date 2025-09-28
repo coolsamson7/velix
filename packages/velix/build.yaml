@@ -1,4 +1,27 @@
 builders:
+  registry_json_aggregator:
+    import: "package:velix/src/generators/json_builder.dart"
+    builder_factories: [ "jsonRegistryAggregator" ]
+    build_extensions:
+      ".dart": [ ".new_registry.json" ]
+    auto_apply: none  #dependents
+    build_to: cache
+    defaults:
+  registry_json_builder:
+    import: "package:velix/src/generators/json_builder.dart"
+    builder_factories: [ "registryJSONBuilder" ]
+    build_extensions:
+      ".dart": [ ".new_registry.json" ]
+    auto_apply: none  #dependents
+    build_to: cache
+    defaults:
+    #generate_for:
+    #  - lib/*.dart
+    #  - lib/**/*.dart
+    #  - "!lib/**/*.g.dart"
+    #  - "!lib/**/*.part.dart"
+    #  - "!lib/**/*.freezed.dart"
+    #  - "!lib/**/*.gr.dart"
   # Builder for extracting individual class metadata AND code fragments
   registry_builder:
     import: "package:velix/src/generators/registry_generator.dart"
@@ -33,6 +56,8 @@ targets:
       - lib/**
     builders:
       velix|registry_builder:
+        options:
+          package: "velix/"
         generate_for:
           - example/*.dart
           - example/**/*.dart
@@ -49,7 +74,21 @@ targets:
       - $package$
       - lib/**
     builders:
+      velix|registry_json_builder:
+        generate_for:
+          - test/*.dart
+          - test/**/*.dart
+          - "!test/**/*.g.dart"
+          - "!test/**/*.part.dart"
+      velix|registry_json_aggregator:
+        options:
+          prefix: "test"
+          package: "velix/"
+        generate_for:
+          - test/type_descriptor_test.dart
       velix|registry_builder:
+        options:
+          package: "velix/"
         generate_for:
           - test/*.dart
           - test/**/*.dart

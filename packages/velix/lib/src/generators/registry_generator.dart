@@ -928,16 +928,23 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 class RegistryFragmentBuilder extends Builder {
   // instance data
 
+  String package;
+
+  // constructor
+
+  RegistryFragmentBuilder({required this.package});
+
+  // override
+
   @override
   final buildExtensions = const {
     '.dart': ['.registry.json', '.registry.dart']
   };
 
-  // override
-
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     final path = buildStep.inputId.path;
+    final package = buildStep.inputId.package; // the current package
 
     // Skip generated or irrelevant files
     if (!path.endsWith('.dart') ||
@@ -950,6 +957,11 @@ class RegistryFragmentBuilder extends Builder {
 
     try {
       final lib = await buildStep.resolver.libraryFor(buildStep.inputId);
+
+      if ( !lib.uri.path.startsWith(this.package)) {
+        //print("ignore ${lib.uri.path}");
+        return;
+      }
 
       // Get parsed AST to resolve line/col
 
@@ -1328,7 +1340,13 @@ void $functionName() {
 /// Builder factories
 /// ----------------------------
 
-Builder registryBuilder(BuilderOptions options) =>  RegistryFragmentBuilder();
+Builder registryBuilder(BuilderOptions options) {
+  final config = options.config;
+
+  final package = config['package'] as String? ?? '';//velix/
+
+  return RegistryFragmentBuilder(package: package);
+}
 
 Builder registryAggregator(BuilderOptions options) {
   final config = options.config;

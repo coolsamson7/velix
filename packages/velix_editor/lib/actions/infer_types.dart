@@ -130,8 +130,9 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   @override
   ClassDescTypeInfo resolve(String name, {ClassDescTypeInfo? parent}) {
     var parentType = (parent ?? root).type;
+
     if ( parentType is ClassDesc)
-      return ClassDescTypeInfo(parentType.find(name) ?? UnknownPropertyDesc(parent: parentType, property: name));
+      return ClassDescTypeInfo(parentType.find(name)?.type ?? UnknownPropertyDesc(parent: parentType, property: name));
     else
       return ClassDescTypeInfo(UnknownPropertyDesc(parent: parentType, property: name));
   }

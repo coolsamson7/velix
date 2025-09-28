@@ -13,7 +13,7 @@ final userClass = ClassDesc('User',
   properties: {
     'name': FieldDesc('value', type: Desc.string_type),
     'address': FieldDesc('address',  type: addressClass),
-    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
+    'hello': MethodDesc('hello', [ParameterDesc("message", type: Desc.string_type)], type: Desc.string_type)
   },
 );
 

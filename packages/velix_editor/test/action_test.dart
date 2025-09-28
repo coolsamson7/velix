@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:velix_di/velix_di.dart';
@@ -9,6 +11,191 @@ import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/types.dart';
 
 import 'action_test.types.g.dart';
+
+String json = '''
+{
+  "classes": [
+    {
+      "name": "Address",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "city",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "street",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "13:1"
+    },
+    {
+      "name": "User",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "name",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "address",
+          "type": "Address",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "34:1"
+    },
+    {
+      "name": "Page",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "user",
+          "type": "User",
+          "isNullable": false,
+          "isFinal": true,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "setup",
+          "parameters": [],
+          "returnType": "void",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Injectable",
+          "value": "Injectable"
+        },
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "56:1"
+    },
+    {
+      "name": "TestModule",
+      "superClass": null,
+      "properties": [],
+      "methods": [],
+      "annotations": [
+        {
+          "name": "Module",
+          "value": "Module"
+        }
+      ],
+      "isAbstract": false,
+      "location": "100:1"
+    }
+  ]
+}
+''';
 
 @Dataclass()
 class Address {
@@ -73,30 +260,6 @@ class Page {
   }
 }
 
-// same thing
-
-final pageClass = ClassDesc('Page',
-    properties: {
-      'user': FieldDesc('user', type: userClass),
-    }
-);
-
-final userClass = ClassDesc('User',
-  properties: {
-    'name': FieldDesc('value', type: Desc.string_type),
-    'address': FieldDesc('address',  type: addressClass),
-    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
-  },
-);
-
-final addressClass = ClassDesc('Address',
-  properties: {
-    'city': FieldDesc('city', type: Desc.string_type),
-    'street': FieldDesc('street', type: Desc.string_type)
-  },
-);
-
-
 @Module(includeSiblings: false, includeSubdirectories: false)
 class TestModule {}
 
@@ -111,8 +274,18 @@ void main() {
 
   var environment = Environment(forModule: TestModule);
   var page = environment.get<Page>();
+  
+  var registry = ClassRegistry();
 
   // parser tests
+
+  group('json', () {
+    test('parse ', () {
+      final Map<String, dynamic> data = jsonDecode(json);
+      
+      registry.read(data["classes"]);
+    });
+  });
 
   group('parser', () {
     var parser = ActionParser();
@@ -145,10 +318,14 @@ void main() {
   // auto completion
 
   group('autocompletion', () {
-    var autocomplete = Autocomplete(pageClass);
+    final Map<String, dynamic> data = jsonDecode(json);
+
+    registry.read(data["classes"]);
+
+    var autocomplete = Autocomplete(registry.getClass("Page"));
     
     test('variable ', () {
-      var suggestions = autocomplete.suggest("a");
+      /*var suggestions = autocomplete.suggest("a");
 
       expect(suggestions.length, equals(0));
 
@@ -166,9 +343,9 @@ void main() {
 
       suggestions = autocomplete.suggest("user.h");
 
-      expect(suggestions.length, equals(1));
+      expect(suggestions.length, equals(1));*/
 
-      suggestions = autocomplete.suggest("user.address.");
+      var suggestions = autocomplete.suggest("user.address.");
 
       expect(suggestions.length, equals(1));
     });

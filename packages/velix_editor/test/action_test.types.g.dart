@@ -9,7 +9,7 @@ import 'package:velix_di/di/di.dart';
 
 void registerTypes() {
   type<Address>(
-    location: 'asset:velix_editor/test/action_test.dart:13:1',
+    location: 'asset:velix_editor/test/action_test.dart:200:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -41,7 +41,7 @@ void registerTypes() {
   );
 
   type<Page>(
-    location: 'asset:velix_editor/test/action_test.dart:56:1',
+    location: 'asset:velix_editor/test/action_test.dart:243:1',
     annotations: [
       Injectable()
     ],
@@ -64,7 +64,7 @@ void registerTypes() {
   );
 
   type<TestModule>(
-    location: 'asset:velix_editor/test/action_test.dart:100:1',
+    location: 'asset:velix_editor/test/action_test.dart:287:1',
     annotations: [
       Module(includeSiblings: false, includeSubdirectories: false)
     ],
@@ -74,7 +74,7 @@ void registerTypes() {
   );
 
   type<User>(
-    location: 'asset:velix_editor/test/action_test.dart:34:1',
+    location: 'asset:velix_editor/test/action_test.dart:221:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true)

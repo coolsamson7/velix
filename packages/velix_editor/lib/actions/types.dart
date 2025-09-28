@@ -1,27 +1,78 @@
 
-class ClassDesc extends Desc {
+
+
+class ClassRegistry {
   // instance data
 
-  final Map<String, ClassPropertyDesc> properties;
+  Map<String,ClassDesc> classes = {};
+  Map<String,Desc> types = {};
 
   // constructor
 
-  ClassDesc(
-      super.name, {
-        Map<String, ClassPropertyDesc>? properties,
-      })  : properties = properties ?? {} {
-    for ( var prop in this.properties.values)
-      prop.classDesc = this;
+  ClassRegistry();
+
+  // public
+
+  ClassDesc getClass(String name) {
+    return classes[name]!;
+  }
+
+  Desc getType(String name) {
+    var result = types[name];
+    if ( result == null) {
+
+      result = Desc(name);
+      types[name] = result;
+    }
+
+    return result;
   }
 
   // public
 
-  Desc? find(String name) => properties[name];
+  void read(List<dynamic> items) {
+    // fill registry
 
-  // override
+    for (var item in items) {
+      var name = item["name"];
 
-  @override
-  String toString() => name;
+      classes[name] = ClassDesc(name);
+      types[name] = classes[name]!;
+    }
+
+    // parse
+
+    for (var item in items) {
+      var name = item["name"];
+      var clazz = getClass(name);
+
+      if ( item["superClass"] != null)
+        clazz.superClass = getClass(item["superClass"]);
+
+      // properties
+
+      for (var property in item["properties"]) {
+        var name = property["name"];
+
+        clazz.properties[name] = FieldDesc(property["name"], type: getType(property["type"]));
+      }
+
+      // properties
+
+      for (var method in item["methods"]) {
+        var name = method["name"];
+
+        List<dynamic> params = method["parameters"] as List<dynamic>;
+
+        List<ParameterDesc> parameters = params.map((p) =>
+          ParameterDesc(p["name"], type: getType(p["type"]))
+        ).toList();
+
+        clazz.properties[name] = MethodDesc(name, parameters, type: getType(method["returnType"]));
+      }
+    }
+  }
+
 }
 
 class Desc {
@@ -55,6 +106,38 @@ class Desc {
   Desc(this.name);
 }
 
+class ParameterDesc extends Desc {
+  Desc type;
+
+  ParameterDesc(super.name, {required this.type});
+}
+
+class ClassDesc extends Desc {
+  // instance data
+
+  ClassDesc? superClass;
+  final Map<String, ClassPropertyDesc> properties;
+
+  // constructor
+
+  ClassDesc(
+      super.name, {
+        Map<String, ClassPropertyDesc>? properties,
+      })  : properties = properties ?? {} {
+    for ( var prop in this.properties.values)
+      prop.classDesc = this;
+  }
+
+  // public
+
+  ClassPropertyDesc? find(String name) => properties[name];
+
+  // override
+
+  @override
+  String toString() => name;
+}
+
 abstract class ClassPropertyDesc extends Desc {
   late ClassDesc classDesc;
   final Desc type;
@@ -77,11 +160,11 @@ class FieldDesc extends ClassPropertyDesc {
 class MethodDesc extends ClassPropertyDesc {
   // instance data
 
-  final List<Desc> parameterTypes;
+  final List<ParameterDesc> parameters;
 
   // constructor
 
-  MethodDesc(String name, this.parameterTypes, {required super.type}): super(name);
+  MethodDesc(String name, this.parameters, {required super.type}): super(name);
 
   @override
   bool isMethod() => true;

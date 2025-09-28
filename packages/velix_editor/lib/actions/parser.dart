@@ -70,19 +70,48 @@ class ExpressionParser {
           .mapWithPosition((list, start, end) {
         Expression obj = list[0];
         final args = list[1] as List;
+
         for (var arg in args) {
-          if (arg is Identifier) obj = MemberExpression(obj, arg)..end = end;
-          else if (arg is Expression) obj = IndexExpression(obj, arg)..end = end;
-          else if (arg is List<Expression>) obj = CallExpression(obj, arg)..end = end;
+          if (arg is Identifier) {
+            // For member access, if it's an empty identifier (dangling dot),
+            // extend its end to the current parsing position
+            if (arg.name.isEmpty) {
+              arg.end = end;
+            }
+            obj = MemberExpression(obj, arg)
+              ..start = obj.start
+              ..end = arg.end;
+          } else if (arg is Expression) {
+            obj = IndexExpression(obj, arg)
+              ..start = obj.start
+              ..end = arg.end;
+          } else if (arg is List<Expression>) {
+            obj = CallExpression(obj, arg)
+              ..start = obj.start
+              ..end = arg.isNotEmpty ? arg.last.end : obj.end;
+          }
         }
+
+        // Set the final bounds to the full parsed span
         obj.start = start;
         obj.end = end;
+
         return obj;
       });
 
+
+
   Parser<Expression> memberAccess() =>
-      (char('.') & partialIdentifier().optional()).pick(1).map((id) {
-        return id ?? Identifier(''); // empty identifier for dangling dot
+      (char('.') & partialIdentifier().optional())
+          .mapWithPosition((list, start, end) {
+        final id = list[1]; // partialIdentifier result
+        if (id != null) {
+          return id;
+        } else {
+          // For dangling dot, create empty identifier starting after the dot
+          // The end position will be fixed by the parent variable() parser
+          return Identifier('')..start = end..end = end;
+        }
       });
 
   Parser<Expression> indexArgument() =>

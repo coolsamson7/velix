@@ -58,7 +58,10 @@ class Autocomplete {
     }
 
     if ( node is MemberExpression) {
-      var type = node.object.getType<ClassPropertyDesc>().type;
+      if ( node.getType() is UnknownPropertyDesc)
+        return node.getType<UnknownPropertyDesc>().suggestions();
+
+      var type = node.object.getType();
       var property = node.property.name;
 
       if ( type is ClassDesc)
@@ -71,6 +74,14 @@ class Autocomplete {
     }
 
     return [];
+  }
+
+  bool containsOffset(Expression expr, int offset) {
+    if (expr.start == expr.end) {
+      // Accept offsets exactly at the zero-length span start (e.g., trailing dot)
+      return offset == expr.start;
+    }
+    return offset >= expr.start && offset < expr.end;
   }
 
   /// Recursively find the deepest AST node containing the cursor

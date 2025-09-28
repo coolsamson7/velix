@@ -117,24 +117,30 @@ class _CodeEditorState extends State<CodeEditor> {
 
     final typedPart = _originalText.substring(wordStart, _originalCursorPos);
 
-    if (completion.toLowerCase().startsWith(typedPart.toLowerCase())) {
-      final beforeWord = _originalText.substring(0, wordStart);
-      final afterCursor = _originalText.substring(_originalCursorPos);
-      final newText = beforeWord + completion + afterCursor;
-
-      _isUpdatingCompletion = true;
-
-      _controller.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection(
-          baseOffset: wordStart + typedPart.length,
-          extentOffset: wordStart + completion.length,
-        ),
-      );
-
-      _isUpdatingCompletion = false;
+    // Only update if completion extends the typedPart and cursor hasn't moved left
+    if (!completion.toLowerCase().startsWith(typedPart.toLowerCase()) ||
+        completion.length <= typedPart.length) {
+      return; // User probably deleted or moved cursor back, don't autocomplete
     }
+
+    final beforeWord = _originalText.substring(0, wordStart);
+    final afterCursor = _originalText.substring(_originalCursorPos);
+    final newText = beforeWord + completion + afterCursor;
+
+    _isUpdatingCompletion = true;
+
+    _controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection(
+        baseOffset: wordStart + typedPart.length,
+        extentOffset: wordStart + completion.length,
+      ),
+    );
+
+    _isUpdatingCompletion = false;
   }
+
+
 
   bool _isWordChar(String char) {
     return RegExp(r'[a-zA-Z0-9_]').hasMatch(char);

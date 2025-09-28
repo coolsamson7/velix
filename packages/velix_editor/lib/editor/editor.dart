@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
@@ -28,6 +30,178 @@ part "editor.command.g.dart";
 
 // TEST TODO
 
+String json = '''
+{
+  "classes": [
+    {
+      "name": "Address",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "city",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "street",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "13:1"
+    },
+    {
+      "name": "User",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "name",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "address",
+          "type": "Address",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "34:1"
+    },
+    {
+      "name": "Page",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "user",
+          "type": "User",
+          "isNullable": false,
+          "isFinal": true,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "setup",
+          "parameters": [],
+          "returnType": "void",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Injectable",
+          "value": "Injectable"
+        },
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "56:1"
+    }
+  ]
+}
+''';
+
+var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
 
 @Dataclass()
 class User {
@@ -69,29 +243,6 @@ class Page {
     print("setup");
   }
 }
-
-final pageClass = ClassDesc('Page',
-    properties: {
-      'user': FieldDesc('user', type: userClass),
-    }
-);
-
-final userClass = ClassDesc('User',
-  properties: {
-    'name': FieldDesc('value', type: Desc.string_type),
-    'address': FieldDesc('address',  type: addressClass),
-    'hello': MethodDesc('hello', [Desc.string_type], type: Desc.string_type)
-  },
-);
-
-final addressClass = ClassDesc('Address',
-  properties: {
-    'city': FieldDesc('city', type: Desc.string_type),
-    'street': FieldDesc('street', type: Desc.string_type)
-  },
-);
-
-// TEST
 
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
@@ -204,7 +355,7 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
     return EnvironmentProvider(
       environment: environment,
       child: Provider<ClassDesc>.value(
-          value: pageClass,
+          value: registry.getClass("Page"),
           child: FocusScope(
             autofocus: true,
             child: Shortcuts(

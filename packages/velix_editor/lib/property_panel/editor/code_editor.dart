@@ -46,7 +46,8 @@ class CompletionItem {
   CompletionItem({required this.label, required this.icon});
 }
 
-class _CodeEditorState extends State<CodeEditor> {
+class _CodeEditorState extends State<CodeEditor>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   List<CompletionItem> _matches = [];
@@ -56,6 +57,8 @@ class _CodeEditorState extends State<CodeEditor> {
   int _originalCursorPos = 0;
   late Autocomplete autocomplete;
   String? _parseException;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
 
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
@@ -75,17 +78,19 @@ class _CodeEditorState extends State<CodeEditor> {
         setState(() {
           _parseException = null;
         });
+        // Stop pulse animation when error is cleared
+        _pulseController.stop();
       }
 
       return suggestions;
     } catch (e) {
-      print("caught exception during suggestions $e");
-
       // Update parse exception state
       if (_parseException != e.toString()) {
         setState(() {
           _parseException = e.toString();
         });
+        // Start pulse animation for errors
+        _pulseController.repeat(reverse: true);
       }
 
       return [];
@@ -300,31 +305,49 @@ class _CodeEditorState extends State<CodeEditor> {
   }
 
   Widget _buildStatusIndicator() {
-    if (_parseException == null) {
-      return Tooltip(
-        message: "Code is valid",
-        child: Icon(
-          Icons.check_circle,
-          size: 16,
-          color: Colors.green.shade600,
-        ),
-      );
-    } else {
-      return Tooltip(
-        message: "Parse error: $_parseException",
+    return Positioned(
+      top: 4,
+      right: 4,
+      bottom: 4,
+      child: Tooltip(
+        message: _parseException == null
+            ? "Code is valid"
+            : "Parse error: $_parseException",
         preferBelow: false,
         textStyle: const TextStyle(fontSize: 12),
         decoration: BoxDecoration(
-          color: Colors.red.shade800,
+          color: _parseException == null
+              ? Colors.green.shade800
+              : Colors.red.shade800,
           borderRadius: BorderRadius.circular(4),
         ),
-        child: Icon(
-          Icons.error,
-          size: 16,
-          color: Colors.red.shade600,
+        child: AnimatedBuilder(
+          animation: _pulseAnimation,
+          builder: (context, child) {
+            return Container(
+              width: 12,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                gradient: _parseException == null
+                    ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.green.shade400, Colors.green.shade600],
+                )
+                    : LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.red.shade400.withOpacity(_pulseAnimation.value),
+                    Colors.red.shade600.withOpacity(_pulseAnimation.value),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -346,12 +369,26 @@ class _CodeEditorState extends State<CodeEditor> {
         _removeOverlay();
       }
     });
+
+    // Initialize pulse animation for error states
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _pulseAnimation = Tween<double>(
+      begin: 0.6,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _pulseController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _pulseController.dispose();
     _removeOverlay();
 
     super.dispose();

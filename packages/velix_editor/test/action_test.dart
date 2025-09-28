@@ -374,6 +374,10 @@ void main() {
       suggestions = autocomplete.suggest("user.address.");
 
       expect(suggestions.length, equals(3));
+
+      suggestions = autocomplete.suggest("user.hello(user.)", cursorOffset: 15);
+
+      expect(suggestions.length, equals(3));
     });
   });
 

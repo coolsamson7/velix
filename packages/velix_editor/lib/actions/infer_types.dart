@@ -199,6 +199,9 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   @override
   bool isAssignableFrom(dynamic a, dynamic b) {
+    if ( b is UnknownPropertyDesc)
+      return true;
+
     return a == b;
   }
 }

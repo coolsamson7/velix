@@ -312,6 +312,7 @@ class _CodeEditorState extends State<CodeEditor> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Focus(
       onKeyEvent: (node, event) {
@@ -329,11 +330,25 @@ class _CodeEditorState extends State<CodeEditor> {
 
             case LogicalKeyboardKey.tab:
             case LogicalKeyboardKey.enter:
-            case LogicalKeyboardKey.arrowRight:
               _acceptCompletion();
               return KeyEventResult.handled;
 
+            case LogicalKeyboardKey.arrowRight:
+              final sel = _controller.selection;
+              // 🚀 Only accept if selection highlights suggestion
+              if (sel.extentOffset > sel.baseOffset) {
+                _acceptCompletion();
+                return KeyEventResult.handled;
+              }
+              // else: let cursor move right normally
+              return KeyEventResult.ignored;
+
             case LogicalKeyboardKey.escape:
+              _dismissCompletion();
+              return KeyEventResult.handled;
+
+            case LogicalKeyboardKey.backspace:
+            case LogicalKeyboardKey.arrowLeft:
               _dismissCompletion();
               return KeyEventResult.handled;
           }

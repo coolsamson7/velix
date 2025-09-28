@@ -11,28 +11,32 @@ import 'expressions.dart';
 // we need a generalized mechanism, since we have to deal with real types ( e.g. TypeDescriptor )
 // as well as the information available from json files with no representation in the runtime. Gosh...
 
-class TypeInfo<T> {
+class TypeInfo<T,D> {
   final T type;
+  final D? descriptor;
 
-  TypeInfo(this.type);
+  TypeInfo(this.type, this.descriptor);
 
   V getType<V>() => type as V;
+  V getDescriptor<V>() => descriptor as V;
 }
 
-abstract class TypeResolver<T> {
+abstract class TypeResolver<T extends TypeInfo> {
+  void checkArguments(dynamic descriptor, List<T> arguments);
+
   T resolve(String name, {T? parent});
 
   T resolveType(Type type);
 
   T rootType();
 
-  bool isAssignableFrom(T a, T b);
+  bool isAssignableFrom(dynamic a, dynamic b);
 }
 
 // this is the implementation for real types
 
-class RuntimeTypeInfo extends TypeInfo<AbstractType> {
-  RuntimeTypeInfo(super.type);
+class RuntimeTypeInfo extends TypeInfo<AbstractType,AbstractDescriptor> {
+  RuntimeTypeInfo(super.type, super.descriptor);
 }
 
 class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
@@ -60,35 +64,50 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   // override
 
   @override
+  void checkArguments(dynamic descriptor, List<RuntimeTypeInfo> arguments) {
+    var method = descriptor as MethodDescriptor;
+
+    if (method.parameters.length != arguments.length)
+      throw Exception("ouch wrong number of args");
+
+    for (var i = 0; i <  arguments.length; i++) {
+      if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type.type));
+        throw Exception("ouch wrong arg type"); // TODO
+    }
+  }
+
+  @override
   RuntimeTypeInfo rootType() {
-    return RuntimeTypeInfo(root.objectType);
+    return RuntimeTypeInfo(root.objectType, null);
   }
 
   @override
   RuntimeTypeInfo resolve(String name, {RuntimeTypeInfo? parent}) {
     if ( parent == null)
-      return RuntimeTypeInfo(root.getProperty(name).type);
-    else
-      return RuntimeTypeInfo((parent.type as ObjectType).typeDescriptor.getProperty(name).type);
+      return RuntimeTypeInfo(root.getProperty(name).type, root.getProperty(name));
+    else {
+      var descriptor = parent.getType<ObjectType>().typeDescriptor.getProperty(name);
+      return RuntimeTypeInfo(descriptor.type, descriptor);
+    }
   }
 
   @override
   RuntimeTypeInfo resolveType(Type type) {
-    return RuntimeTypeInfo(getTypeFor(type));
+    return RuntimeTypeInfo(getTypeFor(type), null);
   }
 
   @override
-  bool isAssignableFrom(RuntimeTypeInfo a, RuntimeTypeInfo b) {
-    return a.type.type == b.type.type; // TODO
+  bool isAssignableFrom(dynamic a, dynamic b) {
+    return a == b;
   }
 }
 
 // TODO
 
-class ClassDescTypeInfo extends TypeInfo<Desc> {
+class ClassDescTypeInfo extends TypeInfo<Desc,Desc> {
   // constructor
 
-  ClassDescTypeInfo(super.type);
+  ClassDescTypeInfo(super.type, super.descriptor);
 }
 
 class UnknownPropertyDesc extends Desc {
@@ -119,27 +138,58 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   ClassDescTypeInfo root;
 
+  Map<String,Desc> types = {};
+
+  Desc getType(String name) {
+    var result = types[name];
+    if ( result == null) {
+      result = Desc.getType(name);
+      types[name] = result;
+    }
+
+    return result;
+  }
+
   // constructor
 
-  ClassDescTypeResolver({required ClassDesc root}): root = ClassDescTypeInfo(root);
+  ClassDescTypeResolver({required ClassDesc root}): root = ClassDescTypeInfo(root, null);
 
   // internal
 
   // override
 
   @override
-  ClassDescTypeInfo resolve(String name, {ClassDescTypeInfo? parent}) {
-    var parentType = (parent ?? root).type;
+  void checkArguments(dynamic descriptor, List<ClassDescTypeInfo> arguments) {
+    var method = descriptor as MethodDesc;
 
-    if ( parentType is ClassDesc)
-      return ClassDescTypeInfo(parentType.find(name)?.type ?? UnknownPropertyDesc(parent: parentType, property: name));
-    else
-      return ClassDescTypeInfo(UnknownPropertyDesc(parent: parentType, property: name));
+    // number
+
+    if (method.parameters.length != arguments.length)
+      throw Exception("${method.name} expects ${method.parameters.length} arguments");
+
+    // type
+
+    for (var i = 0; i <  arguments.length; i++) {
+      if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type))
+        throw Exception("${method.name} parameter $i ${descriptor.parameters[i].name} expected a ${descriptor.parameters[i].type.name} ");
+    }
   }
 
   @override
-  ClassDescTypeInfo resolveType(Type type) { // who calls that?
-    throw ClassDescTypeInfo(Desc.dynamic_type); // TODO
+  ClassDescTypeInfo resolve(String name, {ClassDescTypeInfo? parent}) {
+    var parentType = (parent ?? root).type;
+
+    if ( parentType is ClassDesc) {
+      var property  = parentType.find(name);
+      return ClassDescTypeInfo(property?.type ?? UnknownPropertyDesc(parent: parentType, property: name), property);
+    }
+    else
+      return ClassDescTypeInfo(UnknownPropertyDesc(parent: parentType, property: name), null);
+  }
+
+  @override
+  ClassDescTypeInfo resolveType(Type type) {
+    return ClassDescTypeInfo(getType(type.toString()), null);
   }
 
   @override
@@ -148,16 +198,16 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   }
 
   @override
-  bool isAssignableFrom(ClassDescTypeInfo a, ClassDescTypeInfo b) {
-    return a.type.name == b.type.name; // TODO
+  bool isAssignableFrom(dynamic a, dynamic b) {
+    return a == b;
   }
 }
 
 
-class TypeChecker implements ExpressionVisitor<TypeInfo> {
+class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   // instance data
 
-  final TypeResolver resolver;
+  final TypeResolver<TI> resolver;
 
   // constructor
 
@@ -166,27 +216,27 @@ class TypeChecker implements ExpressionVisitor<TypeInfo> {
   // override
 
   @override
-  TypeInfo visitLiteral(Literal expr) {
+  TI visitLiteral(Literal expr) {
     return expr.type = resolver.resolveType(expr.value.runtimeType);
   }
 
   @override
-  TypeInfo visitIdentifier(Identifier expr) => expr.type = resolver.resolveType(String);
+  TI visitIdentifier(Identifier expr) => expr.type = resolver.resolveType(String);
 
   @override
-  TypeInfo visitVariable(Variable expr) {
+  TI visitVariable(Variable expr) {
     return expr.type = resolver.resolve(expr.identifier.name);
   }
 
   @override
-  TypeInfo visitUnary(UnaryExpression expr) {
+  TI visitUnary(UnaryExpression expr) {
     expr.argument.accept(this);
 
     return resolver.resolveType(int); // TODO
   }
 
   @override
-  TypeInfo visitBinary(BinaryExpression expr) {
+  TI visitBinary(BinaryExpression expr) {
     expr.left.accept(this);
     expr.right.accept(this);
 
@@ -194,7 +244,7 @@ class TypeChecker implements ExpressionVisitor<TypeInfo> {
   }
 
   @override
-  TypeInfo visitConditional(ConditionalExpression expr) {
+  TI visitConditional(ConditionalExpression expr) {
     expr.test.accept(this);
     expr.consequent.accept(this);
     expr.alternate.accept(this);
@@ -203,14 +253,14 @@ class TypeChecker implements ExpressionVisitor<TypeInfo> {
   }
 
   @override
-  TypeInfo visitMember(MemberExpression expr) {
+  TI visitMember(MemberExpression expr) {
     var objType = expr.object.accept(this);
 
     return expr.type = resolver.resolve(expr.property.name, parent: objType);
   }
 
   @override
-  TypeInfo visitIndex(IndexExpression expr) {
+  TI visitIndex(IndexExpression expr) {
     expr.object.accept(this);
     expr.index.accept(this);
 
@@ -218,31 +268,31 @@ class TypeChecker implements ExpressionVisitor<TypeInfo> {
   }
 
   @override
-  TypeInfo visitCall(CallExpression expr) { // callee, arguments
+  TI visitCall(CallExpression expr) { // callee, arguments
     expr.callee.accept(this);
 
     // resolve arguments
 
-    for ( var argument in expr.arguments)
-      argument.accept(this);
+    var argumentTypes = expr.arguments.map((arg) => arg.accept(this)).toList();
 
     if (expr.callee is Variable) {
+      resolver.checkArguments(expr.getDescriptor(), argumentTypes);
       expr.type = resolver.resolve((expr.callee as Variable).identifier.name);
     }
 
     else if (expr.callee is MemberExpression) {
       final member = expr.callee as MemberExpression;
-      final objType = member.object.type;
+      TI? objType = member.object.type as TI?;
 
+      resolver.checkArguments(member.getDescriptor(), argumentTypes);
       if (objType != null) {
-        // TODO we need to check if the arguments are ok, both number and type!
         expr.type = resolver.resolve(member.property.name, parent: objType);
       }
     }
 
-    return expr.type!;
+    return expr.type as TI;
   }
 
   @override
-  TypeInfo visitThis(ThisExpression expr) => expr.type = resolver.rootType();
+  TI visitThis(ThisExpression expr) => expr.type = resolver.rootType();
 }

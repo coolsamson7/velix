@@ -20,8 +20,7 @@ class ClassRegistry {
   Desc getType(String name) {
     var result = types[name];
     if ( result == null) {
-
-      result = Desc(name);
+      result = Desc.getType(name);
       types[name] = result;
     }
 
@@ -84,17 +83,23 @@ class Desc {
   static final bool_type    = Desc("bool");
   static final dynamic_type = Desc("dynamic");
 
+  static Map<String,Desc> types = {
+    "String": string_type,
+    "int": int_type,
+    "double": double_type,
+    "bool": bool_type,
+  };
+
   // static
 
   static Desc getType(String name) {
-    final literalTypes = {
-      "String": string_type,
-      "int": int_type,
-      "double": double_type,
-      "bool": bool_type,
-    };
+    var result = types[name];
+    if ( result == null) {
+      result = Desc(name);
+      types[name] = result;
+    }
 
-    return literalTypes[name]!; // TODO
+    return result;
   }
 
   // instance data

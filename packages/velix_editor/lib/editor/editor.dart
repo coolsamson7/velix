@@ -463,7 +463,6 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                               ],
                             ),
                           ),
-                          //Container(width: 300, color: Colors.white, child: PropertyPanel()),
                           DockedPanelSwitcher(
                             side: DockSide.right,
                             panels: {

@@ -10,6 +10,7 @@ abstract class Expression {
   TypeInfo? type;
 
   T getType<T>() => type!.type as T;
+  T getDescriptor<T>() => type!.descriptor as T;
 
   // abstract
 

@@ -20,14 +20,14 @@ class Autocomplete {
   // instance data
 
   final ClassDesc root;
-  final TypeResolver typeResolver;
+  final TypeResolver<ClassDescTypeInfo> typeResolver;
   final ActionParser parser = ActionParser();
   late TypeChecker typeChecker;
 
   // constructor
 
   Autocomplete(this.root) :typeResolver = ClassDescTypeResolver(root: root) {
-    typeChecker = TypeChecker(typeResolver);
+    typeChecker = TypeChecker<ClassDescTypeInfo>(typeResolver);
   }
 
   // public

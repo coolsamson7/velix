@@ -69,6 +69,7 @@ class _CodeEditorState extends State<CodeEditor> {
               ? Icons.data_object
               : Icons.functions));
     } catch (e) {
+      print("caight exception during suggestions $e");
       return [];
     }
   }
@@ -87,7 +88,8 @@ class _CodeEditorState extends State<CodeEditor> {
 
     final matches = suggestions(_controller.text, cursorPos).toList();
 
-    widget.onChanged(_originalText);
+    if ( widget.value != _originalText)
+      widget.onChanged(_originalText);
 
     setState(() {
       _matches = matches;

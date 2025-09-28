@@ -8,6 +8,7 @@ import 'package:velix_editor/actions/action_parser.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
+import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
 
 import 'action_test.types.g.dart';
@@ -315,6 +316,31 @@ void main() {
     });
   });
 
+  group('type checker', () {
+    var parser = ActionParser();
+
+    final checker = TypeChecker(RuntimeTypeTypeResolver(root: TypeDescriptor.forType(Page)));
+
+    test('wrong parameter number ', () {
+      var code = "user.hello()";
+
+      var expression = parser.parse(code);
+
+      expect(() {
+        expression.accept(checker);
+      }, throwsA(isA<Exception>()));
+    });
+
+    test('wrong parameter type ', () {
+      var code = "user.hello(1)";
+
+      var expression = parser.parse(code);
+      expect(() {
+        expression.accept(checker);
+      }, throwsA(isA<Exception>()));
+    });
+  });
+
   // auto completion
 
   group('autocompletion', () {
@@ -325,7 +351,7 @@ void main() {
     var autocomplete = Autocomplete(registry.getClass("Page"));
     
     test('variable ', () {
-      /*var suggestions = autocomplete.suggest("a");
+      var suggestions = autocomplete.suggest("a");
 
       expect(suggestions.length, equals(0));
 
@@ -343,11 +369,11 @@ void main() {
 
       suggestions = autocomplete.suggest("user.h");
 
-      expect(suggestions.length, equals(1));*/
-
-      var suggestions = autocomplete.suggest("user.address.");
-
       expect(suggestions.length, equals(1));
+
+      suggestions = autocomplete.suggest("user.address.");
+
+      expect(suggestions.length, equals(3));
     });
   });
 

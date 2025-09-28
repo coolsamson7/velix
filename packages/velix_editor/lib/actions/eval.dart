@@ -110,7 +110,6 @@ class CallVisitor extends ExpressionVisitor<Call> {
     return Value(value: null); // TODO?
   }
 
-
   @override
   Call visitVariable(Variable expr) {
     var field =  rootClass.getField(expr.identifier.name);

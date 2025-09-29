@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_i18n/i18n/i18n.dart';
 
 import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_di/di/di.dart';
@@ -472,41 +473,58 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                       child:
                 DockingContainer(
                   left: Dock(
-                    panels: {
-                      "tree": (onClose) =>
-                          FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
-                      "palette": (onClose) =>
-                          WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
-                      "json": (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
-                    },
-                    icons: {
-                      "tree": Icons.account_tree,
-                      "palette": Icons.widgets,
-                      "json": Icons.code,
-                    },
+                    panels: [
+                      Panel(
+                        name: 'tree',
+                        label: 'editor:docks.tree.label'.tr(),
+                        tooltip: 'editor:docks.tree.tooltip'.tr(),
+                        create: (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
+                        icon: Icons.account_tree
+                      ),
+                      Panel(
+                          name: 'palette',
+                          label: 'editor:docks.palette.label'.tr(),
+                          tooltip: 'editor:docks.palette.tooltip'.tr(),
+                          create: (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
+                          icon: Icons.widgets
+                      ),
+                      Panel(
+                          name: 'editor',
+                          label: 'editor:docks.editor.label:'.tr(),
+                          tooltip: 'editor:docks.editor.tooltip'.tr(),
+                          create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                          icon: Icons.code
+                      )
+                    ],
                     initialPanel: "tree",
                     size: 240,
                   ),
                   right: Dock(
-                    panels: {
-                      "properties": (onClose) => PropertyPanel(onClose: onClose),
-                    },
-                    icons: {
-                      "properties": Icons.tune,
-                    },
+                    panels: [
+                      Panel(
+                          name: 'properties',
+                          label: 'editor:docks.properties.label:'.tr(),
+                          tooltip: 'editor:docks.properties.tooltip:'.tr(),
+                          icon: Icons.tune,
+                          create: (onClose) => PropertyPanel(onClose: onClose),
+                      )
+                    ],
                     initialPanel: "properties",
                     size: 280,
                   ),
                   bottom: Dock(
-                    panels: {
-                      "errors": (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
-                        "Something went wrong",
-                        "Another error occurred",
-                      ]),
-                    },
-                    icons: {
-                      "errors": Icons.bug_report,
-                    },
+                    panels: [
+                      Panel(
+                          name: 'errors',
+                          label: 'editor:docks.errors.label:'.tr(),
+                          tooltip: 'editor:docks.errors.tooltip:'.tr(),
+                          icon: Icons.bug_report,
+                          create:  (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
+                            "Something went wrong",
+                            "Another error occurred",
+                          ])
+                      )
+                    ],
                     initialPanel: "errors",
                     size: 150,
                     overlay: false, // change to true if you want floating

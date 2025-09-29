@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:velix_editor/editor/panel_switcher.dart';
 
 /// Config for a docking panel
+///
+
+class Panel {
+  String name;
+  String label;
+  String tooltip;
+  IconData? icon;
+  Function(VoidCallback onClose) create;
+
+  Panel({required this.name, required this.label, required this.icon, required this.create, required this.tooltip});
+}
+
 class Dock {
-  final Map<String, Widget Function(VoidCallback onClose)> panels;
-  final Map<String, IconData> icons;
+
+  final List<Panel> panels;
+
   final String? initialPanel;
   final bool overlay;
   final double? size; // width for side, height for bottom
 
   const Dock({
     required this.panels,
-    required this.icons,
     this.initialPanel,
     this.overlay = false,
     this.size,
@@ -108,7 +120,6 @@ class _DockingContainerState extends State<DockingContainer> {
           elevation: 8,
           child: DockedPanelSwitcher(
             panels: config.panels,
-            icons: config.icons,
             initialPanel: config.initialPanel,
             position: _getPositionFromAlignment(alignment),
             panelSize: size,
@@ -132,7 +143,6 @@ class _DockingContainerState extends State<DockingContainer> {
             height: bottomPanel != null ? bottomSize! : 40, // Always allocate space for bar
             child: DockedPanelSwitcher(
               panels: widget.bottom!.panels,
-              icons: widget.bottom!.icons,
               initialPanel: widget.bottom!.initialPanel,
               position: DockPosition.bottom,
               panelSize: bottomSize!,
@@ -155,7 +165,6 @@ class _DockingContainerState extends State<DockingContainer> {
               width: leftPanel != null ? leftSize! : 40, // Always allocate space for bar
               child: DockedPanelSwitcher(
                 panels: widget.left!.panels,
-                icons: widget.left!.icons,
                 initialPanel: widget.left!.initialPanel,
                 position: DockPosition.left,
                 panelSize: leftSize!,
@@ -173,7 +182,6 @@ class _DockingContainerState extends State<DockingContainer> {
               width: rightPanel != null ? rightSize! : 40, // Always allocate space for bar
               child: DockedPanelSwitcher(
                 panels: widget.right!.panels,
-                icons: widget.right!.icons,
                 initialPanel: widget.right!.initialPanel,
                 position: DockPosition.right,
                 panelSize: rightSize!,

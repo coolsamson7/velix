@@ -4,7 +4,6 @@ import 'package:velix_mapper/mapper/json.dart';
 
 import '../../property_panel/editor/code_editor.dart';
 import '../annotations.dart';
-import '../properties/properties.dart';
 import '../widget_data.dart';
 
 @Dataclass()

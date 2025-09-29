@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'docking_container.dart';
+
 typedef OnClose<T> = void Function(T value);
 
 enum DockPosition { left, right, top, bottom }
@@ -9,8 +11,7 @@ extension _FirstOrNull<E> on Iterable<E> {
 }
 
 class DockedPanelSwitcher extends StatefulWidget {
-  final Map<String, Widget Function(VoidCallback onClose)> panels;
-  final Map<String, IconData> icons;
+  final List<Panel> panels;
   final String? initialPanel;
   final DockPosition position;
   final double barSize; // width for left/right, height for top/bottom
@@ -21,7 +22,6 @@ class DockedPanelSwitcher extends StatefulWidget {
   const DockedPanelSwitcher({
     super.key,
     required this.panels,
-    required this.icons,
     this.initialPanel,
     this.position = DockPosition.left,
     this.barSize = 40,
@@ -45,7 +45,8 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
   @override
   void initState() {
     super.initState();
-    selectedPanel = widget.initialPanel ?? widget.panels.keys.firstOrNull;
+
+    selectedPanel = widget.initialPanel ?? widget.panels.first.name;
     panelSize = widget.panelSize;
   }
 
@@ -145,12 +146,12 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
         width: widget.barSize,
         color: Colors.grey.shade200,
         child: Column(
-          children: widget.panels.keys.map((name) {
+          children: widget.panels.map((panel) {
             return IconButton(
-              icon: Icon(widget.icons[name] ?? Icons.help_outline),
-              tooltip: name,
-              color: selectedPanel == name ? Colors.blue : null,
-              onPressed: () => _openPanel(name),
+              icon: Icon(panel.icon ?? Icons.help_outline),
+              tooltip: panel.tooltip,
+              color: selectedPanel == panel.name ? Colors.blue : null,
+              onPressed: () => _openPanel(panel.name),
             );
           }).toList(),
         ),
@@ -160,12 +161,12 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
         height: widget.barSize,
         color: Colors.grey.shade200,
         child: Row(
-          children: widget.panels.keys.map((name) {
+          children: widget.panels.map((panel) {
             return IconButton(
-              icon: Icon(widget.icons[name] ?? Icons.help_outline),
-              tooltip: name,
-              color: selectedPanel == name ? Colors.blue : null,
-              onPressed: () => _openPanel(name),
+              icon: Icon(panel.icon ?? Icons.help_outline),
+              tooltip: panel.tooltip,
+              color: selectedPanel == panel.name ? Colors.blue : null,
+              onPressed: () => _openPanel(panel.name),
             );
           }).toList(),
         ),
@@ -176,7 +177,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
   Widget _buildPanel() {
     return Container(
       color: Colors.grey.shade100,
-      child: widget.panels[selectedPanel!]!(_closePanel),
+      child: widget.panels.firstWhere((panel) => panel.name == selectedPanel).create(_closePanel),
     );
   }
 

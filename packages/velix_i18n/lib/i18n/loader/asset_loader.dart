@@ -31,31 +31,52 @@ class AssetTranslationLoader implements TranslationLoader {
     for (var locale in locales) {
       if (packageName != null) {
         path = 'packages/$packageName/$basePath/$locale/$namespace.json';
-      }
-      else {
+      } else {
         path = '$basePath/$locale/$namespace.json';
       }
 
       try {
         final jsonString = await rootBundle.loadString(path);
 
-        if ( Tracer.enabled)
+        if (Tracer.enabled) {
           Tracer.trace("i18n", TraceLevel.high, "load $path");
+        }
 
         final Map<String, dynamic> map = json.decode(jsonString);
 
-        map.forEach((key, value) {
-          mergedTranslations.putIfAbsent(key, () => value);
-        });
-      }
-      catch (e) {
+        mergedTranslations = _deepMerge(mergedTranslations, map);
+      } catch (e) {
         // Could not load the file; return empty map or handle missing file
-
-        if ( !e.toString().startsWith("Unable to load"))
+        if (!e.toString().startsWith("Unable to load")) {
           debugPrint('exception while loading translations from $path, error: $e');
+        }
       }
-    } // for
+    }
 
     return mergedTranslations;
   }
+
+  /// Recursively merges two maps (values in [other] override values in [base])
+  Map<String, dynamic> _deepMerge(
+      Map<String, dynamic> base,
+      Map<String, dynamic> other,
+      ) {
+    final result = Map<String, dynamic>.from(base);
+
+    other.forEach((key, value) {
+      if (result.containsKey(key) &&
+          result[key] is Map<String, dynamic> &&
+          value is Map<String, dynamic>) {
+        result[key] = _deepMerge(
+          result[key] as Map<String, dynamic>,
+          value,
+        );
+      } else {
+        result[key] = value;
+      }
+    });
+
+    return result;
+  }
+
 }

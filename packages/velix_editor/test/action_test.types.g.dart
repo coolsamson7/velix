@@ -41,7 +41,7 @@ void registerTypes() {
   );
 
   type<Page>(
-    location: 'asset:velix_editor/test/action_test.dart:244:1',
+    location: 'asset:velix_editor/test/action_test.dart:245:1',
     annotations: [
       Injectable()
     ],
@@ -64,7 +64,7 @@ void registerTypes() {
   );
 
   type<TestModule>(
-    location: 'asset:velix_editor/test/action_test.dart:264:1',
+    location: 'asset:velix_editor/test/action_test.dart:265:1',
     annotations: [
       Module(includeSiblings: false, includeSubdirectories: false)
     ],

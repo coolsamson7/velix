@@ -20,17 +20,6 @@
       "label": "Street"
     },
     {
-      "type": "label",
-      "databinding": "user.address.street",
-      "children": [],
-      "font": {
-        "size": 12,
-        "weight": 100,
-        "style": "normal"
-      },
-      "label": "Label"
-    },
-    {
     "type": "button",
     "children": [],
     "label": "PRESS",

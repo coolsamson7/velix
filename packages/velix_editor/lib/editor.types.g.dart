@@ -4,7 +4,7 @@
 
 import 'dart:ui';
 
-import 'package:flutter/material.dart' hide Padding, WidgetBuilder, Page;
+import 'package:flutter/material.dart' show Icons;
 import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -20,7 +20,7 @@ import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_editor/metadata/widgets/label.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_editor/property_panel/editor/bool_editor.dart';
-import 'package:velix_editor/property_panel/editor/code_editor.dart' show CodeEditorBuilder;
+import 'package:velix_editor/property_panel/editor/code_editor.dart';
 import 'package:velix_editor/property_panel/editor/font_style_editor.dart';
 import 'package:velix_editor/property_panel/editor/font_weight_editor.dart';
 import 'package:velix_editor/property_panel/editor/int_editor.dart';
@@ -446,7 +446,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/label.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/label.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "label", group: "widgets", icon: Icons.text_fields),
@@ -456,11 +456,12 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
-      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null)
+      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Font font}) => LabelWidgetData(type: type, children: children, label: label, font: font),
-    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?),
-    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font),
+    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, font: font, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, databinding: args[4] as String? ?? ''),
     fields: [
       field<LabelWidgetData,String>('label',
         annotations: [
@@ -468,20 +469,22 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.label,
         setter: (obj, value) => (obj as LabelWidgetData).label = value,
-      ),
-      field<LabelWidgetData,String>('databinding',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
-      ),
+      ), 
       field<LabelWidgetData,Font>('font',
         annotations: [
           DeclareProperty(group: "general")
         ],
         getter: (obj) => obj.font,
         setter: (obj, value) => (obj as LabelWidgetData).font = value,
+        isNullable: true
+      ), 
+      field<LabelWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
         isNullable: true
       )
     ],
@@ -535,7 +538,7 @@ void registerEditorTypes() {
   );
 
   type<CodeEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:16:1',
+    location: 'package:velix_editor/property_panel/editor/code_editor.dart:13:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -651,7 +654,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:7:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:12:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -662,7 +665,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:19:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:93:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

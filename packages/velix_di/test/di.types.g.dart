@@ -12,6 +12,16 @@ import 'package:velix_di/configuration/configuration.dart';
 import 'package:velix_di/di/di.dart';
 
 void registerTypes() {
+  type<Conflict>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:11:1',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => Conflict(),
+    fromMapConstructor: (Map<String,dynamic> args) => Conflict(),
+    fromArrayConstructor: (List<dynamic> args) => Conflict(),
+  );
+
   type<ConflictModule>(
     location: 'asset:velix_di/test/conflict/conflict.dart:3:1',
     annotations: [
@@ -28,16 +38,6 @@ void registerTypes() {
         invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
       )
     ],
-  );
-
-  type<Conflict>(
-    location: 'asset:velix_di/test/conflict/conflict.dart:11:1',
-    annotations: [
-      Injectable()
-    ],
-    constructor: () => Conflict(),
-    fromMapConstructor: (Map<String,dynamic> args) => Conflict(),
-    fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 
   type<CycleModule>(

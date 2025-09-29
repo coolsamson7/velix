@@ -71,7 +71,7 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
       throw Exception("ouch wrong number of args");
 
     for (var i = 0; i <  arguments.length; i++) {
-      if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type.type));
+      if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type.type))
         throw Exception("ouch wrong arg type"); // TODO
     }
   }

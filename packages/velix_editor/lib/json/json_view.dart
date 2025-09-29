@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart'; // ✅ dark theme
+import 'package:flutter_highlight/themes/idea.dart'; // ✅ dark theme
 import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -105,7 +105,7 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
                 child: HighlightView(
                   jsonString,
                   language: 'json',
-                  theme: monokaiSublimeTheme,
+                  theme: ideaTheme,
                   padding: const EdgeInsets.all(12),
                   textStyle: const TextStyle(
                     fontFamily: 'monospace',

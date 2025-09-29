@@ -78,6 +78,15 @@
     }
   },
   "widgets": {
+    "switch": {
+      "title": "Switch",
+      "label": {
+        "label":  "Label"
+      },
+      "databinding": {
+        "label":  "Label"
+      }
+    },
     "label": {
       "title": "Label",
       "weight": {

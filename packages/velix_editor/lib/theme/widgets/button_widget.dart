@@ -28,7 +28,7 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   VoidCallback? onClick(ButtonWidgetData data, Environment environment, BuildContext context) { // TODO cache!
     if (data.onClick != null) {
       var instance = Provider.of<WidgetContext>(context).page;
-      var type =  TypeDescriptor.forType(instance.runtimeType);
+      var type = TypeDescriptor.forType(instance.runtimeType);
 
       return () => compile(data.onClick!,type).eval(instance);
     }

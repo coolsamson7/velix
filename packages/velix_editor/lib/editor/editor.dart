@@ -490,8 +490,8 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                       ),
                       Panel(
                           name: 'editor',
-                          label: 'editor:docks.editor.label:'.tr(),
-                          tooltip: 'editor:docks.editor.tooltip'.tr(),
+                          label: 'editor:docks.json.label:'.tr(),
+                          tooltip: 'editor:docks.json.tooltip'.tr(),
                           create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
                           icon: Icons.code
                       )
@@ -503,8 +503,8 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     panels: [
                       Panel(
                           name: 'properties',
-                          label: 'editor:docks.properties.label:'.tr(),
-                          tooltip: 'editor:docks.properties.tooltip:'.tr(),
+                          label: 'editor:docks.properties.label'.tr(),
+                          tooltip: 'editor:docks.properties.tooltip'.tr(),
                           icon: Icons.tune,
                           create: (onClose) => PropertyPanel(onClose: onClose),
                       )

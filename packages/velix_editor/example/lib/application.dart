@@ -37,7 +37,7 @@ class EditorApp extends StatelessWidget {
             environment: environment,
             child:  MultiProvider(
                 providers: [
-                  Provider<LocaleManager>(create: (_) => localeManager),
+                  ChangeNotifierProvider<LocaleManager>(create: (_) => localeManager),
                   Provider<CommandManager>(create: (_) => CommandManager(
                       interceptors: [
                         LockCommandInterceptor(),

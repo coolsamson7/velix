@@ -4,7 +4,7 @@
 
 import 'dart:ui';
 
-import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart' hide Padding, WidgetBuilder, Page;
 import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -48,35 +48,40 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => CommandStack(),
   );
 
-  type<User>(
-    location: 'package:velix_editor/editor/editor.dart:208:1',
+  type<Address>(
+    location: 'package:velix_editor/editor/editor.dart:207:1',
     params: [
-      param<String>('name', isNamed: true, isRequired: true)
+      param<String>('city', isNamed: true, isRequired: true), 
+      param<String>('street', isNamed: true, isRequired: true)
     ],
-    constructor: ({String name = ''}) => User(name: name),
-    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? ''),
+    constructor: ({String city = '', String street = ''}) => Address(city: city, street: street),
+    fromMapConstructor: (Map<String,dynamic> args) => Address(city: args['city'] as String? ?? '', street: args['street'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => Address(city: args[0] as String? ?? '', street: args[1] as String? ?? ''),
     fields: [
-      field<User,String>('name',
-        getter: (obj) => obj.name,
-        setter: (obj, value) => (obj as User).name = value,
+      field<Address,String>('city',
+        getter: (obj) => obj.city,
+        setter: (obj, value) => (obj as Address).city = value,
+      ), 
+      field<Address,String>('street',
+        getter: (obj) => obj.street,
+        setter: (obj, value) => (obj as Address).street = value,
       )
     ],
     methods: [
-      method<User,String>('hello',
+      method<Address,String>('hello',
         annotations: [
           Inject()
         ],
         parameters: [
           param<String>('message', isRequired: true)
         ],
-        invoker: (List<dynamic> args)=> (args[0] as User).hello(args[1])
+        invoker: (List<dynamic> args)=> (args[0] as Address).hello(args[1])
       )
     ],
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:229:1',
+    location: 'package:velix_editor/editor/editor.dart:249:1',
     annotations: [
       Injectable()
     ],
@@ -86,6 +91,7 @@ void registerEditorTypes() {
     fields: [
       field<Page,User>('user',
         getter: (obj) => obj.user,
+        setter: (obj, value) => (obj as Page).user = value,
       )
     ],
     methods: [
@@ -337,6 +343,38 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => MessageBus(),
   );
 
+  type<User>(
+    location: 'package:velix_editor/editor/editor.dart:228:1',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<Address>('address', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required Address address}) => User(name: name, address: address),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address),
+    fields: [
+      field<User,String>('name',
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as User).name = value,
+      ), 
+      field<User,Address>('address',
+        getter: (obj) => obj.address,
+        setter: (obj, value) => (obj as User).address = value,
+      )
+    ],
+    methods: [
+      method<User,String>('hello',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<String>('message', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as User).hello(args[1])
+      )
+    ],
+  );
+
   type<ButtonWidgetData>(
     location: 'package:velix_editor/metadata/widgets/button.dart:10:1',
     superClass: widgetDataDescriptor,
@@ -349,11 +387,12 @@ void registerEditorTypes() {
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Padding>('padding', isNamed: true, isNullable: true, defaultValue: null)
+      param<Padding>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Padding padding}) => ButtonWidgetData(type: type, children: children, label: label, font: font, padding: padding),
-    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, padding: args['padding'] as Padding?),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, padding: args[4] as Padding),
+    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Padding padding, String onClick = ''}) => ButtonWidgetData(type: type, children: children, label: label, font: font, padding: padding, onClick: onClick),
+    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, padding: args['padding'] as Padding?, onClick: args['onClick'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, padding: args[4] as Padding, onClick: args[5] as String? ?? ''),
     fields: [
       field<ButtonWidgetData,String>('label',
         annotations: [
@@ -429,7 +468,14 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.label,
         setter: (obj, value) => (obj as LabelWidgetData).label = value,
-      ), 
+      ),
+      field<LabelWidgetData,String>('databinding',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
+      ),
       field<LabelWidgetData,Font>('font',
         annotations: [
           DeclareProperty(group: "general")
@@ -533,7 +579,7 @@ void registerEditorTypes() {
   );
 
   type<PaddingEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/paddding_editor.dart:15:1',
+    location: 'package:velix_editor/property_panel/editor/paddding_editor.dart:13:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -627,7 +673,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:7:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:11:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -638,7 +684,7 @@ void registerEditorTypes() {
   );
 
   type<TextEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:17:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:56:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:velix_ui/databinding/form_mapper.dart';
 
 import './dynamic_widget.dart';
 import './metadata/type_registry.dart';
@@ -10,10 +11,11 @@ class WidgetContext {
   // instance data
 
   dynamic page;
+  FormMapper formMapper; // TODO databinding
 
   // constructor
 
-  WidgetContext({required this.page});
+  WidgetContext({required this.page}) :  formMapper = FormMapper(instance: page, twoWay: true);
 }
 
 class WidgetContainer extends StatefulWidget {
@@ -25,7 +27,9 @@ class WidgetContainer extends StatefulWidget {
 
   // constructor
 
-  const WidgetContainer({super.key, required this.models, required this.typeRegistry, required this.context});
+  WidgetContainer({super.key, required this.models, required this.typeRegistry, required this.context}) {
+    //formMapper = FormMapper(instance: context.page, twoWay: false);
+  }
 
   // override
 
@@ -43,6 +47,10 @@ class _WidgetContainerState extends State<WidgetContainer> {
   @override
   Widget build(BuildContext context) {
     typeRegistry ??= EnvironmentProvider.of(context).get<TypeRegistry>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.context.formMapper.setValue(widget.context.page);
+    });
 
     return Provider<WidgetContext>.value(
         value: widget.context,

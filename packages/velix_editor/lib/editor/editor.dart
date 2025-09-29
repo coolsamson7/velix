@@ -24,7 +24,6 @@ import '../util/message_bus.dart';
 import '../widget_container.dart';
 import 'canvas.dart';
 import 'error_messages.dart';
-import 'panel_switcher.dart';
 import 'docking_container.dart';
 import 'widget_breadcrumb.dart';
 
@@ -206,25 +205,46 @@ String json = '''
 var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
 
 @Dataclass()
+class Address {
+  // instance data
+
+  @Attribute()
+  String city = "";
+  @Attribute()
+  String street = "";
+
+  // constructor
+
+  Address({required this.city, required this.street});
+
+  // methods
+
+  @Inject()
+  String hello(String message, ) {
+    return "world";
+  }
+}
+
+@Dataclass()
 class User {
   // instance data
 
   @Attribute()
   String name = "";
+  @Attribute()
+  Address address;
 
   // constructor
 
-  User({required this.name});
+  User({required this.name, required this.address});
 
   // methods
 
   @Inject()
   String hello(String message) {
-    print("hello $message");
     return "hello $message";
   }
 }
-
 
 @Injectable()
 @Dataclass()
@@ -232,11 +252,11 @@ class Page {
   // instance data
 
   @Attribute()
-  final User user;
+  User user;
 
   // constructor
 
-  Page() : user = User(name: "andi");
+  Page() : user = User(name: "andi", address: Address(city: "Cologne", street: "Neumarkt"));
 
   // methods
 

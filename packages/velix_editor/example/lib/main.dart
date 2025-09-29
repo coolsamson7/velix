@@ -38,7 +38,7 @@ class ApplicationModule {
 void main() async {
   // flutter
 
-  registerWidgets(TargetPlatform.iOS);
+  registerWidgets(TargetPlatform.android);
 
   WidgetsFlutterBinding.ensureInitialized();
 

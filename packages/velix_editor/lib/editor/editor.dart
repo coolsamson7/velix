@@ -110,6 +110,30 @@ String json = '''
             }
           ]
         },
+         {
+          "name": "age",
+          "type": "int",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+         {
+          "name": "cool",
+          "type": "bool",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
         {
           "name": "address",
           "type": "Address",
@@ -232,11 +256,15 @@ class User {
   @Attribute()
   String name = "";
   @Attribute()
+  int age;
+  @Attribute()
   Address address;
+  @Attribute()
+  bool cool;
 
   // constructor
 
-  User({required this.name, required this.address});
+  User({required this.name, required this.address, required this.age, required this.cool});
 
   // methods
 
@@ -256,7 +284,14 @@ class Page {
 
   // constructor
 
-  Page() : user = User(name: "andi", address: Address(city: "Cologne", street: "Neumarkt"));
+  Page() : user = User(
+      name: "Andreas",
+      age: 60,
+      cool: true,
+      address: Address(
+          city: "Cologne",
+          street: "Neumarkt"
+      ));
 
   // methods
 

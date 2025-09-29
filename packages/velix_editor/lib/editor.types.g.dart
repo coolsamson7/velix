@@ -18,6 +18,7 @@ import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_editor/metadata/widgets/label.dart';
+import 'package:velix_editor/metadata/widgets/switch.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_editor/property_panel/editor/bool_editor.dart';
 import 'package:velix_editor/property_panel/editor/code_editor.dart';
@@ -33,6 +34,7 @@ import 'package:velix_editor/theme/widget_builder.dart';
 import 'package:velix_editor/theme/widgets/button_widget.dart';
 import 'package:velix_editor/theme/widgets/container_widget.dart';
 import 'package:velix_editor/theme/widgets/label_widget.dart';
+import 'package:velix_editor/theme/widgets/switch_widget.dart';
 import 'package:velix_editor/theme/widgets/text_widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_mapper/mapper/json.dart';
@@ -81,7 +83,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:249:1',
+    location: 'package:velix_editor/editor/editor.dart:253:1',
     annotations: [
       Injectable()
     ],
@@ -347,19 +349,29 @@ void registerEditorTypes() {
     location: 'package:velix_editor/editor/editor.dart:228:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
-      param<Address>('address', isNamed: true, isRequired: true)
+      param<Address>('address', isNamed: true, isRequired: true), 
+      param<int>('age', isNamed: true, isRequired: true), 
+      param<bool>('cool', isNamed: true, isRequired: true)
     ],
-    constructor: ({String name = '', required Address address}) => User(name: name, address: address),
-    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address),
-    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address),
+    constructor: ({String name = '', required Address address, int age = 0, bool cool = false}) => User(name: name, address: address, age: age, cool: cool),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address, age: args['age'] as int? ?? 0, cool: args['cool'] as bool? ?? false),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address, age: args[2] as int? ?? 0, cool: args[3] as bool? ?? false),
     fields: [
       field<User,String>('name',
         getter: (obj) => obj.name,
         setter: (obj, value) => (obj as User).name = value,
       ), 
+      field<User,int>('age',
+        getter: (obj) => obj.age,
+        setter: (obj, value) => (obj as User).age = value,
+      ), 
       field<User,Address>('address',
         getter: (obj) => obj.address,
         setter: (obj, value) => (obj as User).address = value,
+      ), 
+      field<User,bool>('cool',
+        getter: (obj) => obj.cool,
+        setter: (obj, value) => (obj as User).cool = value,
       )
     ],
     methods: [
@@ -485,6 +497,42 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<SwitchWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/switch.dart:10:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "switch", group: "widgets", icon: Icons.text_fields),
+      JsonSerializable(discriminator: "switch")
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "switch", List<WidgetData> children = const [], String label = '', String databinding = ''}) => SwitchWidgetData(type: type, children: children, label: label, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', databinding: args[3] as String? ?? ''),
+    fields: [
+      field<SwitchWidgetData,String>('label',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.label,
+        setter: (obj, value) => (obj as SwitchWidgetData).label = value,
+      ), 
+      field<SwitchWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as SwitchWidgetData).databinding = value,
         isNullable: true
       )
     ],
@@ -673,6 +721,28 @@ void registerEditorTypes() {
     constructor: () => EditLabelWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => EditLabelWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => EditLabelWidgetBuilder(),
+  );
+
+  type<SwitchWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:13:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => SwitchWidgetBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetBuilder(),
+  );
+
+  type<EditSwitchWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:57:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => EditSwitchWidgetBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => EditSwitchWidgetBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => EditSwitchWidgetBuilder(),
   );
 
   type<TextWidgetBuilder>(

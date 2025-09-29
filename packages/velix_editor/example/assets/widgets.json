@@ -20,6 +20,12 @@
       "label": "Street"
     },
     {
+      "type": "switch",
+      "databinding": "user.cool",
+      "children": [],
+      "label": "Cool"
+    },
+    {
     "type": "button",
     "children": [],
     "label": "PRESS",

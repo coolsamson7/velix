@@ -525,7 +525,7 @@ void registerEditorTypes() {
     ],
     constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Color color, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, children: children, label: label, font: font, color: color, padding: padding, onClick: onClick),
     fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, color: args['color'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, color: args[4] as Color, padding: args[5] as Insets, onClick: args[6] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font?, color: args[4] as Color?, padding: args[5] as Insets?, onClick: args[6] as String? ?? ''),
     fields: [
       field<ButtonWidgetData,String>('label',
         annotations: [
@@ -651,7 +651,7 @@ void registerEditorTypes() {
     ],
     constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, font: font, databinding: databinding),
     fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, databinding: args[4] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font?, databinding: args[4] as String? ?? ''),
     fields: [
       field<LabelWidgetData,String>('label',
         annotations: [

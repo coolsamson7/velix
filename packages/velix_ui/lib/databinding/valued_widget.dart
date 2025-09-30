@@ -133,6 +133,7 @@ class ValuedWidget {
   // properties
 
   static final Map<AdapterKey, ValuedWidgetAdapter> _adapters = {};
+  static final Map<Type, ValuedWidgetAdapter> _by_type = {};
 
   static String platform = "iOS";
 
@@ -140,6 +141,11 @@ class ValuedWidget {
 
   static void register(ValuedWidgetAdapter adapter) {
      _adapters[(platform, adapter.getName())] = adapter;
+     _by_type[adapter.getType()] = adapter;
+  }
+
+  static ValuedWidgetAdapter getAdapterFor<T>() {
+    return _by_type[T]!;
   }
 
   static ValuedWidgetAdapter getAdapter(String name) {

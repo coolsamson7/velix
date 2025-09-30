@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class PanelHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onClose;
-  final IconData? icon; // optional left-side icon
+  final Widget? icon; // optional left-side icon
 
   const PanelHeader({
     super.key,
@@ -29,7 +29,8 @@ class PanelHeader extends StatelessWidget {
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 16, color: Colors.grey.shade800),
+            icon!,
+            //Icon(icon, size: 16, color: Colors.grey.shade800),
             const SizedBox(width: 4),
           ],
           Text(
@@ -60,7 +61,7 @@ class PanelContainer extends StatelessWidget {
   // instance data
 
   final String title;
-  final IconData? icon;
+  final Widget? icon;
   final Widget child;
   final VoidCallback? onClose;
 

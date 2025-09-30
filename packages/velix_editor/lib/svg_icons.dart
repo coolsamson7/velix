@@ -1,9 +1,11 @@
 // GENERATED FILE - DO NOT EDIT
 
 class SvgIcons {
+  static const String widget_label = "assets/icons/widget/label.svg";
   static const String widget_textbutton = "assets/icons/widget/textbutton.svg";
   static const String widget_container = "assets/icons/widget/container.svg";
   static const String widget_slider = "assets/icons/widget/slider.svg";
+  static const String widget_button = "assets/icons/widget/button.svg";
   static const String widget_text = "assets/icons/widget/text.svg";
   static const String widget_gridview = "assets/icons/widget/gridview.svg";
   static const String widget_column = "assets/icons/widget/column.svg";
@@ -19,9 +21,11 @@ class SvgIcons {
 
   // Registry for lookup by name
   static const Map<String, String> registry = {
+    "widget_label": widget_label,
     "widget_textbutton": widget_textbutton,
     "widget_container": widget_container,
     "widget_slider": widget_slider,
+    "widget_button": widget_button,
     "widget_text": widget_text,
     "widget_gridview": widget_gridview,
     "widget_column": widget_column,
@@ -35,5 +39,5 @@ class SvgIcons {
     "toolbar_play": toolbar_play,
     "widgets": widgets,
   };
-  static String? get(String key) => registry[key];
+  static String? get(String key) => registry[key] ?? widget_component;
 }

@@ -42,6 +42,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/widgets.json
+    - assets/icons/
+    - assets/icons/widget/
+    - assets/icons/widget/button.svg
     - assets/locales/en/sample.json
     - assets/locales/de/sample.json
 

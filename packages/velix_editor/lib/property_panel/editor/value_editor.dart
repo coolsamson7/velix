@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_di/di/di.dart';
 
-@Dataclass()
-enum ValueType {
-  i18n,
-  binding,
-  value
-}
+import '../../commands/command_stack.dart';
+import '../../metadata/properties/properties.dart' hide Border;
+import '../../util/message_bus.dart';
+import '../editor_builder.dart';
 
-@Dataclass()
-class Value {
-  ValueType type;
-  dynamic value;
+class ValueField extends StatefulWidget {
+  final Value value;
+  final ValueChanged<dynamic> onChanged;
 
-  Value({required this.type, required this.value});
-}
-
-class MultiEditorField extends StatefulWidget {
-  final String initialValue;
-  final ValueType initialMode;
-
-  const MultiEditorField({
+  const ValueField({
     super.key,
-    this.initialValue = '',
-    this.initialMode = ValueType.value,
+    required this.value,
+    required this.onChanged,
   });
 
+  // override
+
   @override
-  State<MultiEditorField> createState() => _MultiEditorFieldState();
+  State<ValueField> createState() => _ValueFieldState();
 }
 
-class _MultiEditorFieldState extends State<MultiEditorField> {
+class _ValueFieldState extends State<ValueField> {
   late ValueType _mode;
   late TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-    _mode = widget.initialMode;
-    _controller = TextEditingController(text: widget.initialValue);
+
+    _mode = widget.value.type;
+    _controller = TextEditingController(text: widget.value.value);
   }
 
   Widget _buildEditor() {
@@ -144,6 +138,27 @@ class _ValueEditor extends StatelessWidget {
         labelText: 'Value',
         border: OutlineInputBorder(),
       ),
+    );
+  }
+}
+
+@Injectable()
+class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
+  // override
+
+  @override
+  Widget buildEditor({
+    required MessageBus messageBus,
+    required CommandStack commandStack,
+    required FieldDescriptor property,
+    required String label,
+    required dynamic object,
+    required dynamic value,
+    required ValueChanged<dynamic> onChanged,
+  }) {
+    return ValueField(
+      value: value,
+      onChanged: onChanged,
     );
   }
 }

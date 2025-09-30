@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -7,7 +6,7 @@ import '../widget_data.dart';
 
 
 @Dataclass()
-@DeclareWidget(name: "row", group: "container", icon: Icons.view_column)
+@DeclareWidget(name: "row", group: "container", icon: "widget_row")
 @JsonSerializable(discriminator: "row", includeNull: false)
 class RowWidgetData extends WidgetData {
   // instance data

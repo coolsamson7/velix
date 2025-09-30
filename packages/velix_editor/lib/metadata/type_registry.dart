@@ -3,7 +3,9 @@ import 'dart:ui';
 
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/components/svg_icon.dart';
 
+import '../svg_icons.dart';
 import 'annotations.dart';
 import 'metadata.dart';
 import 'widget_data.dart';
@@ -46,7 +48,7 @@ class TypeRegistry {
 
       var widgetDescriptor = WidgetDescriptor(
         annotation: declareWidget,
-        icon: declareWidget.icon,
+        icon: SvgIcon(SvgIcons.get(declareWidget.icon)!),
         type: widgetType,
         properties: properties,
       );

@@ -41,6 +41,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icons/
+    - assets/icons/widget/
     - assets/locales/en/editor.json
     - assets/locales/de/editor.json
 

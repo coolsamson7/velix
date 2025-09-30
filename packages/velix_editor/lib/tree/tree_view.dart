@@ -352,13 +352,13 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                           color: theme.colorScheme.outline.withOpacity(0.2),
                         ),
                       ),
-                      child: Icon(
+                      child: //Icon(
                         _getIconForNode(node),
-                        size: 16,
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface.withOpacity(0.8),
-                      ),
+                        //size: 16,
+                        //color: isSelected
+                        //    ? theme.colorScheme.primary
+                        //    : theme.colorScheme.onSurface.withOpacity(0.8),
+                      //),
                     ),
 
                     const SizedBox(width: 12),
@@ -386,7 +386,8 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(_getIconForNode(node), size: 16),
+                               //Icon(
+                                    _getIconForNode(node),//, size: 16),
                                 const SizedBox(width: 8),
                                 Text(
                                   node.type,
@@ -459,8 +460,8 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
   }
 
   /// Helper: icon per node type
-  IconData _getIconForNode(WidgetData node) {
-    return environment.get<TypeRegistry>().getDescriptor(node).icon!;
+  Widget _getIconForNode(WidgetData node) {
+    return environment.get<TypeRegistry>().getDescriptor(node).icon;
   }
 }
 

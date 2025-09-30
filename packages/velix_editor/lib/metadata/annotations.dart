@@ -11,7 +11,7 @@ class DeclareWidget extends ClassAnnotation {
 
   final String name;
   final String group;
-  final IconData? icon;
+  final String icon; // IconData? or String?
 
   // constructor
 

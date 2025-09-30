@@ -4,7 +4,6 @@ import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
 import '../../components/color_picker.dart';
-import '../../components/font_picker.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 

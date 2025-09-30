@@ -29,6 +29,17 @@
           "label": "Cool"
         },
         {
+          "type": "label",
+          "label": "hurz",
+          "value": {
+            "type": "value",
+            "value": "hurz"
+          },
+          "databinding": "user.cool",
+          "children": [],
+          "label": "Cool"
+        },
+        {
           "type": "button",
           "children": [],
           "label": "PRESS",

@@ -50,6 +50,23 @@ class FontStyleConvert extends Convert<FontStyle,String> {
   }
 }
 
+
+@Dataclass()
+enum ValueType {
+  i18n,
+  binding,
+  value
+}
+
+@Dataclass()
+class Value {
+  ValueType type;
+  String value;
+
+  Value({required this.type, required this.value});
+}
+
+
 @Dataclass()
 class Insets {
   @DeclareProperty(label: "editor:properties.insets.left")

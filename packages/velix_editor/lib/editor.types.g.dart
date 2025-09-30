@@ -4,7 +4,6 @@
 
 import 'dart:ui';
 
-import 'package:flutter/material.dart' show Icons;
 import 'package:velix/velix.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
@@ -218,7 +217,7 @@ void registerEditorTypes() {
   );
 
   type<Insets>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:53:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:70:1',
     params: [
       param<int>('left', isNamed: true, isNullable: true, defaultValue: 0), 
       param<int>('top', isNamed: true, isNullable: true, defaultValue: 0), 
@@ -261,7 +260,7 @@ void registerEditorTypes() {
   );
 
   type<Font>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:93:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:110:1',
     params: [
       param<FontWeight>('weight', isNamed: true, isNullable: true, defaultValue: FontWeight.normal), 
       param<FontStyle>('style', isNamed: true, isNullable: true, defaultValue: FontStyle.normal), 
@@ -303,13 +302,18 @@ void registerEditorTypes() {
     ],
   );
 
+  enumeration<ValueType>(
+    name: 'package:velix_editor/metadata/properties/properties.dart.ValueType',
+    values: ValueType.values
+  );
+
   enumeration<BorderStyle>(
     name: 'package:velix_editor/metadata/properties/properties.dart.BorderStyle',
     values: BorderStyle.values
   );
 
   type<TypeRegistry>(
-    location: 'package:velix_editor/metadata/type_registry.dart:11:1',
+    location: 'package:velix_editor/metadata/type_registry.dart:13:1',
     annotations: [
       Injectable()
     ],
@@ -361,11 +365,6 @@ void registerEditorTypes() {
         isNullable: true
       )
     ],
-  );
-
-  enumeration<ValueType>(
-    name: 'package:velix_editor/property_panel/editor/value_editor.dart.ValueType',
-    values: ValueType.values
   );
 
   var propertyEditorBuilderDescriptor =  type<PropertyEditorBuilder>(
@@ -478,8 +477,29 @@ void registerEditorTypes() {
     ],
   );
 
+  type<Value>(
+    location: 'package:velix_editor/metadata/properties/properties.dart:61:1',
+    params: [
+      param<ValueType>('type', isNamed: true, isRequired: true), 
+      param<String>('value', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required ValueType type, required String value}) => Value(type: type, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType, value: args['value'] as String),
+    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType, value: args[1] as String),
+    fields: [
+      field<Value,ValueType>('type',
+        getter: (obj) => obj.type,
+        setter: (obj, value) => (obj as Value).type = value,
+      ), 
+      field<Value,String>('value',
+        getter: (obj) => obj.value,
+        setter: (obj, value) => (obj as Value).value = value,
+      )
+    ],
+  );
+
   type<Border>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:79:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:96:1',
     params: [
       param<Color>('color', isNamed: true, isRequired: true), 
       param<int>('width', isNamed: true, isRequired: true), 
@@ -517,7 +537,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/button.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "button", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "button", group: "widgets", icon: "widget_button"),
       JsonSerializable(discriminator: "button", includeNull: false)
     ],
     params: [
@@ -577,10 +597,10 @@ void registerEditorTypes() {
   );
 
   type<ColumnWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/column.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/column.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "column", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "column", group: "container", icon: "widget_column"),
       JsonSerializable(discriminator: "column", includeNull: false)
     ],
     params: [
@@ -593,10 +613,10 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/grid.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/grid.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "grid", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "grid", group: "container", icon: "widget_grid"),
       JsonSerializable(discriminator: "grid", includeNull: false)
     ],
     params: [
@@ -608,56 +628,11 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>? ?? const []),
   );
 
-  type<LabelWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/label.dart:10:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "label", group: "widgets", icon: Icons.text_fields),
-      JsonSerializable(discriminator: "label", includeNull: false)
-    ],
-    params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true), 
-      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
-    ],
-    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, font: font, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font?, databinding: args[4] as String? ?? ''),
-    fields: [
-      field<LabelWidgetData,String>('label',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.label,
-        setter: (obj, value) => (obj as LabelWidgetData).label = value,
-      ), 
-      field<LabelWidgetData,Font>('font',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.font,
-        setter: (obj, value) => (obj as LabelWidgetData).font = value,
-        isNullable: true
-      ), 
-      field<LabelWidgetData,String>('databinding',
-        type: StringType().optional(),
-        annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder)
-        ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
-        isNullable: true
-      )
-    ],
-  );
-
   type<RowWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/row.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/row.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "row", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "row", group: "container", icon: "widget_row"),
       JsonSerializable(discriminator: "row", includeNull: false)
     ],
     params: [
@@ -670,10 +645,10 @@ void registerEditorTypes() {
   );
 
   type<StackWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/stack.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/stack.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "stack", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "stack", group: "container", icon: "widget_stack"),
       JsonSerializable(discriminator: "stack", includeNull: false)
     ],
     params: [
@@ -686,10 +661,10 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/switch.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/switch.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "switch", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "switch", group: "widgets", icon: "widget_switch"),
       JsonSerializable(discriminator: "switch", includeNull: false)
     ],
     params: [
@@ -722,10 +697,10 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/text.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "text", group: "widgets", icon: Icons.text_fields),
+      DeclareWidget(name: "text", group: "widgets", icon: "widget_text"),
       JsonSerializable(discriminator: "text", includeNull: false)
     ],
     params: [
@@ -753,27 +728,6 @@ void registerEditorTypes() {
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as TextWidgetData).databinding = value,
         isNullable: true
-      )
-    ],
-  );
-
-  type<Value>(
-    location: 'package:velix_editor/property_panel/editor/value_editor.dart:11:1',
-    params: [
-      param<ValueType>('type', isNamed: true, isRequired: true), 
-      param<dynamic>('value', isNamed: true, isRequired: true)
-    ],
-    constructor: ({required ValueType type, required dynamic value}) => Value(type: type, value: value),
-    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType, value: args['value'] as dynamic),
-    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType, value: args[1] as dynamic),
-    fields: [
-      field<Value,ValueType>('type',
-        getter: (obj) => obj.type,
-        setter: (obj, value) => (obj as Value).type = value,
-      ), 
-      field<Value,dynamic>('value',
-        getter: (obj) => obj.value,
-        setter: (obj, value) => (obj as Value).value = value,
       )
     ],
   );
@@ -823,7 +777,7 @@ void registerEditorTypes() {
   );
 
   type<ColorEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/color_editor.dart:11:1',
+    location: 'package:velix_editor/property_panel/editor/color_editor.dart:10:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -972,6 +926,28 @@ void registerEditorTypes() {
           param<PropertyEditorBuilderFactory>('registry', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as StringEditorBuilder).setup(args[1])
+      )
+    ],
+  );
+
+  type<ValueEditorBuilder>(
+    location: 'package:velix_editor/property_panel/editor/value_editor.dart:145:1',
+    superClass: propertyEditorBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => ValueEditorBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => ValueEditorBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => ValueEditorBuilder(),
+    methods: [
+      method<ValueEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ValueEditorBuilder).setup(args[1])
       )
     ],
   );
@@ -1402,11 +1378,64 @@ void registerEditorTypes() {
     ],
   );
 
-  type<ContainerWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/container.dart:10:1',
+  type<LabelWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/label.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "container", group: "container", icon: Icons.view_column),
+      DeclareWidget(name: "label", group: "widgets", icon: "widget_label"),
+      JsonSerializable(discriminator: "label", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<Value>('value', isNamed: true, isRequired: true), 
+      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Value value, required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, value: value, font: font, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', value: args['value'] as Value, font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', value: args[3] as Value, font: args[4] as Font?, databinding: args[5] as String? ?? ''),
+    fields: [
+      field<LabelWidgetData,String>('label',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.label,
+        setter: (obj, value) => (obj as LabelWidgetData).label = value,
+      ), 
+      field<LabelWidgetData,Font>('font',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.font,
+        setter: (obj, value) => (obj as LabelWidgetData).font = value,
+        isNullable: true
+      ), 
+      field<LabelWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as LabelWidgetData).databinding = value,
+        isNullable: true
+      ), 
+      field<LabelWidgetData,Value>('value',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.value,
+        setter: (obj, value) => (obj as LabelWidgetData).value = value,
+      )
+    ],
+  );
+
+  type<ContainerWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/container.dart:9:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "container", group: "container", icon: "widget_container"),
       JsonSerializable(discriminator: "container", includeNull: false)
     ],
     params: [

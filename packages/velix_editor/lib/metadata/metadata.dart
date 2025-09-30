@@ -60,7 +60,7 @@ class WidgetDescriptor {
   String label = "";
   String group = "";
 
-  final IconData? icon;
+  final Widget icon;
   final TypeDescriptor type;
   List<PropertyDescriptor> properties;
 

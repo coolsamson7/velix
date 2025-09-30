@@ -170,7 +170,8 @@ class _WidgetPaletteState extends State<WidgetPalette> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.widgets, size: 32), // generic icon
+          type.icon,
+          //const Icon(Icons.widgets, size: 32), // generic icon
           const SizedBox(height: 4),
           Text(
             type.label,

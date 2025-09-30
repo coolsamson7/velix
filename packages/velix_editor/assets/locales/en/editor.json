@@ -79,6 +79,18 @@
     }
   },
   "widgets": {
+    "column": {
+      "title": "Column"
+    },
+    "grid": {
+      "title": "Grid"
+    },
+    "row": {
+      "title": "Row"
+    },
+    "stack": {
+      "title": "Stack"
+    },
     "switch": {
       "title": "Switch",
       "label": {
@@ -90,6 +102,12 @@
     },
     "label": {
       "title": "Label",
+      "value": {
+        "label": "Value"
+      },
+      "databinding": {
+        "label": "Databinding"
+      },
       "weight": {
         "label":  "Weight"
       },

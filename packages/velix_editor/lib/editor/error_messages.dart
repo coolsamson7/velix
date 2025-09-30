@@ -61,7 +61,7 @@ class _MessagePaneState extends State<MessagePane> {
           final isWarning = message.type == MessageType.warning;
 
           return InkWell(
-            onTap: message.onClick as GestureTapCallback,
+            onTap: () {if (message.onClick != null) message.onClick!();},
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(

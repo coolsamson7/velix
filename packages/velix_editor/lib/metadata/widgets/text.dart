@@ -8,7 +8,7 @@ import '../widget_data.dart';
 
 @Dataclass()
 @DeclareWidget(name: "text", group: "widgets", icon: Icons.text_fields)
-@JsonSerializable(discriminator: "text")
+@JsonSerializable(discriminator: "text", includeNull: false)
 class TextWidgetData extends WidgetData {
   // instance data
 

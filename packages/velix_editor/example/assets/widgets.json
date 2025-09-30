@@ -2,45 +2,52 @@
   "type": "container",
   "children": [
     {
-    "type": "text",
-    "databinding": "user.name",
-    "children": [],
-    "label": "Name"
-    },
-    {
-      "type": "text",
-      "databinding": "user.address.city",
-      "children": [],
-      "label": "City"
-    },
-    {
-      "type": "text",
-      "databinding": "user.address.street",
-      "children": [],
-      "label": "Street"
-    },
-    {
-      "type": "switch",
-      "databinding": "user.cool",
-      "children": [],
-      "label": "Cool"
-    },
-    {
-    "type": "button",
-    "children": [],
-    "label": "PRESS",
-    "onClick": "user.hello(user.name)",
-    "font": {
-      "size": 12,
-      "weight": 100,
-      "style": "normal"
-      },
-    "padding": {
-      "left": 1,
-      "top": 1,
-      "right": 1,
-      "bottom": 1
-      }
+      "type": "column",
+      "children": [
+        {
+          "type": "text",
+          "databinding": "user.name",
+          "children": [],
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "databinding": "user.address.city",
+          "children": [],
+          "label": "City"
+        },
+        {
+          "type": "text",
+          "databinding": "user.address.street",
+          "children": [],
+          "label": "Street"
+        },
+        {
+          "type": "switch",
+          "databinding": "user.cool",
+          "children": [],
+          "label": "Cool"
+        },
+        {
+          "type": "button",
+          "children": [],
+          "label": "PRESS",
+          "onClick": "user.hello(user.name)",
+          "color": "FFFF0000",
+          "font": {
+            "family": "Arial",
+            "size": 12,
+            "weight": 100,
+            "style": "normal"
+          },
+          "padding": {
+            "left": 1,
+            "top": 1,
+            "right": 1,
+            "bottom": 1
+          }
+        }
+      ]
     }
   ]
-}
+  }

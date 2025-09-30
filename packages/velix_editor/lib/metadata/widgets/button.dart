@@ -20,7 +20,7 @@ class ButtonWidgetData extends WidgetData {
   @DeclareProperty(group: "font")
   Color? color;
   @DeclareProperty(group: "layout")
-  Padding? padding;
+  Insets? padding;
   @DeclareProperty(group: "events", editor: CodeEditorBuilder)
   String? onClick;
 

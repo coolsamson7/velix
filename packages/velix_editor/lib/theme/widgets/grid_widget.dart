@@ -9,21 +9,18 @@ import '../../dynamic_widget.dart';
 import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
-import '../../metadata/widgets/container.dart';
+import '../../metadata/widgets/grid.dart';
 import '../widget_builder.dart';
 
-
 @Injectable()
-class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
+class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   final TypeRegistry typeRegistry;
 
-  ContainerEditWidgetBuilder({required this.typeRegistry})
-      : super(name: "container", edit: true);
-
-  // override
+  GridEditWidgetBuilder({required this.typeRegistry})
+      : super(name: "grid", edit: true);
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
+  Widget create(GridWidgetData data, Environment environment, BuildContext context) {
     return DragTarget<WidgetData>(
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
@@ -92,26 +89,20 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 }
 
 @Injectable()
-class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
+class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   final TypeRegistry typeRegistry;
 
-  // constructor
-
-  ContainerWidgetBuilder({required this.typeRegistry})
-      : super(name: "container");
-
-  // override
+  GridWidgetBuilder({required this.typeRegistry})
+      : super(name: "grid");
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
+  Widget create(GridWidgetData data, Environment environment, BuildContext context) {
     return Container(
-      padding: data.padding?.edgeInsets(),
-      margin: data.margin?.edgeInsets(),
-      //height: data.height;,
-      decoration: data.border != null ? BoxDecoration(
-        border: data.border!.border(),
-        //color: Colors.grey.shade100,
-      ) : null,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        color: Colors.grey.shade100,
+      ),
       child: data.children.isNotEmpty
           ? Column(
         crossAxisAlignment: CrossAxisAlignment.start,

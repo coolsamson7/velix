@@ -51,22 +51,43 @@ class FontStyleConvert extends Convert<FontStyle,String> {
 }
 
 @Dataclass()
-class Padding {
-  @DeclareProperty(label: "editor:properties.padding.left")
+class Insets {
+  @DeclareProperty(label: "editor:properties.insets.left")
   int left;
-  @DeclareProperty(label: "editor:properties.padding.top")
+  @DeclareProperty(label: "editor:properties.insets.top")
   int top;
-  @DeclareProperty(label: "editor:properties.padding.right")
+  @DeclareProperty(label: "editor:properties.insets.right")
   int right;
-  @DeclareProperty(label: "editor:properties.padding.bottom")
+  @DeclareProperty(label: "editor:properties.insets.bottom")
   int bottom;
 
-  Padding({
+  Insets({
     this.left = 0,
     this.top = 0,
     this.right = 0,
     this.bottom = 0,
   });
+}
+
+@Dataclass()
+enum BorderStyle {
+  solid,
+  dashed,
+  dotted
+}
+
+@Dataclass()
+class Border {
+  @DeclareProperty(label: "editor:properties.border.color")
+  Color color;
+  @DeclareProperty(label: "editor:properties.border.width")
+  int width;
+  @DeclareProperty(label: "editor:properties.border.style")
+  BorderStyle style;
+
+  // constructor
+
+  Border({required this.color, required this.width, required this.style});
 }
 
 @Dataclass()

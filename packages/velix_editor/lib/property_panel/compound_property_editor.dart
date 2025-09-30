@@ -169,7 +169,9 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: compoundDescriptor.getFields().map((field) {
-        final editorBuilder = widget.editorRegistry.getBuilder(field.type.type);
+        var editorType = field.findAnnotation<DeclareProperty>()!.editor;
+
+        final editorBuilder = editorType != null  ? environment.get(type: editorType) : widget.editorRegistry.getBuilder(field.type.type);
         final value = compoundDescriptor.get(this.value, field.name);
         final isDirty = widget.commandStack.propertyIsDirty(this.value, field.name);
 

@@ -9,21 +9,18 @@ import '../../dynamic_widget.dart';
 import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
-import '../../metadata/widgets/container.dart';
+import '../../metadata/widgets/column.dart';
 import '../widget_builder.dart';
 
-
 @Injectable()
-class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
+class ColumnEditWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   final TypeRegistry typeRegistry;
 
-  ContainerEditWidgetBuilder({required this.typeRegistry})
-      : super(name: "container", edit: true);
-
-  // override
+  ColumnEditWidgetBuilder({required this.typeRegistry})
+      : super(name: "column", edit: true);
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
+  Widget create(ColumnWidgetData data, Environment environment, BuildContext context) {
     return DragTarget<WidgetData>(
       onWillAccept: (widget) => data.acceptsChild(widget!),
       onAccept: (widget) {
@@ -92,52 +89,20 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
 }
 
 @Injectable()
-class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
+class ColumnWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   final TypeRegistry typeRegistry;
 
-  // constructor
-
-  ContainerWidgetBuilder({required this.typeRegistry})
-      : super(name: "container");
-
-  // override
+  ColumnWidgetBuilder({required this.typeRegistry})
+      : super(name: "column");
 
   @override
-  Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
-    return Container(
-      padding: data.padding?.edgeInsets(),
-      margin: data.margin?.edgeInsets(),
-      //height: data.height;,
-      decoration: data.border != null ? BoxDecoration(
-        border: data.border!.border(),
-        //color: Colors.grey.shade100,
-      ) : null,
-      child: data.children.isNotEmpty
-          ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: data.children
-            .map(
-              (child) => Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: DynamicWidget(
-              model: child,
-              meta: typeRegistry[child.type],
-              parent: data,
-            ),
-          ),
-        )
-            .toList(),
-      )
-          : const SizedBox(
-        height: 50,
-        child: Center(
-          child: Text(
-            'Empty container',
-            style: TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-        ),
-      ),
+  Widget create(ColumnWidgetData data, Environment environment, BuildContext context) {
+    return Column(
+        children: data.children.map((child) => DynamicWidget(
+          model: child,
+          meta: typeRegistry[child.type],
+          parent: data,
+        )).toList(growable: false)
     );
   }
 }

@@ -66,6 +66,7 @@ void main() async {
   JSON(
       validate: false,
       converters: [
+        ColorConvert(),
         FontWeightConvert(),
         FontStyleConvert(),
         Convert<DateTime,String>(

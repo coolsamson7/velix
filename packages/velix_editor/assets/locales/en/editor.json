@@ -66,6 +66,7 @@
   },
   "properties": {
     "font": {
+      "family": {"label":  "Family"},
       "size": {"label":  "Size"},
       "weight": {"label":  "Weight"},
       "style": {"label":  "Style"}
@@ -94,6 +95,9 @@
       },
       "size": {
         "label":  "Size"
+      },
+      "font": {
+        "label":  "Font"
       },
       "label": {
         "label":  "Label"
@@ -133,6 +137,9 @@
       },
       "weight": {
         "label":  "Weight"
+      },
+      "color": {
+        "label":  "Color"
       },
       "onClick": {
         "label":  "On Click"

@@ -29,7 +29,7 @@ class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
     var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
 
     var result = Text(data.label,
-        style: textStyle(data.font)
+        style: data.font?.textStyle()
     );
 
     // TODO: no labeladapter yet
@@ -104,7 +104,7 @@ class EditLabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
     return IgnorePointer(
       ignoring: true,
       child: Text(data.label,
-          style: textStyle(data.font) // TODO more...
+          style: data.font?.textStyle()
       ),
     );
   }

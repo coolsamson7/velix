@@ -6,12 +6,12 @@ import 'package:velix_di/di/di.dart';
 import '../../commands/command.dart';
 import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
-import '../../metadata/properties/properties.dart' as m show Padding;
+import '../../metadata/properties/properties.dart' as m show Insets;
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
 @Injectable()
-class PaddingEditorBuilder extends PropertyEditorBuilder<m.Padding> {
+class PaddingEditorBuilder extends PropertyEditorBuilder<m.Insets> {
   @override
   Widget buildEditor({
     required MessageBus messageBus,
@@ -36,7 +36,7 @@ class PaddingEditorBuilder extends PropertyEditorBuilder<m.Padding> {
 
 class PaddingEditor extends StatefulWidget {
   final String label;
-  final m.Padding? value;
+  final m.Insets? value;
   final ValueChanged<EdgeInsets> onChanged;
 
   final FieldDescriptor property;
@@ -65,7 +65,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
   late final TextEditingController rightController;
   late final TextEditingController bottomController;
 
-  late m.Padding value;
+  late m.Insets value;
 
   Command? currentCommand;
   Command? parentCommand;
@@ -73,7 +73,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
   @override
   void initState() {
     super.initState();
-    value = widget.value ?? m.Padding();
+    value = widget.value ?? m.Insets();
 
     topController = TextEditingController(text: value.top.toString());
     leftController = TextEditingController(text: value.left.toString());
@@ -85,7 +85,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
   void didUpdateWidget(covariant PaddingEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value) {
-      value = widget.value ?? m.Padding();
+      value = widget.value ?? m.Insets();
       parentCommand = null;
       currentCommand = null;
 
@@ -105,12 +105,12 @@ class _PaddingEditorState extends State<PaddingEditor> {
     super.dispose();
   }
 
-  m.Padding createPadding() {
+  m.Insets createPadding() {
     final top = int.tryParse(topController.text) ?? 0;
     final left = int.tryParse(leftController.text) ?? 0;
     final right = int.tryParse(rightController.text) ?? 0;
     final bottom = int.tryParse(bottomController.text) ?? 0;
-    return m.Padding(left: left, top: top, right: right, bottom: bottom);
+    return m.Insets(left: left, top: top, right: right, bottom: bottom);
   }
 
   void changedProperty() {

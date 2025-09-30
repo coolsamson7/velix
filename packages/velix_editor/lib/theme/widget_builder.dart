@@ -1,12 +1,39 @@
 
 import 'package:flutter/material.dart' hide Padding;
+import '../../metadata/properties/properties.dart' as Props;
 import 'package:velix_di/di/di.dart';
 
-import '../metadata/properties/properties.dart';
 import '../metadata/widget_data.dart';
 import 'theme.dart';
 
-@Injectable(factory: false, eager: false) // TODO
+extension InsetsHelper on Props.Insets {
+  EdgeInsets edgeInsets() {
+    return EdgeInsets.fromLTRB(left.toDouble(), top.toDouble(), right.toDouble(), bottom.toDouble());
+  }
+}
+
+extension FontHelper on Props.Font {
+  TextStyle textStyle() {
+      return TextStyle(
+        fontFamily: family,
+        fontSize: size.toDouble(),
+        fontWeight: weight,
+        fontStyle: style,
+      );
+  }
+}
+
+extension BorderHelper on Props.Border {
+  Border border() {
+    return  Border.all(
+        color: color,
+        width: width.toDouble(),
+        style: BorderStyle.solid
+    );
+  }
+}
+
+@Injectable(factory: false, eager: false)
 abstract class WidgetBuilder<T extends WidgetData> {
   // instance data
 
@@ -15,7 +42,7 @@ abstract class WidgetBuilder<T extends WidgetData> {
 
   // constructor
 
-  WidgetBuilder({required this.name, bool edit = false}) : edit = edit;
+  WidgetBuilder({required this.name, this.edit = false});
 
   // lifecycle
 
@@ -23,30 +50,6 @@ abstract class WidgetBuilder<T extends WidgetData> {
   void setThema(WidgetFactory theme) {
     theme.register(this, name, edit);
   }
-
-  // common functions
-
-  TextStyle? textStyle(Font? font) {
-    if (font != null)
-      return TextStyle(
-        fontSize: font.size.toDouble(),
-        fontWeight: font.weight,
-        fontStyle: font.style,
-      );
-    else return null;
-  }
-
-  EdgeInsets? edgeInsets(Padding? padding) {
-    if ( padding != null)
-      return EdgeInsets.only(
-        left: padding.left.toDouble(),
-        top: padding.top.toDouble(),
-        right: padding.right.toDouble(),
-        bottom: padding.bottom.toDouble(),
-      );
-    else return null;
-  }
-
 
   // abstract
 

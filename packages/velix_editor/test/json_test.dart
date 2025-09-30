@@ -31,7 +31,7 @@ void main() {
           children: [
             ButtonWidgetData(
               label: "zwei",
-              padding: Padding(left: 1, top: 1, right: 1, bottom: 1),
+              padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
               font: Font(
                   weight: FontWeight.normal,
                   style: FontStyle.normal,
@@ -50,7 +50,7 @@ void main() {
     test('serialize button', () {
       var input = ButtonWidgetData(
           label: "zwei",
-          padding: Padding(left: 1, top: 1, right: 1, bottom: 1),
+          padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
           font: Font(
               weight: FontWeight.normal,
               style: FontStyle.normal,
@@ -69,7 +69,7 @@ void main() {
       var input = ButtonWidgetData(
           label: "zwei",
           onClick: "click()",
-          padding: Padding(left: 1, top: 1, right: 1, bottom: 1),
+          padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
           font: Font(
               weight: FontWeight.normal,
               style: FontStyle.normal,

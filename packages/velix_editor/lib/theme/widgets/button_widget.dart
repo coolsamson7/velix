@@ -43,8 +43,9 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
     return ElevatedButton(
       onPressed: onClick(data, environment, context),
       style: ElevatedButton.styleFrom(
-          textStyle: textStyle(data.font),
-          padding: edgeInsets(data.padding)
+          textStyle: data.font?.textStyle(),
+          backgroundColor: data.color,
+          padding: data.padding?.edgeInsets()
       ),
       child: Text(data.label),
     );
@@ -66,9 +67,11 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
       ignoring: true,
       child: ElevatedButton(
         onPressed: () {  }, // This won't be called due to IgnorePointer
+
         style: ElevatedButton.styleFrom(
-          textStyle: textStyle(data.font),
-          padding: edgeInsets(data.padding)
+          backgroundColor: data.color,
+          textStyle: data.font?.textStyle(),
+          padding: data.padding?.edgeInsets()
         ),
         child: Text(data.label),
       ),

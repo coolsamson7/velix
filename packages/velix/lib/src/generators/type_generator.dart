@@ -64,11 +64,46 @@ abstract class GeneratorElement<T extends InterfaceElement> {
 
   // internal
 
+  void collectTypeImports(DartType type, TypeBuilder builder) {
+    final element = type.element;
+
+    // Add the type's library
+    if (element?.library != null) {
+      builder.addImport(element!.library!.uri);
+    }
+
+    // Handle parameterized types (e.g., List<MyClass>, Map<String, User>)
+    if (type is ParameterizedType) {
+      for (final typeArg in type.typeArguments) {
+        collectTypeImports(typeArg, builder);
+      }
+    }
+
+    // Handle function types (e.g., void Function(String))
+    if (type is FunctionType) {
+      // Return type
+      collectTypeImports(type.returnType, builder);
+
+      // Parameter types
+      for (final param in type.formalParameters) {
+        collectTypeImports(param.type, builder);
+      }
+    }
+  }
+
   void collectAnnotationImports(List<ElementAnnotation> metadata, TypeBuilder builder) {
     for (final annotation in metadata) {
-      final libUri = annotation.element?.library?.uri;
-      if (libUri != null) {
-        builder.addImport(libUri);
+      final element = annotation.element;
+
+      // Import the annotation's library
+      if (element?.library != null) {
+        builder.addImport(element!.library!.uri);
+      }
+
+      // Also check for types used in annotation constructor arguments
+      final constantValue = annotation.computeConstantValue();
+      if (constantValue != null && constantValue.type != null) {
+        collectTypeImports(constantValue.type!, builder);
       }
     }
   }
@@ -139,23 +174,150 @@ class ClassGeneratorElement extends GeneratorElement<ClassElement> {
 
     // fields
 
+    // Also collect dependencies for field types that are dataclasses
     for (final field in element.fields) {
-      if (field.isStatic)
-        continue;
+      if (field.isStatic || field.isPrivate) continue;
 
+      // Handle the field's direct type
       final fieldTypeElem = field.type.element3;
-      if (fieldTypeElem != null && fieldTypeElem is InterfaceElement && fieldTypeElem != element && isDataclass(fieldTypeElem)) {
-        addDependency(builder.checkElement(fieldTypeElem,  isDataclass(fieldTypeElem)));
+      if (fieldTypeElem != null &&
+          fieldTypeElem is InterfaceElement &&
+          fieldTypeElem != element &&
+          (isDataclass(fieldTypeElem) || isInjectable(fieldTypeElem))) {
+        addDependency(
+            builder.checkElement(fieldTypeElem, isDataclass(fieldTypeElem)));
       }
-    } // for
+
+      // Handle generic type arguments (e.g., List<MyDataclass>)
+      if (field.type is ParameterizedType) {
+        final paramType = field.type as ParameterizedType;
+        for (final typeArg in paramType.typeArguments) {
+          final typeArgElem = typeArg.element3;
+          if (typeArgElem != null &&
+              typeArgElem is InterfaceElement &&
+              typeArgElem != element &&
+              (isDataclass(typeArgElem) || isInjectable(typeArgElem))) {
+            addDependency(
+                builder.checkElement(typeArgElem, isDataclass(typeArgElem)));
+          }
+        }
+      }
+    }
+
+    // Collect dependencies from method parameters and return types
+    for (final method in element.methods) {
+      if (!method.isPublic) continue;
+
+      // Return type
+      final returnTypeElem = method.returnType.element3;
+      if (returnTypeElem != null &&
+          returnTypeElem is InterfaceElement &&
+          returnTypeElem != element &&
+          (isDataclass(returnTypeElem) || isInjectable(returnTypeElem))) {
+        addDependency(builder.checkElement(returnTypeElem, isDataclass(returnTypeElem)));
+      }
+
+      // Parameter types
+      for (final param in method.formalParameters) {
+        final paramTypeElem = param.type.element3;
+        if (paramTypeElem != null &&
+            paramTypeElem is InterfaceElement &&
+            paramTypeElem != element &&
+            (isDataclass(paramTypeElem) || isInjectable(paramTypeElem))) {
+          addDependency(builder.checkElement(paramTypeElem, isDataclass(paramTypeElem)));
+        }
+      }
+    }
   }
 
   @override
-  collectImports(TypeBuilder builder) {
+  @override
+  void collectImports(TypeBuilder builder) {
     super.collectImports(builder);
 
+    final element = this.element;
+
+    // 1. Superclass and interfaces
+    if (element.supertype != null) {
+      collectTypeImports(element.supertype!, builder);
+    }
+
+    for (final interface in element.interfaces) {
+      collectTypeImports(interface, builder);
+    }
+
+    for (final mixin in element.mixins) {
+      collectTypeImports(mixin, builder);
+    }
+
+    // 2. Fields and their types
     for (final field in element.fields) {
+      if (field.isStatic || field.isPrivate) continue;
+
+      // Field type
+      collectTypeImports(field.type, builder);
+
+      // Field annotations
       collectAnnotationImports(field.metadata.annotations, builder);
+
+      // Getter/setter types (accessed through the field)
+      if (field.getter != null) {
+        collectTypeImports(field.getter!.returnType, builder);
+        collectAnnotationImports(field.getter!.metadata.annotations, builder);
+      }
+
+      if (field.setter != null) {
+        for (final param in field.setter!.formalParameters) {
+          collectTypeImports(param.type, builder);
+          collectAnnotationImports(param.metadata.annotations, builder);
+        }
+        collectAnnotationImports(field.setter!.metadata.annotations, builder);
+      }
+    }
+
+    // 3. Constructors and their parameters
+    for (final constructor in element.constructors) {
+      if (!constructor.isPublic) continue;
+
+      // Constructor annotations
+      collectAnnotationImports(constructor.metadata.annotations, builder);
+
+      // Constructor parameters
+      for (final param in constructor.formalParameters) {
+        collectTypeImports(param.type, builder);
+        collectAnnotationImports(param.metadata.annotations, builder);
+      }
+    }
+
+    // 4. Methods, their parameters, and return types
+    for (final method in element.methods) {
+      if (!method.isPublic) continue;
+
+      // Method annotations
+      collectAnnotationImports(method.metadata.annotations, builder);
+
+      // Return type
+      collectTypeImports(method.returnType, builder);
+
+      // Method parameters
+      for (final param in method.formalParameters) {
+        collectTypeImports(param.type, builder);
+        collectAnnotationImports(param.metadata.annotations, builder);
+      }
+
+      // Type parameters (e.g., T in void myMethod<T>())
+      for (final typeParam in method.typeParameters) {
+        if (typeParam.bound != null) {
+          collectTypeImports(typeParam.bound!, builder);
+        }
+      }
+    }
+
+    // 5. Class-level type parameters (e.g., T in class MyClass<T>)
+    for (final typeParam in element.typeParameters) {
+      if (typeParam.bound != null) {
+        collectTypeImports(typeParam.bound!, builder);
+      }
     }
   }
 
@@ -173,6 +335,31 @@ class EnumGeneratorElement extends GeneratorElement<EnumElement2> {
   EnumGeneratorElement({required super.element, required super.builder});
 
   // override
+
+  @override
+  void collectImports(TypeBuilder builder) {
+    super.collectImports(builder);
+
+    final element = this.element;
+
+    // Collect imports for enum field types (if any)
+    for (final field in element.fields) {
+      if (field.isStatic || field.isPrivate) continue;
+
+      collectTypeImports(field.type, builder);
+      collectAnnotationImports(field.metadata.annotations, builder);
+    }
+
+    // Collect imports for enum interfaces
+    for (final interface in element.interfaces) {
+      collectTypeImports(interface, builder);
+    }
+
+    // Collect imports for enum mixins
+    for (final mixin in element.mixins) {
+      collectTypeImports(mixin, builder);
+    }
+  }
 
   @override
   generateCode(StringBuffer buffer, bool variable, TypeBuilder builder) {

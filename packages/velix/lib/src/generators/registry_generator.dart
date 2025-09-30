@@ -829,6 +829,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
             else
               write("? ?? $defaultValue");
           }
+          else if ( param.isOptional)
+            write("?");
         }
 
         // next

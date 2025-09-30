@@ -30,3 +30,35 @@ class CreateWidgetEvent extends Event {
 
   CreateWidgetEvent({required this.widget, required super.source});
 }
+
+enum MessageType {
+  warning,
+  error
+}
+
+enum MessageEventType {
+  add,
+  delete,
+  replace,
+  clear,
+}
+
+class Message {
+  MessageType type;
+  String message;
+  Function? onClick;
+
+  Message({required this.type, required this.message, this.onClick});
+}
+
+class MessageEvent extends Event{
+  // instance data
+
+  MessageEventType type;
+  List<Message> messages;
+
+  // constructor
+
+  MessageEvent({required super.source, required this.type, this.messages = const []});
+}
+

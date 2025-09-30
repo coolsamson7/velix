@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/editor/editor.dart';
 
 import '../../actions/autocomplete.dart';
-import '../../actions/types.dart';
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
@@ -356,7 +356,7 @@ class _CodeEditorState extends State<CodeEditor>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    autocomplete = Autocomplete(Provider.of<ClassDesc>(context));
+    autocomplete = Autocomplete(Provider.of<EditContext>(context).type);
   }
 
   @override

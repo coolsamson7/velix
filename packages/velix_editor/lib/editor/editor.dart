@@ -302,6 +302,16 @@ class Page {
   }
 }
 
+class EditContext {
+  // instance data
+
+  ClassDesc type;
+
+  // constructor
+
+  EditContext({required this.type});
+}
+
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
   // instance data
@@ -402,18 +412,24 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
       updateCommandState();
     }));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        bus.publish("load", LoadEvent(widget: widget.models.first, source: this)));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+        bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
+        bus.publish("messages", MessageEvent(source: this, type: MessageEventType.add, messages: [
+          Message(type: MessageType.warning, message: "oh dear"),
+          Message(type: MessageType.error, message: "damnit")
+        ]));
+    });
 
     updateCommandState();
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return EnvironmentProvider(
       environment: environment,
-      child: Provider<ClassDesc>.value(
-          value: registry.getClass("Page"),
+      child: Provider<EditContext>.value(
+          value: EditContext(type: registry.getClass("Page")), // TODO
           child: FocusScope(
             autofocus: true,
             child: Shortcuts(
@@ -516,13 +532,10 @@ class _EditorScreenState extends State<EditorScreen> with CommandController<Edit
                     panels: [
                       Panel(
                           name: 'errors',
-                          label: 'editor:docks.errors.label:'.tr(),
-                          tooltip: 'editor:docks.errors.tooltip:'.tr(),
+                          label: 'editor:docks.errors.label'.tr(),
+                          tooltip: 'editor:docks.errors.tooltip'.tr(),
                           icon: Icons.bug_report,
-                          create:  (onClose) => BottomErrorDisplay(onClose: onClose, errors: [
-                            "Something went wrong",
-                            "Another error occurred",
-                          ])
+                          create:  (onClose) => MessagePane(onClose: onClose)
                       )
                     ],
                     initialPanel: "errors",

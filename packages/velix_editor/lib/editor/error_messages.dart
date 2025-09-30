@@ -9,49 +9,38 @@ import '../components/panel_header.dart';
 import '../util/message_bus.dart';
 
 class MessagePane extends StatefulWidget {
-  // instance data
-
   final VoidCallback onClose;
-
-  // constructor
 
   const MessagePane({super.key, required this.onClose});
 
-  // override
-
   @override
-  _MessagePaneState createState() => _MessagePaneState();
+  State<MessagePane> createState() => _MessagePaneState();
 }
 
 class _MessagePaneState extends State<MessagePane> {
-  // instance data
-
   final List<Message> _messages = [];
-  late StreamSubscription subscription;
-
-  // internal
+  late StreamSubscription<MessageEvent> subscription;
 
   void _onMessageEvent(MessageEvent event) {
     setState(() {
-      if (event == MessageEventType.add)
+      if (event.type == MessageEventType.add) {
         _messages.addAll(event.messages);
+      }
     });
   }
-
-  // override
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    subscription = EnvironmentProvider.of(context).get<MessageBus>().subscribe<MessageEvent>("messages", _onMessageEvent);
+    subscription = EnvironmentProvider.of(context)
+        .get<MessageBus>()
+        .subscribe<MessageEvent>("messages", _onMessageEvent);
   }
-
 
   @override
   void dispose() {
     subscription.cancel();
-
     super.dispose();
   }
 
@@ -66,13 +55,15 @@ class _MessagePaneState extends State<MessagePane> {
         padding: const EdgeInsets.all(8),
         shrinkWrap: true,
         itemCount: _messages.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 4),
+        separatorBuilder: (context, index) => const SizedBox(height: 4),
         itemBuilder: (context, index) {
           final message = _messages[index];
           final isWarning = message.type == MessageType.warning;
+
           return InkWell(
+            onTap: message.onClick as GestureTapCallback,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(
                 color: isWarning ? Colors.orange.shade700 : Colors.red.shade700,
                 borderRadius: BorderRadius.circular(4),
@@ -88,7 +79,10 @@ class _MessagePaneState extends State<MessagePane> {
                   Expanded(
                     child: Text(
                       message.message,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ],

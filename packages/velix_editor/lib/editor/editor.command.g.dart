@@ -39,22 +39,27 @@ mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
 
   // command bodies
 
+  @Method()
   void open() {
     execute("open", []);
   }
 
+  @Method()
   void save() {
     execute("save", []);
   }
 
+  @Method()
   void revert() {
     execute("revert", []);
   }
 
+  @Method()
   void undo() {
     execute("undo", []);
   }
 
+  @Method()
   void play() {
     execute("play", []);
   }

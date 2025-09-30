@@ -22,6 +22,8 @@ import 'package:velix_editor/metadata/widgets/switch.dart';
 import 'package:velix_editor/metadata/widgets/text.dart';
 import 'package:velix_editor/property_panel/editor/bool_editor.dart';
 import 'package:velix_editor/property_panel/editor/code_editor.dart';
+import 'package:velix_editor/property_panel/editor/color_editor.dart';
+import 'package:velix_editor/property_panel/editor/font_editor.dart';
 import 'package:velix_editor/property_panel/editor/font_style_editor.dart';
 import 'package:velix_editor/property_panel/editor/font_weight_editor.dart';
 import 'package:velix_editor/property_panel/editor/int_editor.dart';
@@ -37,6 +39,7 @@ import 'package:velix_editor/theme/widgets/label_widget.dart';
 import 'package:velix_editor/theme/widgets/switch_widget.dart';
 import 'package:velix_editor/theme/widgets/text_widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
+import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 void registerEditorTypes() {
@@ -51,7 +54,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:207:1',
+    location: 'package:velix_editor/editor/editor.dart:232:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -83,7 +86,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:253:1',
+    location: 'package:velix_editor/editor/editor.dart:278:1',
     annotations: [
       Injectable()
     ],
@@ -102,6 +105,60 @@ void registerEditorTypes() {
           Inject()
         ],
         invoker: (List<dynamic> args)=> (args[0] as Page).setup()
+      )
+    ],
+  );
+
+  type<EditorScreenState>(
+    location: 'package:velix_editor/editor/editor.dart:331:1',
+    constructor: () => EditorScreenState(),
+    fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
+    fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
+    fields: [
+      field<EditorScreenState,Environment>('environment',
+        getter: (obj) => obj.environment,
+      ), 
+      field<EditorScreenState,CommandStack>('commandStack',
+        getter: (obj) => obj.commandStack,
+      ), 
+      field<EditorScreenState,bool>('edit',
+        getter: (obj) => obj.edit,
+        setter: (obj, value) => (obj as EditorScreenState).edit = value,
+      ), 
+      field<EditorScreenState,LocaleManager>('localeManager',
+        getter: (obj) => obj.localeManager,
+      )
+    ],
+    methods: [
+      method<EditorScreenState,void>('open',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).open()
+      ), 
+      method<EditorScreenState,void>('save',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).save()
+      ), 
+      method<EditorScreenState,void>('revert',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).revert()
+      ), 
+      method<EditorScreenState,void>('undo',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).undo()
+      ), 
+      method<EditorScreenState,void>('play',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).play()
       )
     ],
   );
@@ -131,21 +188,21 @@ void registerEditorTypes() {
   );
 
   type<FontWeightConvert>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:8:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:9:1',
     constructor: () => FontWeightConvert(),
     fromMapConstructor: (Map<String,dynamic> args) => FontWeightConvert(),
     fromArrayConstructor: (List<dynamic> args) => FontWeightConvert(),
   );
 
   type<FontStyleConvert>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:22:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:23:1',
     constructor: () => FontStyleConvert(),
     fromMapConstructor: (Map<String,dynamic> args) => FontStyleConvert(),
     fromArrayConstructor: (List<dynamic> args) => FontStyleConvert(),
   );
 
   type<Padding>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:35:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:36:1',
     params: [
       param<int>('left', isNamed: true, isNullable: true, defaultValue: 0), 
       param<int>('top', isNamed: true, isNullable: true, defaultValue: 0), 
@@ -188,16 +245,24 @@ void registerEditorTypes() {
   );
 
   type<Font>(
-    location: 'package:velix_editor/metadata/properties/properties.dart:54:1',
+    location: 'package:velix_editor/metadata/properties/properties.dart:55:1',
     params: [
       param<FontWeight>('weight', isNamed: true, isNullable: true, defaultValue: FontWeight.normal), 
       param<FontStyle>('style', isNamed: true, isNullable: true, defaultValue: FontStyle.normal), 
+      param<String>('family', isNamed: true, isNullable: true, defaultValue: "Arial"), 
       param<int>('size', isNamed: true, isNullable: true, defaultValue: 16)
     ],
-    constructor: ({FontWeight weight = FontWeight.normal, FontStyle style = FontStyle.normal, int size = 16}) => Font(weight: weight, style: style, size: size),
-    fromMapConstructor: (Map<String,dynamic> args) => Font(weight: args['weight'] as FontWeight? ?? FontWeight.normal, style: args['style'] as FontStyle? ?? FontStyle.normal, size: args['size'] as int? ?? 16),
-    fromArrayConstructor: (List<dynamic> args) => Font(weight: args[0] as FontWeight? ?? FontWeight.normal, style: args[1] as FontStyle? ?? FontStyle.normal, size: args[2] as int? ?? 16),
+    constructor: ({FontWeight weight = FontWeight.normal, FontStyle style = FontStyle.normal, String family = "Arial", int size = 16}) => Font(weight: weight, style: style, family: family, size: size),
+    fromMapConstructor: (Map<String,dynamic> args) => Font(weight: args['weight'] as FontWeight? ?? FontWeight.normal, style: args['style'] as FontStyle? ?? FontStyle.normal, family: args['family'] as String? ?? "Arial", size: args['size'] as int? ?? 16),
+    fromArrayConstructor: (List<dynamic> args) => Font(weight: args[0] as FontWeight? ?? FontWeight.normal, style: args[1] as FontStyle? ?? FontStyle.normal, family: args[2] as String? ?? "Arial", size: args[3] as int? ?? 16),
     fields: [
+      field<Font,String>('family',
+        annotations: [
+          DeclareProperty(label: "editor:properties.font.family", editor: FontEditorBuilder)
+        ],
+        getter: (obj) => obj.family,
+        setter: (obj, value) => (obj as Font).family = value,
+      ), 
       field<Font,FontWeight>('weight',
         annotations: [
           DeclareProperty(label: "editor:properties.font.weight")
@@ -346,7 +411,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:228:1',
+    location: 'package:velix_editor/editor/editor.dart:253:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
@@ -392,19 +457,20 @@ void registerEditorTypes() {
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "button", group: "widgets", icon: Icons.text_fields),
-      JsonSerializable(discriminator: "button")
+      JsonSerializable(discriminator: "button", includeNull: false)
     ],
     params: [
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Color>('color', isNamed: true, isNullable: true, defaultValue: null), 
       param<Padding>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Padding padding, String onClick = ''}) => ButtonWidgetData(type: type, children: children, label: label, font: font, padding: padding, onClick: onClick),
-    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, padding: args['padding'] as Padding?, onClick: args['onClick'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, padding: args[4] as Padding, onClick: args[5] as String? ?? ''),
+    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Color color, required Padding padding, String onClick = ''}) => ButtonWidgetData(type: type, children: children, label: label, font: font, color: color, padding: padding, onClick: onClick),
+    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, color: args['color'] as Color?, padding: args['padding'] as Padding?, onClick: args['onClick'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font, color: args[4] as Color, padding: args[5] as Padding, onClick: args[6] as String? ?? ''),
     fields: [
       field<ButtonWidgetData,String>('label',
         annotations: [
@@ -419,6 +485,14 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.font,
         setter: (obj, value) => (obj as ButtonWidgetData).font = value,
+        isNullable: true
+      ), 
+      field<ButtonWidgetData,Color>('color',
+        annotations: [
+          DeclareProperty(group: "font")
+        ],
+        getter: (obj) => obj.color,
+        setter: (obj, value) => (obj as ButtonWidgetData).color = value,
         isNullable: true
       ), 
       field<ButtonWidgetData,Padding>('padding',
@@ -503,7 +577,7 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/switch.dart:10:1',
+    location: 'package:velix_editor/metadata/widgets/switch.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "switch", group: "widgets", icon: Icons.text_fields),
@@ -583,6 +657,17 @@ void registerEditorTypes() {
     constructor: () => BooleanEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => BooleanEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => BooleanEditorBuilder(),
+    methods: [
+      method<BooleanEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as BooleanEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<CodeEditorBuilder>(
@@ -594,6 +679,61 @@ void registerEditorTypes() {
     constructor: () => CodeEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => CodeEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => CodeEditorBuilder(),
+    methods: [
+      method<CodeEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as CodeEditorBuilder).setup(args[1])
+      )
+    ],
+  );
+
+  type<ColorEditorBuilder>(
+    location: 'package:velix_editor/property_panel/editor/color_editor.dart:11:1',
+    superClass: propertyEditorBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => ColorEditorBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => ColorEditorBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => ColorEditorBuilder(),
+    methods: [
+      method<ColorEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ColorEditorBuilder).setup(args[1])
+      )
+    ],
+  );
+
+  type<FontEditorBuilder>(
+    location: 'package:velix_editor/property_panel/editor/font_editor.dart:10:1',
+    superClass: propertyEditorBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => FontEditorBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => FontEditorBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => FontEditorBuilder(),
+    methods: [
+      method<FontEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as FontEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<FontStyleEditorBuilder>(
@@ -605,6 +745,17 @@ void registerEditorTypes() {
     constructor: () => FontStyleEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => FontStyleEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => FontStyleEditorBuilder(),
+    methods: [
+      method<FontStyleEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as FontStyleEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<FontWeightEditorBuilder>(
@@ -616,6 +767,17 @@ void registerEditorTypes() {
     constructor: () => FontWeightEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => FontWeightEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => FontWeightEditorBuilder(),
+    methods: [
+      method<FontWeightEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as FontWeightEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<IntEditorBuilder>(
@@ -627,6 +789,17 @@ void registerEditorTypes() {
     constructor: () => IntEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => IntEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => IntEditorBuilder(),
+    methods: [
+      method<IntEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as IntEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<PaddingEditorBuilder>(
@@ -638,6 +811,17 @@ void registerEditorTypes() {
     constructor: () => PaddingEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => PaddingEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => PaddingEditorBuilder(),
+    methods: [
+      method<PaddingEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as PaddingEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<StringEditorBuilder>(
@@ -649,6 +833,17 @@ void registerEditorTypes() {
     constructor: () => StringEditorBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => StringEditorBuilder(),
     fromArrayConstructor: (List<dynamic> args) => StringEditorBuilder(),
+    methods: [
+      method<StringEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as StringEditorBuilder).setup(args[1])
+      )
+    ],
   );
 
   type<ButtonWidgetBuilder>(
@@ -660,6 +855,17 @@ void registerEditorTypes() {
     constructor: () => ButtonWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => ButtonWidgetBuilder(),
+    methods: [
+      method<ButtonWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ButtonWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<ButtonEditWidgetBuilder>(
@@ -671,6 +877,17 @@ void registerEditorTypes() {
     constructor: () => ButtonEditWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => ButtonEditWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => ButtonEditWidgetBuilder(),
+    methods: [
+      method<ButtonEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ButtonEditWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<ContainerEditWidgetBuilder>(
@@ -685,6 +902,17 @@ void registerEditorTypes() {
     constructor: ({required TypeRegistry typeRegistry}) => ContainerEditWidgetBuilder(typeRegistry: typeRegistry),
     fromMapConstructor: (Map<String,dynamic> args) => ContainerEditWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
     fromArrayConstructor: (List<dynamic> args) => ContainerEditWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<ContainerEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ContainerEditWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<ContainerWidgetBuilder>(
@@ -699,6 +927,17 @@ void registerEditorTypes() {
     constructor: ({required TypeRegistry typeRegistry}) => ContainerWidgetBuilder(typeRegistry: typeRegistry),
     fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
     fromArrayConstructor: (List<dynamic> args) => ContainerWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<ContainerWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ContainerWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<LabelWidgetBuilder>(
@@ -710,6 +949,17 @@ void registerEditorTypes() {
     constructor: () => LabelWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => LabelWidgetBuilder(),
+    methods: [
+      method<LabelWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as LabelWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<EditLabelWidgetBuilder>(
@@ -721,10 +971,21 @@ void registerEditorTypes() {
     constructor: () => EditLabelWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => EditLabelWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => EditLabelWidgetBuilder(),
+    methods: [
+      method<EditLabelWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditLabelWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<SwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:13:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:11:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -732,10 +993,21 @@ void registerEditorTypes() {
     constructor: () => SwitchWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => SwitchWidgetBuilder(),
+    methods: [
+      method<SwitchWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as SwitchWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:57:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:55:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -743,6 +1015,17 @@ void registerEditorTypes() {
     constructor: () => EditSwitchWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => EditSwitchWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => EditSwitchWidgetBuilder(),
+    methods: [
+      method<EditSwitchWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditSwitchWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<TextWidgetBuilder>(
@@ -754,6 +1037,17 @@ void registerEditorTypes() {
     constructor: () => TextWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => TextWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => TextWidgetBuilder(),
+    methods: [
+      method<TextWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TextWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   type<TextEditWidgetBuilder>(
@@ -765,6 +1059,17 @@ void registerEditorTypes() {
     constructor: () => TextEditWidgetBuilder(),
     fromMapConstructor: (Map<String,dynamic> args) => TextEditWidgetBuilder(),
     fromArrayConstructor: (List<dynamic> args) => TextEditWidgetBuilder(),
+    methods: [
+      method<TextEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TextEditWidgetBuilder).setThema(args[1])
+      )
+    ],
   );
 
   TypeDescriptor.verify();

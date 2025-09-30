@@ -9,7 +9,7 @@ import '../widget_data.dart';
 
 @Dataclass()
 @DeclareWidget(name: "button", group: "widgets", icon: Icons.text_fields)
-@JsonSerializable(discriminator: "button")
+@JsonSerializable(discriminator: "button", includeNull: false)
 class ButtonWidgetData extends WidgetData {
   // instance data
 
@@ -17,6 +17,8 @@ class ButtonWidgetData extends WidgetData {
   String label;
   @DeclareProperty(group: "font")
   Font? font;
+  @DeclareProperty(group: "font")
+  Color? color;
   @DeclareProperty(group: "layout")
   Padding? padding;
   @DeclareProperty(group: "events", editor: CodeEditorBuilder)
@@ -24,5 +26,5 @@ class ButtonWidgetData extends WidgetData {
 
   // constructor
 
-  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.padding, this.onClick});
+  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.color, this.padding, this.onClick});
 }

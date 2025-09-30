@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
 
+import '../../property_panel/editor/font_editor.dart';
 import '../annotations.dart';
 
 
@@ -53,6 +54,9 @@ class Padding {
 
 @Dataclass()
 class Font {
+  @DeclareProperty(label: "editor:properties.font.family", editor: FontEditorBuilder)
+  String family;
+
   @DeclareProperty(label: "editor:properties.font.weight")
   FontWeight weight;
 
@@ -62,5 +66,5 @@ class Font {
   @DeclareProperty(label: "editor:properties.font.size")
   int size;
 
-  Font({this.weight = FontWeight.normal, this.style = FontStyle.normal, this.size = 16});
+  Font({this.weight = FontWeight.normal, this.style = FontStyle.normal, this.family = "Arial", this.size = 16});
 }

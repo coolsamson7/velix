@@ -483,9 +483,9 @@ void registerEditorTypes() {
       param<ValueType>('type', isNamed: true, isRequired: true), 
       param<String>('value', isNamed: true, isRequired: true)
     ],
-    constructor: ({required ValueType type, required String value}) => Value(type: type, value: value),
-    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType, value: args['value'] as String),
-    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType, value: args[1] as String),
+    constructor: ({required ValueType type, String value = ''}) => Value(type: type, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType, value: args['value'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType, value: args[1] as String? ?? ''),
     fields: [
       field<Value,ValueType>('type',
         getter: (obj) => obj.type,
@@ -931,7 +931,7 @@ void registerEditorTypes() {
   );
 
   type<ValueEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/value_editor.dart:145:1',
+    location: 'package:velix_editor/property_panel/editor/value_editor.dart:185:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1388,14 +1388,14 @@ void registerEditorTypes() {
     params: [
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true), 
+      param<String>('label', isNamed: true, isRequired: true, isNullable: true),
       param<Value>('value', isNamed: true, isRequired: true), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
     constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Value value, required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, value: value, font: font, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', value: args['value'] as Value, font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', value: args[3] as Value, font: args[4] as Font?, databinding: args[5] as String? ?? ''),
+    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', value: args['value'] as Value?, font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', value: args[3] as Value?, font: args[4] as Font?, databinding: args[5] as String? ?? ''),
     fields: [
       field<LabelWidgetData,String>('label',
         annotations: [
@@ -1427,6 +1427,7 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.value,
         setter: (obj, value) => (obj as LabelWidgetData).value = value,
+        isNullable: true
       )
     ],
   );

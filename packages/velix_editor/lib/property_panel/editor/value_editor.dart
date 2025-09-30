@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/property_panel/editor/string_editor.dart';
+import 'package:velix_ui/provider/environment_provider.dart';
 
+import '../../commands/command.dart';
 import '../../commands/command_stack.dart';
+import '../../commands/property_changed_command.dart';
 import '../../metadata/properties/properties.dart' hide Border;
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
+import 'code_editor.dart';
 
 class ValueField extends StatefulWidget {
-  final Value value;
+  // instance data
+
+  final FieldDescriptor property;
+  final dynamic object;
+  final Value? value;
   final ValueChanged<dynamic> onChanged;
+
+  // constructor
 
   const ValueField({
     super.key,
+
+    required this.property,
     required this.value,
+    required this.object,
     required this.onChanged,
   });
 
@@ -24,26 +38,94 @@ class ValueField extends StatefulWidget {
 }
 
 class _ValueFieldState extends State<ValueField> {
-  late ValueType _mode;
-  late TextEditingController _controller;
+  // instance data
 
-  @override
-  void initState() {
-    super.initState();
+  late Environment environment;
+  late CommandStack commandStack;
+  var typeDescriptor = TypeDescriptor.forType<Value>();
+  var descriptor = TypeDescriptor.forType<Value>().getProperty("value");
+  Command? currentCommand;
+  Command? parentCommand;
 
-    _mode = widget.value.type;
-    _controller = TextEditingController(text: widget.value.value);
+  Value? value;
+
+  ValueType get mode => value!.type;
+
+  // internal
+
+  bool isPropertyChangeCommand(Command command, String property) {
+    if (command is PropertyChangeCommand) {
+      if (command.target != value) return false;
+      if (command.property != property) return false;
+
+      return true;
+    }
+    return false;
+  }
+
+  void changedProperty(String property, dynamic newValue) {
+    // set the value
+
+    if ( typeDescriptor.get(widget.object, widget.property.name) == null) {
+      // value is null, set the constructed compound
+
+      parentCommand = commandStack.execute(PropertyChangeCommand(
+        bus: environment.get<MessageBus>(),
+        widget: widget.object,
+        descriptor: TypeDescriptor.forType(widget.object.runtimeType),
+        target: widget.object,
+        property: widget.property.name, // the value property name!
+        newValue: value, // the created compound
+      ));
+
+      // how to remember as the new parent?
+    }
+
+    if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
+      currentCommand = commandStack.execute(PropertyChangeCommand(
+        bus: environment.get<MessageBus>(),
+        parent: parentCommand,
+        widget: widget.object, // imer noch labelwidget....
+        descriptor: typeDescriptor,
+        target: value!,
+        property: property,
+        newValue: newValue,
+      ));
+    }
+    else {
+      (currentCommand as PropertyChangeCommand).value = newValue;
+    }
+    setState(() {});
+  }
+
+  void _resetProperty(String property) {
+    currentCommand = null;
+    commandStack.revert(value, property);
+    setState(() {});
   }
 
   Widget _buildEditor() {
-    switch (_mode) {
+    PropertyEditorBuilder builder;
+    switch (mode) {
       case ValueType.i18n:
-        return _I18nEditor(controller: _controller);
+        builder = environment.get<StringEditorBuilder>();
+        break;
       case ValueType.binding:
-        return _BindingEditor(controller: _controller);
+        builder = environment.get<CodeEditorBuilder>();
+        break;
       case ValueType.value:
-        return _ValueEditor(controller: _controller);
+        builder = environment.get<StringEditorBuilder>();
     }
+
+    return builder.buildEditor(
+        messageBus: environment.get<MessageBus>(),
+        commandStack: commandStack,
+        property: descriptor,
+        object: value,
+        label: "label",
+        value: value!.value,
+        onChanged: (newVal) => changedProperty("value", newVal)
+    );
   }
 
   IconData _modeIcon(ValueType mode) {
@@ -57,6 +139,23 @@ class _ValueFieldState extends State<ValueField> {
     }
   }
 
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    environment = EnvironmentProvider.of(context);
+    commandStack = environment.get<CommandStack>();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    value = widget.value ?? Value(type: ValueType.value, value: "");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -64,9 +163,9 @@ class _ValueFieldState extends State<ValueField> {
         Expanded(child: _buildEditor()),
         const SizedBox(width: 4),
         DropdownButton<ValueType>(
-          value: _mode,
+          value: mode,
           underline: const SizedBox(),
-          icon: Icon(_modeIcon(_mode)),
+          //icon: Icon(_modeIcon(_mode)),
           items: ValueType.values.map((mode) {
             return DropdownMenuItem(
               value: mode,
@@ -75,7 +174,7 @@ class _ValueFieldState extends State<ValueField> {
           }).toList(),
           onChanged: (mode) {
             if (mode != null) {
-              setState(() => _mode = mode);
+              setState(() => changedProperty("type", mode));
             }
           },
         ),
@@ -84,63 +183,6 @@ class _ValueFieldState extends State<ValueField> {
   }
 }
 
-//
-// Example editor widgets (all text fields but with different wrappers/logics)
-//
-class _I18nEditor extends StatelessWidget {
-  final TextEditingController controller;
-  const _I18nEditor({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: const InputDecoration(
-        labelText: 'I18n key',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
-}
-
-class _BindingEditor extends StatelessWidget {
-  final TextEditingController controller;
-  const _BindingEditor({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blueAccent),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: TextField(
-        controller: controller,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Enter binding (e.g. model.name)',
-        ),
-      ),
-    );
-  }
-}
-
-class _ValueEditor extends StatelessWidget {
-  final TextEditingController controller;
-  const _ValueEditor({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: const InputDecoration(
-        labelText: 'Value',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
-}
 
 @Injectable()
 class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
@@ -157,6 +199,8 @@ class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return ValueField(
+      object: object,
+      property: property,
       value: value,
       onChanged: onChanged,
     );

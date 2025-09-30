@@ -19,9 +19,9 @@ class LabelWidgetData extends WidgetData {
   @DeclareProperty(group: "general", editor: CodeEditorBuilder)
   String? databinding;
   @DeclareProperty(group: "general")
-  Value value;
+  Value? value;
 
   // constructor
 
-  LabelWidgetData({super.type = "text", super.children = const [], required this.label, required this.value, this.font, this.databinding});
+  LabelWidgetData({super.type = "text", super.children = const [], required this.label, this.value, this.font, this.databinding});
 }

@@ -181,6 +181,7 @@ class CommandGenerator extends Generator {
             returnType != 'Future<void>';
         final returnKeyword = needsReturn ? 'return ' : '';
 
+        output.writeln('  @Method()');
         output.writeln('  $returnType $publicName($signature) $asyncKeyword{');
         output.writeln(
             '    $returnKeyword${awaitPrefix}execute("$publicName", [$argList]);');
@@ -189,8 +190,6 @@ class CommandGenerator extends Generator {
 
       output.writeln('}');
     }
-
-
 
     return output.toString();
   }

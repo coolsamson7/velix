@@ -329,7 +329,7 @@ class EditorScreen extends StatefulWidget {
 }
 
 @Dataclass()
-class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, _EditorScreenStateCommands, TickerProviderStateMixin  {
+class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, EditorScreenStateCommands, TickerProviderStateMixin  {
   // instance data
 
   late final Environment environment;

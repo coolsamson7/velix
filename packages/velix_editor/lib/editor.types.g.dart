@@ -129,38 +129,6 @@ void registerEditorTypes() {
         getter: (obj) => obj.localeManager,
       )
     ],
-    methods: [
-      method<EditorScreenState,void>('open',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).open()
-      ), 
-      method<EditorScreenState,void>('save',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).save()
-      ), 
-      method<EditorScreenState,void>('revert',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).revert()
-      ), 
-      method<EditorScreenState,void>('undo',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).undo()
-      ), 
-      method<EditorScreenState,void>('play',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).play()
-      )
-    ],
   );
 
   type<EditorModule>(

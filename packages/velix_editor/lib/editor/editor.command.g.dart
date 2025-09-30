@@ -7,7 +7,7 @@
 
 part of 'editor.dart';
 
-mixin _EditorScreenStateCommands on CommandController<EditorScreen> {
+mixin EditorScreenStateCommands on CommandController<EditorScreen> {
   // override
 
   @override

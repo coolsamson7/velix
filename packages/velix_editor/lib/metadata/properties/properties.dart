@@ -7,6 +7,23 @@ import '../annotations.dart';
 
 
 @Dataclass()
+class ColorConvert extends Convert<Color,String> {
+  @override
+  String convertSource(Color source) {
+    return source.value.toRadixString(16).padLeft(8, '0').toUpperCase();
+  }
+
+  @override
+  Color convertTarget(String value) {
+    value = value.replaceAll('#', ''); // remove hash if present
+    if (value.length == 6) {
+      // If only RGB is provided, add full opacity
+      value = 'FF$value';
+    }
+    return Color(int.parse(value, radix: 16));
+  }
+}
+@Dataclass()
 class FontWeightConvert extends Convert<FontWeight,int> {
   @override
   int convertSource(FontWeight source) {

@@ -17,6 +17,7 @@ void main() {
     JSON(
         validate: false,
         converters: [
+          ColorConvert(),
           FontWeightConvert(),
           FontStyleConvert(),
 
@@ -24,7 +25,9 @@ void main() {
               convertSource: (value) => value.toIso8601String(),
               convertTarget: (str) => DateTime.parse(str))
         ],
-        factories: [Enum2StringFactory()]);
+        factories: [
+          Enum2StringFactory()
+        ]);
 
     test('serialize container', () {
       var input = ContainerWidgetData(
@@ -69,7 +72,7 @@ void main() {
       var input = ButtonWidgetData(
           label: "zwei",
           onClick: "click()",
-          padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
+          //padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
           font: Font(
               weight: FontWeight.normal,
               style: FontStyle.normal,

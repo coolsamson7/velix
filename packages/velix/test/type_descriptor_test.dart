@@ -25,6 +25,11 @@ class Lazy {
   Lazy? parent;
 
   Lazy({required this.parent});
+
+  //@Inject()
+  Derived set(Derived derived) {
+    return derived;
+  }
 }
 
 void main() {

@@ -40,6 +40,11 @@ class Dataclass {
   const Dataclass();
 }
 
+/// decorator used to mark methods that should be considered by the generator
+class Method {
+  const Method();
+}
+
 /// decorator used to add meta-data to properties
 class Attribute {
   final String type;

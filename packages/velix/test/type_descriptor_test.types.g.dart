@@ -21,7 +21,7 @@ void registerTypes() {
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Base).id = value,
       )
-    ]
+    ],
   );
 
   type<Derived>(
@@ -40,7 +40,7 @@ void registerTypes() {
         getter: (obj) => obj.number,
         setter: (obj, value) => (obj as Derived).number = value,
       )
-    ]
+    ],
   );
 
   // watchout: is part of a cycle
@@ -58,7 +58,7 @@ void registerTypes() {
         setter: (obj, value) => (obj as Lazy).parent = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   TypeDescriptor.verify();

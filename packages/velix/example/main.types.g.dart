@@ -25,7 +25,7 @@ void registerTypes() {
         type: IntType().greaterThan(0),
         getter: (obj) => obj.value,
       )
-    ]
+    ],
   );
 
   TypeDescriptor.verify();

@@ -29,6 +29,53 @@ String assetIdToImportUri(AssetId id) {
   return 'asset:${id.package}/${id.path}';
 }
 
+String getReturnTypeFQN(MethodElement method) {
+  DartType type = method.returnType;
+
+  if (type is InterfaceType) {
+    final element = type.element; // ClassElement of the return type
+    final libraryUri = element.library.identifier ?? '<unknown>';
+    final name = element.name;
+
+    // Handle generic type arguments
+    final generics = type.typeArguments;
+    if (generics.isNotEmpty) {
+      final genericNames = generics.map((t) => getTypeFQN(t)).join(', ');
+      return '$libraryUri.$name<$genericNames>';
+    }
+    else {
+      return '$libraryUri:$name';
+    }
+  }
+  else {
+    // For function types, typedefs, etc.
+    return getTypeFQN(type);
+  }
+}
+
+String getTypeFQN(DartType type) {
+  if (type is InterfaceType) {
+    final element = type.element;
+    final libraryUri = element.library.identifier ?? '<unknown>';
+    final name = element.name;
+    final generics = type.typeArguments;
+    if (generics.isNotEmpty) {
+      final genericNames = generics.map((t) => getTypeFQN(t)).join(', ');
+      return '$libraryUri.$name<$genericNames>';
+    }
+    return '$libraryUri.$name';
+  }
+  else if (type is TypeParameterType) {
+    return type.element.name!;
+  }
+  else if (type is FunctionType) {
+    return 'Function'; // optionally expand signature
+  }
+  else {
+    return type.getDisplayString(withNullability: true);
+  }
+}
+
 typedef FetchCode = Future<String> Function(String name, List<int> offset);
 typedef FindNode = Element Function(String ref);
 
@@ -69,12 +116,12 @@ bool isInjectable(InterfaceElement element) {
   });
 }
 
-bool hasAnnotation(ClassElement element, String annotationName) {
+bool hasAnnotation(Annotatable element,  List<String> annotations) {
   return element.metadata.annotations.any((annotation) {
     final value = annotation.computeConstantValue();
     if (value == null) return false;
 
-    return value.type?.getDisplayString() == annotationName;
+    return annotations.contains(value.type?.getDisplayString());
   });
 }
 
@@ -87,12 +134,13 @@ String variableName(String className) {
 abstract class CodeGenerator<T extends InterfaceElement> {
   // instance data
 
+  AssetId forInput;
   StringBuffer buffer = StringBuffer();
   int level = 0;
 
   // constructor
 
-  CodeGenerator();
+  CodeGenerator({required this.forInput});
 
   // protected
 
@@ -197,13 +245,16 @@ abstract class CodeGenerator<T extends InterfaceElement> {
   }
 
   void addDependency(String dependency, {bool variable = false}) {
-    if ( !dependency.startsWith("dart:")) {
-      if (variable)
-        dependency = "$dependency!";
+    var uri = forInput.uri;
+    String packagePart = "${uri.scheme}:${uri.pathSegments.first}";
 
+    if (!dependency.startsWith(packagePart))
+      return; // covers dart: as well as references to other packages ( or test -> lib )
 
-      dependencies.add(dependency);
-    }
+    if (variable)
+      dependency = "$dependency!";
+
+    dependencies.add(dependency);
   }
 
   void collectDependencies(T element) {
@@ -231,7 +282,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
 
   // constructor
 
-  EnumCodeGenerator({required this.variable});
+  EnumCodeGenerator({required this.variable, required super.forInput});
 
   // override
 
@@ -275,7 +326,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
   // constructor
 
-  ClassCodeGenerator({required this.variable, required this.generateProperties});
+  ClassCodeGenerator({required this.variable, required this.generateProperties, required super.forInput});
 
   // override
 
@@ -388,18 +439,29 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
-  //
-
   void generateMethods(ClassElement element) {
-    final methods = element.methods.where((method) =>
-        method.metadata.annotations.any((annotation) {
-          final value = annotation.computeConstantValue();
-          if (value == null)
-            return false;
-          final typeName = value.type?.getDisplayString();
-          return typeName == 'OnInit' || typeName == 'OnDestroy' || typeName == 'OnRunning' || typeName == 'Create' || typeName == 'Inject';
-        })
-    ).toList();
+    // Collect methods from this class and all superclasses/mixins
+    final methods = <MethodElement>[];
+
+    if ( element.name != null && element.name!.contains("_EditorScreenState"))
+      print(element.name);
+
+    void collectMethods(InterfaceElement? el, bool Function(Annotatable) predicate) {
+      if (el != null) {
+        methods.addAll(el.methods.where(predicate));
+
+        collectMethods(el.supertype?.element, predicate);
+
+        // Recurse into mixins
+
+        for (final mixinType in el.mixins) {
+          collectMethods(mixinType.element, predicate);
+          //return;
+        }
+      }
+    }
+
+    collectMethods(element, (element) => hasAnnotation(element, ["OnInit", "OnDestroy", "OnRunning", "Create", "Inject", "Method"]));
 
     if (methods.isEmpty)
       return;
@@ -410,6 +472,15 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     int i = 0;
     for (final method in methods) {
       generateMethod(element.name!, method, i == len - 1);
+
+      // add dependency, in case of @Create
+
+      if (hasAnnotation(method, ["Create"])) {
+        addDependency(getReturnTypeFQN(method));
+      }
+
+      // next
+
       i++;
     }
 
@@ -998,10 +1069,10 @@ class RegistryFragmentBuilder extends Builder {
         var location = lineInfo.getLocation(node.offset);
 
         if ( cls is EnumElement) {
-          classes.add(EnumCodeGenerator(variable: false).generate(buffer, cls, buildStep.inputId, location));
+          classes.add(EnumCodeGenerator(forInput: buildStep.inputId, variable: false).generate(buffer, cls, buildStep.inputId, location));
         }
         else if ( cls is ClassElement)
-          classes.add(ClassCodeGenerator(variable: false, generateProperties: isDataclass(cls)).generate(buffer, cls, buildStep.inputId, location));
+          classes.add(ClassCodeGenerator(forInput: buildStep.inputId, variable: false, generateProperties: isDataclass(cls)).generate(buffer, cls, buildStep.inputId, location));
       }
 
       // write JSON metadata
@@ -1195,7 +1266,11 @@ class RegistryAggregator extends Builder {
       }
 
       Element findElement(String ref) { // "sample:/lib/foo.dart:Foo"
-        return elements[ref]!;
+        var element = elements[ref];
+        if (element != null)
+          return element;
+        else
+          throw Exception("unknown element $ref");
       }
 
       // resolve elements
@@ -1206,12 +1281,17 @@ class RegistryAggregator extends Builder {
           if ( requiresVariable )
             dependency = dependency.substring(0, dependency.length - 1);
 
-          var referencedElement = findElement(dependency);
+          try {
+            var referencedElement = findElement(dependency);
 
-          if (requiresVariable)
-            referencedElement.requiresVariable = true;
+            if (requiresVariable)
+              referencedElement.requiresVariable = true;
 
-          referencedElement.dependants.add(element);
+            referencedElement.dependants.add(element);
+          }
+          catch(e) {
+            // ocuch
+          }
         }
       }
 

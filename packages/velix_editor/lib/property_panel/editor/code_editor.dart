@@ -2,15 +2,14 @@ import 'package:flutter/material.dart' hide Autocomplete;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor/editor.dart';
 
 import '../../actions/autocomplete.dart';
+import '../../actions/types.dart';
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
-@Injectable()
 class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
   @override
   Widget buildEditor({
@@ -86,6 +85,8 @@ class _CodeEditorState extends State<CodeEditor>
 
       return suggestions;
     } catch (e) {
+      print("caught exception during suggestions $e");
+
       // Update parse exception state
       if (_parseException != e.toString()) {
         setState(() {
@@ -208,15 +209,8 @@ class _CodeEditorState extends State<CodeEditor>
   }
 
   void _dismissCompletion() {
-    if (_matches.isEmpty) return;
-
-    _isUpdatingCompletion = true;
-    _controller.value = TextEditingValue(
-      text: _originalText,
-      selection: TextSelection.collapsed(offset: _originalCursorPos),
-    );
-    _isUpdatingCompletion = false;
-
+    // Simply clear the matches and selection, but don't revert text
+    // The text has already been modified by the keypress
     _removeOverlay();
 
     setState(() {
@@ -360,16 +354,6 @@ class _CodeEditorState extends State<CodeEditor>
   }
 
   @override
-  void didUpdateWidget(covariant CodeEditor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.value.toString() != _controller.text) {
-      // Update controller text if external value has changed
-      _controller.text = widget.value.toString();
-    }
-  }
-
-  @override
   void initState() {
     super.initState();
 
@@ -413,6 +397,9 @@ class _CodeEditorState extends State<CodeEditor>
         if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
         if (_matches.isNotEmpty) {
+          final sel = _controller.selection;
+          final hasSelection = sel.extentOffset > sel.baseOffset;
+
           switch (event.logicalKey) {
             case LogicalKeyboardKey.arrowDown:
               _selectNext();
@@ -428,13 +415,11 @@ class _CodeEditorState extends State<CodeEditor>
               return KeyEventResult.handled;
 
             case LogicalKeyboardKey.arrowRight:
-              final sel = _controller.selection;
-              // 🚀 Only accept if selection highlights suggestion
-              if (sel.extentOffset > sel.baseOffset) {
+            // Only accept if selection highlights suggestion
+              if (hasSelection) {
                 _acceptCompletion();
                 return KeyEventResult.handled;
               }
-              // else: let cursor move right normally
               return KeyEventResult.ignored;
 
             case LogicalKeyboardKey.escape:
@@ -442,9 +427,25 @@ class _CodeEditorState extends State<CodeEditor>
               return KeyEventResult.handled;
 
             case LogicalKeyboardKey.backspace:
-            case LogicalKeyboardKey.arrowLeft:
+            // If there's a selection (inline completion), collapse it first
+              if (hasSelection) {
+                _isUpdatingCompletion = true;
+                _controller.value = TextEditingValue(
+                  text: _originalText,
+                  selection: TextSelection.collapsed(offset: _originalCursorPos),
+                );
+                _isUpdatingCompletion = false;
+                _dismissCompletion();
+                return KeyEventResult.handled; // We handled it, don't let backspace proceed
+              }
+              // No selection, just dismiss and let backspace work normally
               _dismissCompletion();
-              return KeyEventResult.handled;
+              return KeyEventResult.ignored;
+
+            case LogicalKeyboardKey.arrowLeft:
+            // Dismiss the inline completion but let the key event proceed
+              _dismissCompletion();
+              return KeyEventResult.ignored;
           }
         }
 
@@ -464,11 +465,7 @@ class _CodeEditorState extends State<CodeEditor>
               ),
               style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
             ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: _buildStatusIndicator(),
-            ),
+            _buildStatusIndicator(),
           ],
         ),
       ),

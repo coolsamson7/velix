@@ -31,13 +31,9 @@
         {
           "type": "label",
           "label": "hurz",
-          "value": {
-            "type": "value",
-            "value": "hurz"
-          },
+
           "databinding": "user.cool",
-          "children": [],
-          "label": "Cool"
+          "children": []
         },
         {
           "type": "button",
@@ -45,12 +41,6 @@
           "label": "PRESS",
           "onClick": "user.hello(user.name)",
           "color": "FFFF0000",
-          "font": {
-            "family": "Arial",
-            "size": 12,
-            "weight": 100,
-            "style": "normal"
-          },
           "padding": {
             "left": 1,
             "top": 1,

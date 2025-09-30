@@ -99,8 +99,6 @@ class ExpressionParser {
         return obj;
       });
 
-
-
   Parser<Expression> memberAccess() =>
       (char('.') & partialIdentifier().optional())
           .mapWithPosition((list, start, end) {
@@ -139,21 +137,26 @@ class ExpressionParser {
         return t;
       });
 
-  Parser<List<Expression>> get arguments =>
-      (expression & (char(',').trim() & expression).star())
-          .map<List<Expression>>((values) {
-        final first = values[0] as Expression;
-        final rest = values[1] as List;
-        final result = <Expression>[first];
+  // Fixed: Properly handle comma-separated arguments
+  Parser<List<Expression>> get arguments {
+    // Non-empty argument list: expression followed by zero or more (comma + expression)
+    final nonEmptyArgs = (expression & (char(',').trim() & expression).star())
+        .map<List<Expression>>((values) {
+      final first = values[0] as Expression;
+      final rest = values[1] as List;
+      final result = <Expression>[first];
 
-        for (var pair in rest) {
-          // pair[0] is comma, pair[1] is expression
-          result.add(pair[1] as Expression);
-        }
-        return result;
-      })
-          .optional()
-          .map<List<Expression>>((result) => result ?? <Expression>[]);
+      for (var pair in rest) {
+        // pair is a list: [comma_char, expression]
+        // The & operator ensures both comma AND expression must be present
+        result.add(pair[1] as Expression);
+      }
+      return result;
+    });
+
+    // Allow either non-empty args or empty args (for empty parentheses)
+    return nonEmptyArgs.or(epsilon().map((_) => <Expression>[])).cast<List<Expression>>();
+  }
 
   Parser<List<Expression>> conditionArguments() =>
       (char('?') & expression & char(':') & expression).pick(1).seq(expression)
@@ -166,11 +169,19 @@ class ExpressionParser {
       digit().plus().flatten().mapWithPosition((v, start, end) =>
       Literal(int.parse(v), v)..start = start..end = end);
 
-  Parser<Expression> stringLiteral() =>
-      (char('"') & pattern('^"').star().flatten() & char('"'))
-          .pick(1)
-          .mapWithPosition((v, start, end) =>
-      Literal(v, '"$v"')..start = start..end = end);
+  // Fixed: Require closing quote for string literals
+  Parser<Expression> stringLiteral() {
+    // Match opening quote, content (anything except quote or newline), and closing quote
+    final stringContent = (char('\\') & any()) // escaped character
+        .or(pattern('^"\n\r')) // any char except quote or newline
+        .star()
+        .flatten();
+
+    return (char('"') & stringContent & char('"'))
+        .pick(1)
+        .mapWithPosition((v, start, end) =>
+    Literal(v, '"$v"')..start = start..end = end);
+  }
 
   Parser<Expression> boolLiteral() =>
       (string('true').or(string('false')))

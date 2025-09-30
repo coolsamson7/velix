@@ -65,7 +65,7 @@ class JSONAccessor extends Accessor {
       if ( convert != null)
         return ConvertingJSONProperty(name: name, includeNull: includeNull, convert: convert!, type: this.type);
       else
-        return JSONProperty(name: name, includeNull: includeNull,type: this.type);
+        return JSONProperty(name: name, includeNull: includeNull, type: this.type);
     }
   }
 
@@ -454,7 +454,7 @@ class JSONMapper {
       // process fields
 
       for ( var field in typeDescriptor.getFields()) {
-        var json = field.findAnnotation<Json>() ?? Json(name: field.name, defaultValue: null);
+        var json = field.findAnnotation<Json>() ?? Json(name: field.name, defaultValue: JSONAccessor, required: !field.isNullable);
 
         var includeNull = jsonSerializable.includeNull && json.includeNull != false;
 
@@ -466,8 +466,8 @@ class JSONMapper {
           jsonField = field.name;
 
         Object? defaultValue = JSONAccessor;
-        if ( !json.required) {
-          defaultValue = json.defaultValue;
+        if ( field.isNullable) {
+          defaultValue = null;//json.defaultValue;
 
           //if ( !field.type.isValid(defaultValue))
           //  throw MapperException("the default $defaultValue for ${field.name} is not valid"); // TODO?

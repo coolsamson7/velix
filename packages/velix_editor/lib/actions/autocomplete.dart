@@ -21,7 +21,7 @@ class Autocomplete {
 
   final ClassDesc root;
   final TypeResolver<ClassDescTypeInfo> typeResolver;
-  final ActionParser parser = ActionParser();
+  final ActionParser parser = ActionParser.instance;
   late TypeChecker typeChecker;
 
   // constructor

@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
+import 'package:velix_mapper/mapper/json.dart';
 
 import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_di/di/di.dart';
@@ -22,6 +25,7 @@ import '../property_panel/property_panel.dart';
 
 import '../tree/tree_view.dart';
 import '../util/message_bus.dart';
+import '../validate/validate.dart';
 import '../widget_container.dart';
 import 'canvas.dart';
 import 'error_messages.dart';
@@ -364,22 +368,59 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
   @Command(i18n: "editor:commands.open", icon: Icons.folder_open)
   @override
-  void _open() {}
+  Future<void> _open() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      final file = File(result.files.single.path!);
+      final contents = await file.readAsString();
+
+      var widget = JSON.deserialize<WidgetData>(jsonDecode(contents));
+
+      setState(() {
+       print(widget); // TODO
+      });
+    }
+  }
 
   @Command(i18n: "editor:commands.save", icon: Icons.save)
   @override
-  void _save() {}
+  void _save() {
+    var root = widget.models[0]; // TODO
+
+    try {
+      environment.get<WidgetValidator>().validate(root, type: registry.getClass("Page"), environment: environment); // TODO
+    }
+    on ValidationException catch (e) {
+      environment.get<MessageBus>().publish("messages", MessageEvent(
+          source: this,
+          type: MessageEventType.add,
+          messages: e.errors.map((error) =>  Message(
+              type: MessageType.error,
+              message: "${error.exception.toString()}", // TODO
+             onClick: null
+          )).toList()
+      ));
+    }
+  }
 
   @Command(i18n: "editor:commands.revert", icon: Icons.restore)
   @override
   void _revert() {
-    commandStack.undo();
+    commandStack.undo(); // TODO
+
+    updateCommandState();
   }
 
   @Command(i18n: "editor:commands.undo", icon: Icons.undo)
   @override
   void _undo() {
     commandStack.undo();
+
+    updateCommandState();
   }
 
   @Command(label: "Play", icon: Icons.play_arrow)
@@ -487,96 +528,95 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
                     // ===== Main Editor =====
                     Expanded(
-                      child:
-                DockingContainer(
-                  left: Dock(
-                    panels: [
-                      Panel(
-                        name: 'tree',
-                        label: 'editor:docks.tree.label'.tr(),
-                        tooltip: 'editor:docks.tree.tooltip'.tr(),
-                        create: (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
-                        icon: Icons.account_tree
-                      ),
-                      Panel(
-                          name: 'palette',
-                          label: 'editor:docks.palette.label'.tr(),
-                          tooltip: 'editor:docks.palette.tooltip'.tr(),
-                          create: (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
-                          icon: Icons.widgets
-                      ),
-                      Panel(
-                          name: 'editor',
-                          label: 'editor:docks.json.label:'.tr(),
-                          tooltip: 'editor:docks.json.tooltip'.tr(),
-                          create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
-                          icon: Icons.code
-                      )
-                    ],
-                    initialPanel: "tree",
-                    size: 240,
-                  ),
-                  right: Dock(
-                    panels: [
-                      Panel(
-                          name: 'properties',
-                          label: 'editor:docks.properties.label'.tr(),
-                          tooltip: 'editor:docks.properties.tooltip'.tr(),
-                          icon: Icons.tune,
-                          create: (onClose) => PropertyPanel(onClose: onClose),
-                      )
-                    ],
-                    initialPanel: "properties",
-                    size: 280,
-                  ),
-                  bottom: Dock(
-                    panels: [
-                      Panel(
-                          name: 'errors',
-                          label: 'editor:docks.errors.label'.tr(),
-                          tooltip: 'editor:docks.errors.tooltip'.tr(),
-                          icon: Icons.bug_report,
-                          create:  (onClose) => MessagePane(onClose: onClose)
-                      )
-                    ],
-                    initialPanel: "errors",
-                    size: 150,
-                    overlay: false, // change to true if you want floating
-                  ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child:
-                      edit ? FocusableRegion(
-                          child: EditorCanvas(
-                            models: widget.models,
-                            typeRegistry: environment.get<TypeRegistry>(),
-                          ),
-                        )
-                            : WidgetContainer(
-                          context: WidgetContext(page: environment.get<Page>()),
-                          models: widget.models,
-                          typeRegistry: environment.get<TypeRegistry>(),
+                      child: DockingContainer(
+                        left: Dock(
+                          panels: [
+                            Panel(
+                              name: 'tree',
+                              label: 'editor:docks.tree.label'.tr(),
+                              tooltip: 'editor:docks.tree.tooltip'.tr(),
+                              create: (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
+                              icon: Icons.account_tree
+                            ),
+                            Panel(
+                                name: 'palette',
+                                label: 'editor:docks.palette.label'.tr(),
+                                tooltip: 'editor:docks.palette.tooltip'.tr(),
+                                create: (onClose) => WidgetPalette(typeRegistry: environment.get<TypeRegistry>(), onClose: onClose),
+                                icon: Icons.widgets
+                            ),
+                            Panel(
+                                name: 'editor',
+                                label: 'editor:docks.json.label:'.tr(),
+                                tooltip: 'editor:docks.json.tooltip'.tr(),
+                                create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                                icon: Icons.code
+                            )
+                          ],
+                          initialPanel: "tree",
+                          size: 240,
                         ),
-                      ),
-                      Container(
-                        height: 32,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border(
-                            top: BorderSide(color: Colors.grey.shade400, width: 0.5),
-                          ),
+                        right: Dock(
+                          panels: [
+                            Panel(
+                                name: 'properties',
+                                label: 'editor:docks.properties.label'.tr(),
+                                tooltip: 'editor:docks.properties.tooltip'.tr(),
+                                icon: Icons.tune,
+                                create: (onClose) => PropertyPanel(onClose: onClose),
+                            )
+                          ],
+                          initialPanel: "properties",
+                          size: 280,
                         ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: WidgetBreadcrumbWidget(),
+                        bottom: Dock(
+                          panels: [
+                            Panel(
+                                name: 'errors',
+                                label: 'editor:docks.errors.label'.tr(),
+                                tooltip: 'editor:docks.errors.tooltip'.tr(),
+                                icon: Icons.bug_report,
+                                create:  (onClose) => MessagePane(onClose: onClose)
+                            )
+                          ],
+                          initialPanel: "errors",
+                          size: 150,
+                          overlay: false, // change to true if you want floating
                         ),
-                      ),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child:
+                            edit ? FocusableRegion(
+                                child: EditorCanvas(
+                                  models: widget.models,
+                                  typeRegistry: environment.get<TypeRegistry>(),
+                                ),
+                              )
+                                  : WidgetContainer(
+                                context: WidgetContext(page: environment.get<Page>()),
+                                models: widget.models,
+                                typeRegistry: environment.get<TypeRegistry>(),
+                              ),
+                            ),
+                            Container(
+                              height: 32,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey.shade400, width: 0.5),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: WidgetBreadcrumbWidget(),
+                              ),
+                            ),
 
-                    ],
-                  ),
-                )
+                          ],
+                        ),
+                      )
 
                     )
                 ],

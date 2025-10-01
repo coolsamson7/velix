@@ -290,7 +290,7 @@ void main() {
   });
 
   group('parser', () {
-    var parser = ActionParser();
+    var parser = ActionParser.instance;
 
     test('parse member ', () {
       var code = "user.name";
@@ -318,7 +318,7 @@ void main() {
   });
 
   group('type checker', () {
-    var parser = ActionParser();
+    var parser = ActionParser.instance;
 
     final checker = TypeChecker(RuntimeTypeTypeResolver(root: TypeDescriptor.forType(Page)));
 

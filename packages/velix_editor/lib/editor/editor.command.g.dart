@@ -31,7 +31,7 @@ mixin EditorScreenStateCommands on CommandController<EditorScreen> {
 
   // command declarations
 
-  void _open();
+  Future<void> _open();
   void _save();
   void _revert();
   void _undo();
@@ -40,8 +40,8 @@ mixin EditorScreenStateCommands on CommandController<EditorScreen> {
   // command bodies
 
   @Method()
-  void open() {
-    execute("open", []);
+  Future<void> open() async {
+    await execute("open", []);
   }
 
   @Method()

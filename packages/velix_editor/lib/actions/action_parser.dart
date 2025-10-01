@@ -4,13 +4,18 @@ import 'expressions.dart';
 import 'parser.dart';
 
 class ActionParser {
+  // private constructor
+  ActionParser._internal();
+
+  // static singleton instance (initialized on first call)
+  static final ActionParser _instance = ActionParser._internal();
+
+  // public getter
+  static ActionParser get instance => _instance;
+
   // instance data
 
   final parser = ExpressionParser();
-
-  // constructor
-
-  ActionParser();
 
   // public
 

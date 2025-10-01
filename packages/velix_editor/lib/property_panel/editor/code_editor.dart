@@ -2,14 +2,15 @@ import 'package:flutter/material.dart' hide Autocomplete;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor/editor.dart';
 
 import '../../actions/autocomplete.dart';
-import '../../actions/types.dart';
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
+@Injectable()
 class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
   @override
   Widget buildEditor({

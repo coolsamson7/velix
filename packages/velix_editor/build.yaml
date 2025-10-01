@@ -11,6 +11,8 @@ targets:
           exclude:
             - lib/**.g.dart
       velix|registry_builder:
+        options:
+          package: "velix_editor/"
         generate_for:
           - lib/*.dart
           - lib/**/*.dart

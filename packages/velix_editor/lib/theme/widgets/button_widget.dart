@@ -11,43 +11,57 @@ import '../widget_builder.dart';
 
 @Injectable()
 class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
-  // instance data
-
-  ActionCompiler compiler = ActionCompiler();
-
   // constructor
 
   ButtonWidgetBuilder() : super(name: "button");
-
-  // internal
-
-  Call compile(String input, TypeDescriptor context) {
-    return compiler.compile(input, context: context);
-  }
-
-  VoidCallback? onClick(ButtonWidgetData data, Environment environment, BuildContext context) { // TODO cache!
-    if (data.onClick != null) {
-      var instance = Provider.of<WidgetContext>(context).page;
-      var type = TypeDescriptor.forType(instance.runtimeType);
-
-      return () => compile(data.onClick!,type).eval(instance);
-    }
-
-    return null;
-  }
 
   // override
 
   @override
   Widget create(ButtonWidgetData data, Environment environment, BuildContext context) {
+    return ButtonWidget(data: data);
+  }
+}
+
+// A stateful wrapper around ElevatedButton that caches the compiled call
+class ButtonWidget extends StatefulWidget {
+  // instance data
+
+  final ButtonWidgetData data;
+
+  const ButtonWidget({super.key, required this.data});
+
+  @override
+  State<ButtonWidget> createState() => _ButtonWidgetState();
+}
+
+class _ButtonWidgetState extends State<ButtonWidget> {
+  VoidCallback? _onClick;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Only compile once per lifecycle if onClick is set
+    if (widget.data.onClick != null && _onClick == null) {
+      final instance = Provider.of<WidgetContext>(context, listen: false).page;
+      final type = TypeDescriptor.forType(instance.runtimeType);
+
+      final call = ActionCompiler.instance.compile(widget.data.onClick!, context: type);
+      _onClick = () => call.eval(instance);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onClick(data, environment, context),
+      onPressed: _onClick,
       style: ElevatedButton.styleFrom(
-          textStyle: data.font?.textStyle(),
-          backgroundColor: data.color,
-          padding: data.padding?.edgeInsets()
+        textStyle: widget.data.font?.textStyle(),
+        backgroundColor: widget.data.color,
+        padding: widget.data.padding?.edgeInsets(),
       ),
-      child: Text(data.label),
+      child: Text(widget.data.label),
     );
   }
 }

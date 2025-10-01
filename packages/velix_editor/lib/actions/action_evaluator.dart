@@ -5,9 +5,18 @@ import 'action_parser.dart';
 import 'eval.dart';
 
 class ActionCompiler {
+  ActionCompiler._internal();
+
+  // static singleton instance (initialized on first call)
+  static final ActionCompiler _instance = ActionCompiler._internal();
+
+  // public getter
+  static ActionCompiler get instance => _instance;
+
+
   // instance data
 
-  final parser = ActionParser();
+  final parser = ActionParser.instance;
 
   // public
 
@@ -32,7 +41,7 @@ class ActionEvaluator {
   // instance data
 
   dynamic instance;
-  final parser = ActionParser();
+  final parser = ActionParser.instance;
   TypeDescriptor contextType;
 
   // constructor

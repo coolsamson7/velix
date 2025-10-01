@@ -24,6 +24,8 @@ class PropertyDescriptor {
 
   Type get type => field.type.type;
 
+  Type? get validator => annotation.validator;
+
   // constructor
 
   PropertyDescriptor({required this.name,  required this.annotation,  required this.field, required this.hide, this.editor});

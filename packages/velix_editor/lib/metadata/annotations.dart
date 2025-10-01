@@ -32,10 +32,11 @@ class DeclareProperty extends FieldAnnotation {
   final Type? editor;
   final String? label;
   final bool hide;
+  final Type? validator;
 
   // constructor
 
-  const DeclareProperty({this.group = "", this.hide = false, this.editor, this.label});
+  const DeclareProperty({this.group = "", this.hide = false, this.editor, this.label, this.validator});
 
   // override
 

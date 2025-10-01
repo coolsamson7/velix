@@ -47,6 +47,7 @@ import 'package:velix_editor/theme/widgets/stack_widget.dart';
 import 'package:velix_editor/theme/widgets/switch_widget.dart';
 import 'package:velix_editor/theme/widgets/text_widget.dart';
 import 'package:velix_editor/util/message_bus.dart';
+import 'package:velix_editor/validate/validate.dart';
 import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -62,7 +63,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:232:1',
+    location: 'package:velix_editor/editor/editor.dart:236:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -94,7 +95,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:278:1',
+    location: 'package:velix_editor/editor/editor.dart:282:1',
     annotations: [
       Injectable()
     ],
@@ -118,7 +119,7 @@ void registerEditorTypes() {
   );
 
   type<EditorScreenState>(
-    location: 'package:velix_editor/editor/editor.dart:331:1',
+    location: 'package:velix_editor/editor/editor.dart:335:1',
     constructor: () => EditorScreenState(),
     fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
     fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
@@ -138,11 +139,12 @@ void registerEditorTypes() {
       )
     ],
     methods: [
-      method<EditorScreenState,void>('open',
+      method<EditorScreenState,Future<void>>('open',
         annotations: [
           Method()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).open()
+        isAsync: true,
+        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).open()
       ), 
       method<EditorScreenState,void>('save',
         annotations: [
@@ -435,8 +437,27 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => MessageBus(),
   );
 
+  var propertyValidatorDescriptor =  type<PropertyValidator>(
+    location: 'package:velix_editor/validate/validate.dart:41:1',
+    annotations: [
+      Injectable(factory: false)
+    ],
+    isAbstract: true,
+    methods: [
+      method<PropertyValidator,void>('set',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetValidator>('validator', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as PropertyValidator).set(args[1])
+      )
+    ],
+  );
+
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:253:1',
+    location: 'package:velix_editor/editor/editor.dart:257:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
@@ -531,6 +552,19 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as Border).style = value,
       )
     ],
+  );
+
+  type<WidgetValidator>(
+    location: 'package:velix_editor/validate/validate.dart:139:1',
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('registry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry registry}) => WidgetValidator(registry: registry),
+    fromMapConstructor: (Map<String,dynamic> args) => WidgetValidator(registry: args['registry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => WidgetValidator(registry: args[0] as TypeRegistry),
   );
 
   type<ButtonWidgetData>(
@@ -931,7 +965,7 @@ void registerEditorTypes() {
   );
 
   type<ValueEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/value_editor.dart:185:1',
+    location: 'package:velix_editor/property_panel/editor/value_editor.dart:187:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -975,7 +1009,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:55:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:69:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1378,6 +1412,50 @@ void registerEditorTypes() {
     ],
   );
 
+  type<ExpressionPropertyValidator>(
+    location: 'package:velix_editor/validate/validate.dart:68:1',
+    superClass: propertyValidatorDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => ExpressionPropertyValidator(),
+    fromMapConstructor: (Map<String,dynamic> args) => ExpressionPropertyValidator(),
+    fromArrayConstructor: (List<dynamic> args) => ExpressionPropertyValidator(),
+    methods: [
+      method<ExpressionPropertyValidator,void>('set',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetValidator>('validator', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ExpressionPropertyValidator).set(args[1])
+      )
+    ],
+  );
+
+  type<ValuePropertyValidator>(
+    location: 'package:velix_editor/validate/validate.dart:102:1',
+    superClass: propertyValidatorDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => ValuePropertyValidator(),
+    fromMapConstructor: (Map<String,dynamic> args) => ValuePropertyValidator(),
+    fromArrayConstructor: (List<dynamic> args) => ValuePropertyValidator(),
+    methods: [
+      method<ValuePropertyValidator,void>('set',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetValidator>('validator', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ValuePropertyValidator).set(args[1])
+      )
+    ],
+  );
+
   type<LabelWidgetData>(
     location: 'package:velix_editor/metadata/widgets/label.dart:9:1',
     superClass: widgetDataDescriptor,
@@ -1388,8 +1466,8 @@ void registerEditorTypes() {
     params: [
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true, isNullable: true),
-      param<Value>('value', isNamed: true, isRequired: true), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<Value>('value', isNamed: true, isNullable: true, defaultValue: null), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],

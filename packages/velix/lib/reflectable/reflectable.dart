@@ -174,7 +174,7 @@ class FieldDescriptor<T, V> extends AbstractPropertyDescriptor<T> {
 
   // public
 
-  V get(T object) {
+  V? get(T object) {
     return getter(object);
   }
 

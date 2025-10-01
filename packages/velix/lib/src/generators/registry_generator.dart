@@ -196,14 +196,14 @@ abstract class CodeGenerator<T extends InterfaceElement> {
       final element = type.element;
 
       if (element is ClassElement) {
-        addImport(element.library.identifier);
+        addImport(element.library.identifier, element.name!);
 
         // inspect fields
         for (final field in element.fields) {
           final fieldValue = obj.getField(field.name!);
           if (fieldValue != null && fieldValue.type?.element is ClassElement) {
             final classElement = fieldValue.type!.element as ClassElement;
-            addImport(classElement.library.identifier);
+            addImport(classElement.library.identifier, classElement.name!);
           }
         }
       }
@@ -230,16 +230,26 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     }
   }
 
-  Set<String> imports = <String>{};
+  Map<String,Set<String>> imports = {};
   Set<String> dependencies = <String>{};
 
-  void addImport(String? import) {
-    if ( import != null && !import.startsWith("dart:core") && !import.startsWith("velix:"))
-      imports.add(import);
+  void addImport(String? library, String element) {
+    if (library == null )
+      return;
+    if (element == "new")
+      return; // WTF!
+
+    if ( !library.startsWith("dart:core") && !library.startsWith("velix:")) {
+      var importList = imports[library];
+      if (importList == null)
+        imports[library] = importList = <String>{};
+
+      importList.add(element);
+    }
   }
 
   void collectImports(T element) {
-    addImport(element.library.uri.toString());
+    addImport(element.library.uri.toString(), element.name!);
 
     collectAnnotationImports(element.metadata.annotations);
   }
@@ -263,7 +273,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
   void _collectTypeImports(DartType type) {
     if (type is InterfaceType) {
-      addImport(type.element.library.uri.toString());
+      addImport(type.element.library.uri.toString(), type.name!);
 
       // Recursively collect imports for generic type arguments
       for (final typeArg in type.typeArguments) {
@@ -286,7 +296,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
       // Import the annotation's library
       if (element?.library != null) {
-        addImport(element!.library!.uri.toString());
+        addImport(element!.library!.uri.toString(), element.name!);
       }
 
       // Also check for types used in annotation constructor arguments
@@ -340,7 +350,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
       'type': element.name,
       'dependencies': dependencies.toList(),
       'offset': [start, buffer.length],
-      'imports': imports.toList(),
+      'imports': imports.map((key, value) => MapEntry(key, value.toList())),
     };
   }
 }
@@ -373,8 +383,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     // Fields and their types
     if (generateProperties) {
       for (final field in element.fields) {
-        if ( field.name!.contains("olor"))
-          print("k");
         if (field.isStatic || field.isPrivate) continue;
         _addTypeDependency(field.type);
       }
@@ -419,8 +427,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
   @override
   void collectImports(ClassElement element) {
-    if ( element.name!.contains("Border"))
-      print(1);
     super.collectImports(element);
 
     // Supertype
@@ -444,8 +450,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         if (field.isStatic || field.isPrivate) continue;
 
         // Field type
-        if ( field.type.name!.contains("Locale"))
-          print(1);
 
         _collectTypeImports(field.type);
 
@@ -464,9 +468,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       _collectAnnotationTypeImports(method.metadata.annotations);
 
       // Return type
-
-      if ( method.returnType.name!.contains("Locale"))
-        print(1);
 
       _collectTypeImports(method.returnType);
 
@@ -611,9 +612,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     // Collect methods from this class and all superclasses/mixins
     final methods = <MethodElement>[];
 
-    if ( element.name != null && element.name!.contains("_EditorScreenState"))
-      print(element.name);
-
     void collectMethods(InterfaceElement? el, bool Function(Annotatable) predicate) {
       if (el != null) {
         methods.addAll(el.methods.where(predicate));
@@ -701,7 +699,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     final returnType = method.returnType;
     final isAsync = method.returnType.isDartAsyncFuture;
 
-    addImport(typeLibrary(method.returnType));
+    addImport(typeLibrary(method.returnType), method.returnType.name!);
 
     // Find the lifecycle annotation
 
@@ -779,7 +777,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
             addDependency("$uri:${param.type.name}");
 
-            addImport(typeLibrary(param.type));
+            addImport(typeLibrary(param.type)!, param.type.name!);
 
             tab().write("param<$typeStr>('$name'");
 
@@ -1161,7 +1159,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       'type': element.name,
       'dependencies': dependencies.toList(),
       'offset': [start, buffer.length],
-      'imports': imports.toList(),
+      'imports': imports.map((key, value) => MapEntry(key, value.toList()))
     };
   }
 }
@@ -1283,7 +1281,7 @@ class Element {
   final String name;
   var requiresVariable = false;
   final String type;
-  final List<String> imports;
+  final Map<String,List<String>> imports;
   final List<String> dependencies;
   final List<Element> dependants = [];
   final List<int> offset;
@@ -1431,7 +1429,12 @@ class RegistryAggregator extends Builder {
               name: cl["name"],
               type: cl["type"],
               dependencies: (cl["dependencies"] as List<dynamic>).cast<String>(),
-              imports: (cl["imports"] as List<dynamic>).cast<String>(),
+              imports: (cl["imports"] as Map<String,dynamic>).map(
+                      (key, value) => MapEntry(
+                    key,
+                    List<String>.from(value as List), // forces list of strings
+                  )
+              ),
               offset: (cl["offset"] as List<dynamic>).cast<int>(),
             );
         }
@@ -1480,7 +1483,7 @@ class RegistryAggregator extends Builder {
 
       // gather imports from metadata
 
-      final importSet = <String>{};
+      final Map<String,Set<String>> importSet = {};
 
       String getImport(String import) {
         if (import.startsWith('asset:')) { // asset:velix_di/test/bla...
@@ -1492,7 +1495,13 @@ class RegistryAggregator extends Builder {
       }
 
       for (final element in elements.values) {
-        importSet.addAll(element.imports);
+        for (var library in element.imports.keys) {
+          if (!importSet.containsKey(library)) {
+            importSet[library] = <String>{};
+          }
+
+          importSet[library]?.addAll(element.imports[library]!.toList());
+        }
       }
 
       // and print
@@ -1504,9 +1513,19 @@ class RegistryAggregator extends Builder {
       else {
         buffer.writeln("import 'package:velix/velix.dart';");
 
-        for (final importPath in importSet.toList()
-          ..sort()) {
-          buffer.writeln("import '${getImport(importPath)}';");
+        for (final library in importSet.keys) { // TODO sort??
+          buffer.write("import '${getImport(library)}' show ");
+
+          var first = true;
+          for ( var show in importSet[library]!) {
+            if ( !first)
+              buffer.write(", ");
+            buffer.write(show);
+
+            first = false;
+          }
+
+          buffer.writeln(";");
         }
       }
 

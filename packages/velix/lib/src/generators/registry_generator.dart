@@ -234,7 +234,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
   Set<String> dependencies = <String>{};
 
   void addImport(String? import) {
-    if ( import != null && !import.startsWith("dart:") && !import.startsWith("velix:"))
+    if ( import != null && !import.startsWith("dart:core") && !import.startsWith("velix:"))
       imports.add(import);
   }
 
@@ -261,11 +261,38 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     //addDependency(element.library.uri);
   }
 
+  void _collectTypeImports(DartType type) {
+    if (type is InterfaceType) {
+      addImport(type.element.library.uri.toString());
+
+      // Recursively collect imports for generic type arguments
+      for (final typeArg in type.typeArguments) {
+        _collectTypeImports(typeArg);
+      }
+    } else if (type is FunctionType) {
+      // Return type
+      _collectTypeImports(type.returnType);
+
+      // Parameter types
+      for (final param in type.formalParameters) {
+        _collectTypeImports(param.type);
+      }
+    }
+  }
+
   void collectAnnotationImports(List<ElementAnnotation> metadata) {
     for (final annotation in metadata) {
-      final libUri = annotation.element?.library?.uri;
-      if (libUri != null) {
-        addImport(libUri.toString());
+      final element = annotation.element;
+
+      // Import the annotation's library
+      if (element?.library != null) {
+        addImport(element!.library!.uri.toString());
+      }
+
+      // Also check for types used in annotation constructor arguments
+      final constantValue = annotation.computeConstantValue();
+      if (constantValue != null && constantValue.type != null) {
+        _collectTypeImports(constantValue.type!);
       }
     }
   }
@@ -334,26 +361,167 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   void collectDependencies(ClassElement element) {
     super.collectDependencies(element);
 
-    // super class
-
+    // Superclass
     final superType = element.supertype;
     if (superType != null && !superType.isDartCoreObject) {
       final superElement = superType.element;
-
       if (isDataclass(superElement) || isInjectable(superElement)) {
         addDependency("${superType.element.library.uri}:${superElement.name}", variable: true);
       }
-    } // if
+    }
+
+    // Fields and their types
+    if (generateProperties) {
+      for (final field in element.fields) {
+        if ( field.name!.contains("olor"))
+          print("k");
+        if (field.isStatic || field.isPrivate) continue;
+        _addTypeDependency(field.type);
+      }
+    }
+
+    // Methods
+    for (final method in element.methods) {
+      if (!method.isPublic) continue;
+
+      // Return type
+      _addTypeDependency(method.returnType);
+
+      // Parameter types
+      for (final param in method.formalParameters) {
+        _addTypeDependency(param.type);
+      }
+    }
+
+    // Constructors
+    for (final ctor in element.constructors) {
+      if (!ctor.isPublic || ctor.isFactory) continue;
+
+      for (final param in ctor.formalParameters) {
+        _addTypeDependency(param.type);
+      }
+    }
+  }
+
+  void _addTypeDependency(DartType type) { return; // TODO
+    if (type is InterfaceType) {
+      final element = type.element;
+      if (isDataclass(element) || isInjectable(element)) {
+        addDependency("${element.library.uri}:${element.name}");
+      }
+
+      // Handle generic type arguments recursively
+      for (final typeArg in type.typeArguments) {
+        _addTypeDependency(typeArg);
+      }
+    }
   }
 
   @override
   void collectImports(ClassElement element) {
+    if ( element.name!.contains("Border"))
+      print(1);
     super.collectImports(element);
 
-    if ( generateProperties )
+    // Supertype
+    if (element.supertype != null) {
+      _collectTypeImports(element.supertype!);
+    }
+
+    // Interfaces
+    for (final interface in element.interfaces) {
+      _collectTypeImports(interface);
+    }
+
+    // Mixins
+    for (final mixin in element.mixins) {
+      _collectTypeImports(mixin);
+    }
+
+    // Fields
+    if (generateProperties) {
       for (final field in element.fields) {
+        if (field.isStatic || field.isPrivate) continue;
+
+        // Field type
+        if ( field.type.name!.contains("Locale"))
+          print(1);
+
+        _collectTypeImports(field.type);
+
+        // Field annotations
         collectAnnotationImports(field.metadata.annotations);
+        _collectAnnotationTypeImports(field.metadata.annotations);
       }
+    }
+
+    // Methods
+    for (final method in element.methods) {
+      if (!method.isPublic) continue;
+
+      // Annotations
+      collectAnnotationImports(method.metadata.annotations);
+      _collectAnnotationTypeImports(method.metadata.annotations);
+
+      // Return type
+
+      if ( method.returnType.name!.contains("Locale"))
+        print(1);
+
+      _collectTypeImports(method.returnType);
+
+      // Parameters
+      for (final param in method.formalParameters) {
+        _collectTypeImports(param.type);
+        collectAnnotationImports(param.metadata.annotations);
+        _collectAnnotationTypeImports(param.metadata.annotations);
+      }
+    }
+
+    // Constructors
+    for (final ctor in element.constructors) {
+      if (!ctor.isPublic) continue;
+
+      collectAnnotationImports(ctor.metadata.annotations);
+
+      for (final param in ctor.formalParameters) {
+        _collectTypeImports(param.type);
+        collectAnnotationImports(param.metadata.annotations);
+        _collectAnnotationTypeImports(param.metadata.annotations);
+      }
+    }
+  }
+
+  void _collectAnnotationTypeImports(List<ElementAnnotation> annotations) {
+    for (final annotation in annotations) {
+      final constantValue = annotation.computeConstantValue();
+      if (constantValue == null || constantValue.type == null) continue;
+
+      final annotationType = constantValue.type!;
+      if (annotationType.element is! ClassElement) continue;
+
+      // Get types used in annotation constructor arguments
+      final classElement = annotationType.element as ClassElement;
+
+      // Instead of iterating fields, we need to look at what was actually passed
+      // Check if the constant value has any fields with Type values
+      for (final field in classElement.fields) {
+        if (field.isStatic) continue;
+
+        final fieldValue = constantValue.getField(field.name!);
+        if (fieldValue == null) continue;
+
+        // Check if this field holds a Type value
+        if (fieldValue.toTypeValue() != null) {
+          // This is a Type parameter - get the actual type it represents
+          final actualType = fieldValue.toTypeValue()!;
+          _collectTypeImports(actualType);
+        } else if (fieldValue.type != null) {
+          // Regular field - collect its type
+          _collectTypeImports(fieldValue.type!);
+        }
+      }
+    }
   }
 
   // internal
@@ -1017,7 +1185,7 @@ class RegistryFragmentBuilder extends Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     final path = buildStep.inputId.path;
-    final package = buildStep.inputId.package; // the current package
+    final inputPackage = buildStep.inputId.package; // the current package
 
     // Skip generated or irrelevant files
     if (!path.endsWith('.dart') ||
@@ -1030,6 +1198,11 @@ class RegistryFragmentBuilder extends Builder {
 
     try {
       final lib = await buildStep.resolver.libraryFor(buildStep.inputId);
+
+      if (lib.library.identifier != 'package:$inputPackage/${path.substring(4)}' &&
+          !path.startsWith('lib/')) {
+        return;
+      }
 
       if ( !lib.uri.path.startsWith(this.package)) {
         //print("ignore ${lib.uri.path}");
@@ -1255,11 +1428,11 @@ class RegistryAggregator extends Builder {
 
           for ( var cl in classes)
             elements[cl["name"]] = Element(
-                name: cl["name"],
-                type: cl["type"],
-                dependencies: (cl["dependencies"] as List<dynamic>).cast<String>(),
-                imports: (cl["imports"] as List<dynamic>).cast<String>(),
-                offset: (cl["offset"] as List<dynamic>).cast<int>(),
+              name: cl["name"],
+              type: cl["type"],
+              dependencies: (cl["dependencies"] as List<dynamic>).cast<String>(),
+              imports: (cl["imports"] as List<dynamic>).cast<String>(),
+              offset: (cl["offset"] as List<dynamic>).cast<int>(),
             );
         }
         catch (e) {

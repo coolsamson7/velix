@@ -84,6 +84,9 @@ class ExpressionPropertyValidator extends PropertyValidator<String> {
       final checker = TypeChecker(ClassDescTypeResolver(root: type));
 
       expression.accept(checker);
+
+
+      print(1);
     }
     catch(e) {
       rethrow;
@@ -118,6 +121,8 @@ class ValuePropertyValidator extends PropertyValidator<Value> {
       final checker = TypeChecker(ClassDescTypeResolver(root: type));
 
       expression.accept(checker);
+
+      print(1);
     }
     catch(e) {
       rethrow;

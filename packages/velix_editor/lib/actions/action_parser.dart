@@ -28,7 +28,7 @@ class ActionParser {
       return expr;
     }
     else {
-      throw Exception("ouch");
+      throw Exception((result as Failure).message);
     }
   }
 }

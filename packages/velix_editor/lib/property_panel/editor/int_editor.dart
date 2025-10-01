@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
+import '../../metadata/metadata.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
@@ -13,7 +13,7 @@ class IntEditorBuilder extends PropertyEditorBuilder<int> {
   Widget buildEditor({
     required MessageBus messageBus,
     required CommandStack commandStack,
-    required FieldDescriptor property,
+    required PropertyDescriptor property,
     required String label,
     required dynamic object,
     required dynamic value,

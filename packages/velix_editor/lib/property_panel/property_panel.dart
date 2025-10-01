@@ -120,7 +120,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
 
     // Group properties by group
     final groupedProps = <String, List<PropertyDescriptor>>{};
-    for (var prop in widgetDescriptor!.properties) {
+    for (var prop in widgetDescriptor!.properties.values) {
       if (!prop.hide) {
         groupedProps.putIfAbsent(prop.group, () => []).add(prop);
       }
@@ -176,7 +176,6 @@ class _PropertyPanelState extends State<PropertyPanel> {
                       final editorBuilder = getBuilder(prop);
                       final isCompound = editorBuilder == null && TypeDescriptor.hasType(prop.type);
                       final value = widgetDescriptor!.get(selected!, prop.name);
-                      final property = widgetDescriptor!.type.getField(prop.name);
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -223,7 +222,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                                 commandStack: commandStack,
                                 label: prop.name,
                                 object: selected,
-                                property: property,
+                                property: prop,
                                 value: value,
                                 onChanged: (newVal) =>
                                     changedProperty(prop.name, newVal),

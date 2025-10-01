@@ -170,7 +170,7 @@ class WidgetValidator {
   void _validate(WidgetData widget, ValidationContext context) {
     var descriptor = registry[widget.type];
 
-    for (var property in descriptor.properties) {
+    for (var property in descriptor.properties.values) {
       var validator = getValidator(property, context);
       if (validator != null) {
         try {

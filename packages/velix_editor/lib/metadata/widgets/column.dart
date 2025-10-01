@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -11,9 +12,16 @@ import '../widget_data.dart';
 class ColumnWidgetData extends WidgetData {
   // instance data
 
+  @DeclareProperty(group: "layout")
+  MainAxisAlignment? mainAxisAlignment;
+  @DeclareProperty(group: "layout")
+  CrossAxisAlignment? crossAxisAlignment;
+  @DeclareProperty(group: "layout")
+  MainAxisSize? mainAxisSize;
+
   // constructor
 
-  ColumnWidgetData({super.type = "column", super.children = const []});
+  ColumnWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "column", super.children = const []});
 
   // override
 

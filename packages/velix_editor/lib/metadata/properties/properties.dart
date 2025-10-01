@@ -60,8 +60,14 @@ enum ValueType {
 
 @Dataclass()
 class Value {
+  // instance data
+
+  @DeclareProperty()
   ValueType type;
+  @DeclareProperty()
   String value;
+
+  // constructor
 
   Value({required this.type, required this.value});
 }

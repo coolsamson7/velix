@@ -6,6 +6,7 @@ import 'package:velix_di/di/di.dart';
 import '../../commands/command.dart';
 import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
+import '../../metadata/metadata.dart';
 import '../../metadata/properties/properties.dart' as m show Insets;
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
@@ -16,7 +17,7 @@ class PaddingEditorBuilder extends PropertyEditorBuilder<m.Insets> {
   Widget buildEditor({
     required MessageBus messageBus,
     required CommandStack commandStack,
-    required FieldDescriptor property,
+    required PropertyDescriptor property,
     required String label,
     required dynamic object,
     required dynamic value,
@@ -39,7 +40,7 @@ class PaddingEditor extends StatefulWidget {
   final m.Insets? value;
   final ValueChanged<EdgeInsets> onChanged;
 
-  final FieldDescriptor property;
+  final PropertyDescriptor property;
   final dynamic object;
   final CommandStack commandStack;
   final MessageBus messageBus;
@@ -120,7 +121,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
       parentCommand = widget.commandStack.execute(PropertyChangeCommand(
         bus: widget.messageBus,
         widget: widget.object,
-        descriptor: widget.property.typeDescriptor,
+        descriptor: widget.property.getTypeDescriptor(),
         target: widget.object,
         property: widget.property.name,
         newValue: value,
@@ -132,7 +133,7 @@ class _PaddingEditorState extends State<PaddingEditor> {
         bus: widget.messageBus,
         parent: parentCommand,
         widget: widget.object,
-        descriptor: widget.property.typeDescriptor,
+        descriptor: widget.property.getTypeDescriptor(),
         target: widget.object,
         property: widget.property.name,
         newValue: value,

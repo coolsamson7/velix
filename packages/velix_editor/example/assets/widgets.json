@@ -3,6 +3,9 @@
   "children": [
     {
       "type": "column",
+      "mainAxisAlignment": "start",
+      "crossAxisAlignment": "start",
+      "mainAxisSize": "min",
       "children": [
         {
           "type": "text",

@@ -42,7 +42,13 @@ class TypeRegistry {
         var property = field.findAnnotation<DeclareProperty>();
 
         if (property != null) {
-          properties.add(PropertyDescriptor(name: field.name, annotation: property, field: field, hide: property.hide, editor: property.editor));
+          properties.add(PropertyDescriptor(
+              name: field.name,
+              annotation: property,
+              field: field,
+              hide: property.hide,
+              editor: property.editor
+          ));
         }
       }
 

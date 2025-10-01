@@ -19,16 +19,33 @@ class PropertyDescriptor {
   String label = "";
   final FieldDescriptor field;
   String group = "";
-  final Type? editor;
+  final Type? editor; // TODO
   final bool hide;
+
+  dynamic defaultValue = null;
 
   Type get type => field.type.type;
 
   Type? get validator => annotation.validator;
 
+  TypeDescriptor getTypeDescriptor() => field.typeDescriptor;
+
+  T? get<T>(dynamic object) => field.get(object);
+
+  void set<T>(T object, dynamic value) => field.set(object, value);
+
   // constructor
 
-  PropertyDescriptor({required this.name,  required this.annotation,  required this.field, required this.hide, this.editor});
+  PropertyDescriptor({required this.name, required this.annotation, required this.field,  this.hide = false, this.editor}) {
+      try {
+        defaultValue = getTypeDescriptor().constructorParameters
+            .firstWhere((param) => param.name == name)
+            .defaultValue;
+      }
+      catch (e) {
+        print(1);
+      }
+  }
 
   // public
 
@@ -49,6 +66,11 @@ class PropertyDescriptor {
         return false;
     }
 
+    if (defaultValue != null)
+      return defaultValue; // e.g. enums
+
+    // children...
+
     return field.factoryConstructor!();
   }
 }
@@ -64,17 +86,21 @@ class WidgetDescriptor {
 
   final Widget icon;
   final TypeDescriptor type;
-  List<PropertyDescriptor> properties;
+  Map<String,PropertyDescriptor> properties;
 
   String get name => annotation.name;
 
   // constructor
 
-  WidgetDescriptor({required this.annotation, required this.type, required this.properties, required this.icon}) {
+  WidgetDescriptor({required this.annotation, required this.type, required List<PropertyDescriptor> properties, required this.icon})
+  : properties = {for (var p in properties) p.name: p}
+  {
     updateI18n();
   }
 
   // public
+
+  PropertyDescriptor getProperty(String name) => properties[name]!;
 
   T get<T>(dynamic instance, String property) {
     return type.get<T>(instance, property);
@@ -88,7 +114,7 @@ class WidgetDescriptor {
     label = Translator.tr("editor:widgets.$name.title");
     group = Translator.tr("editor:widget.groups.${annotation.group}.label");
 
-    for ( var property in properties)
+    for ( var property in properties.values)
       property.updateI18n(name);
   }
 
@@ -97,7 +123,7 @@ class WidgetDescriptor {
 
     // fetch defaults
 
-    for (var property in properties)
+    for (var property in properties.values)
       args[property.name] = property.field.isNullable ? null : property.createDefault();
 
     // done

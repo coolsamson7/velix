@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Reusable panel header with a title and close button
-import 'package:flutter/material.dart';
-
 class PanelHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onClose;

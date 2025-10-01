@@ -80,13 +80,19 @@
   },
   "widgets": {
     "column": {
-      "title": "Column"
+      "title": "Column",
+      "mainAxisAlignment": {"label":  "Main Axis Alignment"},
+      "crossAxisAlignment": {"label":  "Cross Axis Alignment"},
+      "mainAxisSize": {"label":  "Main Axis Size"}
     },
     "grid": {
       "title": "Grid"
     },
     "row": {
-      "title": "Row"
+      "title": "Row",
+      "mainAxisAlignment": {"label":  "Main Axis Alignment"},
+      "crossAxisAlignment": {"label":  "Cross Axis Alignment"},
+      "mainAxisSize": {"label":  "Main Axis Size"}
     },
     "stack": {
       "title": "Stack"

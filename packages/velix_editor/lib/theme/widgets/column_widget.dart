@@ -60,8 +60,9 @@ class ColumnEditWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
           ),
           child: hasChildren
               ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: data.mainAxisAlignment ?? MainAxisAlignment.start,
+            crossAxisAlignment: data.crossAxisAlignment ?? CrossAxisAlignment.center,
+            mainAxisSize: data.mainAxisSize ??  MainAxisSize.max,
             children: [
               for (int i = 0; i < data.children.length; i++) ...[
                 EditWidget(model: data.children[i]),
@@ -98,6 +99,9 @@ class ColumnWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   @override
   Widget create(ColumnWidgetData data, Environment environment, BuildContext context) {
     return Column(
+        mainAxisAlignment: data.mainAxisAlignment ?? MainAxisAlignment.start,
+        crossAxisAlignment: data.crossAxisAlignment ?? CrossAxisAlignment.center,
+        mainAxisSize: data.mainAxisSize ??  MainAxisSize.max,
         children: data.children.map((child) => DynamicWidget(
           model: child,
           meta: typeRegistry[child.type],

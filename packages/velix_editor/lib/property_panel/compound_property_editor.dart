@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+
 import 'package:flutter/material.dart';
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
@@ -18,6 +19,31 @@ import 'editor_registry.dart';
 
 /// A generic editor for compound/class properties (like TextStyle)
 class CompoundPropertyEditor extends StatefulWidget {
+  static Map<TypeDescriptor,List<PropertyDescriptor>> type_properties = {};
+
+  static List<PropertyDescriptor> getTypeProperties(TypeDescriptor type) {
+    var result = type_properties[type];
+    if (result == null) {
+      result = [];
+
+      for ( var field in type.getFields()) {
+        var annotation = field.findAnnotation<DeclareProperty>()!;
+
+        result.add(
+            PropertyDescriptor(
+                name: field.name,
+                annotation: annotation,
+                field: field,
+                editor: annotation.editor,
+                hide: false
+            )
+        );
+      }
+    }
+
+    return result;
+  }
+
   // instance data
 
   final PropertyDescriptor property;
@@ -166,14 +192,16 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
 
     var labels = getLabels(compoundDescriptor);
 
+    var properties = CompoundPropertyEditor.getTypeProperties(compoundDescriptor);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: compoundDescriptor.getFields().map((field) {
-        var editorType = field.findAnnotation<DeclareProperty>()!.editor;
+      children: properties.map((property) {
+        var editorType = property.editor;
 
-        final editorBuilder = editorType != null  ? environment.get(type: editorType) : widget.editorRegistry.getBuilder(field.type.type);
-        final value = compoundDescriptor.get(this.value, field.name);
-        final isDirty = widget.commandStack.propertyIsDirty(this.value, field.name);
+        final editorBuilder = editorType != null  ? environment.get(type: editorType) : widget.editorRegistry.getBuilder(property.type);
+        final value = compoundDescriptor.get(this.value, property.name);
+        final isDirty = widget.commandStack.propertyIsDirty(this.value, property.name);
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
@@ -184,11 +212,11 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
                 width: 100,
                 child: Row(
                   children: [
-                    Text(labels[field.name]!, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Text(labels[property.name]!, style: const TextStyle(fontWeight: FontWeight.w500)),
                     const SizedBox(width: 4),
                     if (isDirty)
                       GestureDetector(
-                        onTap: () => _resetProperty(field.name),
+                        onTap: () => _resetProperty(property.name),
                         child: Container(
                           width: 8,
                           height: 8,
@@ -207,12 +235,12 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
                   messageBus: widget.bus,
                   commandStack: widget.commandStack,
                   object: this.value,
-                  property: field,
-                  label: labels[field.name]!,
+                  property: property,
+                  label: labels[property.name]!,
                   value: value,
-                  onChanged: (newVal) => changedProperty(field.name, newVal),
+                  onChanged: (newVal) => changedProperty(property.name, newVal),
                 )
-                    : Text("No editor for ${field.name}"),
+                    : Text("No editor for ${property.name}"),
               ),
             ],
           ),

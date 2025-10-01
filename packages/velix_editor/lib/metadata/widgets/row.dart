@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -11,9 +12,17 @@ import '../widget_data.dart';
 class RowWidgetData extends WidgetData {
   // instance data
 
+  @DeclareProperty(group: "layout")
+  MainAxisAlignment? mainAxisAlignment;
+  @DeclareProperty(group: "layout")
+  CrossAxisAlignment? crossAxisAlignment;
+  @DeclareProperty(group: "layout")
+  MainAxisSize? mainAxisSize;
+
+
   // constructor
 
-  RowWidgetData({super.type = "row", super.children = const []});
+  RowWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "row", super.children = const []});
 
   // override
 

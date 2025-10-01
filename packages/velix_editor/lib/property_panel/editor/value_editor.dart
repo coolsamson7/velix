@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/property_panel/compound_property_editor.dart';
 import 'package:velix_editor/property_panel/editor/string_editor.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
 import '../../commands/command.dart';
 import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
+import '../../metadata/metadata.dart';
 import '../../metadata/properties/properties.dart' hide Border;
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
@@ -15,7 +17,7 @@ import 'code_editor.dart';
 class ValueField extends StatefulWidget {
   // instance data
 
-  final FieldDescriptor property;
+  final PropertyDescriptor property;
   final dynamic object;
   final Value? value;
   final ValueChanged<dynamic> onChanged;
@@ -42,8 +44,9 @@ class _ValueFieldState extends State<ValueField> {
 
   late Environment environment;
   late CommandStack commandStack;
-  var typeDescriptor = TypeDescriptor.forType<Value>();
-  var descriptor = TypeDescriptor.forType<Value>().getProperty("value");
+
+  var  propertyDescriptor = CompoundPropertyEditor.getTypeProperties(TypeDescriptor.forType<Value>())[1];
+  
   Command? currentCommand;
   Command? parentCommand;
 
@@ -52,6 +55,10 @@ class _ValueFieldState extends State<ValueField> {
   ValueType get mode => value!.type;
 
   // internal
+  
+  PropertyDescriptor findValueProperty(String name) {
+    return CompoundPropertyEditor.getTypeProperties(TypeDescriptor.forType<Value>()).firstWhere((prop) => prop.name == name);
+  }
 
   bool isPropertyChangeCommand(Command command, String property) {
     if (command is PropertyChangeCommand) {
@@ -66,13 +73,15 @@ class _ValueFieldState extends State<ValueField> {
   void changedProperty(String property, dynamic newValue) {
     // set the value
 
+    var typeDescriptor = TypeDescriptor.forType(widget.object.runtimeType);
+
     if ( typeDescriptor.get(widget.object, widget.property.name) == null) {
       // value is null, set the constructed compound
 
       parentCommand = commandStack.execute(PropertyChangeCommand(
         bus: environment.get<MessageBus>(),
         widget: widget.object,
-        descriptor: TypeDescriptor.forType(widget.object.runtimeType),
+        descriptor: typeDescriptor,
         target: widget.object,
         property: widget.property.name, // the value property name!
         newValue: value, // the created compound
@@ -85,8 +94,8 @@ class _ValueFieldState extends State<ValueField> {
       currentCommand = commandStack.execute(PropertyChangeCommand(
         bus: environment.get<MessageBus>(),
         parent: parentCommand,
-        widget: widget.object, // imer noch labelwidget....
-        descriptor: typeDescriptor,
+        widget: widget.object,
+        descriptor: TypeDescriptor.forType<Value>(),
         target: value!,
         property: property,
         newValue: newValue,
@@ -120,7 +129,7 @@ class _ValueFieldState extends State<ValueField> {
     return builder.buildEditor(
         messageBus: environment.get<MessageBus>(),
         commandStack: commandStack,
-        property: descriptor,
+        property: findValueProperty("value"),
         object: value,
         label: "label",
         value: value!.value,
@@ -192,7 +201,7 @@ class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
   Widget buildEditor({
     required MessageBus messageBus,
     required CommandStack commandStack,
-    required FieldDescriptor property,
+    required PropertyDescriptor property,
     required String label,
     required dynamic object,
     required dynamic value,

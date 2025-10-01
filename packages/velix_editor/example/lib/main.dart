@@ -42,6 +42,23 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  // TEST
+
+  enumeration<MainAxisAlignment>(
+      name: 'asset:velix_mapper/test/model.dart.MainAxisAlignment',
+      values: MainAxisAlignment.values
+  );
+
+  enumeration<CrossAxisAlignment>(
+      name: 'asset:velix_mapper/test/model.dart.MainAxisAlignment',
+      values: CrossAxisAlignment.values
+  );
+
+  enumeration<MainAxisSize>(
+      name: 'asset:velix_mapper/test/model.dart.MainAxisSize',
+      values: MainAxisSize.values
+  );
+
   // tracer
 
   Tracer(

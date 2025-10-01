@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:velix/reflectable/reflectable.dart';
+
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/metadata/metadata.dart';
 
 
 import '../../commands/command_stack.dart';
@@ -13,7 +14,7 @@ class BooleanEditorBuilder extends PropertyEditorBuilder<bool> {
   Widget buildEditor({
     required MessageBus messageBus,
     required CommandStack commandStack,
-    required FieldDescriptor property,
+    required PropertyDescriptor property,
     required String label,
     required dynamic object,
     required dynamic value,

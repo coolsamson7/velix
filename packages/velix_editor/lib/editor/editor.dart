@@ -547,7 +547,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                             ),
                             Panel(
                                 name: 'editor',
-                                label: 'editor:docks.json.label:'.tr(),
+                                label: 'editor:docks.json.label'.tr(),
                                 tooltip: 'editor:docks.json.tooltip'.tr(),
                                 create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
                                 icon: Icons.code
@@ -589,6 +589,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                               child:
                             edit ? FocusableRegion(
                                 child: EditorCanvas(
+                                  messageBus: environment.get<MessageBus>(),
                                   models: widget.models,
                                   typeRegistry: environment.get<TypeRegistry>(),
                                 ),

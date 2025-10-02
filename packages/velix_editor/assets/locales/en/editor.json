@@ -128,6 +128,9 @@
       "color": {
         "label": "Color"
       },
+      "backgroundColor": {
+        "label": "Background"
+      },
       "databinding": {
         "label": "Databinding"
       },

@@ -3,6 +3,8 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
+import '../edit_widget.dart';
+
 @Dataclass()
 @JsonSerializable(discriminatorField: "type")
 /*abstract*/ class WidgetData {
@@ -14,6 +16,8 @@ import 'package:velix_mapper/mapper/json.dart';
   List<WidgetData> children;
   @Json(ignore: true)
   WidgetData? parent;
+
+  EditWidgetState? widget;
 
   // constructor
 

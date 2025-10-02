@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show CrossAxisAlignment, MainAxisAlignment, MainAxisSize;
+import 'package:flutter/material.dart' show CrossAxisAlignment, MainAxisAlignment, MainAxisSize, BorderStyle;
 import 'package:velix_di/di/di.dart';
 
 import '../enum_editor.dart';
@@ -15,4 +15,8 @@ class MainAxisAlignmentBuilder extends AbstractEnumBuilder<MainAxisAlignment> {
 
 @Injectable()
 class MainAxisSizeBuilder extends AbstractEnumBuilder<MainAxisSize> {
+}
+
+@Injectable()
+class BorderStyleBuilder extends AbstractEnumBuilder<BorderStyle> {
 }

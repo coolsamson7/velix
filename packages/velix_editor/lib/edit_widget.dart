@@ -22,37 +22,27 @@ class EditWidget extends StatefulWidget {
   // override
 
   @override
-  State<EditWidget> createState() => _EditWidgetState();
+  State<EditWidget> createState() => EditWidgetState();
 }
 
-class _EditWidgetState extends State<EditWidget> {
+class EditWidgetState extends State<EditWidget> {
   // instance data
 
   late final Environment environment;
   late final WidgetFactory theme;
-  late final MessageBus bus;
   bool selected = false;
   bool isHovered = false;
 
-  late final StreamSubscription selectionSubscription;
-  late final StreamSubscription propertyChangeSubscription;
-
   // internal
 
-  void select(SelectionEvent event) {
-    final newSelected = identical(event.selection, widget.model);
-    if (newSelected != selected) {
-      setState(() => selected = newSelected);
-    }
-  }
-
-  void changed(PropertyChangeEvent event) {
-    if (event.widget == widget.model) setState(() {});
+  void setSelected(bool value) {
+    if (value != selected)
+      setState(() => selected = value);
   }
 
   void delete() {
     environment.get<CommandStack>().execute(
-      ReparentCommand(bus: bus, widget: widget.model, newParent: null),
+      ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, newParent: null),
     );
   }
 
@@ -62,24 +52,15 @@ class _EditWidgetState extends State<EditWidget> {
 
     environment = EnvironmentProvider.of(context);
     theme = environment.get<WidgetFactory>();
-    bus = environment.get<MessageBus>();
-
-    selectionSubscription = bus.subscribe<SelectionEvent>("selection", select);
-    propertyChangeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed", changed);
   }
 
-  @override
-  void dispose() {
-    selectionSubscription.cancel();
-    propertyChangeSubscription.cancel();
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final visualChild = theme.builder(widget.model.type, edit: true)
         .create(widget.model, environment, context);
+
+    widget.model.widget = this;
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
@@ -137,7 +118,7 @@ class _EditWidgetState extends State<EditWidget> {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                bus.publish(
+                environment.get<MessageBus>().publish(
                   "selection",
                   SelectionEvent(selection: widget.model, source: this),
                 );

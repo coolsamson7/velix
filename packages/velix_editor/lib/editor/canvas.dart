@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:velix_editor/event/events.dart';
+import 'package:velix_editor/util/message_bus.dart';
 
 import '../edit_widget.dart';
 import '../metadata/type_registry.dart';
@@ -28,9 +32,11 @@ class EditorCanvas extends StatefulWidget {
   final List<WidgetData> models;
   final TypeRegistry typeRegistry;
 
+  final MessageBus messageBus;
+
   // constructor
 
-   EditorCanvas({super.key, required this.models, required this.typeRegistry}) {
+  EditorCanvas({super.key, required this.models, required this.typeRegistry, required this.messageBus}) {
     for ( var model in models)
       linkParents(model);
   }
@@ -46,8 +52,27 @@ class _EditorCanvasState extends State<EditorCanvas> {
 
   TypeRegistry? typeRegistry;
   final FocusNode _focusNode = FocusNode();
+  late StreamSubscription subscription;
+  late StreamSubscription propertyChangeSubscription;
+  EditWidgetState? selection;
 
   // internal
+
+  void select(WidgetData? widget) {
+    if (selection != null)
+      selection!.setSelected(false);
+
+    if (widget != null) {
+      selection = widget.widget;
+
+      selection!.setSelected(true);
+    }
+  }
+
+  void changed(PropertyChangeEvent event) {
+    event.widget?.widget?.setState(() {});
+  }
+
 
   void _handleKey(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
@@ -55,11 +80,14 @@ class _EditorCanvasState extends State<EditorCanvas> {
 
       if (logicalKey == LogicalKeyboardKey.arrowUp) {
         print("Arrow Up pressed");
-      } else if (logicalKey == LogicalKeyboardKey.arrowDown) {
+      }
+      else if (logicalKey == LogicalKeyboardKey.arrowDown) {
         print("Arrow Down pressed");
-      } else if (logicalKey == LogicalKeyboardKey.arrowLeft) {
+      }
+      else if (logicalKey == LogicalKeyboardKey.arrowLeft) {
         print("Arrow Left pressed");
-      } else if (logicalKey == LogicalKeyboardKey.arrowRight) {
+      }
+      else if (logicalKey == LogicalKeyboardKey.arrowRight) {
         print("Arrow Right pressed");
       }
     }
@@ -68,12 +96,21 @@ class _EditorCanvasState extends State<EditorCanvas> {
   // override
 
   @override
+  void initState() {
+    super.initState();
+
+    subscription = widget.messageBus.subscribe<SelectionEvent>("selection", (event) => select(event.selection));
+    propertyChangeSubscription = widget.messageBus.subscribe<PropertyChangeEvent>("property-changed", changed);
+  }
+
+  @override
   void dispose() {
     _focusNode.dispose();
 
+    subscription.cancel();
+
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {

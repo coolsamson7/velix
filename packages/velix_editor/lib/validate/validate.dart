@@ -79,12 +79,13 @@ class ExpressionPropertyValidator extends PropertyValidator<String> {
 
   void validateExpression(String binding, ClassDesc type) {
     try {
-      var expression = ActionParser.instance.parse(binding);
+      var result = ActionParser.instance.parseStrict(binding);
+      if (!result.success)
+        throw Exception(result.message);
 
       final checker = TypeChecker(ClassDescTypeResolver(root: type));
 
-      expression.accept(checker);
-
+      result.value.accept(checker);
 
       print(1);
     }
@@ -116,11 +117,13 @@ class ValuePropertyValidator extends PropertyValidator<Value> {
 
   void validateBinding(String binding, ClassDesc type) {
     try {
-      var expression = ActionParser.instance.parse(binding);
+      var result = ActionParser.instance.parseStrict(binding);
+      if (!result.success)
+        throw Exception(result.message);
 
       final checker = TypeChecker(ClassDescTypeResolver(root: type));
 
-      expression.accept(checker);
+      result.value.accept(checker);
 
       print(1);
     }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor/editor.dart';
 
+import '../../actions/action_parser.dart';
 import '../../actions/autocomplete.dart';
 import '../../commands/command_stack.dart';
 import '../../metadata/metadata.dart';
@@ -48,8 +49,10 @@ class CompletionItem {
   CompletionItem({required this.label, required this.icon});
 }
 
-class _CodeEditorState extends State<CodeEditor>
-    with SingleTickerProviderStateMixin {
+/// Parsing state: invalid, prefix-only (in progress), or complete
+enum ParseState { invalid, prefixOnly, complete }
+
+class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   List<CompletionItem> _matches = [];
@@ -58,45 +61,46 @@ class _CodeEditorState extends State<CodeEditor>
   String _originalText = '';
   int _originalCursorPos = 0;
   late Autocomplete autocomplete;
-  String? _parseException;
+  ParseState _parseState = ParseState.invalid;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
+  ParseResult lastResult = ParseResult.success(false, complete: false);
+
+  // Evaluate parsing state with your parser
+  ParseState checkParse(String input) {
+      // full parse
+
+     lastResult = ActionParser.instance.parseStrict(input);
+
+      if (lastResult.complete)
+        return ParseState.complete;
+
+      // try prefix
+
+     lastResult = ActionParser.instance.parsePrefix(input);
+
+      if (lastResult.success)
+        return ParseState.prefixOnly;
+      else
+        return ParseState.invalid;
+  }
 
   Iterable<CompletionItem> suggestions(String pattern, int offset) {
     try {
       final suggestions = autocomplete
           .suggest(pattern, cursorOffset: offset)
           .map((suggestion) => CompletionItem(
-          label: suggestion.suggestion,
-          icon: suggestion.type == "field"
-              ? Icons.data_object
-              : Icons.functions));
-
-      // Clear parse exception if suggestions work
-      if (_parseException != null) {
-        setState(() {
-          _parseException = null;
-        });
-        // Stop pulse animation when error is cleared
-        _pulseController.stop();
-      }
+        label: suggestion.suggestion,
+        icon: suggestion.type == "field"
+            ? Icons.data_object
+            : Icons.functions,
+      ));
 
       return suggestions;
     } catch (e) {
-      print("caught exception during suggestions $e");
-
-      // Update parse exception state
-      if (_parseException != e.toString()) {
-        setState(() {
-          _parseException = e.toString();
-        });
-        // Start pulse animation for errors
-        _pulseController.repeat(reverse: true);
-      }
-
       return [];
     }
   }
@@ -115,12 +119,17 @@ class _CodeEditorState extends State<CodeEditor>
 
     final matches = suggestions(_controller.text, cursorPos).toList();
 
-    if ( widget.value != _originalText)
+    if (widget.value != _originalText) {
       widget.onChanged(_originalText);
+    }
+
+    // update parse state live
+    final state = checkParse(_controller.text);
 
     setState(() {
       _matches = matches;
       _selectedIndex = matches.isNotEmpty ? 0 : -1;
+      _parseState = state;
     });
 
     if (_matches.isNotEmpty && _focusNode.hasFocus) {
@@ -146,10 +155,9 @@ class _CodeEditorState extends State<CodeEditor>
 
     final typedPart = _originalText.substring(wordStart, _originalCursorPos);
 
-    // Only update if completion extends the typedPart and cursor hasn't moved left
     if (!completion.toLowerCase().startsWith(typedPart.toLowerCase()) ||
         completion.length <= typedPart.length) {
-      return; // User probably deleted or moved cursor back, don't autocomplete
+      return;
     }
 
     final beforeWord = _originalText.substring(0, wordStart);
@@ -169,8 +177,6 @@ class _CodeEditorState extends State<CodeEditor>
     _isUpdatingCompletion = false;
   }
 
-
-
   bool _isWordChar(String char) {
     return RegExp(r'[a-zA-Z0-9_]').hasMatch(char);
   }
@@ -181,7 +187,8 @@ class _CodeEditorState extends State<CodeEditor>
     final selection = _controller.selection;
     if (selection.extentOffset > selection.baseOffset) {
       _isUpdatingCompletion = true;
-      _controller.selection = TextSelection.collapsed(offset: selection.extentOffset);
+      _controller.selection =
+          TextSelection.collapsed(offset: selection.extentOffset);
       _isUpdatingCompletion = false;
     }
 
@@ -210,8 +217,6 @@ class _CodeEditorState extends State<CodeEditor>
   }
 
   void _dismissCompletion() {
-    // Simply clear the matches and selection, but don't revert text
-    // The text has already been modified by the keypress
     _removeOverlay();
 
     setState(() {
@@ -251,15 +256,17 @@ class _CodeEditorState extends State<CodeEditor>
                       _acceptCompletion();
                     },
                     child: Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       color: isSelected ? Colors.blue.shade50 : null,
                       child: Row(
                         children: [
                           Icon(
                             item.icon ?? Icons.code,
                             size: 16,
-                            color: isSelected ? Colors.blue.shade600 : Colors.grey.shade600,
+                            color: isSelected
+                                ? Colors.blue.shade600
+                                : Colors.grey.shade600,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -268,10 +275,12 @@ class _CodeEditorState extends State<CodeEditor>
                               style: TextStyle(
                                 fontSize: 13,
                                 fontFamily: 'monospace',
-                                fontWeight:
-                                isSelected ? FontWeight.w500 : FontWeight.normal,
-                                color:
-                                isSelected ? Colors.blue.shade800 : Colors.black87,
+                                fontWeight: isSelected
+                                    ? FontWeight.w500
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? Colors.blue.shade800
+                                    : Colors.black87,
                               ),
                             ),
                           ),
@@ -301,21 +310,40 @@ class _CodeEditorState extends State<CodeEditor>
     _overlayEntry = null;
   }
 
-  Widget _buildStatusIndicator() {
+  Widget _buildStatusIndicator(bool hasFocus) {
+    Color color;
+    String message;
+
+    switch (_parseState) {
+      case ParseState.complete:
+        color = Colors.green.shade800;
+        message = "Code is valid";
+        break;
+      case ParseState.prefixOnly:
+        if (hasFocus) {
+          color = Colors.amber.shade700;
+          message = "Code incomplete (valid prefix)";
+        } else {
+          color = Colors.red.shade800;
+          message = "Incomplete code";
+        }
+        break;
+      case ParseState.invalid:
+        color = Colors.red.shade800;
+        message = "Parse error: ${lastResult.message ?? ""}";
+        break;
+    }
+
     return Positioned(
       top: 4,
       right: 4,
       bottom: 4,
       child: Tooltip(
-        message: _parseException == null
-            ? "Code is valid"
-            : "Parse error: $_parseException",
+        message: message,
         preferBelow: false,
         textStyle: const TextStyle(fontSize: 12),
         decoration: BoxDecoration(
-          color: _parseException == null
-              ? Colors.green.shade800
-              : Colors.red.shade800,
+          color: color,
           borderRadius: BorderRadius.circular(4),
         ),
         child: AnimatedBuilder(
@@ -325,19 +353,10 @@ class _CodeEditorState extends State<CodeEditor>
               width: 12,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(2),
-                gradient: _parseException == null
-                    ? LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.green.shade400, Colors.green.shade600],
-                )
-                    : LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.red.shade400.withOpacity(_pulseAnimation.value),
-                    Colors.red.shade600.withOpacity(_pulseAnimation.value),
-                  ],
+                  colors: [color.withOpacity(_pulseAnimation.value), color],
                 ),
               ),
             );
@@ -364,14 +383,20 @@ class _CodeEditorState extends State<CodeEditor>
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
         _removeOverlay();
+        // Downgrade prefixOnly → invalid when losing focus
+        if (_parseState == ParseState.prefixOnly) {
+          setState(() {
+            _parseState = ParseState.invalid;
+          });
+        }
       }
     });
 
-    // Initialize pulse animation for error states
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
-    );
+    )..repeat(reverse: true);
+
     _pulseAnimation = Tween<double>(
       begin: 0.6,
       end: 1.0,
@@ -379,6 +404,8 @@ class _CodeEditorState extends State<CodeEditor>
       parent: _pulseController,
       curve: Curves.easeInOut,
     ));
+
+    _parseState = checkParse(widget.value ?? "");
   }
 
   @override
@@ -405,46 +432,37 @@ class _CodeEditorState extends State<CodeEditor>
             case LogicalKeyboardKey.arrowDown:
               _selectNext();
               return KeyEventResult.handled;
-
             case LogicalKeyboardKey.arrowUp:
               _selectPrevious();
               return KeyEventResult.handled;
-
             case LogicalKeyboardKey.tab:
             case LogicalKeyboardKey.enter:
               _acceptCompletion();
               return KeyEventResult.handled;
-
             case LogicalKeyboardKey.arrowRight:
-            // Only accept if selection highlights suggestion
               if (hasSelection) {
                 _acceptCompletion();
                 return KeyEventResult.handled;
               }
               return KeyEventResult.ignored;
-
             case LogicalKeyboardKey.escape:
               _dismissCompletion();
               return KeyEventResult.handled;
-
             case LogicalKeyboardKey.backspace:
-            // If there's a selection (inline completion), collapse it first
               if (hasSelection) {
                 _isUpdatingCompletion = true;
                 _controller.value = TextEditingValue(
                   text: _originalText,
-                  selection: TextSelection.collapsed(offset: _originalCursorPos),
+                  selection:
+                  TextSelection.collapsed(offset: _originalCursorPos),
                 );
                 _isUpdatingCompletion = false;
                 _dismissCompletion();
-                return KeyEventResult.handled; // We handled it, don't let backspace proceed
+                return KeyEventResult.handled;
               }
-              // No selection, just dismiss and let backspace work normally
               _dismissCompletion();
               return KeyEventResult.ignored;
-
             case LogicalKeyboardKey.arrowLeft:
-            // Dismiss the inline completion but let the key event proceed
               _dismissCompletion();
               return KeyEventResult.ignored;
           }
@@ -462,11 +480,12 @@ class _CodeEditorState extends State<CodeEditor>
               decoration: const InputDecoration(
                 hintText: "Type here for autocompletion...",
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                contentPadding:
+                EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
             ),
-            _buildStatusIndicator(),
+            _buildStatusIndicator(_focusNode.hasFocus),
           ],
         ),
       ),

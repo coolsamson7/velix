@@ -3,69 +3,17 @@ import 'package:petitparser/petitparser.dart';
 import 'expressions.dart';
 import 'parser.dart';
 
-class ActionParser {
-  // private constructor
-  ActionParser._internal();
-
-  // static singleton instance (initialized on first call)
-  static final ActionParser _instance = ActionParser._internal();
-
-  // public getter
-  static ActionParser get instance => _instance;
-
-  // instance data
-
-  final parser = ExpressionParser();
-
-  // public
-
-  Expression parse(String input) {
-    var result = parser.expression.parse(input);
-
-    if (result is Success<Expression>) {
-      final expr = result.value;
-
-      return expr;
-    }
-    else {
-      throw Exception((result as Failure).message);
-    }
-  }
-}
-/*
-/// Example: wrap your grammar/parser here
-class ExpressionParser {
-  final Parser _expression;
-
-  ExpressionParser(this._expression);
-
-  /// Parse input allowing partial success (prefix mode).
-  ParseResult parsePrefix(String input) {
-    final result = _expression.parse(input);
-    if (result.isSuccess) {
-      final complete = result.position == result.buffer.length;
-      return ParseResult.success(result.value, complete: complete);
-    }
-    return ParseResult.failure(result.message, result.position);
-  }
-
-  /// Parse input requiring complete success.
-  ParseResult parseStrict(String input) {
-    final result = _expression.end().parse(input);
-    if (result.isSuccess) {
-      return ParseResult.success(result.value, complete: true);
-    }
-    return ParseResult.failure(result.message, result.position);
-  }
-}
-
 /// Standardized result type for both modes.
 class ParseResult {
+  //instance data
+
   final bool success;
   final dynamic value;
   final bool complete;
   final String? message;
   final int? position;
+
+  // constructor
 
   ParseResult._({
     required this.success,
@@ -90,11 +38,64 @@ class ParseResult {
   }
 }
 
-#extension AutoCompleteParser on ExpressionParser {
+class ActionParser {
+  // static singleton instance (initialized on first call)
+
+  static final ActionParser _instance = ActionParser._internal();
+
+  // public getter
+
+  static ActionParser get instance => _instance;
+
+  // private constructor
+
+  ActionParser._internal();
+
+  // instance data
+
+  final parser = ExpressionParser();
+
+  // public
+
+  ParseResult parsePrefix(String input) {
+    final result = parser.expression.parse(input);
+    if (result is Success<Expression>) {
+      final complete = result.position == result.buffer.length;
+
+      return ParseResult.success(result.value, complete: complete);
+    }
+    return ParseResult.failure(result.message, result.position);
+  }
+
+  /// Parse input requiring complete success.
+  ParseResult parseStrict(String input) {
+    final result = parser.expression.end().parse(input);
+    if (result is  Success<Expression>) {
+      return ParseResult.success(result.value, complete: true);
+    }
+    return ParseResult.failure(result.message, result.position);
+  }
+
+  Expression parse(String input) {
+    var result = parser.expression.parse(input);
+
+    if (result is Success<Expression>) {
+      final expr = result.value;
+
+      return expr;
+    }
+    else {
+      throw Exception((result as Failure).message);
+    }
+  }
+}
+
+
+extension AutoCompleteParser on ActionParser {
   /// Try to parse input but return suggestions if parsing failed.
   AutoCompleteResult tryAutoComplete(String input) {
     // Attempt strict parsing
-    final result = _expression.end().parse(input);
+    final result = parser.expression.end().parse(input);
 
     if (result is Success) {
       // Already valid & complete, no suggestions needed
@@ -120,12 +121,16 @@ class ParseResult {
 
 /// Result type specialized for auto-completion
 class AutoCompleteResult {
+  // instance data
+
   final bool valid;
   final bool complete;
   final dynamic value;
   final String? expected;
   final int? position;
   final String? input;
+
+  // constructor
 
   AutoCompleteResult._({
     required this.valid,
@@ -160,13 +165,25 @@ class AutoCompleteResult {
 }
 
 void main() {
-  final parser = ExpressionParser(buildMyGrammar());
+  var result = ActionParser.instance.parsePrefix("user.hello(");
 
-  var r1 = parser.tryAutoComplete('user.hello(');
-  print("valid=${r1.valid}, complete=${r1.complete}, expected=${r1.expected}");
+  result = ActionParser.instance.parseStrict("user.hello(");
+
+  var r =  ActionParser.instance.tryAutoComplete('user.hello(user.name');
+  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
   // → valid=false, complete=false, expected="')' expected"
 
-  var r2 = parser.tryAutoComplete('user.hello(1)');
-  print("valid=${r2.valid}, complete=${r2.complete}");
+  r =  ActionParser.instance.tryAutoComplete('user.hello(');
+  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
+  // → valid=false, complete=false, expected="')' expected"
+
+  r =  ActionParser.instance.tryAutoComplete('user.hello(1');
+  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
+
+  r =  ActionParser.instance.tryAutoComplete('user.hello(1,');
+  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
+
+  r = ActionParser.instance.tryAutoComplete('user.hello(1)');
+  print("valid=${r.valid}, complete=${r.complete}");
   // → valid=true, complete=true
-}*/
+}

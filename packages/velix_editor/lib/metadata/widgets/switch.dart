@@ -1,4 +1,5 @@
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../../property_panel/editor/code_editor.dart';
@@ -13,10 +14,12 @@ class SwitchWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   String label;
-  @DeclareProperty(group: "general", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "style")
+  Insets? padding;
+  @DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
   String? databinding;
 
   // constructor
 
-  SwitchWidgetData({super.type = "switch", super.children = const [], required this.label, this.databinding});
+  SwitchWidgetData({super.type = "switch", super.children = const [], required this.label, this.padding, this.databinding});
 }

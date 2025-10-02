@@ -51,6 +51,12 @@
     "widgets": {
       "label": "Widgets"
     },
+    "databinding": {
+      "label": "Data"
+    },
+    "style": {
+      "label": "Style"
+    },
     "general": {
       "label": "General"
     },
@@ -70,6 +76,11 @@
       "size": {"label":  "Size"},
       "weight": {"label":  "Weight"},
       "style": {"label":  "Style"}
+    },
+    "border": {
+      "width": {"label":  "Width"},
+      "style": {"label":  "Style"},
+      "color": {"label":  "Color"}
     },
     "padding": {
       "left": {"label":  "Left"},
@@ -102,6 +113,9 @@
       "label": {
         "label":  "Label"
       },
+      "padding": {
+        "label":  "Padding"
+      },
       "databinding": {
         "label":  "Label"
       }
@@ -110,6 +124,9 @@
       "title": "Label",
       "value": {
         "label": "Value"
+      },
+      "color": {
+        "label": "Color"
       },
       "databinding": {
         "label": "Databinding"
@@ -132,7 +149,16 @@
     },
 
     "container": {
-      "title": "Container"
+      "title": "Container",
+      "margin": {
+        "label":  "Margin"
+      },
+      "padding": {
+        "label":  "Padding"
+      },
+      "color": {
+        "label":  "Color"
+      }
     },
 
     "text": {
@@ -158,6 +184,12 @@
       "title": "Button",
       "label": {
         "label": "Label"
+      },
+      "foregroundColor": {
+        "label": "Foreground"
+      },
+      "backgroundColor": {
+        "label": "Background"
       },
       "weight": {
         "label":  "Weight"

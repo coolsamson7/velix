@@ -46,11 +46,13 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
         final hasChildren = data.children.isNotEmpty;
 
         return Container(
+          color: data.color,
           constraints: const BoxConstraints(
             minWidth: 100,
             minHeight: 60,
           ),
-          padding: const EdgeInsets.all(12),
+          padding: data.padding?.edgeInsets(),
+          margin: data.margin?.edgeInsets(),
           decoration: BoxDecoration(
             border: Border.all(
               color: isActive ? Colors.blue : Colors.grey.shade400,

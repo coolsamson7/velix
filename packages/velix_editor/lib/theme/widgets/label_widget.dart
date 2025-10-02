@@ -29,7 +29,7 @@ class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
     var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
 
     var result = Text(data.label,
-        style: data.font?.textStyle()
+        style: data.font?.textStyle(color: data.color, backgroundColor: data.backgroundColor)
     );
 
     // TODO: no labeladapter yet

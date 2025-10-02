@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -12,13 +14,18 @@ import '../widget_data.dart';
 class ContainerWidgetData extends WidgetData {
   // instance data
 
+  @DeclareProperty(group: "style")
   Border? border;
+  @DeclareProperty(group: "style")
+  Color? color;
+  @DeclareProperty(group: "layout")
   Insets? padding;
+  @DeclareProperty(group: "layout")
   Insets? margin;
 
   // constructor
 
-  ContainerWidgetData({super.type = "container", this.border, this.margin, this.padding, super.children = const []});
+  ContainerWidgetData({super.type = "container", this.border, this.margin, this.padding, this.color, super.children = const []});
 
   // override
 

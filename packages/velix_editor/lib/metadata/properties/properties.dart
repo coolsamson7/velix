@@ -110,7 +110,7 @@ class Border {
 
   // constructor
 
-  Border({required this.color, required this.width, required this.style});
+  Border({this.color=Colors.white, this.width=1, this.style=BorderStyle.solid});
 }
 
 @Dataclass()

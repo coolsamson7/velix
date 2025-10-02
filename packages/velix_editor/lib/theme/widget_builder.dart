@@ -13,8 +13,10 @@ extension InsetsHelper on Props.Insets {
 }
 
 extension FontHelper on Props.Font {
-  TextStyle textStyle() {
+  TextStyle textStyle({Color? color, Color? backgroundColor}) {
       return TextStyle(
+        color: color,
+        backgroundColor: backgroundColor,
         fontFamily: family,
         fontSize: size.toDouble(),
         fontWeight: weight,

@@ -3,6 +3,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/property_panel/editor/code_editor.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
+import '../../validate/validate.dart';
 import '../annotations.dart';
 import '../properties/properties.dart';
 import '../widget_data.dart';
@@ -17,14 +18,16 @@ class ButtonWidgetData extends WidgetData {
   String label;
   @DeclareProperty(group: "font")
   Font? font;
-  @DeclareProperty(group: "font")
-  Color? color;
+  @DeclareProperty(group: "style")
+  Color? foregroundColor;
+  @DeclareProperty(group: "style")
+  Color? backgroundColor;
   @DeclareProperty(group: "layout")
   Insets? padding;
-  @DeclareProperty(group: "events", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
   String? onClick;
 
   // constructor
 
-  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.color, this.padding, this.onClick});
+  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.foregroundColor, this.backgroundColor, this.padding, this.onClick});
 }

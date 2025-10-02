@@ -56,8 +56,10 @@ class _ButtonWidgetState extends State<ButtonWidget> {
     return ElevatedButton(
       onPressed: _onClick,
       style: ElevatedButton.styleFrom(
+        //shape: ,
         textStyle: widget.data.font?.textStyle(),
-        backgroundColor: widget.data.color,
+        foregroundColor: widget.data.foregroundColor,
+        backgroundColor: widget.data.backgroundColor,
         padding: widget.data.padding?.edgeInsets(),
       ),
       child: Text(widget.data.label),
@@ -82,9 +84,10 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
         onPressed: () {  }, // This won't be called due to IgnorePointer
 
         style: ElevatedButton.styleFrom(
-          backgroundColor: data.color,
-          textStyle: data.font?.textStyle(),
-          padding: data.padding?.edgeInsets()
+            foregroundColor: data.foregroundColor,
+            backgroundColor: data.backgroundColor,
+            textStyle: data.font?.textStyle(),
+            padding: data.padding?.edgeInsets()
         ),
         child: Text(data.label),
       ),

@@ -28,6 +28,7 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
     var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
 
     var result = Switch(
+      padding: data.padding?.edgeInsets(),
       value: mapper.getValue(typeProperty),
       onChanged: (bool newValue) {
         (context as Element).markNeedsBuild();

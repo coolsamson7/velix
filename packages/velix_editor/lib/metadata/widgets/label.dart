@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -14,14 +16,18 @@ class LabelWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   String label;
-  @DeclareProperty(group: "general")
+  @DeclareProperty(group: "style")
   Font? font;
-  @DeclareProperty(group: "general", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "style")
+  Color? color;
+  @DeclareProperty(group: "style")
+  Color? backgroundColor;
+  @DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
   String? databinding;
   @DeclareProperty(group: "general")
   Value? value;
 
   // constructor
 
-  LabelWidgetData({super.type = "text", super.children = const [], required this.label, this.value, this.font, this.databinding});
+  LabelWidgetData({super.type = "text", super.children = const [], required this.label, this.color, this.backgroundColor, this.value, this.font, this.databinding});
 }

@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart' hide WidgetBuilder;
+import 'package:flutter/material.dart' show BuildContext, NeverScrollableScrollPhysics, Widget, GridView, SliverGridDelegateWithFixedCrossAxisCount, Border, Colors, BorderStyle, BorderRadius, BoxDecoration, FontStyle, TextStyle, Text, Center, Container, DragTarget;
+import 'package:velix/util/collections.dart';
 import 'package:velix_di/di/di.dart';
-import 'package:velix_editor/commands/command_stack.dart';
-import 'package:velix_editor/event/events.dart';
-import 'package:velix_editor/util/message_bus.dart';
 
+import '../../commands/command_stack.dart';
 import '../../commands/reparent_command.dart';
-import '../../dynamic_widget.dart';
 import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/grid.dart';
+import '../../util/message_bus.dart';
 import '../widget_builder.dart';
 
 @Injectable()
@@ -21,67 +20,67 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
 
   @override
   Widget create(GridWidgetData data, Environment environment, BuildContext context) {
-    return DragTarget<WidgetData>(
-      onWillAccept: (widget) => data.acceptsChild(widget!),
-      onAccept: (widget) {
-        environment.get<CommandStack>().execute(
-          ReparentCommand(
-            bus: environment.get<MessageBus>(),
-            widget: widget,
-            newParent: data,
-          ),
-        );
+    final rows = data.rows;
+    final cols = data.cols;
+    final spacing = data.spacing ?? 8.0;
 
-        WidgetsBinding.instance.addPostFrameCallback((_) =>
-            environment.get<MessageBus>().publish(
-              "selection",
-              SelectionEvent(selection: widget, source: this),
-            ));
-      },
-      builder: (context, candidateData, rejectedData) {
-        final isActive = candidateData.isNotEmpty;
-        final hasChildren = data.children.isNotEmpty;
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        crossAxisSpacing: spacing.toDouble(),
+        mainAxisSpacing: spacing.toDouble(),
+      ),
+      itemCount: rows * cols,
+      itemBuilder: (context, index) {
+        final row = index ~/ cols;
+        final col = index % cols;
 
-        return Container(
-          constraints: const BoxConstraints(
-            minWidth: 100,
-            minHeight: 60,
-          ),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isActive ? Colors.blue : Colors.grey.shade400,
-              width: isActive ? 3 : 1,
-              style: hasChildren ? BorderStyle.solid : BorderStyle.solid,
-            ),
-            color: isActive
-                ? Colors.blue.shade50
-                : (hasChildren ? Colors.transparent : Colors.grey.shade50),
-          ),
-          child: hasChildren
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (int i = 0; i < data.children.length; i++) ...[
-                EditWidget(model: data.children[i]),
-                // Add spacing between children except for the last one
-                if (i < data.children.length - 1)
-                  const SizedBox(height: 8),
-              ],
-            ],
-          )
-              : Center(
-            child: Text(
-              isActive ? 'Drop widgets here' : 'Empty Container',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isActive ? Colors.blue.shade600 : Colors.grey.shade600,
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
+        // Find if there is a widget at (row, col)
+
+        var child = findElement(data.children,  (w) => w.cell!.row == row && w.cell!.col == col);
+
+        if (child != null) {
+          return EditWidget(model: child);
+        }
+
+        // Empty slot = drop area
+        return DragTarget<WidgetData>(
+          onWillAccept: (widget) => data.acceptsChild(widget!),
+          onAccept: (widget) {
+            environment.get<CommandStack>().execute(
+              ReparentCommand(
+                bus: environment.get<MessageBus>(),
+                widget: widget,
+                newParent: data,
+                newCell: Cell(row: row, col: col), // assign position
               ),
-            ),
-          ),
+            );
+          },
+          builder: (context, candidateData, rejectedData) {
+            final isActive = candidateData.isNotEmpty;
+            return Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: isActive ? Colors.blue : Colors.grey,
+                  width: 1,
+                  style: BorderStyle.solid,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Center(
+                child: Text(
+                  isActive ? "Drop here" : "Empty",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isActive ? Colors.blue : Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -97,38 +96,29 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
 
   @override
   Widget create(GridWidgetData data, Environment environment, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        color: Colors.grey.shade100,
+    final rows = data.rows;
+    final cols = data.cols;
+    final spacing = data.spacing ?? 8.0;
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        crossAxisSpacing: spacing.toDouble(),
+        mainAxisSpacing: spacing.toDouble(),
       ),
-      child: data.children.isNotEmpty
-          ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: data.children
-            .map(
-              (child) => Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: DynamicWidget(
-              model: child,
-              meta: typeRegistry[child.type],
-              parent: data,
-            ),
-          ),
-        )
-            .toList(),
-      )
-          : const SizedBox(
-        height: 50,
-        child: Center(
-          child: Text(
-            'Empty container',
-            style: TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-        ),
-      ),
+      itemCount: rows * cols,
+      itemBuilder: (context, index) {
+        final row = index ~/ cols;
+        final col = index % cols;
+
+        // Find if there is a widget at (row, col)
+
+        var child = findElement(data.children,  (w) => w.cell!.row == row && w.cell!.col == col);
+
+        return child != null ?  EditWidget(model: child) : null;
+      },
     );
   }
 }

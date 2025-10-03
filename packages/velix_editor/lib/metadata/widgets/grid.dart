@@ -11,9 +11,16 @@ import '../widget_data.dart';
 class GridWidgetData extends WidgetData {
   // instance data
 
+  @DeclareProperty(group: "layout")
+  int rows;
+  @DeclareProperty(group: "layout")
+  int cols;
+  @DeclareProperty(group: "layout")
+  int spacing;
+
   // constructor
 
-  GridWidgetData({super.type = "grid", super.children = const []});
+  GridWidgetData({super.type = "grid", super.children = const [], super.cell, this.rows = 1, this.cols = 1, this.spacing = 0});
 
   // override
 

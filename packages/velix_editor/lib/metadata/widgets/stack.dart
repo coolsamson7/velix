@@ -13,7 +13,7 @@ class StackWidgetData extends WidgetData {
 
   // constructor
 
-  StackWidgetData({super.type = "stack", super.children = const []});
+  StackWidgetData({super.type = "stack", super.cell, super.children = const []});
 
   // override
 

@@ -8,6 +8,51 @@
       "mainAxisSize": "min",
       "children": [
         {
+          "type": "grid",
+          "rows": 2,
+          "cols": 2,
+          "spacing": 10,
+          "children": [
+            {
+              "type": "text",
+              "cell": {
+                "row": 0,
+                "col": 0
+              },
+              "children": [],
+              "label": "0/0"
+            },
+            {
+              "type": "text",
+              "cell": {
+                "row": 0,
+                "col": 1
+              },
+              "children": [],
+              "label": "0/1"
+            },
+            {
+              "type": "text",
+              "cell": {
+                "row": 1,
+                "col": 0
+              },
+              "children": [],
+              "label": "1/0"
+            },
+            {
+              "type": "text",
+              "cell": {
+                "row": 1,
+                "col": 1
+              },
+              "children": [],
+              "label": "1/1"
+            }
+          ]
+        },
+
+        {
           "type": "text",
           "databinding": "user.name",
           "children": [],

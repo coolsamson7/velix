@@ -25,7 +25,7 @@ class ContainerWidgetData extends WidgetData {
 
   // constructor
 
-  ContainerWidgetData({super.type = "container", this.border, this.margin, this.padding, this.color, super.children = const []});
+  ContainerWidgetData({super.type = "container", super.cell, this.border, this.margin, this.padding, this.color, super.children = const []});
 
   // override
 

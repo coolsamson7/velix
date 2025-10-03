@@ -96,9 +96,14 @@
       "crossAxisAlignment": {"label":  "Cross Axis Alignment"},
       "mainAxisSize": {"label":  "Main Axis Size"}
     },
+
     "grid": {
-      "title": "Grid"
+      "title": "Grid",
+      "rows": {"label":  "Rows"},
+      "cols": {"label":  "Columns"},
+      "spacing": {"label":  "Spacing"}
     },
+
     "row": {
       "title": "Row",
       "mainAxisAlignment": {"label":  "Main Axis Alignment"},

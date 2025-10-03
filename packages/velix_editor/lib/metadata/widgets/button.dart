@@ -29,5 +29,5 @@ class ButtonWidgetData extends WidgetData {
 
   // constructor
 
-  ButtonWidgetData({super.type = "button", super.children = const [], required this.label, this.font, this.foregroundColor, this.backgroundColor, this.padding, this.onClick});
+  ButtonWidgetData({super.type = "button", super.cell, super.children = const [], required this.label, this.font, this.foregroundColor, this.backgroundColor, this.padding, this.onClick});
 }

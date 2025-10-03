@@ -21,7 +21,7 @@ class ColumnWidgetData extends WidgetData {
 
   // constructor
 
-  ColumnWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "column", super.children = const []});
+  ColumnWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "column", super.cell, super.children = const []});
 
   // override
 

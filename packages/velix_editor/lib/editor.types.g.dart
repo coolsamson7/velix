@@ -16,8 +16,9 @@ import 'package:velix_editor/metadata/annotations.dart' show DeclareProperty, De
 import 'dart:ui' show Color, FontWeight, FontStyle;
 import 'package:velix_editor/property_panel/editor/font_editor.dart' show FontEditorBuilder;
 import 'package:velix_editor/metadata/type_registry.dart' show TypeRegistry;
-import 'package:velix_editor/metadata/widget_data.dart' show WidgetData;
+import 'package:velix_editor/metadata/widget_data.dart' show Cell, WidgetData;
 import 'package:velix_mapper/mapper/json.dart' show JsonSerializable, Json;
+import 'package:velix_editor/edit_widget.dart' show EditWidgetState;
 import 'package:velix_editor/metadata/widgets/button.dart' show ButtonWidgetData;
 import 'package:velix_editor/property_panel/editor/code_editor.dart' show CodeEditorBuilder;
 import 'package:velix_editor/validate/validate.dart' show ExpressionPropertyValidator, PropertyValidator, WidgetValidator, ValuePropertyValidator;
@@ -31,7 +32,7 @@ import 'package:velix_editor/metadata/widgets/stack.dart' show StackWidgetData;
 import 'package:velix_editor/metadata/widgets/switch.dart' show SwitchWidgetData;
 import 'package:velix_editor/metadata/widgets/text.dart' show TextWidgetData;
 import 'package:velix_editor/persistence/persistence.dart' show WidgetLoader, WidgetExporter;
-import 'package:velix_editor/property_panel/editor/alignment_editor.dart' show CrossAxisAlignmentBuilder, MainAxisAlignmentBuilder, MainAxisSizeBuilder;
+import 'package:velix_editor/property_panel/editor/alignment_editor.dart' show CrossAxisAlignmentBuilder, MainAxisAlignmentBuilder, MainAxisSizeBuilder, BorderStyleBuilder;
 import 'package:velix_editor/property_panel/editor/bool_editor.dart' show BooleanEditorBuilder;
 import 'package:velix_editor/property_panel/editor/color_editor.dart' show ColorEditorBuilder;
 import 'package:velix_editor/property_panel/editor/font_style_editor.dart' show FontStyleEditorBuilder;
@@ -337,39 +338,29 @@ void registerEditorTypes() {
     ],
   );
 
-  var widgetDataDescriptor =  type<WidgetData>(
-    location: 'package:velix_editor/metadata/widget_data.dart:6:1',
-    annotations: [
-      JsonSerializable(discriminatorField: "type")
-    ],
+  type<Cell>(
+    location: 'package:velix_editor/metadata/widget_data.dart:8:1',
     params: [
-      param<String>('type', isNamed: true, isRequired: true), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
+      param<int>('row', isNamed: true, isRequired: true), 
+      param<int>('col', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = '', List<WidgetData> children = const []}) => WidgetData(type: type, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => WidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => WidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>? ?? const []),
+    constructor: ({int row = 0, int col = 0}) => Cell(row: row, col: col),
+    fromMapConstructor: (Map<String,dynamic> args) => Cell(row: args['row'] as int? ?? 0, col: args['col'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => Cell(row: args[0] as int? ?? 0, col: args[1] as int? ?? 0),
     fields: [
-      field<WidgetData,String>('type',
-        getter: (obj) => obj.type,
-      ), 
-      field<WidgetData,List<WidgetData>>('children',
+      field<Cell,int>('row',
         annotations: [
-          DeclareProperty(group: "general", label: "editor:groups.general", hide: true),
-          Json(required: false)
+          DeclareProperty()
         ],
-        elementType: WidgetData,
-        factoryConstructor: () => <WidgetData>[],
-        getter: (obj) => obj.children,
-        setter: (obj, value) => (obj as WidgetData).children = value,
+        getter: (obj) => obj.row,
+        setter: (obj, value) => (obj as Cell).row = value,
       ), 
-      field<WidgetData,WidgetData>('parent',
+      field<Cell,int>('col',
         annotations: [
-          Json(ignore: true)
+          DeclareProperty()
         ],
-        getter: (obj) => obj.parent,
-        setter: (obj, value) => (obj as WidgetData).parent = value,
-        isNullable: true
+        getter: (obj) => obj.col,
+        setter: (obj, value) => (obj as Cell).col = value,
       )
     ],
   );
@@ -604,276 +595,52 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => WidgetValidator(registry: args[0] as TypeRegistry),
   );
 
-  type<ButtonWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/button.dart:11:1',
-    superClass: widgetDataDescriptor,
+  var widgetDataDescriptor =  type<WidgetData>(
+    location: 'package:velix_editor/metadata/widget_data.dart:20:1',
     annotations: [
-      DeclareWidget(name: "button", group: "widgets", icon: "widget_button"),
-      JsonSerializable(discriminator: "button", includeNull: false)
+      JsonSerializable(discriminatorField: "type", includeNull: false)
     ],
     params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
+      param<String>('type', isNamed: true, isRequired: true), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true), 
-      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Color>('foregroundColor', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Color>('backgroundColor', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "button", List<WidgetData> children = const [], String label = '', required Font font, required Color foregroundColor, required Color backgroundColor, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
-    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, foregroundColor: args['foregroundColor'] as Color?, backgroundColor: args['backgroundColor'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', font: args[3] as Font?, foregroundColor: args[4] as Color?, backgroundColor: args[5] as Color?, padding: args[6] as Insets?, onClick: args[7] as String? ?? ''),
+    constructor: ({String type = '', List<WidgetData> children = const [], required Cell cell}) => WidgetData(type: type, children: children, cell: cell),
+    fromMapConstructor: (Map<String,dynamic> args) => WidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>? ?? const [], cell: args['cell'] as Cell?),
+    fromArrayConstructor: (List<dynamic> args) => WidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>? ?? const [], cell: args[2] as Cell?),
     fields: [
-      field<ButtonWidgetData,String>('label',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.label,
-        setter: (obj, value) => (obj as ButtonWidgetData).label = value,
+      field<WidgetData,String>('type',
+        getter: (obj) => obj.type,
       ), 
-      field<ButtonWidgetData,Font>('font',
+      field<WidgetData,List<WidgetData>>('children',
         annotations: [
-          DeclareProperty(group: "font")
+          DeclareProperty(group: "general", label: "editor:groups.general", hide: true),
+          Json(required: false)
         ],
-        getter: (obj) => obj.font,
-        setter: (obj, value) => (obj as ButtonWidgetData).font = value,
-        isNullable: true
+        elementType: WidgetData,
+        factoryConstructor: () => <WidgetData>[],
+        getter: (obj) => obj.children,
+        setter: (obj, value) => (obj as WidgetData).children = value,
       ), 
-      field<ButtonWidgetData,Color>('foregroundColor',
+      field<WidgetData,WidgetData>('parent',
         annotations: [
-          DeclareProperty(group: "style")
+          Json(ignore: true)
         ],
-        getter: (obj) => obj.foregroundColor,
-        setter: (obj, value) => (obj as ButtonWidgetData).foregroundColor = value,
+        getter: (obj) => obj.parent,
+        setter: (obj, value) => (obj as WidgetData).parent = value,
         isNullable: true
       ), 
-      field<ButtonWidgetData,Color>('backgroundColor',
-        annotations: [
-          DeclareProperty(group: "style")
-        ],
-        getter: (obj) => obj.backgroundColor,
-        setter: (obj, value) => (obj as ButtonWidgetData).backgroundColor = value,
+      field<WidgetData,Cell>('cell',
+        getter: (obj) => obj.cell,
+        setter: (obj, value) => (obj as WidgetData).cell = value,
         isNullable: true
       ), 
-      field<ButtonWidgetData,Insets>('padding',
+      field<WidgetData,EditWidgetState>('widget',
         annotations: [
-          DeclareProperty(group: "layout")
+          Json(ignore: true)
         ],
-        getter: (obj) => obj.padding,
-        setter: (obj, value) => (obj as ButtonWidgetData).padding = value,
-        isNullable: true
-      ), 
-      field<ButtonWidgetData,String>('onClick',
-        type: StringType().optional(),
-        annotations: [
-          DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
-        ],
-        getter: (obj) => obj.onClick,
-        setter: (obj, value) => (obj as ButtonWidgetData).onClick = value,
-        isNullable: true
-      )
-    ],
-  );
-
-  type<ColumnWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/column.dart:9:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "column", group: "container", icon: "widget_column"),
-      JsonSerializable(discriminator: "column", includeNull: false)
-    ],
-    params: [
-      param<MainAxisAlignment>('mainAxisAlignment', isNamed: true, isNullable: true, defaultValue: MainAxisAlignment.start), 
-      param<CrossAxisAlignment>('crossAxisAlignment', isNamed: true, isNullable: true, defaultValue: CrossAxisAlignment.start), 
-      param<MainAxisSize>('mainAxisSize', isNamed: true, isNullable: true, defaultValue: MainAxisSize.min), 
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "column"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
-    ],
-    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "column", List<WidgetData> children = const []}) => ColumnWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => ColumnWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "column", children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => ColumnWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "column", children: args[4] as List<WidgetData>? ?? const []),
-    fields: [
-      field<ColumnWidgetData,MainAxisAlignment>('mainAxisAlignment',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.mainAxisAlignment,
-        setter: (obj, value) => (obj as ColumnWidgetData).mainAxisAlignment = value,
-        isNullable: true
-      ), 
-      field<ColumnWidgetData,CrossAxisAlignment>('crossAxisAlignment',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.crossAxisAlignment,
-        setter: (obj, value) => (obj as ColumnWidgetData).crossAxisAlignment = value,
-        isNullable: true
-      ), 
-      field<ColumnWidgetData,MainAxisSize>('mainAxisSize',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.mainAxisSize,
-        setter: (obj, value) => (obj as ColumnWidgetData).mainAxisSize = value,
-        isNullable: true
-      )
-    ],
-  );
-
-  type<GridWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/grid.dart:8:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "grid", group: "container", icon: "widget_grid"),
-      JsonSerializable(discriminator: "grid", includeNull: false)
-    ],
-    params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "grid"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
-    ],
-    constructor: ({String type = "grid", List<WidgetData> children = const []}) => GridWidgetData(type: type, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => GridWidgetData(type: args['type'] as String? ?? "grid", children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>? ?? const []),
-  );
-
-  type<RowWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/row.dart:9:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "row", group: "container", icon: "widget_row"),
-      JsonSerializable(discriminator: "row", includeNull: false)
-    ],
-    params: [
-      param<MainAxisAlignment>('mainAxisAlignment', isNamed: true, isNullable: true, defaultValue: MainAxisAlignment.start), 
-      param<CrossAxisAlignment>('crossAxisAlignment', isNamed: true, isNullable: true, defaultValue: CrossAxisAlignment.start), 
-      param<MainAxisSize>('mainAxisSize', isNamed: true, isNullable: true, defaultValue: MainAxisSize.min), 
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "row"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
-    ],
-    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "row", List<WidgetData> children = const []}) => RowWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => RowWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "row", children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => RowWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "row", children: args[4] as List<WidgetData>? ?? const []),
-    fields: [
-      field<RowWidgetData,MainAxisAlignment>('mainAxisAlignment',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.mainAxisAlignment,
-        setter: (obj, value) => (obj as RowWidgetData).mainAxisAlignment = value,
-        isNullable: true
-      ), 
-      field<RowWidgetData,CrossAxisAlignment>('crossAxisAlignment',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.crossAxisAlignment,
-        setter: (obj, value) => (obj as RowWidgetData).crossAxisAlignment = value,
-        isNullable: true
-      ), 
-      field<RowWidgetData,MainAxisSize>('mainAxisSize',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        getter: (obj) => obj.mainAxisSize,
-        setter: (obj, value) => (obj as RowWidgetData).mainAxisSize = value,
-        isNullable: true
-      )
-    ],
-  );
-
-  type<StackWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/stack.dart:8:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "stack", group: "container", icon: "widget_stack"),
-      JsonSerializable(discriminator: "stack", includeNull: false)
-    ],
-    params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "stack"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
-    ],
-    constructor: ({String type = "stack", List<WidgetData> children = const []}) => StackWidgetData(type: type, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => StackWidgetData(type: args['type'] as String? ?? "stack", children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => StackWidgetData(type: args[0] as String? ?? "stack", children: args[1] as List<WidgetData>? ?? const []),
-  );
-
-  type<SwitchWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/switch.dart:9:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "switch", group: "widgets", icon: "widget_switch"),
-      JsonSerializable(discriminator: "switch", includeNull: false)
-    ],
-    params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true), 
-      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
-    ],
-    constructor: ({String type = "switch", List<WidgetData> children = const [], String label = '', required Insets padding, String databinding = ''}) => SwitchWidgetData(type: type, children: children, label: label, padding: padding, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', padding: args[3] as Insets?, databinding: args[4] as String? ?? ''),
-    fields: [
-      field<SwitchWidgetData,String>('label',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.label,
-        setter: (obj, value) => (obj as SwitchWidgetData).label = value,
-      ), 
-      field<SwitchWidgetData,Insets>('padding',
-        annotations: [
-          DeclareProperty(group: "style")
-        ],
-        getter: (obj) => obj.padding,
-        setter: (obj, value) => (obj as SwitchWidgetData).padding = value,
-        isNullable: true
-      ), 
-      field<SwitchWidgetData,String>('databinding',
-        type: StringType().optional(),
-        annotations: [
-          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
-        ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as SwitchWidgetData).databinding = value,
-        isNullable: true
-      )
-    ],
-  );
-
-  type<TextWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
-    superClass: widgetDataDescriptor,
-    annotations: [
-      DeclareWidget(name: "text", group: "widgets", icon: "widget_text"),
-      JsonSerializable(discriminator: "text", includeNull: false)
-    ],
-    params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
-      param<String>('label', isNamed: true, isRequired: true), 
-      param<String>('databinding', isNamed: true, isRequired: true)
-    ],
-    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', String databinding = ''}) => TextWidgetData(type: type, children: children, label: label, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', databinding: args[3] as String? ?? ''),
-    fields: [
-      field<TextWidgetData,String>('label',
-        annotations: [
-          DeclareProperty(group: "general")
-        ],
-        getter: (obj) => obj.label,
-        setter: (obj, value) => (obj as TextWidgetData).label = value,
-      ), 
-      field<TextWidgetData,String>('databinding',
-        type: StringType().optional(),
-        annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder)
-        ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as TextWidgetData).databinding = value,
+        getter: (obj) => obj.widget,
+        setter: (obj, value) => (obj as WidgetData).widget = value,
         isNullable: true
       )
     ],
@@ -1266,7 +1033,7 @@ void registerEditorTypes() {
   );
 
   type<GridEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:15:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:14:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1291,7 +1058,7 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:91:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:90:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1591,6 +1358,223 @@ void registerEditorTypes() {
     ],
   );
 
+  type<ButtonWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/button.dart:11:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "button", group: "widgets", icon: "widget_button"),
+      JsonSerializable(discriminator: "button", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Color>('foregroundColor', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Color>('backgroundColor', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "button", required Cell cell, List<WidgetData> children = const [], String label = '', required Font font, required Color foregroundColor, required Color backgroundColor, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, cell: cell, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
+    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', font: args['font'] as Font?, foregroundColor: args['foregroundColor'] as Color?, backgroundColor: args['backgroundColor'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", cell: args[1] as Cell?, children: args[2] as List<WidgetData>? ?? const [], label: args[3] as String? ?? '', font: args[4] as Font?, foregroundColor: args[5] as Color?, backgroundColor: args[6] as Color?, padding: args[7] as Insets?, onClick: args[8] as String? ?? ''),
+    fields: [
+      field<ButtonWidgetData,String>('label',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.label,
+        setter: (obj, value) => (obj as ButtonWidgetData).label = value,
+      ), 
+      field<ButtonWidgetData,Font>('font',
+        annotations: [
+          DeclareProperty(group: "font")
+        ],
+        getter: (obj) => obj.font,
+        setter: (obj, value) => (obj as ButtonWidgetData).font = value,
+        isNullable: true
+      ), 
+      field<ButtonWidgetData,Color>('foregroundColor',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.foregroundColor,
+        setter: (obj, value) => (obj as ButtonWidgetData).foregroundColor = value,
+        isNullable: true
+      ), 
+      field<ButtonWidgetData,Color>('backgroundColor',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.backgroundColor,
+        setter: (obj, value) => (obj as ButtonWidgetData).backgroundColor = value,
+        isNullable: true
+      ), 
+      field<ButtonWidgetData,Insets>('padding',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.padding,
+        setter: (obj, value) => (obj as ButtonWidgetData).padding = value,
+        isNullable: true
+      ), 
+      field<ButtonWidgetData,String>('onClick',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
+        ],
+        getter: (obj) => obj.onClick,
+        setter: (obj, value) => (obj as ButtonWidgetData).onClick = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<ColumnWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/column.dart:9:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "column", group: "container", icon: "widget_column"),
+      JsonSerializable(discriminator: "column", includeNull: false)
+    ],
+    params: [
+      param<MainAxisAlignment>('mainAxisAlignment', isNamed: true, isNullable: true, defaultValue: MainAxisAlignment.start), 
+      param<CrossAxisAlignment>('crossAxisAlignment', isNamed: true, isNullable: true, defaultValue: CrossAxisAlignment.start), 
+      param<MainAxisSize>('mainAxisSize', isNamed: true, isNullable: true, defaultValue: MainAxisSize.min), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "column"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
+    ],
+    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "column", required Cell cell, List<WidgetData> children = const []}) => ColumnWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, cell: cell, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => ColumnWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "column", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const []),
+    fromArrayConstructor: (List<dynamic> args) => ColumnWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "column", cell: args[4] as Cell?, children: args[5] as List<WidgetData>? ?? const []),
+    fields: [
+      field<ColumnWidgetData,MainAxisAlignment>('mainAxisAlignment',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.mainAxisAlignment,
+        setter: (obj, value) => (obj as ColumnWidgetData).mainAxisAlignment = value,
+        isNullable: true
+      ), 
+      field<ColumnWidgetData,CrossAxisAlignment>('crossAxisAlignment',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.crossAxisAlignment,
+        setter: (obj, value) => (obj as ColumnWidgetData).crossAxisAlignment = value,
+        isNullable: true
+      ), 
+      field<ColumnWidgetData,MainAxisSize>('mainAxisSize',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.mainAxisSize,
+        setter: (obj, value) => (obj as ColumnWidgetData).mainAxisSize = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<ContainerWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/container.dart:11:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "container", group: "container", icon: "widget_container"),
+      JsonSerializable(discriminator: "container", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "container"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Border>('border', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Insets>('margin', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Color>('color', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
+    ],
+    constructor: ({String type = "container", required Cell cell, required Border border, required Insets margin, required Insets padding, required Color color, List<WidgetData> children = const []}) => ContainerWidgetData(type: type, cell: cell, border: border, margin: margin, padding: padding, color: color, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetData(type: args['type'] as String? ?? "container", cell: args['cell'] as Cell?, border: args['border'] as Border?, margin: args['margin'] as Insets?, padding: args['padding'] as Insets?, color: args['color'] as Color?, children: args['children'] as List<WidgetData>? ?? const []),
+    fromArrayConstructor: (List<dynamic> args) => ContainerWidgetData(type: args[0] as String? ?? "container", cell: args[1] as Cell?, border: args[2] as Border?, margin: args[3] as Insets?, padding: args[4] as Insets?, color: args[5] as Color?, children: args[6] as List<WidgetData>? ?? const []),
+    fields: [
+      field<ContainerWidgetData,Border>('border',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.border,
+        setter: (obj, value) => (obj as ContainerWidgetData).border = value,
+        isNullable: true
+      ), 
+      field<ContainerWidgetData,Color>('color',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.color,
+        setter: (obj, value) => (obj as ContainerWidgetData).color = value,
+        isNullable: true
+      ), 
+      field<ContainerWidgetData,Insets>('padding',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.padding,
+        setter: (obj, value) => (obj as ContainerWidgetData).padding = value,
+        isNullable: true
+      ), 
+      field<ContainerWidgetData,Insets>('margin',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.margin,
+        setter: (obj, value) => (obj as ContainerWidgetData).margin = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<GridWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/grid.dart:8:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "grid", group: "container", icon: "widget_grid"),
+      JsonSerializable(discriminator: "grid", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "grid"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<int>('rows', isNamed: true, isNullable: true, defaultValue: 1), 
+      param<int>('cols', isNamed: true, isNullable: true, defaultValue: 1), 
+      param<int>('spacing', isNamed: true, isNullable: true, defaultValue: 0)
+    ],
+    constructor: ({String type = "grid", List<WidgetData> children = const [], required Cell cell, int rows = 1, int cols = 1, int spacing = 0}) => GridWidgetData(type: type, children: children, cell: cell, rows: rows, cols: cols, spacing: spacing),
+    fromMapConstructor: (Map<String,dynamic> args) => GridWidgetData(type: args['type'] as String? ?? "grid", children: args['children'] as List<WidgetData>? ?? const [], cell: args['cell'] as Cell?, rows: args['rows'] as int? ?? 1, cols: args['cols'] as int? ?? 1, spacing: args['spacing'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>? ?? const [], cell: args[2] as Cell?, rows: args[3] as int? ?? 1, cols: args[4] as int? ?? 1, spacing: args[5] as int? ?? 0),
+    fields: [
+      field<GridWidgetData,int>('rows',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.rows,
+        setter: (obj, value) => (obj as GridWidgetData).rows = value,
+      ), 
+      field<GridWidgetData,int>('cols',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.cols,
+        setter: (obj, value) => (obj as GridWidgetData).cols = value,
+      ), 
+      field<GridWidgetData,int>('spacing',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.spacing,
+        setter: (obj, value) => (obj as GridWidgetData).spacing = value,
+      )
+    ],
+  );
+
   type<LabelWidgetData>(
     location: 'package:velix_editor/metadata/widgets/label.dart:11:1',
     superClass: widgetDataDescriptor,
@@ -1600,6 +1584,7 @@ void registerEditorTypes() {
     ],
     params: [
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
       param<String>('label', isNamed: true, isRequired: true), 
       param<Color>('color', isNamed: true, isNullable: true, defaultValue: null), 
@@ -1608,9 +1593,9 @@ void registerEditorTypes() {
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "text", List<WidgetData> children = const [], String label = '', required Color color, required Color backgroundColor, required Value value, required Font font, String databinding = ''}) => LabelWidgetData(type: type, children: children, label: label, color: color, backgroundColor: backgroundColor, value: value, font: font, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', color: args['color'] as Color?, backgroundColor: args['backgroundColor'] as Color?, value: args['value'] as Value?, font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", children: args[1] as List<WidgetData>? ?? const [], label: args[2] as String? ?? '', color: args[3] as Color?, backgroundColor: args[4] as Color?, value: args[5] as Value?, font: args[6] as Font?, databinding: args[7] as String? ?? ''),
+    constructor: ({String type = "text", required Cell cell, List<WidgetData> children = const [], String label = '', required Color color, required Color backgroundColor, required Value value, required Font font, String databinding = ''}) => LabelWidgetData(type: type, cell: cell, children: children, label: label, color: color, backgroundColor: backgroundColor, value: value, font: font, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "text", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', color: args['color'] as Color?, backgroundColor: args['backgroundColor'] as Color?, value: args['value'] as Value?, font: args['font'] as Font?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "text", cell: args[1] as Cell?, children: args[2] as List<WidgetData>? ?? const [], label: args[3] as String? ?? '', color: args[4] as Color?, backgroundColor: args[5] as Color?, value: args[6] as Value?, font: args[7] as Font?, databinding: args[8] as String? ?? ''),
     fields: [
       field<LabelWidgetData,String>('label',
         annotations: [
@@ -1663,55 +1648,147 @@ void registerEditorTypes() {
     ],
   );
 
-  type<ContainerWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/container.dart:11:1',
+  type<RowWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/row.dart:9:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "container", group: "container", icon: "widget_container"),
-      JsonSerializable(discriminator: "container", includeNull: false)
+      DeclareWidget(name: "row", group: "container", icon: "widget_row"),
+      JsonSerializable(discriminator: "row", includeNull: false)
     ],
     params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "container"), 
-      param<Border>('border', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Insets>('margin', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Color>('color', isNamed: true, isNullable: true, defaultValue: null), 
+      param<MainAxisAlignment>('mainAxisAlignment', isNamed: true, isNullable: true, defaultValue: MainAxisAlignment.start), 
+      param<CrossAxisAlignment>('crossAxisAlignment', isNamed: true, isNullable: true, defaultValue: CrossAxisAlignment.start), 
+      param<MainAxisSize>('mainAxisSize', isNamed: true, isNullable: true, defaultValue: MainAxisSize.min), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "row"), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "row", List<WidgetData> children = const [], required Cell cell}) => RowWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, children: children, cell: cell),
+    fromMapConstructor: (Map<String,dynamic> args) => RowWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "row", children: args['children'] as List<WidgetData>? ?? const [], cell: args['cell'] as Cell?),
+    fromArrayConstructor: (List<dynamic> args) => RowWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "row", children: args[4] as List<WidgetData>? ?? const [], cell: args[5] as Cell?),
+    fields: [
+      field<RowWidgetData,MainAxisAlignment>('mainAxisAlignment',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.mainAxisAlignment,
+        setter: (obj, value) => (obj as RowWidgetData).mainAxisAlignment = value,
+        isNullable: true
+      ), 
+      field<RowWidgetData,CrossAxisAlignment>('crossAxisAlignment',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.crossAxisAlignment,
+        setter: (obj, value) => (obj as RowWidgetData).crossAxisAlignment = value,
+        isNullable: true
+      ), 
+      field<RowWidgetData,MainAxisSize>('mainAxisSize',
+        annotations: [
+          DeclareProperty(group: "layout")
+        ],
+        getter: (obj) => obj.mainAxisSize,
+        setter: (obj, value) => (obj as RowWidgetData).mainAxisSize = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<StackWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/stack.dart:8:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "stack", group: "container", icon: "widget_stack"),
+      JsonSerializable(discriminator: "stack", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "stack"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const [])
     ],
-    constructor: ({String type = "container", required Border border, required Insets margin, required Insets padding, required Color color, List<WidgetData> children = const []}) => ContainerWidgetData(type: type, border: border, margin: margin, padding: padding, color: color, children: children),
-    fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetData(type: args['type'] as String? ?? "container", border: args['border'] as Border?, margin: args['margin'] as Insets?, padding: args['padding'] as Insets?, color: args['color'] as Color?, children: args['children'] as List<WidgetData>? ?? const []),
-    fromArrayConstructor: (List<dynamic> args) => ContainerWidgetData(type: args[0] as String? ?? "container", border: args[1] as Border?, margin: args[2] as Insets?, padding: args[3] as Insets?, color: args[4] as Color?, children: args[5] as List<WidgetData>? ?? const []),
+    constructor: ({String type = "stack", required Cell cell, List<WidgetData> children = const []}) => StackWidgetData(type: type, cell: cell, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => StackWidgetData(type: args['type'] as String? ?? "stack", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const []),
+    fromArrayConstructor: (List<dynamic> args) => StackWidgetData(type: args[0] as String? ?? "stack", cell: args[1] as Cell?, children: args[2] as List<WidgetData>? ?? const []),
+  );
+
+  type<SwitchWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/switch.dart:9:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "switch", group: "widgets", icon: "widget_switch"),
+      JsonSerializable(discriminator: "switch", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "switch", required Cell cell, List<WidgetData> children = const [], String label = '', required Insets padding, String databinding = ''}) => SwitchWidgetData(type: type, cell: cell, children: children, label: label, padding: padding, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>? ?? const [], label: args[3] as String? ?? '', padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
     fields: [
-      field<ContainerWidgetData,Border>('border',
+      field<SwitchWidgetData,String>('label',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.label,
+        setter: (obj, value) => (obj as SwitchWidgetData).label = value,
+      ), 
+      field<SwitchWidgetData,Insets>('padding',
         annotations: [
           DeclareProperty(group: "style")
-        ],
-        getter: (obj) => obj.border,
-        setter: (obj, value) => (obj as ContainerWidgetData).border = value,
-        isNullable: true
-      ), 
-      field<ContainerWidgetData,Color>('color',
-        annotations: [
-          DeclareProperty(group: "style")
-        ],
-        getter: (obj) => obj.color,
-        setter: (obj, value) => (obj as ContainerWidgetData).color = value,
-        isNullable: true
-      ), 
-      field<ContainerWidgetData,Insets>('padding',
-        annotations: [
-          DeclareProperty(group: "layout")
         ],
         getter: (obj) => obj.padding,
-        setter: (obj, value) => (obj as ContainerWidgetData).padding = value,
+        setter: (obj, value) => (obj as SwitchWidgetData).padding = value,
         isNullable: true
       ), 
-      field<ContainerWidgetData,Insets>('margin',
+      field<SwitchWidgetData,String>('databinding',
+        type: StringType().optional(),
         annotations: [
-          DeclareProperty(group: "layout")
+          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
         ],
-        getter: (obj) => obj.margin,
-        setter: (obj, value) => (obj as ContainerWidgetData).margin = value,
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as SwitchWidgetData).databinding = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<TextWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/text.dart:8:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "text", group: "widgets", icon: "widget_text"),
+      JsonSerializable(discriminator: "text", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: const []), 
+      param<String>('label', isNamed: true, isRequired: true), 
+      param<String>('databinding', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String type = "text", required Cell cell, List<WidgetData> children = const [], String label = '', String databinding = ''}) => TextWidgetData(type: type, cell: cell, children: children, label: label, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>? ?? const [], label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", cell: args[1] as Cell?, children: args[2] as List<WidgetData>? ?? const [], label: args[3] as String? ?? '', databinding: args[4] as String? ?? ''),
+    fields: [
+      field<TextWidgetData,String>('label',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.label,
+        setter: (obj, value) => (obj as TextWidgetData).label = value,
+      ), 
+      field<TextWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as TextWidgetData).databinding = value,
         isNullable: true
       )
     ],
@@ -1779,6 +1856,28 @@ void registerEditorTypes() {
           param<PropertyEditorBuilderFactory>('registry', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as MainAxisSizeBuilder).setup(args[1])
+      )
+    ],
+  );
+
+  type<BorderStyleBuilder>(
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:20:1',
+    superClass: abstractEnumBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => BorderStyleBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => BorderStyleBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => BorderStyleBuilder(),
+    methods: [
+      method<BorderStyleBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as BorderStyleBuilder).setup(args[1])
       )
     ],
   );

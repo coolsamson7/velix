@@ -6,7 +6,19 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../edit_widget.dart';
 
 @Dataclass()
-@JsonSerializable(discriminatorField: "type")
+class Cell {
+  @DeclareProperty()
+  int row;
+  @DeclareProperty()
+  int col;
+
+  // constructor
+
+  Cell({required this.row, required this.col});
+}
+
+@Dataclass()
+@JsonSerializable(discriminatorField: "type", includeNull: false)
 /*abstract*/ class WidgetData {
   // instance data
 
@@ -17,11 +29,14 @@ import '../edit_widget.dart';
   @Json(ignore: true)
   WidgetData? parent;
 
+  Cell? cell;
+
+  @Json(ignore: true)
   EditWidgetState? widget;
 
   // constructor
 
-  WidgetData({required this.type, this.children = const []});
+  WidgetData({required this.type, this.children = const [], this.cell});
 
   // public
 

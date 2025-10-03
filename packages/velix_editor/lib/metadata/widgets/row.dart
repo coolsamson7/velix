@@ -22,7 +22,7 @@ class RowWidgetData extends WidgetData {
 
   // constructor
 
-  RowWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "row", super.children = const []});
+  RowWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "row", super.children = const [], super.cell});
 
   // override
 

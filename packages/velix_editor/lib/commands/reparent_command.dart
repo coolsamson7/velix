@@ -13,14 +13,17 @@ class ReparentCommand extends Command {
   int index = -1;
   final WidgetData? oldParent;
   final WidgetData? newParent;
+  final Cell? oldCell;
+  final Cell? newCell;
 
   // constructor
 
   ReparentCommand({
     required this.bus,
     required this.widget,
-    required this.newParent,
-  }) : oldParent = widget.parent;
+    this.newParent,
+    this.newCell,
+  }) : oldParent = widget.parent, oldCell = widget.cell;
 
   // override
 
@@ -41,6 +44,7 @@ class ReparentCommand extends Command {
     // add to new
 
     widget.parent = newParent;
+    widget.cell = newCell;
 
     if ( newParent != null) {
       newParent!.children.add(widget);
@@ -66,6 +70,7 @@ class ReparentCommand extends Command {
     }
 
     widget.parent = oldParent;
+    widget.cell = oldCell;
 
     // add to old
 

@@ -30,6 +30,7 @@ import '../widget_container.dart';
 import 'canvas.dart';
 import 'error_messages.dart';
 import 'docking_container.dart';
+import 'layout_canvas.dart';
 import 'widget_breadcrumb.dart';
 
 part "editor.command.g.dart";
@@ -586,7 +587,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                         child: Column(
                           children: [
                             Expanded(
-                              child:
+                              child: LayoutCanvas(child:
                             edit ? FocusableRegion(
                                 child: EditorCanvas(
                                   messageBus: environment.get<MessageBus>(),
@@ -599,6 +600,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 models: widget.models,
                                 typeRegistry: environment.get<TypeRegistry>(),
                               ),
+      )
                             ),
                             Container(
                               height: 32,

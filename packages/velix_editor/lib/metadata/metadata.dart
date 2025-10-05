@@ -66,12 +66,15 @@ class PropertyDescriptor {
         return false;
     }
 
-    if (defaultValue != null)
+    if (field.factoryConstructor != null)
+      return field.factoryConstructor!();
+
+    //if (defaultValue != null)
       return defaultValue; // e.g. enums
 
     // children...
 
-    return field.factoryConstructor!();
+    //return field.factoryConstructor!();
   }
 }
 

@@ -28,7 +28,7 @@ class Cell {
   List<WidgetData> children;
   @Json(ignore: true)
   WidgetData? parent;
-
+  @DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
   Cell? cell;
 
   @Json(ignore: true)

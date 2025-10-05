@@ -69,7 +69,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:236:1',
+    location: 'package:velix_editor/editor/editor.dart:237:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -101,7 +101,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:282:1',
+    location: 'package:velix_editor/editor/editor.dart:283:1',
     annotations: [
       Injectable()
     ],
@@ -125,7 +125,7 @@ void registerEditorTypes() {
   );
 
   type<EditorScreenState>(
-    location: 'package:velix_editor/editor/editor.dart:335:1',
+    location: 'package:velix_editor/editor/editor.dart:336:1',
     constructor: () => EditorScreenState(),
     fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
     fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
@@ -453,7 +453,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:257:1',
+    location: 'package:velix_editor/editor/editor.dart:258:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
@@ -631,6 +631,9 @@ void registerEditorTypes() {
         isNullable: true
       ), 
       field<WidgetData,Cell>('cell',
+        annotations: [
+          DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
+        ],
         getter: (obj) => obj.cell,
         setter: (obj, value) => (obj as WidgetData).cell = value,
         isNullable: true

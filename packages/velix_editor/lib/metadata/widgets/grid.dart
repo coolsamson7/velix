@@ -38,7 +38,7 @@ class GridWidgetData extends WidgetData {
   }
 
   @override
-  bool acceptsChild(WidgetData widget) { // TODO parent -> child, CEll!!!
-    return !isParentOf(widget, this); //widget.parent != this;
+  bool acceptsChild(WidgetData widget) {
+    return !isParentOf(widget, this);
   }
 }

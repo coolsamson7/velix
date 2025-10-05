@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/theme/abstract_widget.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
 import 'metadata/metadata.dart';
@@ -15,6 +16,8 @@ class DynamicWidget extends StatefulWidget {
   final WidgetDescriptor meta;
   final WidgetData? parent; // optional reference to parent container
 
+  // constructor
+
   const DynamicWidget({
     super.key,
     required this.model,
@@ -26,7 +29,7 @@ class DynamicWidget extends StatefulWidget {
   State<DynamicWidget> createState() => _DynamicWidgetState();
 }
 
-class _DynamicWidgetState extends State<DynamicWidget> {
+class _DynamicWidgetState extends AbstractWidgetState<DynamicWidget> {
   // instance data
 
   late final WidgetFactory theme;
@@ -44,6 +47,8 @@ class _DynamicWidgetState extends State<DynamicWidget> {
 
   @override
   Widget build(BuildContext context) {
+    widget.model.widget = this;
+
     return theme.builder(widget.model.type).create(widget.model, environment, context);
   }
 }

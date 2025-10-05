@@ -1,6 +1,7 @@
 import 'package:petitparser/petitparser.dart';
 
 import 'expressions.dart';
+import 'infer_types.dart';
 import 'parser.dart';
 
 /// Standardized result type for both modes.
@@ -57,10 +58,20 @@ class ActionParser {
 
   // public
 
-  ParseResult parsePrefix(String input) {
+  ParseResult parsePrefix(String input, { TypeChecker? typeChecker}) {
     final result = parser.expression.parse(input);
     if (result is Success<Expression>) {
       final complete = result.position == result.buffer.length;
+
+      // check types
+
+      if (typeChecker != null) {
+        var expr = result.value;
+
+        expr.accept(typeChecker);
+      }
+
+      // done
 
       return ParseResult.success(result.value, complete: complete);
     }
@@ -68,9 +79,19 @@ class ActionParser {
   }
 
   /// Parse input requiring complete success.
-  ParseResult parseStrict(String input) {
+  ParseResult parseStrict(String input, { TypeChecker? typeChecker}) {
     final result = parser.expression.end().parse(input);
-    if (result is  Success<Expression>) {
+    if (result is Success<Expression>) {
+      // check types
+
+      if (typeChecker != null) {
+        var expr = result.value;
+
+        expr.accept(typeChecker);
+      }
+
+      // done
+
       return ParseResult.success(result.value, complete: true);
     }
     return ParseResult.failure(result.message, result.position);

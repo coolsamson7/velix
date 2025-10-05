@@ -349,7 +349,7 @@ void main() {
 
     registry.read(data["classes"]);
 
-    var autocomplete = Autocomplete(registry.getClass("Page"));
+    var autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"))));
     
     test('variable ', () {
       var suggestions = autocomplete.suggest("a");

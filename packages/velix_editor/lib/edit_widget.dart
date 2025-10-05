@@ -1,8 +1,8 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide WidgetState;
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
 import 'package:velix_editor/event/events.dart';
+import 'package:velix_editor/theme/abstract_widget.dart';
 import 'package:velix_editor/theme/theme.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
@@ -25,7 +25,7 @@ class EditWidget extends StatefulWidget {
   State<EditWidget> createState() => EditWidgetState();
 }
 
-class EditWidgetState extends State<EditWidget> {
+class EditWidgetState extends AbstractWidgetState<EditWidget> {
   // instance data
 
   late final Environment environment;

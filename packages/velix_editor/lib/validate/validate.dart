@@ -87,6 +87,8 @@ class ExpressionPropertyValidator extends PropertyValidator<String> {
 
       result.value.accept(checker);
 
+      // TODO
+
       print(1);
     }
     catch(e) {

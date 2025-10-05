@@ -12,10 +12,34 @@ class WidgetContext {
 
   dynamic page;
   FormMapper formMapper; // TODO databinding
+  late WidgetContainer container;
+  Map<String,List<WidgetData>> bindings = {};
 
   // constructor
 
-  WidgetContext({required this.page}) :  formMapper = FormMapper(instance: page, twoWay: true);
+  WidgetContext({required this.page}) :  formMapper = FormMapper(instance: page, twoWay: true) {
+    formMapper.addListener((event) => onEvent);
+  }
+
+  //( callback
+
+  void onEvent(FormEvent event) {
+    var widgets = bindings[event.path];
+    if (widgets != null) {
+      for ( var widget in widgets)
+        widget.widget!.setState((){}); // TODO widget.update();
+    }
+  }
+
+  // public
+
+   void addBinding(String binding, WidgetData widget) {
+     var widgets = bindings[binding];
+     if (widgets == null)
+       bindings[binding] = [widget];
+     else
+       widgets.add(widget);
+   }
 }
 
 class WidgetContainer extends StatefulWidget {
@@ -29,6 +53,7 @@ class WidgetContainer extends StatefulWidget {
 
   WidgetContainer({super.key, required this.models, required this.typeRegistry, required this.context}) {
     //formMapper = FormMapper(instance: context.page, twoWay: false);
+    context.container = this;
   }
 
   // override

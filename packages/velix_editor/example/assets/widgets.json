@@ -78,9 +78,10 @@
         },
         {
           "type": "label",
-          "label": "hurz",
-
-          "databinding": "user.cool",
+          "label": {
+            "type": "value",
+            "value": "hurz"
+          },
           "children": []
         },
         {

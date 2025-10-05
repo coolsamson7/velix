@@ -63,7 +63,7 @@ class _EditorCanvasState extends State<EditorCanvas> {
       selection!.setSelected(false);
 
     if (widget != null) {
-      selection = widget.widget;
+      selection = widget.widget as EditWidgetState;
 
       selection!.setSelected(true);
     }

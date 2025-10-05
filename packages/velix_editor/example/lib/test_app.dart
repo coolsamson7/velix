@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Autocomplete;
+import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/property_panel/editor/code_editor.dart';
@@ -24,7 +25,7 @@ final addressClass = ClassDesc('Address',
   },
 );
 
-var autocomplete = Autocomplete(pageClass);
+var autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: pageClass)));
 
 void main() => runApp(const MyApp());
 

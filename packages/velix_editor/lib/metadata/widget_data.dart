@@ -3,7 +3,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-import '../edit_widget.dart';
+import '../theme/abstract_widget.dart';
 
 @Dataclass()
 class Cell {
@@ -32,7 +32,7 @@ class Cell {
   Cell? cell;
 
   @Json(ignore: true)
-  EditWidgetState? widget;
+  AbstractWidgetState? widget;
 
   // constructor
 

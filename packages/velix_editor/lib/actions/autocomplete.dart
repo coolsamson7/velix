@@ -19,16 +19,12 @@ class Suggestion {
 class Autocomplete {
   // instance data
 
-  final ClassDesc root;
-  final TypeResolver<ClassDescTypeInfo> typeResolver;
   final ActionParser parser = ActionParser.instance;
-  late TypeChecker typeChecker;
+  final TypeChecker typeChecker;
 
   // constructor
 
-  Autocomplete(this.root) :typeResolver = ClassDescTypeResolver(root: root) {
-    typeChecker = TypeChecker<ClassDescTypeInfo>(typeResolver);
-  }
+  Autocomplete({required this.typeChecker});
 
   // public
 

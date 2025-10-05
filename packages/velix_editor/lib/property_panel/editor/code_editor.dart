@@ -6,6 +6,7 @@ import 'package:velix_editor/editor/editor.dart';
 
 import '../../actions/action_parser.dart';
 import '../../actions/autocomplete.dart';
+import '../../actions/infer_types.dart';
 import '../../commands/command_stack.dart';
 import '../../metadata/metadata.dart';
 import '../../util/message_bus.dart';
@@ -61,6 +62,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   String _originalText = '';
   int _originalCursorPos = 0;
   late Autocomplete autocomplete;
+  TypeChecker? typeChecker;
   ParseState _parseState = ParseState.invalid;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -73,14 +75,14 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   ParseState checkParse(String input) {
       // full parse
 
-     lastResult = ActionParser.instance.parseStrict(input);
+     lastResult = ActionParser.instance.parseStrict(input, typeChecker: typeChecker);
 
       if (lastResult.complete)
         return ParseState.complete;
 
       // try prefix
 
-     lastResult = ActionParser.instance.parsePrefix(input);
+     lastResult = ActionParser.instance.parsePrefix(input, typeChecker: typeChecker);
 
       if (lastResult.success)
         return ParseState.prefixOnly;
@@ -371,10 +373,9 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     super.didChangeDependencies();
 
     var editContext = Provider.of<EditContext>(context);
-
-    //editContext.type
-
-    autocomplete = Autocomplete(Provider.of<EditContext>(context).type);
+    
+    typeChecker = TypeChecker(ClassDescTypeResolver(root: editContext.type));
+    autocomplete = Autocomplete(typeChecker: typeChecker!);
   }
 
   @override

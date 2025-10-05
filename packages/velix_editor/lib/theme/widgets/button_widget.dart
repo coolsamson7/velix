@@ -6,6 +6,7 @@ import 'package:velix_di/di/di.dart';
 import '../../actions/action_evaluator.dart';
 import '../../metadata/widgets/button.dart';
 import '../../widget_container.dart';
+import '../abstract_widget.dart' show AbstractWidgetState;
 import '../widget_builder.dart';
 
 @Injectable()
@@ -34,7 +35,7 @@ class ButtonWidget extends StatefulWidget {
   State<ButtonWidget> createState() => _ButtonWidgetState();
 }
 
-class _ButtonWidgetState extends State<ButtonWidget> {
+class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
   VoidCallback? _onClick;
 
   @override
@@ -53,6 +54,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return ElevatedButton(
       onPressed: _onClick,
       style: ElevatedButton.styleFrom(

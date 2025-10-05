@@ -21,6 +21,25 @@ class TypeInfo<T,D> {
   V getDescriptor<V>() => descriptor as V;
 }
 
+class TypeException implements Exception {
+  // instance data
+
+  final String message;
+  final Exception? cause;
+
+  // constructor
+
+  /// Create a new [ConfigurationException]
+  /// [message] the message
+  /// [cause] optional chained exception
+  const TypeException(this.message, [this.cause]);
+
+  // override
+
+  @override
+  String toString() => 'TypeException: $message';
+}
+
 abstract class TypeResolver<T extends TypeInfo> {
   void checkArguments(dynamic descriptor, List<T> arguments);
 
@@ -68,11 +87,11 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
     var method = descriptor as MethodDescriptor;
 
     if (method.parameters.length != arguments.length)
-      throw Exception("ouch wrong number of args");
+      throw TypeException("${method.name} expects ${method.parameters.length} arguments");
 
     for (var i = 0; i <  arguments.length; i++) {
       if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type.type))
-        throw Exception("ouch wrong arg type"); // TODO
+        throw TypeException("${method.name} parameter $i ${descriptor.parameters[i].name} expected a ${descriptor.parameters[i].type.toString()} ");
     }
   }
 
@@ -165,13 +184,13 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
     // number
 
     if (method.parameters.length != arguments.length)
-      throw Exception("${method.name} expects ${method.parameters.length} arguments");
+      throw TypeException("${method.name} expects ${method.parameters.length} arguments");
 
     // type
 
     for (var i = 0; i <  arguments.length; i++) {
       if (!isAssignableFrom(descriptor.parameters[i].type, arguments[i].type))
-        throw Exception("${method.name} parameter $i ${descriptor.parameters[i].name} expected a ${descriptor.parameters[i].type.name} ");
+        throw TypeException("${method.name} parameter $i ${descriptor.parameters[i].name} expected a ${descriptor.parameters[i].type.name} ");
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
+import 'package:velix_ui/databinding/form_mapper.dart';
 import 'package:velix_ui/databinding/valued_widget.dart';
 
 import '../../metadata/widgets/label.dart';
@@ -31,21 +32,22 @@ class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
 
     var label = data.label.value;
 
+    TypeProperty? typeProperty;
+    if (data.label.type == ValueType.i18n)
+      label = label.tr();
+    if (data.label.type == ValueType.binding) {
+      typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), label);
+      label = typeProperty.get(instance, ValuedWidgetContext(mapper: mapper));
+    }
+
     var result = Text(label,
         style: data.font?.textStyle(color: data.color, backgroundColor: data.backgroundColor)
     );
 
-    switch (data.label.type) {
-      case ValueType.i18n:
-        label = label.tr();
-        break;
-      case ValueType.binding:
-        widgetContext.addBinding(label, data);
-        var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), label);
+    if (data.label.type == ValueType.binding) {
+        widgetContext.addBinding(typeProperty!, data);
+
         mapper.map(property: typeProperty, widget: result, adapter: adapter);
-        break;
-      case ValueType.value:
-        break;
     }
 
     return result;

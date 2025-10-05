@@ -40,6 +40,10 @@ class Cell {
 
   // public
 
+  void update() {
+    widget?.setState((){});
+  }
+
   bool acceptsChild(WidgetData widget) {
     return false;
   }

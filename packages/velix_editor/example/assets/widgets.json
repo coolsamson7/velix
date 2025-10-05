@@ -79,8 +79,8 @@
         {
           "type": "label",
           "label": {
-            "type": "value",
-            "value": "hurz"
+            "type": "binding",
+            "value": "user.name"
           },
           "children": []
         },

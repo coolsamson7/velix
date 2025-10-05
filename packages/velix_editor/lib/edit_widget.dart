@@ -37,7 +37,8 @@ class EditWidgetState extends State<EditWidget> {
 
   void setSelected(bool value) {
     if (value != selected)
-      setState(() => selected = value);
+      if (widget.model.widget != null) // was it deleted?
+        setState(() => selected = value);
   }
 
   void delete() {

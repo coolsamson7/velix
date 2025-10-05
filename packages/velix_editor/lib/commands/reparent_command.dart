@@ -54,6 +54,11 @@ class ReparentCommand extends Command {
         PropertyChangeEvent(widget: newParent, source: this),
       );
     }
+    else {
+      widget.widget = null; // it was deleted
+
+      bus.publish("selection", SelectionEvent(selection: null, source: null));
+    }
   }
 
   @override

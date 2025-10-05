@@ -370,6 +370,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    var editContext = Provider.of<EditContext>(context);
+
+    //editContext.type
+
     autocomplete = Autocomplete(Provider.of<EditContext>(context).type);
   }
 

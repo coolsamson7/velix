@@ -46,7 +46,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
         final hasChildren = data.children.isNotEmpty;
 
         return Container(
-          color: data.color,
+          //color: data.border == null ? data.color : null,
           constraints: const BoxConstraints(
             minWidth: 100,
             minHeight: 60,
@@ -54,6 +54,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
           padding: data.padding?.edgeInsets(),
           margin: data.margin?.edgeInsets(),
           decoration: BoxDecoration(
+
             border: Border.all(
               color: isActive ? Colors.blue : Colors.grey.shade400,
               width: isActive ? 3 : 1,
@@ -107,12 +108,13 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   @override
   Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
     return Container(
+      color: data.border == null ? data.color : null,
       padding: data.padding?.edgeInsets(),
       margin: data.margin?.edgeInsets(),
       //height: data.height;,
       decoration: data.border != null ? BoxDecoration(
         border: data.border!.border(),
-        //color: Colors.grey.shade100,
+        color: data.color,
       ) : null,
       child: data.children.isNotEmpty
           ? Column(

@@ -144,6 +144,9 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   }
 
   void _updateInlineCompletion() {
+    if (_isUpdatingCompletion)
+      return;
+
     if (_matches.isEmpty || _selectedIndex < 0) return;
 
     final completion = _matches[_selectedIndex].label;
@@ -168,8 +171,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     final newText = text.substring(0, wordStart) + completion + text.substring(cursorPos);
 
-    print("new text = '$newText', curser: $cursorPos");
     _isUpdatingCompletion = true;
+
     _controller.value = TextEditingValue(
       text: newText,
       selection: TextSelection(
@@ -177,7 +180,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         extentOffset: cursorPos + suffix.length, // select only the suffix
       ),
     );
-    _isUpdatingCompletion = false;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _isUpdatingCompletion = false);
   }
 
 

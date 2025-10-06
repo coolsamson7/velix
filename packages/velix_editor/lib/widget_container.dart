@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class WidgetContext {
   // instance data
 
   dynamic page;
-  FormMapper formMapper; // TODO databinding
+  FormMapper formMapper;
   late WidgetContainer container;
   Map<TypeProperty,Set<WidgetData>> bindings = {};
 
@@ -29,7 +30,7 @@ class WidgetContext {
     var widgets = bindings[event.path];
     if (widgets != null) {
       for ( var widget in widgets)
-        widget.widget!.setState((){}); // TODO
+        widget.update();
     }
   }
 
@@ -68,8 +69,16 @@ class _WidgetContainerState extends State<WidgetContainer> {
   // instance data
 
   TypeRegistry? typeRegistry;
+  StreamSubscription? subscription;
 
   // override
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    subscription?.cancel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,20 +87,11 @@ class _WidgetContainerState extends State<WidgetContainer> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.context.formMapper.setValue(widget.context.page);
 
-      widget.context.formMapper.addListener((event) { // TODO. wohgin + dispose
-        for ( var w in widget.context.bindings[event.property] ?? {})
-          w.update();
+      subscription ??= widget.context.formMapper.addListener((event) {
+          for ( var widget in widget.context.bindings[event.property] ?? {})
+            widget.update();
 
-      }, emitOnChange: true);
-
-      /* take care of bindings
-
-      var valuedWidgetContext = ValuedWidgetContext(mapper: widget.context.formMapper);
-      for ( var typeProperty in widget.context.bindings.keys) {
-        var v = typeProperty.get(widget.context.page, valuedWidgetContext);
-
-        print(v);
-      }*/
+        }, emitOnChange: true);
     });
 
     return Provider<WidgetContext>.value(

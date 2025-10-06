@@ -57,6 +57,7 @@ import 'package:velix_editor/theme/widgets/stack_widget.dart' show StackEditWidg
 import 'package:velix_editor/theme/widgets/switch_widget.dart' show SwitchWidgetBuilder, EditSwitchWidgetBuilder;
 import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuilder, TextEditWidgetBuilder;
 import 'package:velix_editor/util/message_bus.dart' show MessageBus;
+import 'package:velix_ui/module.dart';
 
 void registerEditorTypes() {
   type<CommandStack>(
@@ -181,9 +182,9 @@ void registerEditorTypes() {
   );
 
   type<EditorModule>(
-    location: 'package:velix_editor/editor_module.dart:5:1',
+    location: 'package:velix_editor/editor_module.dart:6:1',
     annotations: [
-      Module(imports: [])
+      Module(imports: [UIModule])
     ],
     constructor: () => EditorModule(),
     fromMapConstructor: (Map<String,dynamic> args) => EditorModule(),
@@ -498,12 +499,12 @@ void registerEditorTypes() {
   type<Value>(
     location: 'package:velix_editor/metadata/properties/properties.dart:61:1',
     params: [
-      param<ValueType>('type', isNamed: true, isRequired: true), 
-      param<String>('value', isNamed: true, isRequired: true)
+      param<ValueType>('type', isNamed: true, isNullable: true, defaultValue: ValueType.value), 
+      param<String>('value', isNamed: true, isNullable: true, defaultValue: "")
     ],
-    constructor: ({required ValueType type, String value = ''}) => Value(type: type, value: value),
-    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType, value: args['value'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType, value: args[1] as String? ?? ''),
+    constructor: ({ValueType type = ValueType.value, String value = ""}) => Value(type: type, value: value),
+    fromMapConstructor: (Map<String,dynamic> args) => Value(type: args['type'] as ValueType? ?? ValueType.value, value: args['value'] as String? ?? ""),
+    fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType? ?? ValueType.value, value: args[1] as String? ?? ""),
     fields: [
       field<Value,ValueType>('type',
         annotations: [
@@ -1037,7 +1038,7 @@ void registerEditorTypes() {
   );
 
   type<GridEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:14:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:15:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1062,7 +1063,7 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:90:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:94:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1087,7 +1088,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:13:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:14:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1109,7 +1110,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:55:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:57:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1231,7 +1232,7 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:11:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:12:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1253,7 +1254,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:56:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:48:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

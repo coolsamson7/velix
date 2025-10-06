@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix/validation/validation.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import 'annotations.dart';
@@ -68,6 +69,9 @@ class PropertyDescriptor {
 
     if (field.factoryConstructor != null)
       return field.factoryConstructor!();
+
+    if (field.type is ObjectType)
+      return (field.type as ObjectType).typeDescriptor.constructor!();
 
     //if (defaultValue != null)
       return defaultValue; // e.g. enums

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
-import 'package:velix_ui/velix_ui.dart';
+import 'package:velix_ui/databinding/widgets/material/text.dart';
 
 import '../../metadata/widgets/text.dart';
 import '../../widget_container.dart';
@@ -26,15 +26,15 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
     TextEditingController controller =  TextEditingController();
     FocusNode? focusNode = FocusNode();
 
-    // TODO databinding
-
-    var adapter = ValuedWidget.getAdapter("text"); // TODO better: adapterFor<c>
+    var adapter = environment.get<MaterialTextFormFieldAdapter>();
 
     var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
 
     controller.addListener(() {
         mapper.notifyChange(property: typeProperty, value: controller.text);
       });
+
+    // TODO: add coercion ...
 
     TextFormField result = TextFormField(
         key: ValueKey(data.databinding),

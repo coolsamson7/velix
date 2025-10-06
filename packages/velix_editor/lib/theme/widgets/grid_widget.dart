@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart' show BuildContext, NeverScrollableScrollPhysics, Widget, GridView, SliverGridDelegateWithFixedCrossAxisCount, Border, Colors, BorderStyle, BorderRadius, BoxDecoration, FontStyle, TextStyle, Text, Center, Container, DragTarget;
+import 'package:flutter/material.dart' show BuildContext, Widget, Colors, Border, BorderStyle, BorderRadius, BoxDecoration, FontStyle, TextStyle, Text, Center, Container, Table, TableRow, DragTarget, SizedBox, TableCellVerticalAlignment, EdgeInsets, Padding;
+
 import 'package:velix/util/collections.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -24,65 +25,68 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
     final cols = data.cols;
     final spacing = data.spacing ?? 8.0;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: cols,
-        crossAxisSpacing: spacing.toDouble(),
-        mainAxisSpacing: spacing.toDouble(),
-      ),
-      itemCount: rows * cols,
-      itemBuilder: (context, index) {
-        final row = index ~/ cols;
-        final col = index % cols;
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: List.generate(rows, (row) {
+        return TableRow(
+          children: List.generate(cols, (col) {
+            // Find if there is a widget at (row, col)
+            var child = findElement(
+              data.children,
+                  (w) => w.cell?.row == row && w.cell?.col == col,
+            );
 
-        // Find if there is a widget at (row, col)
+            if (child != null) {
+              return Padding(
+                padding: EdgeInsets.all(spacing / 2),
+                child: EditWidget(model: child),
+              );
+            }
 
-        var child = findElement(data.children,  (w) => w.cell!.row == row && w.cell!.col == col);
-
-        if (child != null) {
-          return EditWidget(model: child);
-        }
-
-        // Empty slot = drop area
-        return DragTarget<WidgetData>(
-          onWillAccept: (widget) => data.acceptsChild(widget!),
-          onAccept: (widget) {
-            environment.get<CommandStack>().execute(
-              ReparentCommand(
-                bus: environment.get<MessageBus>(),
-                widget: widget,
-                newParent: data,
-                newCell: Cell(row: row, col: col), // assign position
+            // Empty slot = drop area
+            return Padding(
+              padding: EdgeInsets.all(spacing / 2),
+              child: DragTarget<WidgetData>(
+                onWillAccept: (widget) => data.acceptsChild(widget!),
+                onAccept: (widget) {
+                  environment.get<CommandStack>().execute(
+                    ReparentCommand(
+                      bus: environment.get<MessageBus>(),
+                      widget: widget,
+                      newParent: data,
+                      newCell: Cell(row: row, col: col),
+                    ),
+                  );
+                },
+                builder: (context, candidateData, rejectedData) {
+                  final isActive = candidateData.isNotEmpty;
+                  return Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isActive ? Colors.blue : Colors.grey,
+                        width: 1,
+                        style: BorderStyle.solid,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Center(
+                      child: Text(
+                        isActive ? "Drop here" : "Empty",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isActive ? Colors.blue : Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             );
-          },
-          builder: (context, candidateData, rejectedData) {
-            final isActive = candidateData.isNotEmpty;
-            return Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isActive ? Colors.blue : Colors.grey,
-                  width: 1,
-                  style: BorderStyle.solid,
-                ),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Center(
-                child: Text(
-                  isActive ? "Drop here" : "Empty",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isActive ? Colors.blue : Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-            );
-          },
+          }),
         );
-      },
+      }),
     );
   }
 }
@@ -91,8 +95,7 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
 class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   final TypeRegistry typeRegistry;
 
-  GridWidgetBuilder({required this.typeRegistry})
-      : super(name: "grid");
+  GridWidgetBuilder({required this.typeRegistry}) : super(name: "grid");
 
   @override
   Widget create(GridWidgetData data, Environment environment, BuildContext context) {
@@ -100,25 +103,27 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
     final cols = data.cols;
     final spacing = data.spacing ?? 8.0;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: cols,
-        crossAxisSpacing: spacing.toDouble(),
-        mainAxisSpacing: spacing.toDouble(),
-      ),
-      itemCount: rows * cols,
-      itemBuilder: (context, index) {
-        final row = index ~/ cols;
-        final col = index % cols;
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: List.generate(rows, (row) {
+        return TableRow(
+          children: List.generate(cols, (col) {
+            var child = findElement(
+              data.children,
+                  (w) => w.cell?.row == row && w.cell?.col == col,
+            );
 
-        // Find if there is a widget at (row, col)
-
-        var child = findElement(data.children,  (w) => w.cell!.row == row && w.cell!.col == col);
-
-        return child != null ?  EditWidget(model: child) : null;
-      },
+            if (child != null) {
+              return Padding(
+                padding: EdgeInsets.all(spacing / 2),
+                child: EditWidget(model: child),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          }),
+        );
+      }),
     );
   }
 }

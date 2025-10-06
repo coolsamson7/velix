@@ -69,7 +69,7 @@ class Value {
 
   // constructor
 
-  Value({required this.type, required this.value});
+  Value({this.type = ValueType.value, this.value = ""});
 }
 
 

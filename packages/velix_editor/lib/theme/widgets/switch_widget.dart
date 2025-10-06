@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_ui/databinding/valued_widget.dart';
+import 'package:velix_ui/databinding/widgets/common/switch.dart';
 
 import '../../metadata/widgets/switch.dart';
 import '../../widget_container.dart';
@@ -23,7 +24,7 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
     var mapper = widgetContext.formMapper;
     var instance = widgetContext.page;
 
-    var adapter = ValuedWidget.getAdapter("switch");
+    var adapter = environment.get<SwitchAdapter>();
 
     var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
 
@@ -38,15 +39,6 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
     );
 
     mapper.map(property: typeProperty, widget: result, adapter: adapter);
-
-
-    // TODO: no label adapter yet
-
-    /*TODO databinding mapper.addListener((event) {
-      if (event.path == data.databinding && event.value != result.data ) {
-        print("changed");
-      }
-    })*/;
 
     return result;
   }

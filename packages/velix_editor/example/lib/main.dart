@@ -38,7 +38,7 @@ class ApplicationModule {
 void main() async {
   // flutter
 
-  registerWidgets(TargetPlatform.android);
+  ValuedWidget.platform = TargetPlatform.android;
 
   WidgetsFlutterBinding.ensureInitialized();
 

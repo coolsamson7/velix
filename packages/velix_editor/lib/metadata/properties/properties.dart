@@ -92,12 +92,12 @@ class Insets {
   });
 }
 
-@Dataclass()
+/*@Dataclass()
 enum BorderStyle {
   solid,
   dashed,
   dotted
-}
+}*/
 
 @Dataclass()
 class Border {

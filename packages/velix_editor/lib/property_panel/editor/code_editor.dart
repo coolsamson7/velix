@@ -135,7 +135,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     });
 
     if (_matches.isNotEmpty && _focusNode.hasFocus) {
-      _showOverlay();
+      _showOverlay(_matches);
     } else {
       _removeOverlay();
     }
@@ -144,40 +144,41 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   }
 
   void _updateInlineCompletion() {
-    if (_matches.isEmpty || _selectedIndex < 0) {
-      return;
-    }
+    if (_matches.isEmpty || _selectedIndex < 0) return;
 
     final completion = _matches[_selectedIndex].label;
+    final text = _controller.text;
+    final cursorPos = _controller.selection.baseOffset;
 
-    int wordStart = _originalCursorPos;
-    while (wordStart > 0 && _isWordChar(_originalText[wordStart - 1])) {
+    if (cursorPos < 0 || cursorPos > text.length) return;
+
+    // find the start of the current word
+    int wordStart = cursorPos;
+    while (wordStart > 0 && _isWordChar(text[wordStart - 1])) {
       wordStart--;
     }
 
-    final typedPart = _originalText.substring(wordStart, _originalCursorPos);
+    final typedPart = text.substring(wordStart, cursorPos);
 
+    // only complete if it extends the typed part
     if (!completion.toLowerCase().startsWith(typedPart.toLowerCase()) ||
-        completion.length <= typedPart.length) {
-      return;
-    }
+        completion.length == typedPart.length) return;
 
-    final beforeWord = _originalText.substring(0, wordStart);
-    final afterCursor = _originalText.substring(_originalCursorPos);
-    final newText = beforeWord + completion + afterCursor;
+    final suffix = completion.substring(typedPart.length);
+
+    final newText = text.substring(0, wordStart) + completion + text.substring(cursorPos);
 
     _isUpdatingCompletion = true;
-
     _controller.value = TextEditingValue(
       text: newText,
       selection: TextSelection(
-        baseOffset: wordStart + typedPart.length,
-        extentOffset: wordStart + completion.length,
+        baseOffset: cursorPos,            // keep cursor at end of typed part
+        extentOffset: cursorPos + suffix.length, // select only the suffix
       ),
     );
-
     _isUpdatingCompletion = false;
   }
+
 
   bool _isWordChar(String char) {
     return RegExp(r'[a-zA-Z0-9_]').hasMatch(char);
@@ -219,6 +220,19 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   }
 
   void _dismissCompletion() {
+    // If there's an active inline completion, revert it
+    final sel = _controller.selection;
+    final hasSelection = sel.extentOffset > sel.baseOffset;
+
+    if (hasSelection && _matches.isNotEmpty) {
+      _isUpdatingCompletion = true;
+      _controller.value = TextEditingValue(
+        text: _originalText,
+        selection: TextSelection.collapsed(offset: _originalCursorPos),
+      );
+      _isUpdatingCompletion = false;
+    }
+
     _removeOverlay();
 
     setState(() {
@@ -227,7 +241,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     });
   }
 
-  void _showOverlay() {
+  void _showOverlay(List<CompletionItem> items) {
+    if (_overlayEntry != null)
+      return;
+
     _removeOverlay();
 
     _overlayEntry = OverlayEntry(builder: (context) {
@@ -245,9 +262,9 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                itemCount: _matches.length,
+                itemCount: items.length,
                 itemBuilder: (context, index) {
-                  final item = _matches[index];
+                  final item = items[index];
                   final isSelected = index == _selectedIndex;
                   return InkWell(
                     onTap: () {
@@ -304,12 +321,19 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
       );
     });
 
-    Overlay.of(context).insert(_overlayEntry!);
+    //Overlay.of(context).insert(_overlayEntry!);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && Overlay.of(context, rootOverlay: true) != null) {
+        Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
+      }
+    });
   }
 
   void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    if (_overlayEntry != null && _overlayEntry!.mounted) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
+    }
   }
 
   Widget _buildStatusIndicator(bool hasFocus) {
@@ -384,7 +408,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     super.didChangeDependencies();
 
     var editContext = Provider.of<EditContext>(context);
-    
+
     typeChecker = TypeChecker(ClassDescTypeResolver(root: editContext.type));
     autocomplete = Autocomplete(typeChecker: typeChecker!);
   }
@@ -466,21 +490,37 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
               return KeyEventResult.handled;
             case LogicalKeyboardKey.backspace:
               if (hasSelection) {
+                // There's an inline completion - dismiss it and consume the event
                 _isUpdatingCompletion = true;
                 _controller.value = TextEditingValue(
                   text: _originalText,
-                  selection:
-                  TextSelection.collapsed(offset: _originalCursorPos),
+                  selection: TextSelection.collapsed(offset: _originalCursorPos),
                 );
                 _isUpdatingCompletion = false;
                 _dismissCompletion();
-                return KeyEventResult.handled;
+                return KeyEventResult.handled; // Consume the event
+              }
+              // No selection - just clear matches and let backspace work
+              setState(() {
+                _matches = [];
+                _selectedIndex = -1;
+              });
+              _removeOverlay();
+              return KeyEventResult.ignored; // Let backspace proceed
+
+            case LogicalKeyboardKey.arrowLeft:
+            // Always dismiss completion on arrow left
+              if (hasSelection) {
+                // Revert inline completion first
+                _isUpdatingCompletion = true;
+                _controller.value = TextEditingValue(
+                  text: _originalText,
+                  selection: TextSelection.collapsed(offset: _originalCursorPos),
+                );
+                _isUpdatingCompletion = false;
               }
               _dismissCompletion();
-              return KeyEventResult.ignored;
-            case LogicalKeyboardKey.arrowLeft:
-              _dismissCompletion();
-              return KeyEventResult.ignored;
+              return KeyEventResult.ignored; // Let arrow left proceed
           }
         }
 

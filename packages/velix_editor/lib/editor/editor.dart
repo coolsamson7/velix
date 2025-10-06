@@ -401,8 +401,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
           type: MessageEventType.add,
           messages: e.errors.map((error) =>  Message(
               type: MessageType.error,
-              message: "${error.exception.toString()}", // TODO
-             onClick: null
+              widget: error.widget,
+              property: error.property,
+              message: "${error.exception}"
           )).toList()
       ));
     }

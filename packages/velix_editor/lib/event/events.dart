@@ -38,17 +38,17 @@ enum MessageType {
 
 enum MessageEventType {
   add,
-  delete,
-  replace,
+  set,
   clear,
 }
 
 class Message {
   MessageType type;
+  WidgetData? widget;
+  String? property;
   String message;
-  Function? onClick;
 
-  Message({required this.type, required this.message, this.onClick});
+  Message({required this.type, required this.message, this.widget, this.property});
 }
 
 class MessageEvent extends Event{

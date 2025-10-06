@@ -163,6 +163,7 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   final bool fail;
   Map<String,Desc> types = {};
 
+
   Desc getType(String name) {
     var result = types[name];
     if ( result == null) {
@@ -246,6 +247,14 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   // constructor
 
   TypeChecker(this.resolver, {this.fail = false});
+  
+  // internal
+  
+  TI resolve(String name, {TI? parent}) {
+    TI type = resolver.resolve(name, parent: parent);
+
+    return type;
+  }
 
   // override
 

@@ -3,7 +3,7 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:flutter/cupertino.dart' show StatefulWidget;
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, BorderStyle;
 import 'package:velix/velix.dart';
 import 'package:velix_editor/commands/command_stack.dart' show CommandStack;
 import 'package:velix_di/di/di.dart' show Injectable, Inject, Environment, Module, OnInit, OnDestroy;

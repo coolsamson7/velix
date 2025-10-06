@@ -70,6 +70,31 @@
       "label": "Layout"
     }
   },
+  "enums": {
+    "CrossAxisAlignment": {
+      "start": {"label":  "Start"},
+      "end": {"label":  "End"},
+      "center": {"label":  "Center"},
+      "stretch": {"label":  "Stretch"},
+      "baseline": {"label":  "Baseline"}
+    },
+    "MainAxisAlignment": {
+      "start": {"label":  "Start"},
+      "end": {"label":  "End"},
+      "center": {"label":  "Center"},
+      "spaceBetween": {"label":  "Space Between"},
+      "spaceAround": {"label":  "Space Around"},
+      "spaceEvenly": {"label":  "Space Evenly"}
+    },
+    "MainAxisSize": {
+      "min": {"label":  "Min"},
+      "max": {"label":  "Max"}
+    },
+    "BorderStyle": {
+      "none": {"label":  "none"},
+      "solid": {"label":  "Solid"}
+    }
+  },
   "properties": {
     "font": {
       "family": {"label":  "Family"},

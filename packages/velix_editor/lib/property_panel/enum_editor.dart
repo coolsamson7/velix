@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_i18n/i18n/i18n.dart';
 
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
@@ -9,7 +10,7 @@ import 'editor_builder.dart';
 
 
 @Injectable(factory: false)
-class AbstractEnumBuilder<T> extends PropertyEditorBuilder<T> {
+class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
   // override
 
   @override
@@ -29,7 +30,7 @@ class AbstractEnumBuilder<T> extends PropertyEditorBuilder<T> {
   }
 }
 
-class _EnumEditor<T> extends StatefulWidget {
+class _EnumEditor<T extends Enum> extends StatefulWidget {
   // instance data
 
   final T value;
@@ -49,7 +50,7 @@ class _EnumEditor<T> extends StatefulWidget {
   State<_EnumEditor> createState() => _EnumEditorState<T>();
 }
 
-class _EnumEditorState<T> extends State<_EnumEditor> {
+class _EnumEditorState<T extends Enum> extends State<_EnumEditor> {
   // instance data
 
   late T _selected;
@@ -58,7 +59,8 @@ class _EnumEditorState<T> extends State<_EnumEditor> {
   // internal
 
   String labelOf(T value) {
-    return value.toString();
+    return "editor:enums.${value.runtimeType.toString()}.${value.name}.label".tr();
+    //return value.toString();
   }
 
   // override
@@ -67,7 +69,7 @@ class _EnumEditorState<T> extends State<_EnumEditor> {
   void initState() {
     super.initState();
 
-    _selected = widget.value;
+    _selected = widget.value as dynamic;
     _values = TypeDescriptor.forType<T>().enumValues as List<T>;
   }
 
@@ -76,7 +78,7 @@ class _EnumEditorState<T> extends State<_EnumEditor> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.value != _selected) {
-      setState(() => _selected = widget.value);
+      setState(() => _selected = widget.value as dynamic);
     }
   }
 

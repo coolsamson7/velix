@@ -29,8 +29,19 @@ class ContainerWidgetData extends WidgetData {
 
   // override
 
+  bool isParentOf(WidgetData w1, WidgetData w2) {
+    WidgetData? w = w2.parent;
+    while ( w != null) {
+      if (w == w1)
+        return true;
+      w = w.parent;
+    }
+
+    return false;
+  }
+
   @override
-  bool acceptsChild(WidgetData widget) { // TODO parent -> child
-    return widget.parent != this;
+  bool acceptsChild(WidgetData widget) {
+    return !isParentOf(widget, this);
   }
 }

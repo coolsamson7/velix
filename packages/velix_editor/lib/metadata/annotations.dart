@@ -1,7 +1,6 @@
 
 // annotation
 
-import 'package:flutter/material.dart';
 import 'package:velix/reflectable/reflectable.dart';
 
 import 'type_registry.dart';

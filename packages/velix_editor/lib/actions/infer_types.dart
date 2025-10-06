@@ -133,12 +133,16 @@ class UnknownPropertyDesc extends Desc {
   // instance
 
   Desc parent;
+  bool validPrefix = false;
   String property;
 
   // constructor
 
   UnknownPropertyDesc({required this.parent, required this.property})
-      : super('');
+      : super('') {
+    if (parent is ClassDesc)
+      validPrefix = (parent as ClassDesc).properties.keys.contains((String prop) => prop.startsWith(property));
+  }
 
   // public
 
@@ -156,7 +160,7 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   // instance data
 
   ClassDescTypeInfo root;
-
+  final bool fail;
   Map<String,Desc> types = {};
 
   Desc getType(String name) {
@@ -171,14 +175,21 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   // constructor
 
-  ClassDescTypeResolver({required ClassDesc root}): root = ClassDescTypeInfo(root, null);
+  ClassDescTypeResolver({required ClassDesc root, this.fail = false}): root = ClassDescTypeInfo(root, null);
 
   // internal
+
+  Desc unknownType(Desc parent, String property) {
+    if (fail)
+      throw TypeException("unknown property $property");
+    else
+      return UnknownPropertyDesc(parent: parent, property: property);
+  }
 
   // override
 
   @override
-  void checkArguments(dynamic descriptor, List<ClassDescTypeInfo> arguments) {
+  void checkArguments(dynamic descriptor, List<TypeInfo> arguments) {
     var method = descriptor as MethodDesc;
 
     // number
@@ -200,10 +211,10 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
     if ( parentType is ClassDesc) {
       var property  = parentType.find(name);
-      return ClassDescTypeInfo(property?.type ?? UnknownPropertyDesc(parent: parentType, property: name), property);
+      return ClassDescTypeInfo(property?.type ?? unknownType(parentType, name), property);
     }
     else
-      return ClassDescTypeInfo(UnknownPropertyDesc(parent: parentType, property: name), null);
+      return ClassDescTypeInfo(unknownType(parentType, name), null);
   }
 
   @override
@@ -230,10 +241,11 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   // instance data
 
   final TypeResolver<TI> resolver;
+  final bool fail;
 
   // constructor
 
-  TypeChecker(this.resolver);
+  TypeChecker(this.resolver, {this.fail = false});
 
   // override
 

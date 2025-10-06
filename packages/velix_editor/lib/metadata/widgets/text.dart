@@ -2,6 +2,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../../property_panel/editor/code_editor.dart';
+import '../../validate/validate.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
@@ -13,7 +14,7 @@ class TextWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   String label;
-  @DeclareProperty(group: "general", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
   String? databinding;
 
   // constructor

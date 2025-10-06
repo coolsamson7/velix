@@ -457,10 +457,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
         bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
-        bus.publish("messages", MessageEvent(source: this, type: MessageEventType.add, messages: [
-          Message(type: MessageType.warning, message: "oh dear"),
-          Message(type: MessageType.error, message: "damnit")
-        ]));
+        //bus.publish("messages", MessageEvent(source: this, type: MessageEventType.add, messages: [
+        //  Message(type: MessageType.warning, message: "oh dear"),
+        //  Message(type: MessageType.error, message: "damnit")
+        //]));
     });
 
     updateCommandState();

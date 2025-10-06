@@ -1771,7 +1771,7 @@ void registerEditorTypes() {
       field<TextWidgetData,String>('databinding',
         type: StringType().optional(),
         annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+          DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as TextWidgetData).databinding = value,

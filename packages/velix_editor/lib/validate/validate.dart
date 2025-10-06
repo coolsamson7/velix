@@ -78,18 +78,19 @@ class ExpressionPropertyValidator extends PropertyValidator<String> {
   // internal
 
   void validateExpression(String binding, ClassDesc type) {
-    try {
-      var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type)));
-      if (!result.success)
-        throw Exception(result.message); // TODO
+    if ( binding.isNotEmpty)
+      try {
+        var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true)));
+        if (!result.success)
+          throw Exception(result.message); // TODO
 
-      // TODO
+        // TODO
 
-      print(1);
-    }
-    catch(e) {
-      rethrow;
-    }
+        print(1);
+      }
+      catch(e) {
+        rethrow;
+      }
   }
 
   // implement
@@ -114,17 +115,17 @@ class ValuePropertyValidator extends PropertyValidator<Value> {
   void validateI18N(String key) {}
 
   void validateBinding(String binding, ClassDesc type) {
-    try {
-      var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type)));
-      if (!result.success)
-        throw Exception(result.message);
+    if ( binding.isNotEmpty)
+      try {
+        var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true), fail: true));
+        if (!result.success)
+          throw Exception(result.message);
 
-
-      print(1);
-    }
-    catch(e) {
-      rethrow;
-    }
+        print(1);
+      }
+      catch(e) {
+        rethrow;
+      }
   }
 
   // implement

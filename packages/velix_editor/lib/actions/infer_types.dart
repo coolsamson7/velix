@@ -40,7 +40,7 @@ class TypeException implements Exception {
   String toString() => 'TypeException: $message';
 }
 
-abstract class TypeResolver<T extends TypeInfo> {
+abstract class TypeResolver<T extends TypeInfo<dynamic,dynamic>> {
   void checkArguments(dynamic descriptor, List<T> arguments);
 
   T resolve(String name, {T? parent});
@@ -83,7 +83,7 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   // override
 
   @override
-  void checkArguments(dynamic descriptor, List<RuntimeTypeInfo> arguments) {
+  void checkArguments(dynamic descriptor, List<TypeInfo> arguments) {
     var method = descriptor as MethodDescriptor;
 
     if (method.parameters.length != arguments.length)
@@ -295,7 +295,7 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
 
     // resolve arguments
 
-    var argumentTypes = expr.arguments.map((arg) => arg.accept(this)).toList();
+    List<TI> argumentTypes = expr.arguments.map((arg) => arg.accept(this)).toList();
 
     if (expr.callee is Variable) {
       resolver.checkArguments(expr.getDescriptor(), argumentTypes);

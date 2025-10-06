@@ -12,7 +12,8 @@ import '../../widget_container.dart';
 import '../widget_builder.dart';
 
 @Injectable()
-class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
+class
+LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   // constructor
 
   LabelWidgetBuilder() : super(name: "label");
@@ -46,8 +47,6 @@ class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
 
     if (data.label.type == ValueType.binding) {
         widgetContext.addBinding(typeProperty!, data);
-
-        mapper.map(property: typeProperty, widget: result, adapter: adapter);
     }
 
     return result;

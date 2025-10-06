@@ -168,6 +168,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     final newText = text.substring(0, wordStart) + completion + text.substring(cursorPos);
 
+    print("new text = '$newText', curser: $cursorPos");
     _isUpdatingCompletion = true;
     _controller.value = TextEditingValue(
       text: newText,

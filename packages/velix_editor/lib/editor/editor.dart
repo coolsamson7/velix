@@ -365,6 +365,30 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     Provider.of<LocaleManager>(context, listen: false).locale = Locale(locale);
   }
 
+  bool validate() {
+    var root = widget.models[0]; // TODO
+
+    try {
+      environment.get<WidgetValidator>().validate(root, type: registry.getClass("Page"), environment: environment); // TODO
+
+      return true;
+    }
+    on ValidationException catch (e) {
+      environment.get<MessageBus>().publish("messages", MessageEvent(
+          source: this,
+          type: MessageEventType.set,
+          messages: e.errors.map((error) =>  Message(
+              type: MessageType.error,
+              widget: error.widget,
+              property: error.property,
+              message: "${error.exception}"
+          )).toList()
+      ));
+
+      return false;
+    }
+  }
+
   // commands
 
   @Command(i18n: "editor:commands.open", icon: Icons.folder_open)
@@ -392,21 +416,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   void _save() {
     var root = widget.models[0]; // TODO
 
-    try {
-      environment.get<WidgetValidator>().validate(root, type: registry.getClass("Page"), environment: environment); // TODO
-    }
-    on ValidationException catch (e) {
-      environment.get<MessageBus>().publish("messages", MessageEvent(
-          source: this,
-          type: MessageEventType.add,
-          messages: e.errors.map((error) =>  Message(
-              type: MessageType.error,
-              widget: error.widget,
-              property: error.property,
-              message: "${error.exception}"
-          )).toList()
-      ));
-    }
+    validate();
   }
 
   @Command(i18n: "editor:commands.revert", icon: Icons.restore)
@@ -428,8 +438,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @Command(label: "Play", icon: Icons.play_arrow)
   @override
   void _play() {
-    edit = !edit;
-    setState(() {});
+    if (validate()) {
+      setState(() { edit = !edit; });
+    }
   }
 
   // override

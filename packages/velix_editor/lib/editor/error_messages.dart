@@ -23,8 +23,17 @@ class _MessagePaneState extends State<MessagePane> {
 
   void _onMessageEvent(MessageEvent event) {
     setState(() {
-      if (event.type == MessageEventType.add) {
-        _messages.addAll(event.messages);
+      switch (event.type) {
+        case MessageEventType.add:
+          _messages.addAll(event.messages);
+          break;
+        case MessageEventType.set:
+          _messages.clear();
+          _messages.addAll(event.messages);
+          break;
+        case MessageEventType.clear:
+          _messages.clear();
+          break;
       }
     });
   }

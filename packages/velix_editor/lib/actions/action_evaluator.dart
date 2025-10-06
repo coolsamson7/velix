@@ -21,19 +21,13 @@ class ActionCompiler {
   // public
 
    Call compile(String input, {required TypeDescriptor context}) {
-     var expression = parser.parse(input);
-
-     // check types
-
-     final checker = TypeChecker(RuntimeTypeTypeResolver(root: context));
-
-     expression.accept(checker);
+     var result = parser.parseStrict(input, typeChecker: TypeChecker(RuntimeTypeTypeResolver(root: context)));
 
      // compute call
 
      var visitor = CallVisitor(context);
 
-     return expression.accept(visitor);
+     return result.value!.accept(visitor);
    }
 }
 
@@ -51,19 +45,13 @@ class ActionEvaluator {
   // public
 
   dynamic call(String input, dynamic instance) {
-    var expression = parser.parse(input);
-
-    // check types
-
-    final checker = TypeChecker(RuntimeTypeTypeResolver(root: contextType));
-
-    expression.accept(checker);
+    var result = parser.parseStrict(input, typeChecker: TypeChecker(RuntimeTypeTypeResolver(root: contextType)));
 
     // compute call
 
     var visitor = CallVisitor(contextType);
 
-    var call = expression.accept(visitor);
+    var call = result.value!.accept(visitor);
 
     // eval
 

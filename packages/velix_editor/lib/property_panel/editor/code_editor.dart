@@ -69,7 +69,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
-  ParseResult lastResult = ParseResult.success(false, complete: false);
+  ParseResult lastResult = ParseResult.success(null, complete: false);
 
   // Evaluate parsing state with your parser
   ParseState checkParse(String input) {
@@ -367,6 +367,17 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
       ),
     );
   }
+
+  @override
+  void didUpdateWidget(CodeEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Only update the controller text if the value actually changed
+    if (oldWidget.value != widget.value && !_isUpdatingCompletion) {
+      _controller.text = widget.value ?? '';
+    }
+  }
+
 
   @override
   void didChangeDependencies() {

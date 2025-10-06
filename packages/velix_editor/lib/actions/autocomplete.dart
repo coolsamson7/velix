@@ -33,15 +33,14 @@ class Autocomplete {
     if ( cursorOffset == -1)
       cursorOffset = input.length;
 
-    var expr = parser.parse(input);
-    
-    // check types
+    var result = parser.parsePrefix(input, typeChecker: typeChecker);
 
-    expr.accept(typeChecker);
+    if (!result.success)
+      return [];
 
     // Find the deepest node at the cursor
 
-    final node = _findNodeAt(expr, cursorOffset);
+    final node = _findNodeAt(result.value!, cursorOffset);
     if (node == null)
       return [];
 

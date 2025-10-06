@@ -9,7 +9,7 @@ class ParseResult {
   //instance data
 
   final bool success;
-  final dynamic value;
+  final Expression? value;
   final bool complete;
   final String? message;
   final int? position;
@@ -24,7 +24,7 @@ class ParseResult {
     this.position,
   });
 
-  factory ParseResult.success(dynamic value, {required bool complete}) {
+  factory ParseResult.success(Expression? value, {required bool complete}) {
     return ParseResult._(success: true, value: value, complete: complete);
   }
 

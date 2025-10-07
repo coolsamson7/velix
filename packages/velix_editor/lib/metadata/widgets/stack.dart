@@ -14,11 +14,4 @@ class StackWidgetData extends WidgetData {
   // constructor
 
   StackWidgetData({super.type = "stack", super.cell, super.children = const []});
-
-  // override
-
-  @override
-  bool acceptsChild(WidgetData widget) { // TODO parent -> child
-    return widget.parent != this;
-  }
 }

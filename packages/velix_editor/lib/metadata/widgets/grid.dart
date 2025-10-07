@@ -24,19 +24,6 @@ class GridWidgetData extends WidgetData {
 
   // override
 
-  // accept if widget is not a parent of this or thsi is a child of widget
-
-  bool isParentOf(WidgetData w1, WidgetData w2) {
-    WidgetData? w = w2.parent;
-    while ( w != null) {
-      if (w == w1)
-        return true;
-      w = w.parent;
-    }
-
-    return false;
-  }
-
   @override
   bool acceptsChild(WidgetData widget) {
     return !isParentOf(widget, this);

@@ -26,7 +26,22 @@ class ColumnWidgetData extends WidgetData {
   // override
 
   @override
-  bool acceptsChild(WidgetData widget) { // TODO parent -> child
-    return widget.parent != this;
+  bool acceptsChild(WidgetData widget) {
+    return !isParentOf(widget, this);
+  }
+
+  @override
+  bool canMoveChild(WidgetData child, Direction direction) {
+    switch (direction) {
+      case Direction.up:
+        return child.index() > 0;
+
+      case Direction.down:
+        return child.index() < children.length - 1;
+
+      case Direction.left:
+      case Direction.right:
+        return false;
+    }
   }
 }

@@ -15,6 +15,7 @@ class ReparentCommand extends Command {
   final WidgetData? newParent;
   final Cell? oldCell;
   final Cell? newCell;
+  final int newIndex;
 
   // constructor
 
@@ -23,6 +24,7 @@ class ReparentCommand extends Command {
     required this.widget,
     this.newParent,
     this.newCell,
+    this.newIndex = -1
   }) : oldParent = widget.parent, oldCell = widget.cell;
 
   // override
@@ -47,7 +49,10 @@ class ReparentCommand extends Command {
     widget.cell = newCell;
 
     if ( newParent != null) {
-      newParent!.children.add(widget);
+      if ( newIndex == -1)
+        newParent!.children.add(widget);
+      else
+        newParent!.children.insert(newIndex, widget);
 
       bus.publish(
         "property-changed",

@@ -11,6 +11,14 @@ import 'editor_builder.dart';
 
 @Injectable(factory: false)
 class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
+  // instance data
+
+  final List<T> values;
+
+  // constructor
+
+  AbstractEnumBuilder({this.values = const []});
+
   // override
 
   @override
@@ -24,6 +32,7 @@ class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return _EnumEditor<T>(
+      values: values,
       value: value ?? property.defaultValue,
       onChanged: onChanged,
     );
@@ -34,12 +43,14 @@ class _EnumEditor<T extends Enum> extends StatefulWidget {
   // instance data
 
   final T value;
+  final List<T> values;
   final ValueChanged<T> onChanged;
 
   // constructor
 
   const _EnumEditor({
     Key? key,
+    required this.values,
     required this.value,
     required this.onChanged,
   }) : super(key: key);
@@ -54,7 +65,6 @@ class _EnumEditorState<T extends Enum> extends State<_EnumEditor> {
   // instance data
 
   late T _selected;
-  late List<T> _values;
 
   // internal
 
@@ -70,7 +80,6 @@ class _EnumEditorState<T extends Enum> extends State<_EnumEditor> {
     super.initState();
 
     _selected = widget.value as dynamic;
-    _values = TypeDescriptor.forType<T>().enumValues as List<T>;
   }
 
   @override
@@ -97,9 +106,9 @@ class _EnumEditorState<T extends Enum> extends State<_EnumEditor> {
           isDense: true,
           icon: const Icon(Icons.arrow_drop_down, size: 20),
           style: const TextStyle(color: Colors.black),
-          items: _values.map((value) => DropdownMenuItem<T>(
-              value: value,
-              child: Text(labelOf(value)),
+          items: widget.values.map((value) => DropdownMenuItem<T>(
+              value: value as T,
+              child: Text(labelOf(value as T)),
             ),
           )
               .toList(),

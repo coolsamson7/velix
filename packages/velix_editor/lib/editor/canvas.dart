@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:velix_editor/event/events.dart';
 import 'package:velix_editor/util/message_bus.dart';
 
+import '../commands/command_stack.dart';
+import '../commands/reparent_command.dart';
 import '../edit_widget.dart';
 import '../metadata/type_registry.dart';
 import '../metadata/widget_data.dart';
@@ -38,7 +40,7 @@ class EditorCanvas extends StatefulWidget {
 
   EditorCanvas({super.key, required this.models, required this.typeRegistry, required this.messageBus}) {
     for ( var model in models)
-      linkParents(model);
+      linkParents(model); // TODO doppelt?
   }
 
   // override
@@ -73,22 +75,73 @@ class _EditorCanvasState extends State<EditorCanvas> {
     event.widget?.widget?.setState(() {});
   }
 
+  void handleUp(WidgetData w) {
+    if (w.canMove(Direction.up)) {
+      int index = w.index();
+      EnvironmentProvider.of(context).get<CommandStack>()
+          .execute(ReparentCommand(
+          bus: widget.messageBus,
+          widget: w,
+          newParent: w.parent,
+          newIndex: index - 1
+      ));
+    }
+  }
+
+  void handleDown(WidgetData w) {
+    if (w.canMove(Direction.down)) {
+      int index = w.index();
+      EnvironmentProvider.of(context).get<CommandStack>()
+          .execute(ReparentCommand(
+          bus: widget.messageBus,
+          widget: w,
+          newParent: w.parent,
+          newIndex: index + 1
+      ));
+    }
+  }
+
+  void handleLeft(WidgetData w) {
+    if (w.canMove(Direction.left)) {
+      int index = w.index();
+      EnvironmentProvider.of(context).get<CommandStack>()
+          .execute(ReparentCommand(
+          bus: widget.messageBus,
+          widget: w,
+          newParent: w.parent,
+          newIndex: index - 1
+      ));
+    }
+  }
+
+  void handleRight(WidgetData w) {
+    if (w.canMove(Direction.right)) {
+      int index = w.index();
+      EnvironmentProvider.of(context).get<CommandStack>()
+          .execute(ReparentCommand(
+          bus: widget.messageBus,
+          widget: w,
+          newParent: w.parent,
+          newIndex: index + 1
+      ));
+    }
+  }
 
   void _handleKey(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
       final logicalKey = event.logicalKey;
 
       if (logicalKey == LogicalKeyboardKey.arrowUp) {
-        print("Arrow Up pressed");
+        if (selection != null ) handleUp(selection!.widget.model);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowDown) {
-        print("Arrow Down pressed");
+        if (selection != null ) handleDown(selection!.widget.model);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowLeft) {
-        print("Arrow Left pressed");
+        if (selection != null ) handleLeft(selection!.widget.model);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowRight) {
-        print("Arrow Right pressed");
+        if (selection != null ) handleRight(selection!.widget.model);
       }
     }
   }

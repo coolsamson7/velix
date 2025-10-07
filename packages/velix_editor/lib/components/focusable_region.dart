@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class FocusableRegion extends StatefulWidget {
   final Widget child;
   final ValueChanged<bool>? onFocusChange;
@@ -18,13 +19,27 @@ class FocusableRegion extends StatefulWidget {
 class _FocusableRegionState extends State<FocusableRegion> {
   late FocusNode _focusNode;
 
-  bool get _hasFocusIncludingChildren =>
-      _focusNode.hasFocus || _focusNode.hasPrimaryFocus || _focusNode.children.any((c) => c.hasFocus);
+  bool get _hasFocusIncludingChildren {
+    // Check if this node or any descendant has focus
+    return _focusNode.hasFocus || _hasDescendantFocus(_focusNode);
+  }
+
+  bool _hasDescendantFocus(FocusNode node) {
+    // Recursively check if any descendant has focus
+    for (final child in node.descendants) {
+      if (child.hasFocus) return true;
+    }
+    return false;
+  }
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode(debugLabel: "FocusableRegion");
+    _focusNode = FocusNode(
+      debugLabel: "FocusableRegion",
+      // This allows the focus node to track descendant focus changes
+      skipTraversal: true,
+    );
 
     _focusNode.addListener(_updateFocus);
   }
@@ -45,10 +60,21 @@ class _FocusableRegionState extends State<FocusableRegion> {
   Widget build(BuildContext context) {
     return Focus(
       focusNode: _focusNode,
-      descendantsAreFocusable: true, // allow children to request focus
-      child: InkWell(
+      // Key: This allows descendants to be focusable
+      canRequestFocus: false,
+      // This ensures child focus changes trigger parent listener
+      onFocusChange: (hasFocus) {
+        _updateFocus();
+      },
+      child: GestureDetector(
+        // Use GestureDetector instead of InkWell for better control
         onTap: () {
-          _focusNode.requestFocus();
+          // Find the first focusable descendant and focus it
+          final firstFocusable = _focusNode.descendants.firstWhere(
+                (node) => node.canRequestFocus,
+            orElse: () => _focusNode,
+          );
+          firstFocusable.requestFocus();
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),

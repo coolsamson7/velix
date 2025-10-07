@@ -17,6 +17,13 @@ class Cell {
   Cell({required this.row, required this.col});
 }
 
+enum Direction {
+  right,
+  left,
+  up,
+  down,
+}
+
 @Dataclass()
 @JsonSerializable(discriminatorField: "type", includeNull: false)
 /*abstract*/ class WidgetData {
@@ -38,13 +45,39 @@ class Cell {
 
   WidgetData({required this.type, this.children = const [], this.cell});
 
+  // internal
+
+  bool isParentOf(WidgetData w1, WidgetData w2) {
+    WidgetData? w = w2.parent;
+    while ( w != null) {
+      if (w == w1)
+        return true;
+      w = w.parent;
+    }
+
+    return false;
+  }
+
+  int index() {
+    return parent!.children.indexOf(this);
+  }
+
   // public
 
   void update() {
     widget?.setState((){});
   }
 
+
   bool acceptsChild(WidgetData widget) {
+    return !isParentOf(widget, this);
+  }
+
+  bool canMove(Direction direction) {
+    return parent?.canMoveChild(this, direction) ?? false;
+  }
+
+  bool canMoveChild(WidgetData child, Direction direction) {
     return false;
   }
 }

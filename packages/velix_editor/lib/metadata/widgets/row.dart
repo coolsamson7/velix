@@ -19,7 +19,6 @@ class RowWidgetData extends WidgetData {
   @DeclareProperty(group: "layout")
   MainAxisSize? mainAxisSize;
 
-
   // constructor
 
   RowWidgetData({this.mainAxisAlignment = MainAxisAlignment.start, this.crossAxisAlignment = CrossAxisAlignment.start, this.mainAxisSize = MainAxisSize.min, super.type = "row", super.children = const [], super.cell});
@@ -27,7 +26,22 @@ class RowWidgetData extends WidgetData {
   // override
 
   @override
-  bool acceptsChild(WidgetData widget) { // TODO parent -> child
-    return widget.parent != this;
+  bool acceptsChild(WidgetData widget) {
+    return !isParentOf(widget, this);
+  }
+
+  @override
+  bool canMoveChild(WidgetData child, Direction direction) {
+    switch (direction) {
+      case Direction.left:
+        return child.index() > 0;
+
+      case Direction.right:
+        return child.index() < children.length - 1;
+
+      case Direction.up:
+      case Direction.down:
+        return false;
+    }
   }
 }

@@ -23,6 +23,59 @@ class ColorConvert extends Convert<Color,String> {
     return Color(int.parse(value, radix: 16));
   }
 }
+
+@Dataclass()
+class BorderStyleConvert extends Convert<BorderStyle,String> {
+  @override
+  String convertSource(BorderStyle source) {
+    return source.name;
+  }
+
+  @override
+  BorderStyle convertTarget(String value) {
+    return BorderStyle.values.firstWhere((alignment) => alignment.name == value);
+  }
+}
+
+@Dataclass()
+class MainAxisAlignmentConvert extends Convert<MainAxisAlignment,String> {
+  @override
+  String convertSource(MainAxisAlignment source) {
+    return source.name;
+  }
+
+  @override
+  MainAxisAlignment convertTarget(String value) {
+    return MainAxisAlignment.values.firstWhere((alignment) => alignment.name == value);
+  }
+}
+
+@Dataclass()
+class MainAxisSizeConvert extends Convert<MainAxisSize,String> {
+  @override
+  String convertSource(MainAxisSize source) {
+    return source.name;
+  }
+
+  @override
+  MainAxisSize convertTarget(String value) {
+    return MainAxisSize.values.firstWhere((alignment) => alignment.name == value);
+  }
+}
+
+@Dataclass()
+class CrossAxisAlignmentConvert extends Convert<CrossAxisAlignment,String> {
+  @override
+  String convertSource(CrossAxisAlignment source) {
+    return source.name;
+  }
+
+  @override
+  CrossAxisAlignment convertTarget(String value) {
+    return CrossAxisAlignment.values.firstWhere((alignment) => alignment.name == value);
+  }
+}
+
 @Dataclass()
 class FontWeightConvert extends Convert<FontWeight,int> {
   @override

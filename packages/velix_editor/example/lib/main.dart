@@ -83,6 +83,10 @@ void main() async {
   JSON(
       validate: false,
       converters: [
+        BorderStyleConvert(),
+        MainAxisSizeConvert(),
+        MainAxisAlignmentConvert(),
+        CrossAxisAlignmentConvert(),
         ColorConvert(),
         FontWeightConvert(),
         FontStyleConvert(),

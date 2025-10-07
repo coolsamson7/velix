@@ -11,6 +11,13 @@
           "type": "grid",
           "rows": 2,
           "cols": 2,
+          "gridRows": [
+            {
+              "sizeMode": "fixed",
+              "size": 1.0,
+              "alignment": "start"
+            }
+          ],
           "spacing": 10,
           "children": [
             {

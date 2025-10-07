@@ -127,6 +127,7 @@ class _ValueFieldState extends State<ValueField> {
     }
 
     return builder.buildEditor(
+        environment: environment,
         messageBus: environment.get<MessageBus>(),
         commandStack: commandStack,
         property: findValueProperty("value"),
@@ -199,6 +200,7 @@ class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
 
   @override
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

@@ -4,6 +4,31 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
+@Dataclass()
+enum GridSizeMode { fixed, flex, auto } // "auto" = wrap content
+
+@Dataclass()
+enum GridAlignment { start, center, end, stretch }
+
+@Dataclass()
+class GridRow {
+  // instance data
+
+  @DeclareProperty()
+  GridSizeMode sizeMode;
+  @DeclareProperty()
+  double size;
+  @DeclareProperty()
+  GridAlignment alignment;
+
+  // constructor
+
+  GridRow({
+    this.sizeMode = GridSizeMode.auto,
+    this.size = 1,
+    this.alignment = GridAlignment.start,
+  });
+}
 
 @Dataclass()
 @DeclareWidget(name: "grid", group: "container", icon: "widget_grid")
@@ -17,10 +42,12 @@ class GridWidgetData extends WidgetData {
   int cols;
   @DeclareProperty(group: "layout")
   int spacing;
+  @DeclareProperty(group: "layout")
+  List<GridRow> gridRows;
 
   // constructor
 
-  GridWidgetData({super.type = "grid", super.children = const [], super.cell, this.rows = 1, this.cols = 1, this.spacing = 0});
+  GridWidgetData({super.type = "grid", super.children, super.cell, this.rows = 1, this.cols = 1, this.spacing = 0, List<GridRow>? gridRows}): gridRows = gridRows ?? <GridRow>[];
 
   // override
 

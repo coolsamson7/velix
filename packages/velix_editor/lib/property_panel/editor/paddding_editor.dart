@@ -14,6 +14,7 @@ import '../editor_builder.dart';
 class PaddingEditorBuilder extends PropertyEditorBuilder<m.Insets> {
   @override
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

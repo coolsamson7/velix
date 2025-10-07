@@ -11,6 +11,7 @@ import '../editor_builder.dart';
 class IntEditorBuilder extends PropertyEditorBuilder<int> {
   @override
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

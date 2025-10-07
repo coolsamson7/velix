@@ -23,6 +23,7 @@ class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
 
   @override
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

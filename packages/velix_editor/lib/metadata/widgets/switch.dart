@@ -21,5 +21,5 @@ class SwitchWidgetData extends WidgetData {
 
   // constructor
 
-  SwitchWidgetData({super.type = "switch", super.cell, super.children = const [], required this.label, this.padding, this.databinding});
+  SwitchWidgetData({super.type = "switch", super.cell, super.children, required this.label, this.padding, this.databinding});
 }

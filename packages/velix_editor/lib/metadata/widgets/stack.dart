@@ -13,5 +13,5 @@ class StackWidgetData extends WidgetData {
 
   // constructor
 
-  StackWidgetData({super.type = "stack", super.cell, super.children = const []});
+  StackWidgetData({super.type = "stack", super.cell, super.children});
 }

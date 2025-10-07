@@ -16,6 +16,7 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import '../util/message_bus.dart';
 import 'editor_builder.dart';
 import 'editor_registry.dart';
+import 'list_property_editor.dart';
 
 class PropertyPanel extends StatefulWidget {
   final VoidCallback onClose;
@@ -173,9 +174,13 @@ class _PropertyPanelState extends State<PropertyPanel> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Column(
                     children: props.map((prop) {
-                      final editorBuilder = getBuilder(prop);
-                      final isCompound = editorBuilder == null && TypeDescriptor.hasType(prop.type);
+                      var editorBuilder = getBuilder(prop);
+                      final isList = editorBuilder == null && prop.type.toString().startsWith('List<');
+                      final isCompound = editorBuilder == null && !isList && TypeDescriptor.hasType(prop.type);
                       final value = widgetDescriptor!.get(selected!, prop.name);
+
+                      if (isList)
+                        editorBuilder = environment.get<ListPropertyEditor>();
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -218,6 +223,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: editorBuilder != null ? editorBuilder.buildEditor(
+                                environment: environment,
                                 messageBus: bus,
                                 commandStack: commandStack,
                                 label: prop.name,

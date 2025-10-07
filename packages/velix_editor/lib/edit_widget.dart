@@ -35,6 +35,30 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
 
   // internal
 
+  void _moveWidget(Direction direction) {
+    int index =  widget.model.index();
+
+    switch (direction) {
+      case Direction.left:
+      case Direction.up:
+        index -= 1;
+        break;
+      case Direction.right:
+      case Direction.down:
+        index += 1;
+        break;
+    } // switch
+
+    environment.get<CommandStack>().execute(
+      ReparentCommand(
+        bus: environment.get<MessageBus>(),
+        widget: widget.model,
+        newParent: widget.model.parent,
+        newIndex: index,
+      ),
+    );
+  }
+
   void setSelected(bool value) {
     if (value != selected)
       if (widget.model.widget != null) // was it deleted?
@@ -237,8 +261,10 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
       ),
     );
 
-    Widget moveArrow(IconData icon, {required bool enabled}) {
-      return Opacity(
+    Widget moveArrow(IconData icon, Direction direction) {
+      final bool enabled = widget.model.canMove(direction);
+
+      Widget arrow = Opacity(
         opacity: enabled ? 1.0 : 0.3,
         child: Container(
           width: handleSize * 2,
@@ -259,57 +285,64 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
           child: Icon(icon, size: 12, color: Colors.white),
         ),
       );
+
+      if (!enabled) return arrow;
+
+      return GestureDetector(
+        onTap: () => _moveWidget(direction),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: arrow,
+        ),
+      );
     }
 
     return [
-      // --- Corners (always visible)
+      // --- Corner resize handles (always visible)
       Positioned(top: -4, left: -4, child: cornerHandle()),
       Positioned(top: -4, right: -4, child: cornerHandle()),
       Positioned(bottom: -4, left: -4, child: cornerHandle()),
       Positioned(bottom: -4, right: -4, child: cornerHandle()),
 
-      // --- Midpoint directional handles (show movement availability)
-      if (widget.model.canMove(Direction.up))
-        Positioned(
-          top: -14,
-          left: 0,
-          right: 0,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: moveArrow(Icons.keyboard_arrow_up, enabled: true),
-          ),
+      // --- Midpoint directional handles (show & click to move)
+      Positioned(
+        top: -14,
+        left: 0,
+        right: 0,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: moveArrow(Icons.keyboard_arrow_up, Direction.up),
         ),
-      if (widget.model.canMove(Direction.down))
-        Positioned(
-          bottom: -14,
-          left: 0,
-          right: 0,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: moveArrow(Icons.keyboard_arrow_down, enabled: true),
-          ),
+      ),
+      Positioned(
+        bottom: -14,
+        left: 0,
+        right: 0,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: moveArrow(Icons.keyboard_arrow_down, Direction.down),
         ),
-      if (widget.model.canMove(Direction.left))
-        Positioned(
-          top: 0,
-          bottom: 0,
-          left: -14,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: moveArrow(Icons.keyboard_arrow_left, enabled: true),
-          ),
+      ),
+      Positioned(
+        top: 0,
+        bottom: 0,
+        left: -14,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: moveArrow(Icons.keyboard_arrow_left, Direction.left),
         ),
-      if (widget.model.canMove(Direction.right))
-        Positioned(
-          top: 0,
-          bottom: 0,
-          right: -14,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: moveArrow(Icons.keyboard_arrow_right, enabled: true),
-          ),
+      ),
+      Positioned(
+        top: 0,
+        bottom: 0,
+        right: -14,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: moveArrow(Icons.keyboard_arrow_right, Direction.right),
         ),
+      ),
     ];
   }
+
 
 }

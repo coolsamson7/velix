@@ -32,7 +32,7 @@ enum Direction {
   final String type;
   @DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
   @Json(required: false)
-  List<WidgetData> children;
+  final List<WidgetData> children;
   @Json(ignore: true)
   WidgetData? parent;
   @DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
@@ -43,7 +43,7 @@ enum Direction {
 
   // constructor
 
-  WidgetData({required this.type, this.children = const [], this.cell});
+  WidgetData({required this.type, List<WidgetData>? children, this.cell}) : children = children ?? <WidgetData>[];
 
   // internal
 

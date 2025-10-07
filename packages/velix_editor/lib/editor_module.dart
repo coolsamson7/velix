@@ -14,18 +14,4 @@ class EditorModule {
 
     return T;
   }
-
-  EditorModule();
-
-  @OnInit()
-  void onInit() {
-    print("EditorModule.onInit()");
-
-    //registerEditorTypes();
-  }
-
-  @OnDestroy()
-  void onDestroy() {
-    print("EditorModule.onDestroy()");
-  }
 }

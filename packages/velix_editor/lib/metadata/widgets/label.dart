@@ -24,5 +24,5 @@ class LabelWidgetData extends WidgetData {
 
   // constructor
 
-  LabelWidgetData({super.type = "label", super.cell, super.children = const [], required this.label, this.color, this.backgroundColor, this.font});
+  LabelWidgetData({super.type = "label", super.cell, super.children, required this.label, this.color, this.backgroundColor, this.font});
 }

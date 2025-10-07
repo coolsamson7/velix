@@ -35,7 +35,7 @@ class PropertyChangeCommand<T> extends Command {
     required this.property,
     super.parent,
     required dynamic newValue,
-  }) : oldValue = descriptor.get(target, property) as T {
+  }) : oldValue = descriptor.get(target, property) as T { // TODO clone! compond, aber auch list<>
     _newValue = newValue;
 
   }

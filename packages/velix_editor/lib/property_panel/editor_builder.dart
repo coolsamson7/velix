@@ -18,6 +18,7 @@ abstract class PropertyEditorBuilder<T> {
   // abstract
 
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

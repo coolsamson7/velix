@@ -125,6 +125,7 @@
     "grid": {
       "title": "Grid",
       "rows": {"label":  "Rows"},
+      "gridRows": {"label":  "Rows"},
       "cols": {"label":  "Columns"},
       "spacing": {"label":  "Spacing"}
     },

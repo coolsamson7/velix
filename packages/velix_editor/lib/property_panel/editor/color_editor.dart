@@ -12,6 +12,7 @@ import '../editor_builder.dart';
 class ColorEditorBuilder extends PropertyEditorBuilder<Color> {
   @override
   Widget buildEditor({
+    required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
     required PropertyDescriptor property,

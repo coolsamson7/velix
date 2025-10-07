@@ -31,22 +31,10 @@ targets:
           - lib/editor.dart
   test:
     sources:
-      - test/**
-      #- $package$
+      - test/**.dart
+      - $package$
       #- lib/**
     builders:
-      velix|registry_json_builder:
-        generate_for:
-          - test/*.dart
-          - test/**/*.dart
-          - "!test/**/*.g.dart"
-          - "!test/**/*.part.dart"
-      velix|registry_json_aggregator:
-        options:
-          prefix: "test"
-          package: "velix/"
-        generate_for:
-          - test/action_test.dart
       velix|registry_builder:
         generate_for:
           - test/*.dart

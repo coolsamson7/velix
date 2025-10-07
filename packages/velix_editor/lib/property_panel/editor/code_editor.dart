@@ -446,7 +446,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         // Downgrade prefixOnly → invalid when losing focus
         if (_parseState == ParseState.prefixOnly) {
           setState(() {
-            _parseState = ParseState.invalid;
+            //TODO _parseState = ParseState.invalid;
           });
         }
       }

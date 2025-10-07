@@ -1,5 +1,4 @@
 import 'package:petitparser/petitparser.dart';
-import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';
 import 'infer_types.dart';
@@ -77,6 +76,8 @@ class ActionParser {
           expr.accept(typeChecker, context);
 
           valid = context.validPrefix();
+          if (!valid)
+            message = "unknown property ${context.unknown[0].property}";
 
           complete = context.unknown.isEmpty;
         }

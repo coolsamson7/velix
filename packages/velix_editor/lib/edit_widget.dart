@@ -225,44 +225,91 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
   }
 
   List<Widget> _buildResizeHandles() {
-    const double handleSize = 8;
+    const double handleSize = 10;
 
-    Widget buildHandle() {
-      return Container(
-        width: handleSize,
-        height: handleSize,
-        decoration: BoxDecoration(
-          color: Colors.blue.withOpacity(0.9),
-          border: Border.all(color: Colors.white, width: 1),
-          borderRadius: BorderRadius.circular(2),
+    Widget cornerHandle() => Container(
+      width: handleSize,
+      height: handleSize,
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.9),
+        border: Border.all(color: Colors.white, width: 1),
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+
+    Widget moveArrow(IconData icon, {required bool enabled}) {
+      return Opacity(
+        opacity: enabled ? 1.0 : 0.3,
+        child: Container(
+          width: handleSize * 2,
+          height: handleSize * 2,
+          decoration: BoxDecoration(
+            color: enabled ? Colors.blue.withOpacity(0.9) : Colors.grey.shade500,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1),
+            boxShadow: [
+              if (enabled)
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 3,
+                  offset: const Offset(1, 1),
+                ),
+            ],
+          ),
+          child: Icon(icon, size: 12, color: Colors.white),
         ),
       );
     }
 
     return [
-      // Corner handles
-      Positioned(top: -4, left: -4, child: buildHandle()),
-      Positioned(top: -4, right: -4, child: buildHandle()),
-      Positioned(bottom: -4, left: -4, child: buildHandle()),
-      Positioned(bottom: -4, right: -4, child: buildHandle()),
+      // --- Corners (always visible)
+      Positioned(top: -4, left: -4, child: cornerHandle()),
+      Positioned(top: -4, right: -4, child: cornerHandle()),
+      Positioned(bottom: -4, left: -4, child: cornerHandle()),
+      Positioned(bottom: -4, right: -4, child: cornerHandle()),
 
-      // Mid-point handles
-      Positioned(
-        top: -4, left: 0, right: 0,
-        child: Align(alignment: Alignment.topCenter, child: buildHandle()),
-      ),
-      Positioned(
-        bottom: -4, left: 0, right: 0,
-        child: Align(alignment: Alignment.bottomCenter, child: buildHandle()),
-      ),
-      Positioned(
-        top: 0, bottom: 0, left: -4,
-        child: Align(alignment: Alignment.centerLeft, child: buildHandle()),
-      ),
-      Positioned(
-        top: 0, bottom: 0, right: -4,
-        child: Align(alignment: Alignment.centerRight, child: buildHandle()),
-      ),
+      // --- Midpoint directional handles (show movement availability)
+      if (widget.model.canMove(Direction.up))
+        Positioned(
+          top: -14,
+          left: 0,
+          right: 0,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: moveArrow(Icons.keyboard_arrow_up, enabled: true),
+          ),
+        ),
+      if (widget.model.canMove(Direction.down))
+        Positioned(
+          bottom: -14,
+          left: 0,
+          right: 0,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: moveArrow(Icons.keyboard_arrow_down, enabled: true),
+          ),
+        ),
+      if (widget.model.canMove(Direction.left))
+        Positioned(
+          top: 0,
+          bottom: 0,
+          left: -14,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: moveArrow(Icons.keyboard_arrow_left, enabled: true),
+          ),
+        ),
+      if (widget.model.canMove(Direction.right))
+        Positioned(
+          top: 0,
+          bottom: 0,
+          right: -14,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: moveArrow(Icons.keyboard_arrow_right, enabled: true),
+          ),
+        ),
     ];
   }
+
 }

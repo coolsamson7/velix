@@ -511,18 +511,12 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
               _dismissCompletion();
               return KeyEventResult.handled;
             case LogicalKeyboardKey.backspace:
-            // Inline completion: revert and consume
+            // If there's an inline completion (selection), dismiss it and prevent backspace
               if (hasSelection) {
-                _isUpdatingCompletion = true;
-                _controller.value = TextEditingValue(
-                  text: _originalText,
-                  selection: TextSelection.collapsed(offset: _originalCursorPos),
-                );
-                _isUpdatingCompletion = false;
                 _dismissCompletion();
                 return KeyEventResult.handled;
               }
-              // No selection – just clear matches and let backspace delete
+              // No selection – clear matches and allow backspace to delete normally
               setState(() {
                 _matches = [];
                 _selectedIndex = -1;
@@ -530,15 +524,13 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
               _removeOverlay();
               return KeyEventResult.ignored;
             case LogicalKeyboardKey.arrowLeft:
-            // Always dismiss completion on arrow left
+            // If cursor is within the inline completion (has selection), just dismiss it
+            // Don't move cursor, just remove the suggestion
               if (hasSelection) {
-                _isUpdatingCompletion = true;
-                _controller.value = TextEditingValue(
-                  text: _originalText,
-                  selection: TextSelection.collapsed(offset: _originalCursorPos),
-                );
-                _isUpdatingCompletion = false;
+                _dismissCompletion();
+                return KeyEventResult.handled;
               }
+              // No selection – allow normal arrow left behavior
               _dismissCompletion();
               return KeyEventResult.ignored;
           }
@@ -568,4 +560,3 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     );
   }
 }
-

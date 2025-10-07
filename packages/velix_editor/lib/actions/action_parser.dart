@@ -1,4 +1,5 @@
 import 'package:petitparser/petitparser.dart';
+import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';
 import 'infer_types.dart';
@@ -61,19 +62,30 @@ class ActionParser {
   ParseResult parsePrefix(String input, { TypeChecker? typeChecker}) {
     final result = parser.expression.parse(input);
     if (result is Success<Expression>) {
-      final complete = result.position == result.buffer.length;
+      var complete = result.position == result.buffer.length;
 
       // check types
 
+      var valid = true;
+      var message = "";
       if (typeChecker != null) {
         var expr = result.value;
 
-        expr.accept(typeChecker);
+        var context = ClassTypeCheckerContext();
+
+        expr.accept(typeChecker, context);
+
+        valid = context.validPrefix();
+
+        complete = context.unknown.isEmpty;
       }
 
       // done
 
-      return ParseResult.success(result.value, complete: complete);
+      if (valid)
+        return ParseResult.success(result.value, complete: complete);
+      else
+        return ParseResult.failure(message, result.position);
     }
     return ParseResult.failure(result.message, result.position);
   }
@@ -84,15 +96,26 @@ class ActionParser {
     if (result is Success<Expression>) {
       // check types
 
+      var valid = true;
+      var message = "unknown property";
       if (typeChecker != null) {
         var expr = result.value;
 
-        expr.accept(typeChecker);
+        var context = ClassTypeCheckerContext();
+        expr.accept(typeChecker, context);
+
+        valid = context.unknown.isEmpty;
+        if (!valid) {
+          message =  "unknown property " + context.unknown[0].property;
+        }
       }
 
       // done
 
-      return ParseResult.success(result.value, complete: true);
+      if (valid)
+        return ParseResult.success(result.value, complete: true);
+      else
+        return ParseResult.failure(message, result.position);
     }
     return ParseResult.failure(result.message, result.position);
   }

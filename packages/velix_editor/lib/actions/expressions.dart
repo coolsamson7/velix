@@ -14,7 +14,7 @@ abstract class Expression {
 
   // abstract
 
-  T accept<T>(ExpressionVisitor<T> visitor);
+  T accept<T,C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context);
 }
 
 class Identifier extends Expression {
@@ -29,7 +29,7 @@ class Identifier extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitIdentifier(this);
+  T accept<T,C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitIdentifier(this, context);
 }
 
 class Variable extends Expression {
@@ -44,7 +44,7 @@ class Variable extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitVariable(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitVariable(this, context);
 }
 
 class Literal extends Expression {
@@ -60,7 +60,7 @@ class Literal extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitLiteral(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitLiteral(this, context);
 }
 
 class UnaryExpression extends Expression {
@@ -76,7 +76,7 @@ class UnaryExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitUnary(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitUnary(this, context);
 }
 
 class BinaryExpression extends Expression {
@@ -114,14 +114,14 @@ class BinaryExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitBinary(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitBinary(this, context);
 }
 
 class ThisExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitThis(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitThis(this, context);
 }
 
 class MemberExpression extends Expression {
@@ -137,7 +137,7 @@ class MemberExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitMember(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitMember(this, context);
 }
 
 class IndexExpression extends Expression {
@@ -153,7 +153,7 @@ class IndexExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitIndex(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitIndex(this, context);
 }
 
 class CallExpression extends Expression {
@@ -167,7 +167,7 @@ class CallExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) => visitor.visitCall(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) => visitor.visitCall(this, context);
 }
 
 class ConditionalExpression extends Expression {
@@ -182,6 +182,6 @@ class ConditionalExpression extends Expression {
   // override
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) =>
-      visitor.visitConditional(this);
+  T accept<T, C extends VisitorContext>(ExpressionVisitor<T,C> visitor, C context) =>
+      visitor.visitConditional(this, context);
 }

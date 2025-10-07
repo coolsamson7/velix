@@ -85,7 +85,7 @@ class Method extends Call {
   }
 }
 
-class CallVisitor extends ExpressionVisitor<Call> {
+class CallVisitor extends ExpressionVisitor<Call,VisitorContext> {
   // instance data
 
   final TypeDescriptor rootClass;
@@ -97,7 +97,7 @@ class CallVisitor extends ExpressionVisitor<Call> {
   // visitors
 
   @override
-  Call visitLiteral(Literal expr) {
+  Call visitLiteral(Literal expr, VisitorContext context) {
     if (expr.value is int)
       return Value(value: expr.value);
 
@@ -111,19 +111,19 @@ class CallVisitor extends ExpressionVisitor<Call> {
   }
 
   @override
-  Call visitVariable(Variable expr) {
+  Call visitVariable(Variable expr, VisitorContext context) {
     var field =  rootClass.getField(expr.identifier.name);
     return Field(field: field);
   }
 
   @override
-  Call visitUnary(UnaryExpression expr) {
-    return expr.argument.accept(this);
+  Call visitUnary(UnaryExpression expr, VisitorContext context) {
+    return expr.argument.accept(this, context);
   }
 
   @override
-  Call visitMember(MemberExpression expr) {
-    var receiver = expr.object.accept(this);
+  Call visitMember(MemberExpression expr, VisitorContext context) {
+    var receiver = expr.object.accept(this, context);
     var type = expr.object.getType<ObjectType>();
 
     var property =  expr.property.name;
@@ -135,10 +135,10 @@ class CallVisitor extends ExpressionVisitor<Call> {
   }
 
   @override
-  Call visitCall(CallExpression expr) {
-    var method = expr.callee.accept(this) as Method;
+  Call visitCall(CallExpression expr, VisitorContext context) {
+    var method = expr.callee.accept(this, context) as Method;
 
-    method.arguments = expr.arguments.map((arg) => arg.accept(this)).toList();
+    method.arguments = expr.arguments.map((arg) => arg.accept(this, context)).toList();
 
     return method;
   }

@@ -1,5 +1,6 @@
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/infer_types.dart';
+import 'package:velix_editor/actions/visitor.dart';
 
 import 'action_parser.dart';
 import 'eval.dart';
@@ -27,7 +28,7 @@ class ActionCompiler {
 
      var visitor = CallVisitor(context);
 
-     return result.value!.accept(visitor);
+     return result.value!.accept(visitor, VisitorContext());
    }
 }
 
@@ -51,7 +52,7 @@ class ActionEvaluator {
 
     var visitor = CallVisitor(contextType);
 
-    var call = result.value!.accept(visitor);
+    var call = result.value!.accept(visitor, VisitorContext());
 
     // eval
 

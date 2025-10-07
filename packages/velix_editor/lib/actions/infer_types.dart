@@ -1,5 +1,6 @@
 
 
+import 'package:flutter/cupertino.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart';
 import 'package:velix_editor/actions/types.dart';
@@ -43,7 +44,7 @@ class TypeException implements Exception {
 abstract class TypeResolver<T extends TypeInfo<dynamic,dynamic>> {
   void checkArguments(dynamic descriptor, List<T> arguments);
 
-  T resolve(String name, {T? parent});
+  T resolve(String name, {required Expression forExpression, T? parent});
 
   T resolveType(Type type);
 
@@ -101,7 +102,7 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   }
 
   @override
-  RuntimeTypeInfo resolve(String name, {RuntimeTypeInfo? parent}) {
+  RuntimeTypeInfo resolve(String name, {required Expression forExpression, RuntimeTypeInfo? parent}) {
     if ( parent == null)
       return RuntimeTypeInfo(root.getProperty(name).type, root.getProperty(name));
     else {
@@ -133,15 +134,16 @@ class UnknownPropertyDesc extends Desc {
   // instance
 
   Desc parent;
+  Expression forExpression;
   bool validPrefix = false;
   String property;
 
   // constructor
 
-  UnknownPropertyDesc({required this.parent, required this.property})
+  UnknownPropertyDesc({required this.parent, required this.property, required this.forExpression})
       : super('') {
     if (parent is ClassDesc)
-      validPrefix = (parent as ClassDesc).properties.keys.contains((String prop) => prop.startsWith(property));
+      validPrefix = (parent as ClassDesc).properties.keys.where((String prop) => prop.startsWith(property)).isNotEmpty;
   }
 
   // public
@@ -180,11 +182,11 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   // internal
 
-  Desc unknownType(Desc parent, String property) {
+  Desc unknownType(Desc parent, String property, Expression expression) {
     if (fail)
       throw TypeException("unknown property $property");
     else
-      return UnknownPropertyDesc(parent: parent, property: property);
+      return UnknownPropertyDesc(parent: parent, property: property, forExpression: expression);
   }
 
   // override
@@ -207,15 +209,15 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   }
 
   @override
-  ClassDescTypeInfo resolve(String name, {ClassDescTypeInfo? parent}) {
+  ClassDescTypeInfo resolve(String name, {required Expression forExpression, ClassDescTypeInfo? parent}) {
     var parentType = (parent ?? root).type;
 
     if ( parentType is ClassDesc) {
       var property  = parentType.find(name);
-      return ClassDescTypeInfo(property?.type ?? unknownType(parentType, name), property);
+      return ClassDescTypeInfo(property?.type ?? unknownType(parentType, name, forExpression), property);
     }
     else
-      return ClassDescTypeInfo(unknownType(parentType, name), null);
+      return ClassDescTypeInfo(unknownType(parentType, name, forExpression), null);
   }
 
   @override
@@ -237,8 +239,46 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   }
 }
 
+class TypeCheckerContext<TI> extends VisitorContext {
+  TI resolved(TI type) {
+    return type;
+  }
+}
 
-class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
+class ClassTypeCheckerContext extends TypeCheckerContext<ClassDescTypeInfo> {
+  // instance data
+
+  List<UnknownPropertyDesc> unknown = [];
+
+  // public
+
+  bool validPrefix() {
+    if (unknown.isEmpty)
+      return true;
+
+    for ( var unknownType in unknown) {
+      if (!unknownType.validPrefix)
+        return false;
+    }
+
+    return true;
+  }
+
+  // override
+
+  @override
+  ClassDescTypeInfo resolved(ClassDescTypeInfo type) {
+
+
+    if ( type.type is UnknownPropertyDesc)
+      unknown.add(type.type as UnknownPropertyDesc);
+
+    return type;
+  }
+}
+
+
+class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI, TypeCheckerContext<TI>> {
   // instance data
 
   final TypeResolver<TI> resolver;
@@ -250,8 +290,8 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   
   // internal
   
-  TI resolve(String name, {TI? parent}) {
-    TI type = resolver.resolve(name, parent: parent);
+  TI resolve(String name, {required Expression forExpression, TI? parent}) {
+    TI type = resolver.resolve(name, parent: parent, forExpression: forExpression);
 
     return type;
   }
@@ -259,68 +299,68 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   // override
 
   @override
-  TI visitLiteral(Literal expr) {
+  TI visitLiteral(Literal expr, TypeCheckerContext<TI> context) {
     return expr.type = resolver.resolveType(expr.value.runtimeType);
   }
 
   @override
-  TI visitIdentifier(Identifier expr) => expr.type = resolver.resolveType(String);
+  TI visitIdentifier(Identifier expr, TypeCheckerContext<TI> context) => expr.type = resolver.resolveType(String);
 
   @override
-  TI visitVariable(Variable expr) {
-    return expr.type = resolver.resolve(expr.identifier.name);
+  TI visitVariable(Variable expr, TypeCheckerContext<TI> context) {
+    return expr.type = context.resolved(resolver.resolve(expr.identifier.name, forExpression: expr));
   }
 
   @override
-  TI visitUnary(UnaryExpression expr) {
-    expr.argument.accept(this);
+  TI visitUnary(UnaryExpression expr, TypeCheckerContext<TI> context) {
+    expr.argument.accept(this, context);
 
     return resolver.resolveType(int); // TODO
   }
 
   @override
-  TI visitBinary(BinaryExpression expr) {
-    expr.left.accept(this);
-    expr.right.accept(this);
+  TI visitBinary(BinaryExpression expr, TypeCheckerContext<TI> context) {
+    expr.left.accept(this, context);
+    expr.right.accept(this, context);
 
     return resolver.resolveType(int); // TODO
   }
 
   @override
-  TI visitConditional(ConditionalExpression expr) {
-    expr.test.accept(this);
-    expr.consequent.accept(this);
-    expr.alternate.accept(this);
+  TI visitConditional(ConditionalExpression expr, TypeCheckerContext<TI> context) {
+    expr.test.accept(this, context);
+    expr.consequent.accept(this, context);
+    expr.alternate.accept(this, context);
 
     return resolver.resolveType(bool); // TODO
   }
 
   @override
-  TI visitMember(MemberExpression expr) {
-    var objType = expr.object.accept(this);
+  TI visitMember(MemberExpression expr, TypeCheckerContext<TI> context) {
+    var objType = expr.object.accept(this, context);
 
-    return expr.type = resolver.resolve(expr.property.name, parent: objType);
+    return expr.type = context.resolved(resolver.resolve(expr.property.name, parent: objType, forExpression: expr));
   }
 
   @override
-  TI visitIndex(IndexExpression expr) {
-    expr.object.accept(this);
-    expr.index.accept(this);
+  TI visitIndex(IndexExpression expr, TypeCheckerContext<TI> context) {
+    expr.object.accept(this, context);
+    expr.index.accept(this, context);
 
     return resolver.resolveType(int); // TODO
   }
 
   @override
-  TI visitCall(CallExpression expr) { // callee, arguments
-    expr.callee.accept(this);
+  TI visitCall(CallExpression expr, TypeCheckerContext<TI> context) { // callee, arguments
+    expr.callee.accept(this, context);
 
     // resolve arguments
 
-    List<TI> argumentTypes = expr.arguments.map((arg) => arg.accept(this)).toList();
+    List<TI> argumentTypes = expr.arguments.map((arg) => arg.accept(this, context)).toList();
 
     if (expr.callee is Variable) {
       resolver.checkArguments(expr.getDescriptor(), argumentTypes);
-      expr.type = resolver.resolve((expr.callee as Variable).identifier.name);
+      expr.type = context.resolved(resolver.resolve((expr.callee as Variable).identifier.name, forExpression: expr));
     }
 
     else if (expr.callee is MemberExpression) {
@@ -329,7 +369,7 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
 
       resolver.checkArguments(member.getDescriptor(), argumentTypes);
       if (objType != null) {
-        expr.type = resolver.resolve(member.property.name, parent: objType);
+        expr.type = context.resolved(resolver.resolve(member.property.name, parent: objType, forExpression: expr));
       }
     }
 
@@ -337,5 +377,5 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI> {
   }
 
   @override
-  TI visitThis(ThisExpression expr) => expr.type = resolver.rootType();
+  TI visitThis(ThisExpression expr, TypeCheckerContext<TI> context) => expr.type = resolver.rootType();
 }

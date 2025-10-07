@@ -76,7 +76,7 @@ class _MessagePaneState extends State<MessagePane> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header row
+          /* Header row
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             color: Colors.grey.shade800,
@@ -87,7 +87,7 @@ class _MessagePaneState extends State<MessagePane> {
                 Expanded(flex: 4, child: Text("Message", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold))),
               ],
             ),
-          ),
+          )*/
 
           // Message list
           Expanded(

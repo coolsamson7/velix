@@ -365,6 +365,16 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     Provider.of<LocaleManager>(context, listen: false).locale = Locale(locale);
   }
 
+  String message(Exception e) {
+    var message = e.toString();
+
+    var index = message.indexOf(":");
+    if (index >= 0)
+      return message.substring(index + 1);
+    else
+      return message;
+  }
+
   bool validate() {
     var root = widget.models[0]; // TODO
 
@@ -381,7 +391,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
               type: MessageType.error,
               widget: error.widget,
               property: error.property,
-              message: "${error.exception}"
+              message: message(error.exception)
           )).toList()
       ));
 

@@ -56,57 +56,6 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
     });
   }
 
-  Widget _buildHandle({required bool left}) {
-    return Positioned(
-      left: left ? -6 : null,
-      right: left ? null : -6,
-      top: 0,
-      bottom: 0,
-      child: Center(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragStart: (d) => _startDrag(d, left),
-          onHorizontalDragUpdate: (d) => _updateDrag(d, left),
-          onHorizontalDragEnd: _endDrag,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.resizeLeftRight,
-            child: Container(
-              width: 12,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey.shade300, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    width: 1.5,
-                    height: 16,
-                    color: Colors.grey.shade400,
-                  ),
-                  Container(
-                    width: 1.5,
-                    height: 16,
-                    color: Colors.grey.shade400,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -123,6 +72,9 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
               bottom: 0,
               width: _width,
               child: Container(
+                //color: Colors.white,
+                child: widget.child,
+                // Keep border inside container
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: _isDragging
@@ -131,20 +83,14 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
                     width: _isDragging ? 2 : 1,
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: Container(
-                        color: Colors.white,
-                        child: widget.child,
-                      ),
-                    ),
-                    _buildHandle(left: true),
-                    _buildHandle(left: false),
-                  ],
-                ),
               ),
             ),
+
+            // Left handle
+            _buildHandleAt(containerLeft, left: true),
+
+            // Right handle
+            _buildHandleAt(containerLeft + _width, left: false),
 
             // Ruler only while dragging
             if (_isDragging)
@@ -166,6 +112,48 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
       );
     });
   }
+
+  Widget _buildHandleAt(double xPos, {required bool left}) {
+    return Positioned(
+      left: left ? xPos - 6 : null,
+      right: left ? null : (MediaQuery.of(context).size.width - xPos - 6),
+      top: 0,
+      bottom: 0,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: (d) => _startDrag(d, left),
+        onHorizontalDragUpdate: (d) => _updateDrag(d, left),
+        onHorizontalDragEnd: _endDrag,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.resizeLeftRight,
+          child: Container(
+            width: 12,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(width: 1.5, height: 16, color: Colors.grey.shade400),
+                Container(width: 1.5, height: 16, color: Colors.grey.shade400),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
 class _RulerPainter extends CustomPainter {

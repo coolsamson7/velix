@@ -262,12 +262,14 @@ class FormEvent {
   // instance data
 
   bool isDirty;
-  String? path;
+  TypeProperty? property;
   dynamic value;
+
+  String? get path => property?.path;
 
   // constructor
 
-  FormEvent({required this.isDirty, this.path, this.value});
+  FormEvent({required this.isDirty, this.property, this.value});
 }
 
 /// A [FormMapper] is used to bind field values to form elements
@@ -309,11 +311,11 @@ class FormMapper {
       rootProperty = RootProperty(mapper: this);
   }
 
-  void addListener(void onData(FormEvent event), {emitOnDirty = false, emitOnChange=false}) {
+  StreamSubscription addListener(void onData(FormEvent event), {emitOnDirty = false, emitOnChange=false}) {
     this.emitOnDirty = emitOnDirty;
     this.emitOnChange = emitOnChange;
 
-    eventStream.stream.listen(onData);
+    return eventStream.stream.listen(onData);
   }
 
   // public
@@ -448,7 +450,7 @@ class FormMapper {
     changes += 1;
 
     if ( emitOnChange )
-      eventStream.add(FormEvent(isDirty: isDirty, path: property.path, value: value));
+      eventStream.add(FormEvent(isDirty: isDirty, property: property, value: value));
 
     property.set(instance, value, ValuedWidgetContext(mapper: this));
   }

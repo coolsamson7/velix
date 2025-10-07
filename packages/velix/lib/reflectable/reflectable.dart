@@ -178,6 +178,10 @@ class FieldDescriptor<T, V> extends AbstractPropertyDescriptor<T> {
     return getter(object);
   }
 
+  void set(T object, V value) {
+    setter!(object, value);
+  }
+
   bool isWriteable() {
     return setter != null;
   }

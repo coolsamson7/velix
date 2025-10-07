@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
+import 'package:velix_di/velix_di.dart';
+import 'package:velix_ui/module.dart';
 
 import 'package:velix_ui/velix_ui.dart';
 
@@ -16,12 +19,17 @@ class TypeViolationTranslationProvider extends TranslationProvider<TypeViolation
   }
 }
 
-
 void main() {
   // initialize
 
   registerAllDescriptors();
-  registerWidgets(TargetPlatform.iOS);
+
+  Velix.bootstrap;
+  UIModule.boot;
+
+  Environment(forModule: UIModule);
+
+  ValuedWidget.platform = TargetPlatform.iOS;
 
   TypeViolationTranslationProvider();
 

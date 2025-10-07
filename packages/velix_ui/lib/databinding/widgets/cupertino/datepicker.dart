@@ -2,13 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
 
 import '../../valued_widget.dart';
 import '../../form_mapper.dart';
 
-@WidgetAdapter()
-class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>> {
-  DatePickerAdapter() : super('date', 'iOS');
+@WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.macOS])
+@Injectable()
+class CupertinoDatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>> {
+  CupertinoDatePickerAdapter() : super('date', [TargetPlatform.iOS, TargetPlatform.macOS]);
 
   @override
   FormField<DateTime> build({
@@ -110,23 +112,5 @@ class DatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<DateTime>>
   @override
   void setValue(FormField<DateTime> widget, dynamic value, ValuedWidgetContext context) {
     // override if you track state
-  }
-}
-
-// Extension to use in FormMapper as before
-extension DatePickerFormFieldExtension on FormMapper {
-  Widget date({
-    required String path,
-    required BuildContext context,
-    DateTime? firstDate,
-    DateTime? lastDate,
-    String? label,
-    DateFormat? dateFormat,
-  }) {
-    return bind('date', path: path, context: context, args: Keywords({
-      'firstDate': firstDate,
-      'lastDate': lastDate,
-      'dateFormat': dateFormat
-    }));
   }
 }

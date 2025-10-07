@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
 
 import '../../valued_widget.dart';
 import '../../form_mapper.dart';
 
 ///  A [ValuedWidgetAdapter] for a [Slider]
-@WidgetAdapter()
+@WidgetAdapter(platforms: [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS])
+@Injectable()
 class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   // constructor
 
-  SliderAdapter() : super('slider', 'material');
+  SliderAdapter() : super('slider', [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]);
 
   // override
 
@@ -17,7 +19,7 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   Slider build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     var initialValue = mapper.getValue(property);
 
-    Slider widget = Slider(
+    Slider widget = Slider.adaptive(
       value:  double.parse(initialValue.toString()),
       min: double.parse(args["min"].toString()),
       max: double.parse(args["max"].toString()),
@@ -42,14 +44,5 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   @override
   void setValue(Slider widget, dynamic value, ValuedWidgetContext context) {
     // noop
-  }
-}
-
-extension BindSlider on FormMapper {
-  Widget slider({required String path,  required BuildContext context, required int min,  required int max}) {
-    return bind("slider", path: path, context: context, args: Keywords({
-      "min": min,
-      "max": max,
-    }));
   }
 }

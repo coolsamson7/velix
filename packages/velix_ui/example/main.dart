@@ -75,7 +75,7 @@ void main() {
   // initialize
 
   registerAllDescriptors();
-  registerWidgets(TargetPlatform.iOS);
+  ValuedWidget.platform = TargetPlatform.iOS;
 
   TypeViolationTranslationProvider();
 

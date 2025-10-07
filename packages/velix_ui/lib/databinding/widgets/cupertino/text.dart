@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
 
 
 import '../../valued_widget.dart';
@@ -9,11 +10,12 @@ import '../../form_mapper.dart';
 import '../text.dart';
 
 ///  A [ValuedWidgetAdapter] for a [CupertinoTextFormFieldRow]
-@WidgetAdapter()
-class TextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldRow> {
+@WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.macOS])
+@Injectable()
+class CupertinoTextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextFormFieldRow> {
   // constructor
 
-  TextFieldAdapter() : super('text', 'iOS');
+  CupertinoTextFieldAdapter() : super('text', [TargetPlatform.iOS, TargetPlatform.macOS]);
 
   // override
 

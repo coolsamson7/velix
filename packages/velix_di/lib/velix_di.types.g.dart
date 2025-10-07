@@ -127,6 +127,17 @@ void registerVelixDescriptors() {
     constructor: ({required Map<String, dynamic> values}) => ConfigurationValues(values),
     fromMapConstructor: (Map<String,dynamic> args) => ConfigurationValues(args['values'] as Map<String, dynamic>),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationValues(args[0] as Map<String, dynamic>),
+    methods: [
+      method<ConfigurationValues,void>('setManager',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<ConfigurationManager>('manager', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConfigurationValues).setManager(args[1])
+      )
+    ],
   );
 
   type<JsonFileConfigurationSource>(
@@ -141,6 +152,17 @@ void registerVelixDescriptors() {
     constructor: ({String filePath = ''}) => JsonFileConfigurationSource(filePath),
     fromMapConstructor: (Map<String,dynamic> args) => JsonFileConfigurationSource(args['filePath'] as String),
     fromArrayConstructor: (List<dynamic> args) => JsonFileConfigurationSource(args[0] as String),
+    methods: [
+      method<JsonFileConfigurationSource,void>('setManager',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<ConfigurationManager>('manager', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as JsonFileConfigurationSource).setManager(args[1])
+      )
+    ],
   );
 
   TypeDescriptor.verify();

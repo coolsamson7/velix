@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/util/collections.dart';
 
 import 'form_mapper.dart';
@@ -6,7 +7,13 @@ import 'package:velix/util/transformer.dart';
 
 /// decorates widget adapters
 class WidgetAdapter {
-  const WidgetAdapter();
+  // instance data
+
+  final List<TargetPlatform> platforms;
+
+  // constructor
+
+  const WidgetAdapter({required this.platforms});
 }
 
 dynamic identity(dynamic value) => value;
@@ -57,8 +64,9 @@ abstract class ValuedWidgetAdapter<T> {
   /// return the element type
   Type getType();
 
-  /// return the platform name
-  String getTheme();
+  List<TargetPlatform> supportedPlatforms();
+
+  bool supports(TargetPlatform platform);
 
   /// return the element name
   String getName();
@@ -90,25 +98,33 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   // instance data
 
   final String name;
-  final Type type;
-  final String theme;
+  //final String theme;
+  late WidgetAdapter annotation;
+  List<TargetPlatform> platforms;
 
   // constructor
 
-  AbstractValuedWidgetAdapter(this.name, this.theme) : type = T {
+  AbstractValuedWidgetAdapter(this.name, this.platforms) {
+    annotation = TypeDescriptor.forType(runtimeType).getAnnotation<WidgetAdapter>()!;
+
     ValuedWidget.register(this);
   }
 
   // override
 
   @override
-  Type getType() {
-    return type;
+  List<TargetPlatform> supportedPlatforms() {
+    return platforms;
   }
 
   @override
-  String getTheme() {
-    return theme;
+  bool supports(TargetPlatform platform) {
+    return platforms.contains(platform);
+  }
+
+  @override
+  Type getType() {
+    return T;
   }
 
   @override
@@ -126,30 +142,26 @@ class ValuedWidgetContext {
   ValuedWidgetContext({required this.mapper});
 }
 
-typedef AdapterKey = (String, String);
+typedef AdapterKey = (TargetPlatform, String);
 
 /// A registry for [ValuedWidgetAdapter]s
 class ValuedWidget {
   // properties
 
   static final Map<AdapterKey, ValuedWidgetAdapter> _adapters = {};
-  static final Map<Type, ValuedWidgetAdapter> _by_type = {};
 
-  static String platform = "iOS";
+  static TargetPlatform platform = TargetPlatform.iOS;
 
   // administration
 
   static void register(ValuedWidgetAdapter adapter) {
-     _adapters[(platform, adapter.getName())] = adapter;
-     _by_type[adapter.getType()] = adapter;
+     for (var platform in adapter.supportedPlatforms())
+      _adapters[(platform, adapter.getName())] = adapter;
   }
 
-  static ValuedWidgetAdapter getAdapterFor<T>() {
-    return _by_type[T]!;
-  }
 
   static ValuedWidgetAdapter getAdapter(String name) {
-    ValuedWidgetAdapter? result = _adapters[(platform, name)] ?? _adapters[("", name)];
+    ValuedWidgetAdapter? result = _adapters[(platform, name)];
 
     if (result == null)
       throw Exception("missing adapter for type $name");

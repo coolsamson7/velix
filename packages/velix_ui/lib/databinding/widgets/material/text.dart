@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
 
 import '../../valued_widget.dart';
 import '../../form_mapper.dart';
@@ -8,11 +9,12 @@ import '../../form_mapper.dart';
 import '../text.dart';
 
 ///  A [ValuedWidgetAdapter] for a [TextFormField]
-@WidgetAdapter()
-class TextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
+@WidgetAdapter(platforms: [TargetPlatform.android])
+@Injectable()
+class MaterialTextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
   // constructor
 
-  TextFormFieldAdapter():super("text", "material");
+  MaterialTextFormFieldAdapter():super("text", [TargetPlatform.android]);
 
   // override
 

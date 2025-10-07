@@ -239,6 +239,9 @@ abstract class CodeGenerator<T extends InterfaceElement> {
     if (element == "new")
       return; // WTF!
 
+    //if (library.contains("src"))
+    //  return;
+
     if ( !library.startsWith("dart:core") && !library.startsWith("velix:")) {
       var importList = imports[library];
       if (importList == null)
@@ -276,14 +279,17 @@ abstract class CodeGenerator<T extends InterfaceElement> {
       addImport(type.element.library.uri.toString(), type.name!);
 
       // Recursively collect imports for generic type arguments
+      if ( false )
       for (final typeArg in type.typeArguments) {
         _collectTypeImports(typeArg);
       }
-    } else if (type is FunctionType) {
+    }
+    else if (type is FunctionType) {
       // Return type
       _collectTypeImports(type.returnType);
 
       // Parameter types
+
       for (final param in type.formalParameters) {
         _collectTypeImports(param.type);
       }
@@ -429,7 +435,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   void collectImports(ClassElement element) {
     super.collectImports(element);
 
-    // Supertype
+    /* TODO  Supertype
     if (element.supertype != null) {
       _collectTypeImports(element.supertype!);
     }
@@ -442,7 +448,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     // Mixins
     for (final mixin in element.mixins) {
       _collectTypeImports(mixin);
-    }
+    }*/
 
     // Fields
     if (generateProperties) {
@@ -460,7 +466,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
 
     // Methods
-    for (final method in element.methods) {
+
+    for (final method in element.methods.where((method) => hasAnnotation(method, ["OnInit", "OnDestroy", "OnRunning", "Create", "Inject", "Method"]))) {
       if (!method.isPublic) continue;
 
       // Annotations
@@ -1202,7 +1209,7 @@ class RegistryFragmentBuilder extends Builder {
         return;
       }
 
-      if ( !lib.uri.path.startsWith(this.package)) {
+      if ( !lib.uri.path.startsWith(package)) {
         //print("ignore ${lib.uri.path}");
         return;
       }

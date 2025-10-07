@@ -10,6 +10,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
+import 'package:velix_editor/actions/visitor.dart';
 
 import 'action_test.types.g.dart';
 
@@ -328,7 +329,7 @@ void main() {
       var expression = parser.parse(code);
 
       expect(() {
-        expression.accept(checker);
+        expression.accept(checker, VisitorContext());
       }, throwsA(isA<Exception>()));
     });
 
@@ -337,7 +338,7 @@ void main() {
 
       var expression = parser.parse(code);
       expect(() {
-        expression.accept(checker);
+        expression.accept(checker, VisitorContext());
       }, throwsA(isA<Exception>()));
     });
   });

@@ -73,11 +73,17 @@ class ActionParser {
 
         var context = ClassTypeCheckerContext();
 
-        expr.accept(typeChecker, context);
+        try {
+          expr.accept(typeChecker, context);
 
-        valid = context.validPrefix();
+          valid = context.validPrefix();
 
-        complete = context.unknown.isEmpty;
+          complete = context.unknown.isEmpty;
+        }
+        catch(e) {
+          valid = false;
+          message = e.toString();
+        }
       }
 
       // done
@@ -102,11 +108,18 @@ class ActionParser {
         var expr = result.value;
 
         var context = ClassTypeCheckerContext();
-        expr.accept(typeChecker, context);
 
-        valid = context.unknown.isEmpty;
-        if (!valid) {
-          message =  "unknown property " + context.unknown[0].property;
+        try {
+          expr.accept(typeChecker, context);
+
+          valid = context.unknown.isEmpty;
+          if (!valid) {
+            message = "unknown property " + context.unknown[0].property;
+          }
+        }
+        catch(e) {
+          valid = false;
+          message = e.toString();
         }
       }
 

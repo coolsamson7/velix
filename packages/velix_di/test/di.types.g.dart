@@ -22,24 +22,6 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Conflict(),
   );
 
-  type<ConflictModule>(
-    location: 'asset:velix_di/test/conflict/conflict.dart:3:1',
-    annotations: [
-      Module()
-    ],
-    constructor: () => ConflictModule(),
-    fromMapConstructor: (Map<String,dynamic> args) => ConflictModule(),
-    fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
-    methods: [
-      method<ConflictModule,Conflict>('create',
-        annotations: [
-          Create()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
-      )
-    ],
-  );
-
   type<CycleModule>(
     location: 'asset:velix_di/test/cycle/cycle.dart:3:1',
     annotations: [
@@ -94,56 +76,6 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Baz(),
   );
 
-  type<Factory>(
-    location: 'asset:velix_di/test/di.dart:44:1',
-    annotations: [
-      Injectable(scope: "singleton", eager: true)
-    ],
-    constructor: () => Factory(),
-    fromMapConstructor: (Map<String,dynamic> args) => Factory(),
-    fromArrayConstructor: (List<dynamic> args) => Factory(),
-    methods: [
-      method<Factory,void>('onInit',
-        annotations: [
-          OnInit()
-        ],
-        parameters: [
-          param<Environment>('environment', isRequired: true)
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).onInit(args[1])
-      ), 
-      method<Factory,void>('onDestroy',
-        annotations: [
-          OnDestroy()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).onDestroy()
-      ), 
-      method<Factory,void>('setFoo',
-        annotations: [
-          Inject()
-        ],
-        parameters: [
-          param<Foo>('foo', isRequired: true), 
-          param<int>('value', isRequired: true,
-          annotations: [
-            Value("foo.bar", defaultValue: 1)
-          ],
-          )
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).setFoo(args[1], args[2])
-      ), 
-      method<Factory,Baz>('createBaz',
-        annotations: [
-          Create()
-        ],
-        parameters: [
-          param<Bar>('bar', isRequired: true)
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Factory).createBaz(args[1])
-      )
-    ],
-  );
-
   type<Collections>(
     location: 'asset:velix_di/test/di.dart:70:1',
     params: [
@@ -158,7 +90,7 @@ void registerTypes() {
         factoryConstructor: () => <Money>[],
         getter: (obj) => obj.prices,
       )
-    ]
+    ],
   );
 
   type<Money>(
@@ -179,7 +111,7 @@ void registerTypes() {
         type: IntType().greaterThan(0),
         getter: (obj) => obj.value,
       )
-    ]
+    ],
   );
 
   var baseDescriptor =  type<Base>(
@@ -194,7 +126,7 @@ void registerTypes() {
       field<Base,String>('name',
         getter: (obj) => obj.name,
       )
-    ]
+    ],
   );
 
   var conditionalBaseDescriptor =  type<ConditionalBase>(
@@ -251,7 +183,7 @@ void registerTypes() {
       field<Types,String>('string_var',
         getter: (obj) => obj.string_var,
       )
-    ]
+    ],
   );
 
   type<Invoice>(
@@ -272,7 +204,7 @@ void registerTypes() {
         factoryConstructor: () => <Product>[],
         getter: (obj) => obj.products,
       )
-    ]
+    ],
   );
 
   type<Flat>(
@@ -296,7 +228,7 @@ void registerTypes() {
       field<Flat,int>('priceValue',
         getter: (obj) => obj.priceValue,
       )
-    ]
+    ],
   );
 
   enumeration<Status>(
@@ -314,6 +246,24 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => MockModule(),
   );
 
+  type<ConflictModule>(
+    location: 'asset:velix_di/test/conflict/conflict.dart:3:1',
+    annotations: [
+      Module()
+    ],
+    constructor: () => ConflictModule(),
+    fromMapConstructor: (Map<String,dynamic> args) => ConflictModule(),
+    fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
+    methods: [
+      method<ConflictModule,Conflict>('create',
+        annotations: [
+          Create()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConflictModule).create()
+      )
+    ],
+  );
+
   type<Foo>(
     location: 'asset:velix_di/test/di.dart:35:1',
     annotations: [
@@ -325,6 +275,56 @@ void registerTypes() {
     constructor: ({required Bar bar}) => Foo(bar: bar),
     fromMapConstructor: (Map<String,dynamic> args) => Foo(bar: args['bar'] as Bar),
     fromArrayConstructor: (List<dynamic> args) => Foo(bar: args[0] as Bar),
+  );
+
+  type<Factory>(
+    location: 'asset:velix_di/test/di.dart:44:1',
+    annotations: [
+      Injectable(scope: "singleton", eager: true)
+    ],
+    constructor: () => Factory(),
+    fromMapConstructor: (Map<String,dynamic> args) => Factory(),
+    fromArrayConstructor: (List<dynamic> args) => Factory(),
+    methods: [
+      method<Factory,void>('onInit',
+        annotations: [
+          OnInit()
+        ],
+        parameters: [
+          param<Environment>('environment', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).onInit(args[1])
+      ), 
+      method<Factory,void>('onDestroy',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).onDestroy()
+      ), 
+      method<Factory,void>('setFoo',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<Foo>('foo', isRequired: true), 
+          param<int>('value', isRequired: true,
+          annotations: [
+            Value("foo.bar", defaultValue: 1)
+          ],
+          )
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).setFoo(args[1], args[2])
+      ), 
+      method<Factory,Baz>('createBaz',
+        annotations: [
+          Create()
+        ],
+        parameters: [
+          param<Bar>('bar', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Factory).createBaz(args[1])
+      )
+    ],
   );
 
   type<Mutable>(
@@ -353,7 +353,7 @@ void registerTypes() {
         setter: (obj, value) => (obj as Mutable).dateTime = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   type<Immutable>(
@@ -373,7 +373,7 @@ void registerTypes() {
       field<Immutable,Money>('price',
         getter: (obj) => obj.price,
       )
-    ]
+    ],
   );
 
   type<Derived>(
@@ -390,7 +390,7 @@ void registerTypes() {
       field<Derived,int>('number',
         getter: (obj) => obj.number,
       )
-    ]
+    ],
   );
 
   type<ConditionalProd>(
@@ -421,6 +421,18 @@ void registerTypes() {
           OnRunning()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).runProd()
+      ), 
+      method<ConditionalProd,void>('initBase',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).initBase()
+      ), 
+      method<ConditionalProd,void>('destroyBase',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).destroyBase()
       )
     ],
   );
@@ -435,6 +447,20 @@ void registerTypes() {
     constructor: () => ConditionalDev(),
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalDev(),
+    methods: [
+      method<ConditionalDev,void>('initBase',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalDev).initBase()
+      ), 
+      method<ConditionalDev,void>('destroyBase',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ConditionalDev).destroyBase()
+      )
+    ],
   );
 
   type<MockBase>(
@@ -446,6 +472,20 @@ void registerTypes() {
     constructor: () => MockBase(),
     fromMapConstructor: (Map<String,dynamic> args) => MockBase(),
     fromArrayConstructor: (List<dynamic> args) => MockBase(),
+    methods: [
+      method<MockBase,void>('initBase',
+        annotations: [
+          OnInit()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as MockBase).initBase()
+      ), 
+      method<MockBase,void>('destroyBase',
+        annotations: [
+          OnDestroy()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as MockBase).destroyBase()
+      )
+    ],
   );
 
   type<DerivedType>(
@@ -479,7 +519,7 @@ void registerTypes() {
       field<ImmutableProduct,Status>('status',
         getter: (obj) => obj.status,
       )
-    ]
+    ],
   );
 
   type<Product>(
@@ -505,7 +545,7 @@ void registerTypes() {
         getter: (obj) => obj.status,
         setter: (obj, value) => (obj as Product).status = value,
       )
-    ]
+    ],
   );
 
   type<ImmutableRoot>(
@@ -520,7 +560,7 @@ void registerTypes() {
       field<ImmutableRoot,ImmutableProduct>('product',
         getter: (obj) => obj.product,
       )
-    ]
+    ],
   );
 
   type<MutableRoot>(
@@ -535,7 +575,7 @@ void registerTypes() {
       field<MutableRoot,Product>('product',
         getter: (obj) => obj.product,
       )
-    ]
+    ],
   );
 
   // watchout: is part of a cycle

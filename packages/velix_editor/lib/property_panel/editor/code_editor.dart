@@ -377,7 +377,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         break;
       case ParseState.invalid:
         color = Colors.red.shade800;
-        message = "Parse error: ${lastResult.message ?? ""}";
+        message = "Parse error: ${lastResult.message ?? ""}"; // TODO
         break;
     }
 

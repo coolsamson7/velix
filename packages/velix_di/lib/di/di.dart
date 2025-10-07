@@ -776,7 +776,7 @@ abstract class ParameterResolverFactory {
       if (factory.applies(environment, parameter))
         return factory.create(environment, parameter);
 
-    throw DIRegistrationException("no resolver for parameter");
+    throw DIRegistrationException("no resolver for parameter ${parameter.name} of type ${parameter.type}");
   }
 
   // abstract

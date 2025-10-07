@@ -5,26 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:velix/util/collections.dart';
 
-
-import "valued_widget.dart";
 import "form_mapper.dart";
-import "widgets/cupertino/registry.dart";
-import "widgets/material/registry.dart";
-
-void registerWidgets(TargetPlatform platform) {
-
-
-  if ( platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
-    ValuedWidget.platform = "iOS";
-    registerCupertinoWidgets();
-  }
-  else if ( platform == TargetPlatform.android) {
-    ValuedWidget.platform = "material";
-    registerMaterialWidgets();
-  }
-  else
-    throw Exception("unsupported platform $platform");
-}
 
 // text
 
@@ -60,7 +41,7 @@ extension BindSwitch on FormMapper {
 
 // checkbox
 
-extension CheckboxSlider on FormMapper {
+extension BindCheckbox on FormMapper {
   Widget checkbox({required String path,  required BuildContext context}) {
     return bind("checkbox", path: path, context: context, args: Keywords({}));
   }

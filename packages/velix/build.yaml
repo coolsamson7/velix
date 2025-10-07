@@ -14,14 +14,6 @@ builders:
       ".dart": [ ".new_registry.json" ]
     auto_apply: none  #dependents
     build_to: cache
-    defaults:
-    #generate_for:
-    #  - lib/*.dart
-    #  - lib/**/*.dart
-    #  - "!lib/**/*.g.dart"
-    #  - "!lib/**/*.part.dart"
-    #  - "!lib/**/*.freezed.dart"
-    #  - "!lib/**/*.gr.dart"
   # Builder for extracting individual class metadata AND code fragments
   registry_builder:
     import: "package:velix/src/generators/registry_generator.dart"
@@ -30,14 +22,6 @@ builders:
       ".dart": [ ".registry.json", ".registry.dart" ]
     auto_apply: none  #dependents
     build_to: cache
-    defaults:
-      #generate_for:
-      #  - lib/*.dart
-      #  - lib/**/*.dart
-      #  - "!lib/**/*.g.dart"
-      #  - "!lib/**/*.part.dart"
-      #  - "!lib/**/*.freezed.dart"
-      #  - "!lib/**/*.gr.dart"
 
   # Combine all registries
   registry_aggregator:

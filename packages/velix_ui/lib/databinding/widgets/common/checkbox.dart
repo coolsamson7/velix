@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'package:velix/velix.dart';
+import 'package:velix_di/di/di.dart';
 
 import '../../valued_widget.dart';
 import '../../form_mapper.dart';
 
 ///  A [ValuedWidgetAdapter] for a [Slider]
-@WidgetAdapter()
+@WidgetAdapter(platforms: [TargetPlatform.android])
+@Injectable()
 class CheckboxAdapter extends AbstractValuedWidgetAdapter<Checkbox> {
   // constructor
 
-  CheckboxAdapter() : super('checkbox', 'material');
+  CheckboxAdapter() : super('checkbox', [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]);
 
   // override
 
@@ -38,14 +40,5 @@ class CheckboxAdapter extends AbstractValuedWidgetAdapter<Checkbox> {
   @override
   void setValue(Checkbox widget, dynamic value, ValuedWidgetContext context) {
     // noop
-  }
-}
-
-extension CheckboxSlider on FormMapper {
-  Widget checkbox({required String path,  required BuildContext context, required int min,  required int max}) {
-    return bind("checkbox", path: path, context: context, args: Keywords({
-      "min": min,
-      "max": max,
-    }));
   }
 }

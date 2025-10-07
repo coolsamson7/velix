@@ -58,7 +58,7 @@ void main() async {
 
   TypeViolationTranslationProvider();
   registerTypes();
-  registerWidgets(TargetPlatform.iOS);
+  ValuedWidget.platform = TargetPlatform.iOS;
 
   // Tracing
   Tracer(

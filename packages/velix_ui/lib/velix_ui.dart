@@ -21,8 +21,16 @@ export './databinding/valued_widget.dart';
 
 export './databinding/widgets/text.dart';
 
-export './databinding/widgets/cupertino/registry.dart';
-export './databinding/widgets/material/registry.dart';
+export './databinding/widgets/common/checkbox.dart';
+export './databinding/widgets/common/label.dart';
+export './databinding/widgets/common/slider.dart';
+export './databinding/widgets/common/switch.dart';
+
+export './databinding/widgets/cupertino/datepicker.dart';
+export './databinding/widgets/cupertino/text.dart';
+
+export './databinding/widgets/material/datepicker.dart';
+export './databinding/widgets/material/text.dart';
 
 // provider
 

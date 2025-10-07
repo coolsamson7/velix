@@ -86,11 +86,21 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
               ),
             ),
 
-            // Left handle
-            _buildHandleAt(containerLeft, left: true),
+            _buildHandle(
+              containerLeft: containerLeft,
+              containerTop: 0,
+              containerHeight: constraints.maxHeight,
+              containerWidth: _width,
+              left: true,
+            ),
+            _buildHandle(
+              containerLeft: containerLeft,
+              containerTop: 0,
+              containerHeight: constraints.maxHeight,
+              containerWidth: _width,
+              left: false,
+            ),
 
-            // Right handle
-            _buildHandleAt(containerLeft + _width, left: false),
 
             // Ruler only while dragging
             if (_isDragging)
@@ -113,12 +123,31 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
     });
   }
 
-  Widget _buildHandleAt(double xPos, {required bool left}) {
+  Widget _buildHandle({
+    required double containerLeft,
+    required double containerTop,
+    required double containerHeight,
+    required double containerWidth,
+    required bool left,
+  }) {
+    const handleWidth = 14.0;
+    const handleHeight = 40.0;
+    const lineWidth = 2.0;
+    const lineSpacing = 4.0;
+    const lineCount = 3;
+    const lineRadius = 1.0;
+
+    // Position outside the container
+    final xPos = left
+        ? containerLeft - handleWidth
+        : containerLeft + containerWidth;
+    final yPos = containerTop + (containerHeight - handleHeight) / 2;
+
     return Positioned(
-      left: left ? xPos - 6 : null,
-      right: left ? null : (MediaQuery.of(context).size.width - xPos - 6),
-      top: 0,
-      bottom: 0,
+      left: xPos,
+      top: yPos,
+      width: handleWidth,
+      height: handleHeight,
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onHorizontalDragStart: (d) => _startDrag(d, left),
@@ -127,32 +156,42 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
         child: MouseRegion(
           cursor: SystemMouseCursors.resizeLeftRight,
           child: Container(
-            width: 12,
-            height: 40,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.grey.shade300, width: 1),
+              borderRadius: BorderRadius.horizontal(
+                left: left ? const Radius.circular(6) : Radius.zero,
+                right: left ? Radius.zero : const Radius.circular(6),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.15),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(width: 1.5, height: 16, color: Colors.grey.shade400),
-                Container(width: 1.5, height: 16, color: Colors.grey.shade400),
-              ],
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(lineCount, (i) {
+                  return Container(
+                    width: lineWidth,
+                    height: handleHeight - 16,
+                    margin: EdgeInsets.symmetric(horizontal: lineSpacing / 2),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade600,
+                      borderRadius: BorderRadius.circular(lineRadius),
+                    ),
+                  );
+                }),
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
 
 }
 

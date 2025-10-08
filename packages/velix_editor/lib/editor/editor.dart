@@ -610,21 +610,23 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                         child: Column(
                           children: [
                             Expanded(
-                              child: LayoutCanvas(child:
-                            edit ? FocusableRegion(
-                                child: EditorCanvas(
-                                  messageBus: environment.get<MessageBus>(),
-                                  models: widget.models,
-                                  typeRegistry: environment.get<TypeRegistry>(),
-                                ),
+                              child: FocusableRegion(
+                                  child: LayoutCanvas(
+                                    child: edit ?
+                                      EditorCanvas(
+                                        messageBus: environment.get<MessageBus>(),
+                                        models: widget.models,
+                                        typeRegistry: environment.get<TypeRegistry>(),
+                                      ) :
+
+                                      WidgetContainer(
+                                        context: WidgetContext(page: environment.get<Page>()),
+                                        models: widget.models,
+                                        typeRegistry: environment.get<TypeRegistry>(),
+                                      ),
                               )
-                                  : WidgetContainer(
-                                context: WidgetContext(page: environment.get<Page>()),
-                                models: widget.models,
-                                typeRegistry: environment.get<TypeRegistry>(),
-                              ),
-      )
                             ),
+                        ),
                             Container(
                               height: 32,
                               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -638,8 +640,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 alignment: Alignment.centerLeft,
                                 child: WidgetBreadcrumbWidget(),
                               ),
-                            ),
-
+                            )
                           ],
                         ),
                       )

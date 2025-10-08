@@ -276,6 +276,7 @@ class User {
 
   @Inject()
   String hello(String message) {
+    print(message);
     return "hello $message";
   }
 }

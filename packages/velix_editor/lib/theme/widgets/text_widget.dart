@@ -28,11 +28,12 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 
     var adapter = environment.get<MaterialTextFormFieldAdapter>();
 
-    var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
+    var typeProperty = data.databinding != null && data.databinding!.isNotEmpty ? mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!) : null;
 
-    controller.addListener(() {
-        mapper.notifyChange(property: typeProperty, value: controller.text);
-      });
+    if (typeProperty != null)
+      controller.addListener(() {
+          mapper.notifyChange(property: typeProperty!, value: controller.text);
+        });
 
     // TODO: add coercion ...
 
@@ -47,7 +48,8 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
         //inputFormatters: inputFormatters
     );
 
-    mapper.map(property: typeProperty, widget: result, adapter: adapter);
+    if (typeProperty != null)
+      mapper.map(property: typeProperty, widget: result, adapter: adapter);
 
     return result;
   }

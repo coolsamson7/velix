@@ -10,6 +10,7 @@ import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
 import '../../commands/reparent_command.dart';
+import '../../dynamic_widget.dart';
 import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
@@ -171,7 +172,7 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
               return const SizedBox(width: 80, height: 60); // visible placeholder for auto sizing
             }
 
-            Widget content = EditWidget(model: child);
+            Widget content = DynamicWidget(model: child, meta: typeRegistry[child.type], parent: data);
             content = _alignedCell(row.alignment, content);
 
             return Padding(

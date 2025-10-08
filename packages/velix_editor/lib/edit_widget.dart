@@ -13,7 +13,8 @@ import 'commands/reparent_command.dart';
 class EditWidget extends StatefulWidget {
   final WidgetData model;
 
-  const EditWidget({super.key, required this.model});
+  EditWidget({required this.model})
+      : super(key: ValueKey(model.id));
 
   @override
   State<EditWidget> createState() => EditWidgetState();
@@ -47,6 +48,8 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
         newIndex: index,
       ),
     );
+
+    setSelected(true);
   }
 
   void setSelected(bool value) {

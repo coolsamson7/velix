@@ -1,4 +1,5 @@
 
+import 'package:uuid/uuid.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/metadata/annotations.dart';
 import 'package:velix_mapper/mapper/json.dart';
@@ -38,6 +39,8 @@ enum Direction {
   @DeclareProperty(group: "general", label: "editor:groups.general", hide: true)
   Cell? cell;
 
+  @Json(ignore: true)
+  final id = Uuid().v4();
   @Json(ignore: true)
   AbstractWidgetState? widget;
 

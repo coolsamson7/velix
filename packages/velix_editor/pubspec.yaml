@@ -32,6 +32,7 @@ dependencies:
   flutter_svg: ^2.1.1
   petitparser: ^7.0.1
   file_picker: ^8.0.0
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:

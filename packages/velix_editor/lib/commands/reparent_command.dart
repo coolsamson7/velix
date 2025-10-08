@@ -37,10 +37,11 @@ class ReparentCommand extends Command {
       index = oldParent!.children.indexOf(widget);
       oldParent!.children.remove(widget);
 
-      bus.publish(
-        "property-changed",
-        PropertyChangeEvent(widget: oldParent, source: this),
-      );
+      if ( oldParent != newParent)
+        bus.publish(
+          "property-changed",
+          PropertyChangeEvent(widget: oldParent, source: this),
+        );
     }
 
     // add to new

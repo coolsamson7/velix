@@ -39,10 +39,10 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
   void _updateDrag(DragUpdateDetails details, bool fromLeft) {
     setState(() {
       if (fromLeft) {
-        _width = (_width - details.delta.dx)
+        _width = (_width - 2 * details.delta.dx)
             .clamp(widget.minWidth, widget.maxWidth);
       } else {
-        _width = (_width + details.delta.dx)
+        _width = (_width + 2 * details.delta.dx)
             .clamp(widget.minWidth, widget.maxWidth);
       }
       _rulerX = details.globalPosition.dx;
@@ -64,6 +64,7 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
       return Container(
         color: const Color(0xFFE5E7EB),
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
             // Centered resizable container
             Positioned(
@@ -76,15 +77,17 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
                 child: widget.child,
                 // Keep border inside container
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _isDragging
-                        ? Colors.blue.shade400
-                        : Colors.grey.shade300,
-                    width: _isDragging ? 2 : 1,
+                  border: Border(
+                      left: BorderSide(color: _isDragging
+                          ? Colors.grey.shade600
+                          : Colors.grey.shade300, width: 2),
+                      right: BorderSide(color: _isDragging
+                          ? Colors.grey.shade600
+                          : Colors.grey.shade300, width: 2)
+                  ),
                   ),
                 ),
               ),
-            ),
 
             _buildHandle(
               containerLeft: containerLeft,
@@ -130,11 +133,11 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
     required double containerWidth,
     required bool left,
   }) {
-    const handleWidth = 14.0;
+    const handleWidth = 18.0;
     const handleHeight = 40.0;
     const lineWidth = 2.0;
     const lineSpacing = 4.0;
-    const lineCount = 3;
+    const lineCount = 2;
     const lineRadius = 1.0;
 
     // Position outside the container
@@ -157,7 +160,7 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
           cursor: SystemMouseCursors.resizeLeftRight,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.grey.shade600,
               borderRadius: BorderRadius.horizontal(
                 left: left ? const Radius.circular(6) : Radius.zero,
                 right: left ? Radius.zero : const Radius.circular(6),
@@ -179,7 +182,7 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
                     height: handleHeight - 16,
                     margin: EdgeInsets.symmetric(horizontal: lineSpacing / 2),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(lineRadius),
                     ),
                   );

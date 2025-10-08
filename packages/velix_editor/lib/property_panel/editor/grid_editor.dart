@@ -21,6 +21,9 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
   }) {
     final row = value as GridItem;
 
+    // determines if we are editing columns (horizontal = true)
+    final horizontal = property.name == "cols";
+
     final modeKey = GlobalKey();
     final alignKey = GlobalKey();
 
@@ -37,9 +40,8 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Mode selector
-                //const Text("Mode:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
+                // --- Size mode selector ---
                 GestureDetector(
                   key: modeKey,
                   onTap: () => _showPopup<GridSizeMode>(
@@ -67,9 +69,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                 ),
                 const SizedBox(width: 8),
 
-                // Alignment icons
-                //const Text("Align:", style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
+                // --- Alignment selector ---
                 GestureDetector(
                   key: alignKey,
                   onTap: () => _showPopup<GridAlignment>(
@@ -77,7 +77,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                     key: alignKey,
                     options: GridAlignment.values,
                     selectedOption: row.alignment,
-                    iconFor: _iconFor,
+                    iconFor: (a) => _iconFor(a, horizontal),
                     onSelected: (a) {
                       row.alignment = a;
                       onChanged(row);
@@ -90,16 +90,16 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Icon(
-                      _iconFor(row.alignment),
+                      _iconFor(row.alignment, horizontal),
                       size: 16,
                       color: Colors.white,
                     ),
                   ),
                 ),
 
-                // Height input
-                //const Text("Height:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
+
+                // --- Size input ---
                 SizedBox(
                   width: 60,
                   child: TextFormField(
@@ -107,8 +107,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       isDense: true,
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                     ),
                     style: const TextStyle(fontSize: 12),
                     onChanged: (v) {
@@ -126,18 +125,36 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
     );
   }
 
-  IconData _iconFor(GridAlignment alignment) {
-    switch (alignment) {
-      case GridAlignment.start:
-        return Icons.vertical_align_top;
-      case GridAlignment.center:
-        return Icons.vertical_align_center;
-      case GridAlignment.end:
-        return Icons.vertical_align_bottom;
-      case GridAlignment.stretch:
-        return Icons.height;
-      default:
-        return Icons.help_outline;
+  // ✅ Adjust icons based on orientation (vertical or horizontal)
+  IconData _iconFor(GridAlignment alignment, bool horizontal) {
+    if (horizontal) {
+      // horizontal alignment (columns)
+      switch (alignment) {
+        case GridAlignment.start:
+          return Icons.align_horizontal_left;
+        case GridAlignment.center:
+          return Icons.align_horizontal_center;
+        case GridAlignment.end:
+          return Icons.align_horizontal_right;
+        case GridAlignment.stretch:
+          return Icons.height;
+        default:
+          return Icons.help_outline;
+      }
+    } else {
+      // vertical alignment (rows)
+      switch (alignment) {
+        case GridAlignment.start:
+          return Icons.vertical_align_top;
+        case GridAlignment.center:
+          return Icons.vertical_align_center;
+        case GridAlignment.end:
+          return Icons.vertical_align_bottom;
+        case GridAlignment.stretch:
+          return Icons.height;
+        default:
+          return Icons.help_outline;
+      }
     }
   }
 
@@ -168,7 +185,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
             ),
             Positioned(
               left: target.left,
-              top: target.bottom, // directly under the clicked element
+              top: target.bottom,
               child: Material(
                 color: Colors.transparent,
                 child: Container(
@@ -200,9 +217,11 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: iconFor != null
-                              ? Icon(iconFor(option),
-                              size: 16,
-                              color: selected ? Colors.white : Colors.black87)
+                              ? Icon(
+                            iconFor(option),
+                            size: 16,
+                            color: selected ? Colors.white : Colors.black87,
+                          )
                               : Text(
                             textFor!(option),
                             style: const TextStyle(fontSize: 11, color: Colors.white),

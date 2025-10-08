@@ -316,6 +316,31 @@ class TypePatch extends Patch<AbstractType> {
   }
 }
 
+DateTime cloneDateTime(DateTime d) {
+  if (d.isUtc) {
+    return DateTime.utc(
+      d.year,
+      d.month,
+      d.day,
+      d.hour,
+      d.minute,
+      d.second,
+      d.millisecond,
+      d.microsecond,
+    );
+  }
+  return DateTime(
+    d.year,
+    d.month,
+    d.day,
+    d.hour,
+    d.minute,
+    d.second,
+    d.millisecond,
+    d.microsecond,
+  );
+}
+
 /// Class covering the meta-data of a type.
 /// [T] the reflected type
 ///
@@ -357,6 +382,62 @@ class TypeDescriptor<T> {
     }
 
     return descriptor;
+  }
+
+  static T clone<T>(T instance) {
+    // handle null
+
+    //if (instance == null)
+    //  return null;
+
+    // handle enums and literals (String, int, double, bool, DateTime)
+
+    if (instance is Enum || instance is String || instance is int || instance is double || instance is bool || instance is DateTime) {
+      return instance;
+    }
+
+    // datetime
+
+    if (instance is DateTime) {
+      return cloneDateTime(instance) as T;
+    }
+
+    // types?
+
+    if (TypeDescriptor.hasType(instance.runtimeType)) {
+      var descriptor = TypeDescriptor.forType<T>();
+
+      if (descriptor.isImmutable()) {
+        Map<String, dynamic> params = {};
+
+        for (var param in descriptor.constructorParameters)
+          params[param.name] = clone(descriptor.get(instance as Object, param.name));
+
+        return descriptor.fromMapConstructor!(params);
+      }
+      else {
+        var result = descriptor.constructor!();
+
+        for (var field in descriptor.getFields()) {
+          if (field.factoryConstructor != null) { // TODO: Map, Set...
+            var container = field.factoryConstructor!();
+
+            for (var item in field.get(instance)) {
+              container.add(clone(item));
+            }
+
+            field.set(result, container);
+          }
+          else field.set(result, clone(field.get(instance)));
+        }
+
+        return result;
+      }
+    }
+
+    // any other class?
+
+    return instance;
   }
 
   static bool deepEquals(Object a, Object? b) {

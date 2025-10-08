@@ -27,7 +27,7 @@ import 'package:velix_editor/validate/validate.dart' show ExpressionPropertyVali
 import 'package:velix_editor/metadata/widgets/column.dart' show ColumnWidgetData;
 import 'package:flutter/src/rendering/flex.dart' show MainAxisAlignment, CrossAxisAlignment, MainAxisSize;
 import 'package:velix_editor/metadata/widgets/container.dart' show ContainerWidgetData;
-import 'package:velix_editor/metadata/widgets/grid.dart' show GridRow, GridSizeMode, GridAlignment, GridWidgetData;
+import 'package:velix_editor/metadata/widgets/grid.dart' show GridItem, GridSizeMode, GridAlignment, GridWidgetData;
 import 'package:velix_editor/metadata/widgets/label.dart' show LabelWidgetData;
 import 'package:velix_editor/metadata/widgets/row.dart' show RowWidgetData;
 import 'package:velix_editor/metadata/widgets/stack.dart' show StackWidgetData;
@@ -39,7 +39,7 @@ import 'package:velix_editor/property_panel/editor/bool_editor.dart' show Boolea
 import 'package:velix_editor/property_panel/editor/color_editor.dart' show ColorEditorBuilder;
 import 'package:velix_editor/property_panel/editor/font_style_editor.dart' show FontStyleEditorBuilder;
 import 'package:velix_editor/property_panel/editor/font_weight_editor.dart' show FontWeightEditorBuilder;
-import 'package:velix_editor/property_panel/editor/grid_editor.dart' show RowConfigEditor;
+import 'package:velix_editor/property_panel/editor/grid_editor.dart' show RowConfigEditor, GridItemEditor;
 import 'package:velix_editor/property_panel/editor/int_editor.dart' show IntEditorBuilder;
 import 'package:velix_editor/property_panel/editor/paddding_editor.dart' show PaddingEditorBuilder;
 import 'package:velix_editor/property_panel/editor/string_editor.dart' show StringEditorBuilder;
@@ -672,37 +672,37 @@ void registerEditorTypes() {
     ],
   );
 
-  type<GridRow>(
+  type<GridItem>(
     location: 'package:velix_editor/metadata/widgets/grid.dart:13:1',
     params: [
       param<GridSizeMode>('sizeMode', isNamed: true, isNullable: true, defaultValue: GridSizeMode.auto), 
       param<double>('size', isNamed: true, isNullable: true, defaultValue: 1), 
       param<GridAlignment>('alignment', isNamed: true, isNullable: true, defaultValue: GridAlignment.start)
     ],
-    constructor: ({GridSizeMode sizeMode = GridSizeMode.auto, double size = 1, GridAlignment alignment = GridAlignment.start}) => GridRow(sizeMode: sizeMode, size: size, alignment: alignment),
-    fromMapConstructor: (Map<String,dynamic> args) => GridRow(sizeMode: args['sizeMode'] as GridSizeMode? ?? GridSizeMode.auto, size: args['size'] as double? ?? 1, alignment: args['alignment'] as GridAlignment? ?? GridAlignment.start),
-    fromArrayConstructor: (List<dynamic> args) => GridRow(sizeMode: args[0] as GridSizeMode? ?? GridSizeMode.auto, size: args[1] as double? ?? 1, alignment: args[2] as GridAlignment? ?? GridAlignment.start),
+    constructor: ({GridSizeMode sizeMode = GridSizeMode.auto, double size = 1, GridAlignment alignment = GridAlignment.start}) => GridItem(sizeMode: sizeMode, size: size, alignment: alignment),
+    fromMapConstructor: (Map<String,dynamic> args) => GridItem(sizeMode: args['sizeMode'] as GridSizeMode? ?? GridSizeMode.auto, size: args['size'] as double? ?? 1, alignment: args['alignment'] as GridAlignment? ?? GridAlignment.start),
+    fromArrayConstructor: (List<dynamic> args) => GridItem(sizeMode: args[0] as GridSizeMode? ?? GridSizeMode.auto, size: args[1] as double? ?? 1, alignment: args[2] as GridAlignment? ?? GridAlignment.start),
     fields: [
-      field<GridRow,GridSizeMode>('sizeMode',
+      field<GridItem,GridSizeMode>('sizeMode',
         annotations: [
           DeclareProperty()
         ],
         getter: (obj) => obj.sizeMode,
-        setter: (obj, value) => (obj as GridRow).sizeMode = value,
+        setter: (obj, value) => (obj as GridItem).sizeMode = value,
       ), 
-      field<GridRow,double>('size',
+      field<GridItem,double>('size',
         annotations: [
           DeclareProperty()
         ],
         getter: (obj) => obj.size,
-        setter: (obj, value) => (obj as GridRow).size = value,
+        setter: (obj, value) => (obj as GridItem).size = value,
       ), 
-      field<GridRow,GridAlignment>('alignment',
+      field<GridItem,GridAlignment>('alignment',
         annotations: [
           DeclareProperty()
         ],
         getter: (obj) => obj.alignment,
-        setter: (obj, value) => (obj as GridRow).alignment = value,
+        setter: (obj, value) => (obj as GridItem).alignment = value,
       )
     ],
   );
@@ -839,24 +839,24 @@ void registerEditorTypes() {
     ],
   );
 
-  type<RowConfigEditor>(
+  type<GridItemEditor>(
     location: 'package:velix_editor/property_panel/editor/grid_editor.dart:12:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
     ],
-    constructor: () => RowConfigEditor(),
-    fromMapConstructor: (Map<String,dynamic> args) => RowConfigEditor(),
-    fromArrayConstructor: (List<dynamic> args) => RowConfigEditor(),
+    constructor: () => GridItemEditor(),
+    fromMapConstructor: (Map<String,dynamic> args) => GridItemEditor(),
+    fromArrayConstructor: (List<dynamic> args) => GridItemEditor(),
     methods: [
-      method<RowConfigEditor,void>('setup',
+      method<GridItemEditor,void>('setup',
         annotations: [
           Inject()
         ],
         parameters: [
           param<PropertyEditorBuilderFactory>('registry', isRequired: true)
         ],
-        invoker: (List<dynamic> args)=> (args[0] as RowConfigEditor).setup(args[1])
+        invoker: (List<dynamic> args)=> (args[0] as GridItemEditor).setup(args[1])
       )
     ],
   );
@@ -1651,26 +1651,29 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "grid"), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
-      param<int>('rows', isNamed: true, isNullable: true, defaultValue: 1), 
-      param<int>('cols', isNamed: true, isNullable: true, defaultValue: 1), 
-      param<int>('spacing', isNamed: true, isNullable: true, defaultValue: 0), 
-      param<List<GridRow>>('gridRows', isNamed: true, isNullable: true, defaultValue: null)
+      param<List<GridItem>>('rows', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<GridItem>>('cols', isNamed: true, isNullable: true, defaultValue: null), 
+      param<int>('spacing', isNamed: true, isNullable: true, defaultValue: 0)
     ],
-    constructor: ({String type = "grid", required List<WidgetData> children, required Cell cell, int rows = 1, int cols = 1, int spacing = 0, required List<GridRow> gridRows}) => GridWidgetData(type: type, children: children, cell: cell, rows: rows, cols: cols, spacing: spacing, gridRows: gridRows),
-    fromMapConstructor: (Map<String,dynamic> args) => GridWidgetData(type: args['type'] as String? ?? "grid", children: args['children'] as List<WidgetData>?, cell: args['cell'] as Cell?, rows: args['rows'] as int? ?? 1, cols: args['cols'] as int? ?? 1, spacing: args['spacing'] as int? ?? 0, gridRows: args['gridRows'] as List<GridRow>?),
-    fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>?, cell: args[2] as Cell?, rows: args[3] as int? ?? 1, cols: args[4] as int? ?? 1, spacing: args[5] as int? ?? 0, gridRows: args[6] as List<GridRow>?),
+    constructor: ({String type = "grid", required List<WidgetData> children, required Cell cell, required List<GridItem> rows, required List<GridItem> cols, int spacing = 0}) => GridWidgetData(type: type, children: children, cell: cell, rows: rows, cols: cols, spacing: spacing),
+    fromMapConstructor: (Map<String,dynamic> args) => GridWidgetData(type: args['type'] as String? ?? "grid", children: args['children'] as List<WidgetData>?, cell: args['cell'] as Cell?, rows: args['rows'] as List<GridItem>?, cols: args['cols'] as List<GridItem>?, spacing: args['spacing'] as int? ?? 0),
+    fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>?, cell: args[2] as Cell?, rows: args[3] as List<GridItem>?, cols: args[4] as List<GridItem>?, spacing: args[5] as int? ?? 0),
     fields: [
-      field<GridWidgetData,int>('rows',
+      field<GridWidgetData,List<GridItem>>('rows',
         annotations: [
           DeclareProperty(group: "layout")
         ],
+        elementType: GridItem,
+        factoryConstructor: () => <GridItem>[],
         getter: (obj) => obj.rows,
         setter: (obj, value) => (obj as GridWidgetData).rows = value,
       ), 
-      field<GridWidgetData,int>('cols',
+      field<GridWidgetData,List<GridItem>>('cols',
         annotations: [
           DeclareProperty(group: "layout")
         ],
+        elementType: GridItem,
+        factoryConstructor: () => <GridItem>[],
         getter: (obj) => obj.cols,
         setter: (obj, value) => (obj as GridWidgetData).cols = value,
       ), 
@@ -1680,15 +1683,6 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.spacing,
         setter: (obj, value) => (obj as GridWidgetData).spacing = value,
-      ), 
-      field<GridWidgetData,List<GridRow>>('gridRows',
-        annotations: [
-          DeclareProperty(group: "layout")
-        ],
-        elementType: GridRow,
-        factoryConstructor: () => <GridRow>[],
-        getter: (obj) => obj.gridRows,
-        setter: (obj, value) => (obj as GridWidgetData).gridRows = value,
       )
     ],
   );

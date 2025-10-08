@@ -11,7 +11,7 @@ enum GridSizeMode { fixed, flex, auto } // "auto" = wrap content
 enum GridAlignment { start, center, end, stretch }
 
 @Dataclass()
-class GridRow {
+class GridItem {
   // instance data
 
   @DeclareProperty()
@@ -23,7 +23,7 @@ class GridRow {
 
   // constructor
 
-  GridRow({
+  GridItem({
     this.sizeMode = GridSizeMode.auto,
     this.size = 1,
     this.alignment = GridAlignment.start,
@@ -37,17 +37,16 @@ class GridWidgetData extends WidgetData {
   // instance data
 
   @DeclareProperty(group: "layout")
-  int rows;
+  List<GridItem> rows;
   @DeclareProperty(group: "layout")
-  int cols;
+  List<GridItem> cols;
   @DeclareProperty(group: "layout")
   int spacing;
-  @DeclareProperty(group: "layout")
-  List<GridRow> gridRows;
 
   // constructor
 
-  GridWidgetData({super.type = "grid", super.children, super.cell, this.rows = 1, this.cols = 1, this.spacing = 0, List<GridRow>? gridRows}): gridRows = gridRows ?? <GridRow>[];
+  GridWidgetData({super.type = "grid", super.children, super.cell, List<GridItem>? rows, List<GridItem>? cols, this.spacing = 0})
+      : rows = rows ?? <GridItem>[], cols = cols ?? <GridItem>[];
 
   // override
 

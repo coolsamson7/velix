@@ -10,7 +10,7 @@ import '../editor_builder.dart';
 
 
 @Injectable()
-class RowConfigEditor extends PropertyEditorBuilder<GridRow> {
+class GridItemEditor extends PropertyEditorBuilder<GridItem> {
   @override
   Widget buildEditor({
     required Environment environment,
@@ -22,7 +22,7 @@ class RowConfigEditor extends PropertyEditorBuilder<GridRow> {
     required dynamic value,
     required ValueChanged<dynamic> onChanged,
   }) {
-    final row = value as GridRow;
+    final row = value as GridItem;
 
     return Row(
       children: [

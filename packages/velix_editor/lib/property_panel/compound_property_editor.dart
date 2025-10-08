@@ -114,11 +114,15 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
 
   bool isPropertyChangeCommand(Command command, String property) {
     if (command is PropertyChangeCommand) {
-      if (command.target != widget.value) return false;
-      if (command.property != property) return false;
+      if (command.target != widget.value)
+        return false;
+
+      if (command.property != property)
+        return false;
 
       return true;
     }
+
     return false;
   }
 
@@ -136,8 +140,6 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
         property: widget.property.name, // the compound name!
         newValue: this.value, // the created compound
       ));
-
-      // how to remember as the new parent?
     }
 
     if (currentCommand == null || !isPropertyChangeCommand(currentCommand!, property)) {
@@ -154,12 +156,14 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
     else {
       (currentCommand as PropertyChangeCommand).value = value;
     }
+
     setState(() {});
   }
 
   void _resetProperty(String property) {
     currentCommand = null;
     widget.commandStack.revert(value, property);
+
     setState(() {});
   }
 
@@ -232,6 +236,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
               const SizedBox(width: 8),
               Expanded(
                 child: editorBuilder != null ? editorBuilder.buildEditor(
+                  environment: environment,
                   messageBus: widget.bus,
                   commandStack: widget.commandStack,
                   object: this.value,

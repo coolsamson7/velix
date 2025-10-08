@@ -20,10 +20,27 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     required dynamic object,
     required String label,
     required dynamic value,
-    required ValueChanged<dynamic> onChanged, // TODO usage!
+    required ValueChanged<dynamic> onChanged,
   }) {
     final elementType = TypeDescriptor.forType(property.field.elementType);
-    final items = value ?? property.field.factoryConstructor!();
+    final containerFactory = property.field.factoryConstructor!;
+    var items = value ?? containerFactory();
+
+    void addItem() {
+      var newItems = containerFactory();
+      newItems.addAll(items);
+      newItems.add(elementType.constructor!());
+
+      onChanged(items = newItems);
+    }
+
+    void deleteItem(item) {
+      var newItems = containerFactory();
+      newItems.addAll(items);
+      newItems.remove(item);
+
+      onChanged(items = newItems);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,11 +52,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
             IconButton(
               icon: const Icon(Icons.add_circle_outline, size: 18, color: Colors.green),
               tooltip: "Add item",
-              onPressed: () {
-                final newItem = elementType.constructor!();
-                items.add(newItem);
-                onChanged(items);
-              },
+              onPressed: addItem,
             ),
           ],
         ),
@@ -74,10 +87,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
                       tooltip: "Remove item",
-                      onPressed: () {
-                        items.removeAt(i);
-                        onChanged(items);
-                      },
+                      onPressed: () {  deleteItem(items[i]); },
                     ),
                   ],
                 ),

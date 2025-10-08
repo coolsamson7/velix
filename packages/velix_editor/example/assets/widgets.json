@@ -9,9 +9,25 @@
       "children": [
         {
           "type": "grid",
-          "rows": 2,
-          "cols": 2,
-          "gridRows": [
+
+          "rows": [
+            {
+              "sizeMode": "fixed",
+              "size": 1.0,
+              "alignment": "start"
+            },
+            {
+              "sizeMode": "fixed",
+              "size": 1.0,
+              "alignment": "start"
+            }
+          ],
+          "cols": [
+            {
+              "sizeMode": "fixed",
+              "size": 1.0,
+              "alignment": "start"
+            },
             {
               "sizeMode": "fixed",
               "size": 1.0,

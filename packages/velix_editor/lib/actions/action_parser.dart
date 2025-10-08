@@ -107,15 +107,19 @@ class ActionParser {
       var message = "unknown property";
       if (typeChecker != null) {
         var expr = result.value;
+// TODO this sucks
+        var runtime = typeChecker.resolver is RuntimeTypeTypeResolver;
 
-        var context = ClassTypeCheckerContext();
+        var context = runtime ? TypeCheckerContext<RuntimeTypeInfo>() : ClassTypeCheckerContext();
 
         try {
           expr.accept(typeChecker, context);
 
-          valid = context.unknown.isEmpty;
-          if (!valid) {
-            message = "unknown property " + context.unknown[0].property;
+          if (!runtime) {
+            valid = (context as ClassTypeCheckerContext).unknown.isEmpty;
+            if (!valid) {
+              message = "unknown property " + (context as ClassTypeCheckerContext).unknown[0].property;
+            }
           }
         }
         catch(e) {

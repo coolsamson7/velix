@@ -14,15 +14,12 @@ class DynamicWidget extends StatefulWidget {
 
   final WidgetData model;
   final WidgetDescriptor meta;
-  final WidgetData? parent; // optional reference to parent container
-
   // constructor
 
   const DynamicWidget({
     super.key,
     required this.model,
-    required this.meta,
-    this.parent,
+    required this.meta
   });
 
   @override

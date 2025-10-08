@@ -175,7 +175,7 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
               return const SizedBox(width: 80, height: 60); // visible placeholder for auto sizing
             }
 
-            Widget content = DynamicWidget(model: child, meta: typeRegistry[child.type], parent: data);
+            Widget content = DynamicWidget(model: child, meta: typeRegistry[child.type]);
             content = _alignedCell(row.alignment, content);
 
             return Padding(

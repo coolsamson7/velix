@@ -126,8 +126,7 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
             padding: const EdgeInsets.only(bottom: 4),
             child: DynamicWidget(
               model: child,
-              meta: typeRegistry[child.type],
-              parent: data,
+              meta: typeRegistry[child.type]
             ),
           ),
         )

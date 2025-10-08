@@ -104,8 +104,7 @@ class RowWidgetBuilder extends WidgetBuilder<RowWidgetData> {
         mainAxisSize: data.mainAxisSize ??  MainAxisSize.max,
         children: data.children.map((child) => DynamicWidget(
           model: child,
-          meta: typeRegistry[child.type],
-          parent: data,
+          meta: typeRegistry[child.type]
         )).toList(growable: false)
     );
   }

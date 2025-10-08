@@ -56,18 +56,18 @@ class _EditorCanvasState extends State<EditorCanvas> {
   final FocusNode _focusNode = FocusNode();
   late StreamSubscription subscription;
   late StreamSubscription propertyChangeSubscription;
-  EditWidgetState? selection;
+  WidgetData? selection;
 
   // internal
 
   void select(WidgetData? widget) {
-    if (selection != null)
-      selection!.setSelected(false);
+    if (selection != null && selection!.widget != null)
+      (selection!.widget as EditWidgetState).setSelected(false);
 
     if (widget != null) {
-      selection = widget.widget as EditWidgetState;
+      selection = widget;
 
-      selection!.setSelected(true);
+      (selection!.widget as EditWidgetState).setSelected(true);
     }
   }
 
@@ -132,16 +132,16 @@ class _EditorCanvasState extends State<EditorCanvas> {
       final logicalKey = event.logicalKey;
 
       if (logicalKey == LogicalKeyboardKey.arrowUp) {
-        if (selection != null ) handleUp(selection!.widget.model);
+        if (selection != null ) handleUp(selection!);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowDown) {
-        if (selection != null ) handleDown(selection!.widget.model);
+        if (selection != null ) handleDown(selection!);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowLeft) {
-        if (selection != null ) handleLeft(selection!.widget.model);
+        if (selection != null ) handleLeft(selection!);
       }
       else if (logicalKey == LogicalKeyboardKey.arrowRight) {
-        if (selection != null ) handleRight(selection!.widget.model);
+        if (selection != null ) handleRight(selection!);
       }
     }
   }

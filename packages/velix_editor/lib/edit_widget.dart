@@ -54,6 +54,8 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
 
   void setSelected(bool value) {
     if (value != selected && widget.model.widget != null) {
+      if (!mounted)
+        print("woa");
       setState(() => selected = value);
     }
   }

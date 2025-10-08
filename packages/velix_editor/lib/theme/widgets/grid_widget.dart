@@ -105,6 +105,9 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
                   (w) => w.cell?.row == rowIndex && w.cell?.col == colIndex,
             );
 
+            if ( child != null)
+              print("${child.type} in row $rowIndex, col: $colIndex");
+
             Widget content = child != null
                 ? EditWidget(model: child)
                 : _buildDropArea(rowIndex, colIndex);

@@ -20,6 +20,10 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
     required ValueChanged<dynamic> onChanged,
   }) {
     final row = value as GridItem;
+
+    final modeKey = GlobalKey();
+    final alignKey = GlobalKey();
+
     bool isHovered = false;
 
     return StatefulBuilder(
@@ -58,58 +62,61 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                 // Mode selector
                 const Text("Mode:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
-                Row(
-                  children: GridSizeMode.values.map((mode) {
-                    final selectedColor =
-                    row.sizeMode == mode ? Colors.blue.shade700 : Colors.grey.shade400;
-                    return GestureDetector(
-                      onTap: () {
-                        row.sizeMode = mode;
-                        onChanged(row);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: selectedColor,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          mode.name,
-                          style: const TextStyle(fontSize: 11, color: Colors.white),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                GestureDetector(
+                  key: modeKey,
+                  onTap: () => _showPopup<GridSizeMode>(
+                    context: context,
+                    key: modeKey,
+                    options: GridSizeMode.values,
+                    selectedOption: row.sizeMode,
+                    textFor: (m) => m.name,
+                    onSelected: (m) {
+                      row.sizeMode = m;
+                      onChanged(row);
+                    },
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade700,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      row.sizeMode.name,
+                      style: const TextStyle(fontSize: 11, color: Colors.white),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
 
                 // Alignment icons
                 const Text("Align:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
-                Row(
-                  children: GridAlignment.values.map((alignment) {
-                    final bool selected = row.alignment == alignment;
-                    return GestureDetector(
-                      onTap: () {
-                        row.alignment = alignment;
-                        onChanged(row);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: selected ? Colors.blue.shade700 : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Icon(
-                          _iconFor(alignment),
-                          size: 16,
-                          color: selected ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                GestureDetector(
+                  key: alignKey,
+                  onTap: () => _showPopup<GridAlignment>(
+                    context: context,
+                    key: alignKey,
+                    options: GridAlignment.values,
+                    selectedOption: row.alignment,
+                    iconFor: _iconFor,
+                    onSelected: (a) {
+                      row.alignment = a;
+                      onChanged(row);
+                    },
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade700,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Icon(
+                      _iconFor(row.alignment),
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -132,5 +139,86 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
       default:
         return Icons.help_outline;
     }
+  }
+
+  void _showPopup<T>({
+    required BuildContext context,
+    required GlobalKey key,
+    required List<T> options,
+    required T selectedOption,
+    required void Function(T) onSelected,
+    IconData Function(T)? iconFor,
+    String Function(T)? textFor,
+  }) {
+    final renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(context)!;
+    final target = renderBox.localToGlobal(Offset.zero) & renderBox.size;
+
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => overlayEntry.remove(),
+                behavior: HitTestBehavior.translucent,
+              ),
+            ),
+            Positioned(
+              left: target.left,
+              top: target.bottom, // directly under the clicked element
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: options.map((option) {
+                      final bool selected = option == selectedOption;
+                      return GestureDetector(
+                        onTap: () {
+                          onSelected(option);
+                          overlayEntry.remove();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: selected ? Colors.blue.shade700 : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: iconFor != null
+                              ? Icon(iconFor(option),
+                              size: 16,
+                              color: selected ? Colors.white : Colors.black87)
+                              : Text(
+                            textFor!(option),
+                            style: const TextStyle(fontSize: 11, color: Colors.white),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry);
   }
 }

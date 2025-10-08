@@ -135,15 +135,22 @@ class _HoverableListItemState extends State<_HoverableListItem> {
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(4),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Expanded(child: widget.child),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: widget.child),
+              ],
+            ),
             if (_hovering)
-              IconButton(
-                icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
-                tooltip: "Remove item",
-                onPressed: widget.onRemove,
+              Positioned(
+                top: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: widget.onRemove,
+                  child: Icon(Icons.delete, size: 18, color: Colors.red.shade700),
+                ),
               ),
           ],
         ),

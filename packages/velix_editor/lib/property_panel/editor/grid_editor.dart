@@ -37,30 +37,8 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Height input
-                const Text("Height:", style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
-                SizedBox(
-                  width: 60,
-                  child: TextFormField(
-                    initialValue: row.size.toString(),
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                    ),
-                    style: const TextStyle(fontSize: 12),
-                    onChanged: (v) {
-                      row.size = double.tryParse(v) ?? row.size;
-                      onChanged(row);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-
                 // Mode selector
-                const Text("Mode:", style: TextStyle(fontSize: 12)),
+                //const Text("Mode:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
                 GestureDetector(
                   key: modeKey,
@@ -90,7 +68,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                 const SizedBox(width: 8),
 
                 // Alignment icons
-                const Text("Align:", style: TextStyle(fontSize: 12)),
+                //const Text("Align:", style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
                 GestureDetector(
                   key: alignKey,
@@ -118,6 +96,28 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
                     ),
                   ),
                 ),
+
+                // Height input
+                //const Text("Height:", style: TextStyle(fontSize: 12)),
+                const SizedBox(width: 4),
+                SizedBox(
+                  width: 60,
+                  child: TextFormField(
+                    initialValue: row.size.toString(),
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding:
+                      EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                    ),
+                    style: const TextStyle(fontSize: 12),
+                    onChanged: (v) {
+                      row.size = double.tryParse(v) ?? row.size;
+                      onChanged(row);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
               ],
             ),
           ),

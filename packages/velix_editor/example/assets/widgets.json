@@ -12,24 +12,24 @@
 
           "rows": [
             {
-              "sizeMode": "fixed",
+              "sizeMode": "auto",
               "size": 1.0,
               "alignment": "start"
             },
             {
-              "sizeMode": "fixed",
+              "sizeMode": "auto",
               "size": 1.0,
               "alignment": "start"
             }
           ],
           "cols": [
             {
-              "sizeMode": "fixed",
+              "sizeMode": "auto",
               "size": 1.0,
               "alignment": "start"
             },
             {
-              "sizeMode": "fixed",
+              "sizeMode": "auto",
               "size": 1.0,
               "alignment": "start"
             }

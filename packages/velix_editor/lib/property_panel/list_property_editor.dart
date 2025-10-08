@@ -9,8 +9,6 @@ import 'editor_registry.dart';
 
 @Injectable()
 class ListPropertyEditor extends PropertyEditorBuilder<List> {
-  // override
-
   @override
   Widget buildEditor({
     required Environment environment,
@@ -30,7 +28,6 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
       var newItems = containerFactory();
       newItems.addAll(items);
       newItems.add(elementType.constructor!());
-
       onChanged(items = newItems);
     }
 
@@ -38,7 +35,6 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
       var newItems = containerFactory();
       newItems.addAll(items);
       newItems.remove(item);
-
       onChanged(items = newItems);
     }
 
@@ -47,7 +43,6 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
       children: [
         Row(
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
             const Spacer(),
             IconButton(
               icon: const Icon(Icons.add_circle_outline, size: 18, color: Colors.green),
@@ -57,42 +52,25 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
           ],
         ),
         Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (int i = 0; i < items.length; i++) ...[
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(4),
+            for (int i = 0; i < items.length; i++)
+              _HoverableListItem(
+                child: _buildElementEditor(
+                  environment: environment,
+                  messageBus: messageBus,
+                  commandStack: commandStack,
+                  property: property,
+                  object: object,
+                  elementType: elementType.type,
+                  value: items[i],
+                  onChanged: (newVal) {
+                    items[i] = newVal;
+                    onChanged(items);
+                  },
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _buildElementEditor(
-                        environment: environment,
-                        messageBus: messageBus,
-                        commandStack: commandStack,
-                        property: property,
-                        object: object,
-                        elementType: elementType.type,
-                        value: items[i],
-                        onChanged: (newVal) {
-                          items[i] = newVal;
-                          onChanged(items);
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
-                      tooltip: "Remove item",
-                      onPressed: () {  deleteItem(items[i]); },
-                    ),
-                  ],
-                ),
+                onRemove: () => deleteItem(items[i]),
               ),
-            ],
           ],
         ),
       ],
@@ -110,23 +88,8 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     required ValueChanged<dynamic> onChanged,
   }) {
     final registry = environment.get<PropertyEditorBuilderFactory>();
-
-    /* if the element is compound (struct/object)
-    if (TypeDescriptor.hasType(elementType)) {
-      return CompoundPropertyEditor(
-        property: property,
-        label: "", // element, so no label
-        target: object,
-        descriptor: TypeDescriptor.of(elementType),
-        value: value,
-        editorRegistry: registry,
-        bus: messageBus,
-        commandStack: commandStack,
-      );
-    }*/
-
-    // otherwise use a primitive editor
     final editor = registry.getBuilder(elementType);
+
     if (editor != null) {
       return editor.buildEditor(
         environment: environment,
@@ -141,5 +104,50 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     }
 
     return Text("No editor for $elementType");
+  }
+}
+
+class _HoverableListItem extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onRemove;
+
+  const _HoverableListItem({
+    required this.child,
+    required this.onRemove,
+  });
+
+  @override
+  State<_HoverableListItem> createState() => _HoverableListItemState();
+}
+
+class _HoverableListItemState extends State<_HoverableListItem> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: Container(
+        // Removed vertical padding between items
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: widget.child),
+            if (_hovering)
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
+                tooltip: "Remove item",
+                onPressed: widget.onRemove,
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

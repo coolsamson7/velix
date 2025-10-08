@@ -196,12 +196,13 @@ class _PropertyPanelState extends State<PropertyPanel> {
                           commandStack: commandStack,
                         )
                             : Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start, //?
                           children: [
                             SizedBox(
                               width: 100,
                               child: Row(
                                 children: [
+
                                   Text(prop.label,
                                       style: const TextStyle(fontWeight: FontWeight.w500)),
                                   const SizedBox(width: 4),

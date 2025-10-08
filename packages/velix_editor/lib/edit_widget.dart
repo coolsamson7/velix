@@ -11,32 +11,22 @@ import '../../metadata/widget_data.dart';
 import 'commands/reparent_command.dart';
 
 class EditWidget extends StatefulWidget {
-  // instance data
-
   final WidgetData model;
 
-  // constructor
-
   const EditWidget({super.key, required this.model});
-
-  // override
 
   @override
   State<EditWidget> createState() => EditWidgetState();
 }
 
 class EditWidgetState extends AbstractWidgetState<EditWidget> {
-  // instance data
-
   late final Environment environment;
   late final WidgetFactory theme;
   bool selected = false;
   bool isHovered = false;
 
-  // internal
-
   void _moveWidget(Direction direction) {
-    int index =  widget.model.index();
+    int index = widget.model.index();
 
     switch (direction) {
       case Direction.left:
@@ -47,7 +37,7 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
       case Direction.down:
         index += 1;
         break;
-    } // switch
+    }
 
     environment.get<CommandStack>().execute(
       ReparentCommand(
@@ -60,31 +50,27 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
   }
 
   void setSelected(bool value) {
-    if (value != selected)
-      if (widget.model.widget != null) // was it deleted?
-        setState(() => selected = value);
+    if (value != selected && widget.model.widget != null) {
+      setState(() => selected = value);
+    }
   }
 
   void delete() {
-    environment.get<CommandStack>().execute(
-      ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, newParent: null),
-    );
+    environment
+        .get<CommandStack>()
+        .execute(ReparentCommand(bus: environment.get<MessageBus>(), widget: widget.model, newParent: null));
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     environment = EnvironmentProvider.of(context);
     theme = environment.get<WidgetFactory>();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final visualChild = theme.builder(widget.model.type, edit: true)
-        .create(widget.model, environment, context);
-
+    final visualChild = theme.builder(widget.model.type, edit: true).create(widget.model, environment, context);
     widget.model.widget = this;
 
     return MouseRegion(
@@ -93,15 +79,8 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // The draggable widget
           Draggable<WidgetData>(
             data: widget.model,
-            onDragStarted: () {
-              print('Drag started for: ${widget.model.type}');
-            },
-            onDragEnd: (details) {
-              print('Drag ended for: ${widget.model.type}');
-            },
             feedback: Material(
               elevation: 8,
               borderRadius: BorderRadius.circular(4),
@@ -117,29 +96,7 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
                 ),
               ),
             ),
-            childWhenDragging: Opacity(
-              opacity: 0.5,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  visualChild,
-                  // Show dashed border when dragging
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.blue.withOpacity(0.5),
-                            width: 2,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            childWhenDragging: Opacity(opacity: 0.5, child: visualChild),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -151,42 +108,33 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // The actual widget content (made non-interactive by the builders)
                   visualChild,
-
-                  // Selection border
                   if (selected || isHovered)
                     Positioned.fill(
                       child: IgnorePointer(
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selected
-                                  ? Colors.blue.withOpacity(0.8)
-                                  : Colors.blue.withOpacity(0.4),
+                              color: selected ? Colors.blue.withOpacity(0.8) : Colors.blue.withOpacity(0.4),
                               width: selected ? 2 : 1,
                             ),
                           ),
                         ),
                       ),
                     ),
-
-                  // Type label and resize handles only
                   if (selected) ..._buildNonDeleteControls(),
                 ],
               ),
             ),
           ),
 
-          // Delete button - only visible on hover
+          // Delete (X) button — visible on hover
           if (selected && isHovered)
             Positioned(
               top: 4,
               right: 4,
               child: GestureDetector(
-                onTap: () {
-                  delete();
-                },
+                onTap: delete,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   height: 16,
@@ -195,11 +143,7 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
                     color: Colors.red.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(2),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 2,
-                        offset: const Offset(1, 1),
-                      ),
+                      BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 2, offset: const Offset(1, 1)),
                     ],
                   ),
                   child: const Icon(Icons.close, size: 10, color: Colors.white),
@@ -216,7 +160,6 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
     const double borderWidth = 2;
 
     return [
-      // Type label - back to original position
       Positioned(
         top: -(controlHeight + borderWidth),
         left: 0,
@@ -225,124 +168,80 @@ class EditWidgetState extends AbstractWidgetState<EditWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             color: Colors.blue.withOpacity(0.9),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(4),
-              topRight: Radius.circular(4),
-            ),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
           ),
           child: Center(
             child: Text(
               widget.model.type,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w500),
             ),
           ),
         ),
       ),
-
-      // Resize handles
-      ..._buildResizeHandles(),
+      // move handles now only visible when hovered
+      if (isHovered) ..._buildMoveHandles(),
     ];
   }
 
-  List<Widget> _buildResizeHandles() {
-    const double handleSize = 10;
-
-    Widget cornerHandle() => Container(
-      width: handleSize,
-      height: handleSize,
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.9),
-        border: Border.all(color: Colors.white, width: 1),
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
+  List<Widget> _buildMoveHandles() {
+    const double handleSize = 16;
 
     Widget moveArrow(IconData icon, Direction direction) {
       final bool enabled = widget.model.canMove(direction);
-
-      Widget arrow = Opacity(
-        opacity: enabled ? 1.0 : 0.3,
-        child: Container(
-          width: handleSize * 2,
-          height: handleSize * 2,
-          decoration: BoxDecoration(
-            color: enabled ? Colors.blue.withOpacity(0.9) : Colors.grey.shade500,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 1),
-            boxShadow: [
-              if (enabled)
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 3,
-                  offset: const Offset(1, 1),
-                ),
-            ],
-          ),
-          child: Icon(icon, size: 12, color: Colors.white),
-        ),
-      );
-
-      if (!enabled) return arrow;
+      if (!enabled) return const SizedBox.shrink();
 
       return GestureDetector(
         onTap: () => _moveWidget(direction),
+        behavior: HitTestBehavior.opaque,
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
-          child: arrow,
+          child: Container(
+            width: handleSize,
+            height: handleSize,
+            margin: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.9),
+              border: Border.all(color: Colors.white, width: 1),
+              borderRadius: BorderRadius.circular(2), // rectangular
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 2,
+                  offset: const Offset(1, 1),
+                ),
+              ],
+            ),
+            child: Icon(icon, size: 12, color: Colors.white),
+          ),
         ),
       );
     }
 
     return [
-      // --- Corner resize handles (always visible)
-      Positioned(top: -4, left: -4, child: cornerHandle()),
-      Positioned(top: -4, right: -4, child: cornerHandle()),
-      Positioned(bottom: -4, left: -4, child: cornerHandle()),
-      Positioned(bottom: -4, right: -4, child: cornerHandle()),
-
-      // --- Midpoint directional handles (show & click to move)
       Positioned(
-        top: -14,
+        top: 4,
         left: 0,
         right: 0,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: moveArrow(Icons.keyboard_arrow_up, Direction.up),
-        ),
+        child: Align(alignment: Alignment.topCenter, child: moveArrow(Icons.keyboard_arrow_up, Direction.up)),
       ),
       Positioned(
-        bottom: -14,
+        bottom: 4,
         left: 0,
         right: 0,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: moveArrow(Icons.keyboard_arrow_down, Direction.down),
-        ),
+        child: Align(alignment: Alignment.bottomCenter, child: moveArrow(Icons.keyboard_arrow_down, Direction.down)),
       ),
       Positioned(
         top: 0,
         bottom: 0,
-        left: -14,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: moveArrow(Icons.keyboard_arrow_left, Direction.left),
-        ),
+        left: 4,
+        child: Align(alignment: Alignment.centerLeft, child: moveArrow(Icons.keyboard_arrow_left, Direction.left)),
       ),
       Positioned(
         top: 0,
         bottom: 0,
-        right: -14,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: moveArrow(Icons.keyboard_arrow_right, Direction.right),
-        ),
+        right: 4,
+        child: Align(alignment: Alignment.centerRight, child: moveArrow(Icons.keyboard_arrow_right, Direction.right)),
       ),
     ];
   }
-
-
 }

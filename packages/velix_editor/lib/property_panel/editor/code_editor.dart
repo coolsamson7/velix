@@ -171,24 +171,52 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     if (cursorPos < 0 || cursorPos > text.length) return;
 
-    // Find word boundary
-    int wordStart = cursorPos;
-    while (wordStart > 0 && _isWordChar(text[wordStart - 1])) {
-      wordStart--;
-    }
+    // Use parse tree to find token boundaries
+    final context = autocomplete.getCompletionContext(text, cursorPos);
 
-    final typedPart = text.substring(wordStart, cursorPos);
+    if (context == null) {
+      // Fallback to old word-finding logic if parse fails
+      int wordStart = cursorPos;
+      while (wordStart > 0 && _isWordChar(text[wordStart - 1])) {
+        wordStart--;
+      }
+      final typedPart = text.substring(wordStart, cursorPos);
 
-    if (!completion.toLowerCase().startsWith(typedPart.toLowerCase())) {
+      if (!completion.toLowerCase().startsWith(typedPart.toLowerCase()) ||
+          completion.length == typedPart.length) {
+        return;
+      }
+
+      final suffix = completion.substring(typedPart.length);
+      final newText = text.substring(0, wordStart) + completion + text.substring(cursorPos);
+
+      _isUpdatingCompletion = true;
+      _controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection(
+          baseOffset: cursorPos,
+          extentOffset: cursorPos + suffix.length,
+        ),
+      );
+      Future.microtask(() {
+        if (mounted) {
+          _isUpdatingCompletion = false;
+        }
+      });
       return;
     }
 
-    if (completion.length == typedPart.length) {
+    // Use parse tree token boundaries
+    final tokenStart = context.tokenStart;
+    final typedPart = text.substring(tokenStart, cursorPos);
+
+    if (!completion.toLowerCase().startsWith(typedPart.toLowerCase()) ||
+        completion.length == typedPart.length) {
       return;
     }
 
     final suffix = completion.substring(typedPart.length);
-    final newText = text.substring(0, wordStart) + completion + text.substring(cursorPos);
+    final newText = text.substring(0, tokenStart) + completion + text.substring(cursorPos);
 
     _isUpdatingCompletion = true;
     _controller.value = TextEditingValue(
@@ -198,7 +226,6 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         extentOffset: cursorPos + suffix.length,
       ),
     );
-    // Use a proper future to reset the flag
     Future.microtask(() {
       if (mounted) {
         _isUpdatingCompletion = false;

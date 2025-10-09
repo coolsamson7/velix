@@ -417,12 +417,13 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
-  void _addTypeDependency(DartType type) { return; // TODO
+  void _addTypeDependency(DartType type) {
+    return; // TODO
     if (type is InterfaceType) {
       final element = type.element;
-      if (isDataclass(element) || isInjectable(element)) {
-        addDependency("${element.library.uri}:${element.name}");
-      }
+      //if (isDataclass(element) || isInjectable(element)) {
+      //  addDependency("${element.library.uri}:${element.name}");
+     // }
 
       // Handle generic type arguments recursively
       for (final typeArg in type.typeArguments) {
@@ -496,6 +497,24 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         _collectTypeImports(param.type);
         collectAnnotationImports(param.metadata.annotations);
         _collectAnnotationTypeImports(param.metadata.annotations);
+
+        if (param.defaultValueCode != null) {
+          final defaultValue = param.defaultValueCode;
+          if (defaultValue != null) {
+            final match = RegExp(r'^([A-Z]\w*)\.').firstMatch(defaultValue);
+            if (match != null) {
+              final className = match.group(1)!;
+              var lib = param.library;
+              /*var element = [
+                ...?lib?.classes,
+                ...?lib?.enums,
+                ...?lib?.mixins,
+              ].firstWhere((el) => el.name == className);*/
+
+              addImport(lib!.identifier, className);
+            }
+          }
+        }
       }
     }
   }

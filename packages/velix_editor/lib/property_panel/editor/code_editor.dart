@@ -61,8 +61,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   int _selectedIndex = -1;
   bool _isUpdatingCompletion = false;
 
-  String _originalText = '';
-  int _originalCursorPos = 0;
+  String _lastUserText = '';
+  int _lastUserCursorPos = 0;
 
   late Autocomplete autocomplete;
   TypeChecker? typeChecker;
@@ -106,43 +106,46 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   void _onTextChanged() {
     if (_isUpdatingCompletion) return;
 
-    final cursorPos = _controller.selection.baseOffset;
+    final sel = _controller.selection;
+    final cursorPos = sel.baseOffset;
+
     if (cursorPos < 0) {
       _clearMatches();
       return;
     }
 
-    // Get actual text (without any inline completion)
-    final actualText = _controller.text;
-    final sel = _controller.selection;
+    final currentText = _controller.text;
     final hasInlineCompletion = sel.extentOffset > sel.baseOffset;
 
-    // If we have inline completion, extract only the user-typed part
+    // Extract user text (without inline completion)
     String userText;
     int userCursorPos;
 
     if (hasInlineCompletion) {
-      // User text is everything up to base (cursor position) + everything after extent (end of selection)
-      userText = actualText.substring(0, sel.baseOffset) + actualText.substring(sel.extentOffset);
+      // User text = everything before cursor + everything after selection
+      userText = currentText.substring(0, sel.baseOffset) + currentText.substring(sel.extentOffset);
       userCursorPos = sel.baseOffset;
     } else {
-      userText = actualText;
+      userText = currentText;
       userCursorPos = cursorPos;
     }
 
-    // Store the original user input
-    _originalText = userText;
-    _originalCursorPos = userCursorPos;
-
-    // Notify parent of the actual user input (without inline completion)
-    if (widget.value != _originalText) {
-      widget.onChanged(_originalText);
+    // Only process if user text actually changed
+    if (userText == _lastUserText && userCursorPos == _lastUserCursorPos) {
+      return;
     }
 
-    // Get suggestions based on user input
-    final matches = suggestions(_originalText, _originalCursorPos).toList();
+    _lastUserText = userText;
+    _lastUserCursorPos = userCursorPos;
 
-    final state = checkParse(_originalText);
+    // Notify parent
+    if (widget.value != userText) {
+      widget.onChanged(userText);
+    }
+
+    // Get suggestions
+    final matches = suggestions(userText, userCursorPos).toList();
+    final state = checkParse(userText);
 
     setState(() {
       _matches = matches;
@@ -163,12 +166,12 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     if (_matches.isEmpty || _selectedIndex < 0) return;
 
     final completion = _matches[_selectedIndex].label;
-    final text = _originalText;
-    final cursorPos = _originalCursorPos;
+    final text = _lastUserText;
+    final cursorPos = _lastUserCursorPos;
 
     if (cursorPos < 0 || cursorPos > text.length) return;
 
-    // Find the start of the current word/token
+    // Find word boundary
     int wordStart = cursorPos;
     while (wordStart > 0 && _isWordChar(text[wordStart - 1])) {
       wordStart--;
@@ -176,12 +179,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     final typedPart = text.substring(wordStart, cursorPos);
 
-    // Only show completion if it starts with what user typed
     if (!completion.toLowerCase().startsWith(typedPart.toLowerCase())) {
       return;
     }
 
-    // Don't show if already complete
     if (completion.length == typedPart.length) {
       return;
     }
@@ -197,8 +198,11 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         extentOffset: cursorPos + suffix.length,
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _isUpdatingCompletion = false;
+    // Use a proper future to reset the flag
+    Future.microtask(() {
+      if (mounted) {
+        _isUpdatingCompletion = false;
+      }
     });
   }
 
@@ -223,8 +227,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     if (_matches.isEmpty || _selectedIndex < 0) return;
 
     final completion = _matches[_selectedIndex].label;
-    final text = _originalText;
-    final cursorPos = _originalCursorPos;
+    final text = _lastUserText;
+    final cursorPos = _lastUserCursorPos;
 
     if (cursorPos < 0 || cursorPos > text.length) return;
 
@@ -254,8 +258,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
         extentOffset: cursorPos + suffix.length,
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _isUpdatingCompletion = false;
+    Future.microtask(() {
+      if (mounted) {
+        _isUpdatingCompletion = false;
+      }
     });
   }
 
@@ -266,21 +272,26 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     final selection = _controller.selection;
     if (selection.extentOffset > selection.baseOffset) {
-      // Move cursor to end of completion
-      _isUpdatingCompletion = true;
-      final newText = _controller.text;
+      final acceptedText = _controller.text;
       final newCursorPos = selection.extentOffset;
 
+      _isUpdatingCompletion = true;
+
+      // Update internal state first
+      _lastUserText = acceptedText;
+      _lastUserCursorPos = newCursorPos;
+
+      // Then update controller
       _controller.value = TextEditingValue(
-        text: newText,
+        text: acceptedText,
         selection: TextSelection.collapsed(offset: newCursorPos),
       );
 
-      // Update original text to accepted completion
-      _originalText = newText;
-      _originalCursorPos = newCursorPos;
-
-      _isUpdatingCompletion = false;
+      Future.microtask(() {
+        if (mounted) {
+          _isUpdatingCompletion = false;
+        }
+      });
     }
 
     _clearMatches();
@@ -291,13 +302,16 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     final hasSelection = sel.extentOffset > sel.baseOffset;
 
     if (hasSelection) {
-      // Revert to original user input
       _isUpdatingCompletion = true;
       _controller.value = TextEditingValue(
-        text: _originalText,
-        selection: TextSelection.collapsed(offset: _originalCursorPos),
+        text: _lastUserText,
+        selection: TextSelection.collapsed(offset: _lastUserCursorPos),
       );
-      _isUpdatingCompletion = false;
+      Future.microtask(() {
+        if (mounted) {
+          _isUpdatingCompletion = false;
+        }
+      });
     }
 
     _clearMatches();
@@ -305,10 +319,12 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
   void _clearMatches() {
     _removeOverlay();
-    setState(() {
-      _matches = [];
-      _selectedIndex = -1;
-    });
+    if (_matches.isNotEmpty) {
+      setState(() {
+        _matches = [];
+        _selectedIndex = -1;
+      });
+    }
   }
 
   void _showOverlay(List<CompletionItem> items) {
@@ -461,9 +477,12 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.value != widget.value && !_isUpdatingCompletion) {
-      _controller.text = widget.value ?? '';
-      _originalText = widget.value ?? '';
-      _originalCursorPos = _controller.selection.baseOffset;
+      final newValue = widget.value ?? '';
+      if (newValue != _lastUserText) {
+        _lastUserText = newValue;
+        _lastUserCursorPos = newValue.length;
+        _controller.text = newValue;
+      }
     }
   }
 
@@ -481,8 +500,12 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
   void initState() {
     super.initState();
 
-    _controller = TextEditingController(text: widget.value);
+    final initialValue = widget.value ?? '';
+    _controller = TextEditingController(text: initialValue);
     _focusNode = FocusNode();
+    _lastUserText = initialValue;
+    _lastUserCursorPos = initialValue.length;
+
     _controller.addListener(_onTextChanged);
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -508,9 +531,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
       curve: Curves.easeInOut,
     ));
 
-    _parseState = checkParse(widget.value ?? "");
-    _originalText = widget.value ?? '';
-    _originalCursorPos = _controller.selection.baseOffset;
+    _parseState = checkParse(initialValue);
   }
 
   @override

@@ -559,8 +559,27 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                               name: 'tree',
                               label: 'editor:docks.tree.label'.tr(),
                               tooltip: 'editor:docks.tree.tooltip'.tr(),
-                              create: (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
-                              icon: Icons.account_tree
+                              //create: (onClose) => FocusableRegion(child: WidgetTreePanel(models: widget.models, onClose: onClose)),
+                              create: (onClose) => FocusGroup(
+                                onActiveChanged: (isActive) {
+                                  print("tree.active = $isActive");
+                                  // Optionally inform your global state, e.g. via MessageBus
+                                },
+                                builder: (context, isActive) {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    color: isActive
+                                        ? Colors.blue.withOpacity(0.08)
+                                        : Colors.transparent,
+                                    child: WidgetTreePanel(models: widget.models, onClose: onClose, isActive: isActive)
+                                      //isActive: isActive,
+                                      // Tree continues to handle keyboard events internally
+                                    );
+
+                                },
+                              ),
+
+                                icon: Icons.account_tree
                             ),
                             Panel(
                                 name: 'palette',
@@ -610,22 +629,38 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                         child: Column(
                           children: [
                             Expanded(
-                              child: FocusableRegion(
-                                  child: LayoutCanvas(
-                                    child: edit ?
-                                      EditorCanvas(
-                                        messageBus: environment.get<MessageBus>(),
-                                        models: widget.models,
-                                        typeRegistry: environment.get<TypeRegistry>(),
-                                      ) :
+                            child: FocusGroup(
+                            onActiveChanged: (isActive) {
+                              print("canvas.active = $isActive");
+                      // Optionally inform your global state, e.g. via MessageBus
+                      },
+                        builder: (context, isActive) {
+                          return AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              color: isActive
+                                  ? Colors.blue.withOpacity(0.08)
+                                  : Colors.transparent,
+                              child: LayoutCanvas(
+                                child: edit ?
+                                EditorCanvas(
+                                  messageBus: environment.get<MessageBus>(),
+                                  models: widget.models,
+                                  isActive: isActive,
+                                  typeRegistry: environment.get<TypeRegistry>(),
+                                ) :
 
-                                      WidgetContainer(
-                                        context: WidgetContext(page: environment.get<Page>()),
-                                        models: widget.models,
-                                        typeRegistry: environment.get<TypeRegistry>(),
-                                      ),
+                                WidgetContainer(
+                                  context: WidgetContext(page: environment.get<Page>()),
+                                  models: widget.models,
+                                  typeRegistry: environment.get<TypeRegistry>(),
+                                ),
                               )
-                            ),
+                            //isActive: isActive,
+                            // Tree continues to handle keyboard events internally
+                          );
+
+                        },
+                      )
                         ),
                             Container(
                               height: 32,

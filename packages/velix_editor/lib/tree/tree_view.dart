@@ -186,8 +186,9 @@ class WidgetTreeController extends ChangeNotifier {
 /// WidgetTree view
 class WidgetTreeView extends StatefulWidget {
   final WidgetTreeController controller;
+  final bool isActive;
 
-  const WidgetTreeView({super.key, required this.controller});
+  const WidgetTreeView({super.key, required this.controller, required this.isActive});
 
   @override
   State<WidgetTreeView> createState() => _WidgetTreeViewState();
@@ -253,22 +254,11 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
         _handleKeyPress(event);
         return KeyEventResult.handled;
       },
-      child: GestureDetector(
-        onTap: () => _focusNode.requestFocus(),
-        child: Container(
-          decoration: BoxDecoration(
-            border: _focusNode.hasFocus
-                ? Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3))
-                : null,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: ListView(
+      child: ListView(
             padding: const EdgeInsets.all(8),
             children: widget.controller.roots.map((node) => _buildNode(node, 0)).toList(),
           ),
-        ),
-      ),
-    );
+        );
   }
 
   Widget _buildNode(WidgetData node, int depth) {
@@ -297,13 +287,12 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
               margin: const EdgeInsets.only(bottom: 2),
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.colorScheme.primary.withOpacity(0.12)
-                    : isHovering
+                // Use your _getNodeBackground function
+                color: isHovering
                     ? theme.colorScheme.secondary.withOpacity(0.08)
-                    : Colors.transparent,
+                    : _getNodeBackground(isSelected),
                 borderRadius: BorderRadius.circular(6),
-                border: isSelected
+                border: isSelected && widget.isActive
                     ? Border.all(color: theme.colorScheme.primary.withOpacity(0.3))
                     : null,
               ),
@@ -352,13 +341,7 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                           color: theme.colorScheme.outline.withOpacity(0.2),
                         ),
                       ),
-                      child: //Icon(
-                        _getIconForNode(node),
-                        //size: 16,
-                        //color: isSelected
-                        //    ? theme.colorScheme.primary
-                        //    : theme.colorScheme.onSurface.withOpacity(0.8),
-                      //),
+                      child: _getIconForNode(node),
                     ),
 
                     const SizedBox(width: 12),
@@ -386,8 +369,7 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                               //Icon(
-                                    _getIconForNode(node),//, size: 16),
+                                _getIconForNode(node),
                                 const SizedBox(width: 8),
                                 Text(
                                   node.type,
@@ -413,7 +395,9 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                             color: isSelected
+                                ? (widget.isActive
                                 ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface)
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
@@ -459,6 +443,14 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
     );
   }
 
+// Your existing color function (for reference)
+  Color _getNodeBackground(bool isSelected) {
+    if (!isSelected) return Colors.transparent;
+    return widget.isActive
+        ? Colors.blue.withOpacity(0.2)
+        : Colors.grey.withOpacity(0.2);
+  }
+
   /// Helper: icon per node type
   Widget _getIconForNode(WidgetData node) {
     return environment.get<TypeRegistry>().getDescriptor(node).icon;
@@ -469,8 +461,9 @@ class _WidgetTreeViewState extends State<WidgetTreeView> {
 class WidgetTreePanel extends StatefulWidget {
   final List<WidgetData> models;
   final VoidCallback onClose;
+  final bool isActive;
 
-  const WidgetTreePanel({required this.models, required this.onClose, super.key});
+  const WidgetTreePanel({required this.models, required this.onClose, required this.isActive, super.key});
 
   @override
   State<WidgetTreePanel> createState() => _WidgetTreePanelState();
@@ -497,7 +490,7 @@ class _WidgetTreePanelState extends State<WidgetTreePanel> {
         children: [
           // Tree view
           Expanded(
-            child: WidgetTreeView(controller: controller),
+            child: WidgetTreeView(controller: controller, isActive: widget.isActive),
           ),
         ],
       ),

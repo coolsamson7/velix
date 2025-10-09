@@ -33,12 +33,12 @@ class EditorCanvas extends StatefulWidget {
 
   final List<WidgetData> models;
   final TypeRegistry typeRegistry;
-
+  final bool isActive;
   final MessageBus messageBus;
 
   // constructor
 
-  EditorCanvas({super.key, required this.models, required this.typeRegistry, required this.messageBus}) {
+  EditorCanvas({super.key, required this.models, required this.typeRegistry, required this.messageBus, required this.isActive}) {
     for ( var model in models)
       linkParents(model); // TODO doppelt?
   }

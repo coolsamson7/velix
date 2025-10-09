@@ -279,7 +279,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
       addImport(type.element.library.uri.toString(), type.name!);
 
       // Recursively collect imports for generic type arguments
-      if ( false )
+
       for (final typeArg in type.typeArguments) {
         _collectTypeImports(typeArg);
       }
@@ -538,12 +538,20 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         final fieldValue = constantValue.getField(field.name!);
         if (fieldValue == null) continue;
 
+
         // Check if this field holds a Type value
         if (fieldValue.toTypeValue() != null) {
           // This is a Type parameter - get the actual type it represents
           final actualType = fieldValue.toTypeValue()!;
           _collectTypeImports(actualType);
-        } else if (fieldValue.type != null) {
+        }
+        else if (fieldValue.toListValue() != null) {
+          for (final item in fieldValue.toListValue()!) {
+            final t = item.toTypeValue();
+            if (t != null) _collectTypeImports(t);
+          }
+        }
+        else if (fieldValue.type != null) {
           // Regular field - collect its type
           _collectTypeImports(fieldValue.type!);
         }

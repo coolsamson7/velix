@@ -519,7 +519,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     var editContext = Provider.of<EditContext>(context);
 
-    typeChecker = TypeChecker(ClassDescTypeResolver(root: editContext.type));
+    typeChecker = TypeChecker(ClassDescTypeResolver(root: editContext.type!));
     autocomplete = Autocomplete(typeChecker: typeChecker!);
   }
 

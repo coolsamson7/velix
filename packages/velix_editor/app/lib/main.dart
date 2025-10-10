@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
-import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
@@ -56,7 +52,6 @@ void main() async {
 
   // bootstrap types
 
-  Velix.bootstrap;
   EditorModule.boot; // this sucks
 
   registerTypes();
@@ -108,14 +103,6 @@ void main() async {
 
   await i18n.load();
 
-  // load json
-
-  final jsonString = await rootBundle.loadString('assets/widgets.json');
-
-  var json = jsonDecode(jsonString);
-
-  var widget = JSON.deserialize<WidgetData>(json);
-
   // boot environment
 
   var environment = Environment(forModule: ApplicationModule);
@@ -126,7 +113,6 @@ void main() async {
       environment: environment,
       i18n: i18n,
       localeManager: localeManager,
-      widgets: [widget]
   ));
 }
 

@@ -487,11 +487,11 @@ void registerEditorTypes() {
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
       param<int>('age', isNamed: true, isRequired: true), 
-      param<bool>('cool', isNamed: true, isRequired: true)
+      param<bool>('single', isNamed: true, isRequired: true)
     ],
-    constructor: ({String name = '', required Address address, int age = 0, bool cool = false}) => User(name: name, address: address, age: age, cool: cool),
-    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address, age: args['age'] as int? ?? 0, cool: args['cool'] as bool? ?? false),
-    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address, age: args[2] as int? ?? 0, cool: args[3] as bool? ?? false),
+    constructor: ({String name = '', required Address address, int age = 0, bool cool = false}) => User(name: name, address: address, age: age, single: cool),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address, age: args['age'] as int? ?? 0, single: args['single'] as bool? ?? false),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address, age: args[2] as int? ?? 0, single: args[3] as bool? ?? false),
     fields: [
       field<User,String>('name',
         getter: (obj) => obj.name,
@@ -505,9 +505,9 @@ void registerEditorTypes() {
         getter: (obj) => obj.address,
         setter: (obj, value) => (obj as User).address = value,
       ), 
-      field<User,bool>('cool',
-        getter: (obj) => obj.cool,
-        setter: (obj, value) => (obj as User).cool = value,
+      field<User,bool>('single',
+        getter: (obj) => obj.single,
+        setter: (obj, value) => (obj as User).single = value,
       )
     ],
     methods: [

@@ -25,7 +25,7 @@ class SettingsPanel extends StatelessWidget {
     if (result != null && result.files.single.path != null) {
       var path = result.files.single.path!;
 
-      await editor.loadRegistry(path);
+      editor.loadRegistry(path);
 
       return result.files.single.path;
     }
@@ -67,7 +67,7 @@ class SettingsPanel extends StatelessWidget {
             ClassSelector(
               registry: editor.registry,
               initial: null,
-              onChanged: (clazz) => print(clazz),
+              onChanged: (clazz) => editor.selectClass(clazz),
             )
           ],
         ),

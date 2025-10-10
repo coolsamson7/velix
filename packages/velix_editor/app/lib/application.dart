@@ -4,7 +4,6 @@ import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
 
-import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_ui/velix_ui.dart';
 
@@ -17,11 +16,10 @@ class EditorApp extends StatelessWidget {
   final I18N i18n;
   final LocaleManager localeManager;
   final Environment environment;
-  final List<WidgetData> widgets;
 
   // constructor
 
-  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment, required this.widgets});
+  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment});
 
   // override
 
@@ -69,7 +67,7 @@ class EditorApp extends StatelessWidget {
                         // main screen
 
                         home: Scaffold(
-                            body: EditorScreen(models: widgets)
+                            body: EditorScreen()
                         ),
                       );
                     }

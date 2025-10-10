@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -41,205 +42,6 @@ import 'widget_breadcrumb.dart';
 
 part "editor.command.g.dart";
 
-// TEST TODO
-
-String json = '''
-{
-  "classes": [
-    {
-      "name": "Address",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "city",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-        {
-          "name": "street",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "hello",
-          "parameters": [
-            {
-              "name": "message",
-              "type": "String",
-              "isNamed": false,
-              "isRequired": true,
-              "isNullable": false
-            }
-          ],
-          "returnType": "String",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "13:1"
-    },
-    {
-      "name": "User",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "name",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-         {
-          "name": "age",
-          "type": "int",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-         {
-          "name": "cool",
-          "type": "bool",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-        {
-          "name": "address",
-          "type": "Address",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "hello",
-          "parameters": [
-            {
-              "name": "message",
-              "type": "String",
-              "isNamed": false,
-              "isRequired": true,
-              "isNullable": false
-            }
-          ],
-          "returnType": "String",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "34:1"
-    },
-    {
-      "name": "Page",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "user",
-          "type": "User",
-          "isNullable": false,
-          "isFinal": true,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "setup",
-          "parameters": [],
-          "returnType": "void",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Injectable",
-          "value": "Injectable"
-        },
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "56:1"
-    }
-  ]
-}
-''';
-
-var testRegistry = ClassRegistry()..read(jsonDecode(json)["classes"]);
-
 @Dataclass()
 class Address {
   // instance data
@@ -256,7 +58,8 @@ class Address {
   // methods
 
   @Inject()
-  String hello(String message, ) {
+  String hello(String message) {
+    print(message);
     return "world";
   }
 }
@@ -272,11 +75,11 @@ class User {
   @Attribute()
   Address address;
   @Attribute()
-  bool cool;
+  bool single;
 
   // constructor
 
-  User({required this.name, required this.address, required this.age, required this.cool});
+  User({required this.name, required this.address, required this.age, required this.single});
 
   // methods
 
@@ -300,7 +103,7 @@ class Page {
   Page() : user = User(
       name: "Andreas",
       age: 60,
-      cool: true,
+      single: true,
       address: Address(
           city: "Cologne",
           street: "Neumarkt"
@@ -312,12 +115,17 @@ class Page {
   void setup() {
     print("setup");
   }
+
+  @Method()
+  void hello(String message) {
+    print(message);
+  }
 }
 
 class EditContext {
   // instance data
 
-  ClassDesc type;
+  ClassDesc? type;
 
   // constructor
 
@@ -328,11 +136,11 @@ class EditContext {
 class EditorScreen extends StatefulWidget {
   // instance data
 
-  List<WidgetData> models;
+  List<WidgetData> models = [ContainerWidgetData()];
 
   // constructor
 
-  EditorScreen({super.key, required this.models});
+  EditorScreen({super.key});
 
   // override
 
@@ -349,22 +157,78 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   bool edit = true;
   String path = "";
   String lastContent = "";
-  ClassRegistry registry = testRegistry;//ClassRegistry();
+  ClassRegistry registry = ClassRegistry();
+  ClassDesc? clazz;
 
   late final LocaleManager localeManager;
 
   // internal
 
-  Future<void> loadRegistry(String path) async {
-    final file = File(path);
-    final json = await file.readAsString();
-
-    var registry =  ClassRegistry()..read(jsonDecode(json)["classes"]);
-
-    setRegistry(registry);
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+            const SizedBox(width: 8),
+            const Text("Error"),
+          ],
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
-  void setRegistry(ClassRegistry registry) {
+  Future<void> loadRegistry(String path) async {
+    var json = "";
+    if (path.startsWith("assets:")) {
+      json = await rootBundle.loadString(path.replaceFirst(":", "/"));
+    }
+    else {
+      final file = File(path);
+
+      try {
+        json = await file.readAsString();
+      }
+      catch(e) {
+        print(e);
+        showErrorDialog(context, e.toString());
+        return ;
+      }
+    }
+
+    try {
+      var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
+
+      selectRegistry(registry);
+    }
+    catch(e) {
+      print(e);
+      showErrorDialog(context, e.toString());
+    }
+  }
+
+  void selectClass(ClassDesc? clazz) {
+    this.clazz = clazz;
+
+    setState(() {
+    });
+  }
+
+  void selectRegistry(ClassRegistry registry) {
     this.registry = registry;
 
     setState(() {
@@ -403,10 +267,13 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   bool validate() {
-    var root = widget.models[0]; // TODO
+    var root = widget.models[0];
 
     try {
-      environment.get<WidgetValidator>().validate(root, type: registry.getClass("Page"), environment: environment); // TODO
+      environment.get<WidgetValidator>().validate(root,
+          type: clazz!,
+          environment: environment
+      );
 
       return true;
     }
@@ -450,14 +317,85 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   void showToast(String msg, {ok.ToastPosition? position}) {
-    ok.showToast(
-      msg,
+    ok.showToastWidget(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 32, right: 24), // margin from edges
+          child: Container(
+            constraints: BoxConstraints(
+              minWidth: 200, // minimum width
+              maxWidth: 400, // optional maximum width
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, color: Colors.greenAccent),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    msg,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+        ),
+        ),
       duration: const Duration(seconds: 2),
-      position: position ?? ok.ToastPosition.bottom,
-      backgroundColor: Colors.black87,
-      radius: 8.0,
-      textPadding: const EdgeInsets.all(12),
+      position: position ?? ok.ToastPosition(align: Alignment.bottomRight),
+      dismissOtherToast: false,
+      //backgroundColor: Colors.grey,
+      //radius: 8.0,
+      //textPadding: const EdgeInsets.all(12),
     );
+  }
+
+  void test() async { // TODO TEST CODE
+    await loadRegistry("assets:main.types.g.json");
+
+    selectClass(registry.getClass("Page"));
+    await loadFile("assets:screen.json");
+  }
+
+  Future<void> loadFile(String path) async {
+    var json = "";
+    if (path.startsWith("assets:")) {
+      json = await rootBundle.loadString(path.replaceFirst(":", "/"));
+    }
+    else {
+      final file = File(this.path = path);
+
+      try {
+        json = await file.readAsString();
+      }
+      catch (e) {
+        showErrorDialog(context, e.toString());
+      }
+    }
+
+    try {
+      var root = JSON.deserialize<WidgetData>(jsonDecode(json));
+
+      setState(() {
+        widget.models = [root];
+
+        updateCommandState();
+      });
+    }
+    catch(e) {
+      showErrorDialog(context, e.toString());
+    }
   }
 
   // commands
@@ -476,16 +414,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     );
 
     if (result != null && result.files.single.path != null) {
-      final file = File(path = result.files.single.path!);
-      final contents = await file.readAsString();
-
-      var root = JSON.deserialize<WidgetData>(jsonDecode(contents));
-
-      setState(() {
-        widget.models = [root];
-
-        updateCommandState();
-      });
+      loadFile(result.files.single.path!);
     }
   }
 
@@ -549,6 +478,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @Command(label: "Play", icon: Icons.play_arrow)
   @override
   void _play() {
+    showToast("UP");
+    showToast("MY");
+    showToast("ASS");
+
     if (validate()) {
       setState(() { edit = !edit; });
     }
@@ -583,14 +516,13 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
         bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
-        //bus.publish("messages", MessageEvent(source: this, type: MessageEventType.add, messages: [
-        //  Message(type: MessageType.warning, message: "oh dear"),
-        //  Message(type: MessageType.error, message: "damnit")
-        //]));
     });
 
     updateCommandState();
-    
+
+    // TEST
+
+    test();
   }
 
   @override
@@ -598,8 +530,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     return EnvironmentProvider(
       environment: environment,
       child: Provider<EditContext>.value(
-          value: EditContext(type: registry.getClass("Page")), // TODO
-          child: FocusScope(
+          value: EditContext(type: clazz),
+          child: ok.OKToast( child: FocusScope(
             autofocus: true,
             child: Shortcuts(
               shortcuts: computeShortcuts(),
@@ -799,6 +731,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
               ),
             )
         )
+          )
       )
     );
   }

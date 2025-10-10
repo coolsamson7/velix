@@ -78,6 +78,10 @@ class CommandStack extends ChangeNotifier {
     return _stack.isNotEmpty;
   }
 
+  void clear() {
+    _stack.clear();
+  }
+
   Command? tos() {
     return _stack.isNotEmpty ? _stack.last : null;
   }

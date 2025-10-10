@@ -9,7 +9,6 @@ import 'package:velix_di/di/di.dart' show Injectable, Inject, Environment, Modul
 import 'package:velix_editor/editor/editor.dart' show Address, User, Page, EditorScreenState;
 import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
 import 'package:velix_i18n/i18n/locale.dart' show LocaleManager;
-import 'dart:async' show Future;
 import 'package:velix_editor/editor_module.dart' show EditorModule;
 import 'package:velix_editor/metadata/properties/properties.dart' show ColorConvert, BorderStyleConvert, MainAxisAlignmentConvert, MainAxisSizeConvert, CrossAxisAlignmentConvert, FontWeightConvert, FontStyleConvert, Value, ValueType, Insets, Border, Font;
 import 'package:velix_editor/metadata/annotations.dart' show DeclareProperty, DeclareWidget;
@@ -74,7 +73,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:237:1',
+    location: 'package:velix_editor/editor/editor.dart:238:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -106,7 +105,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:284:1',
+    location: 'package:velix_editor/editor/editor.dart:285:1',
     annotations: [
       Injectable()
     ],
@@ -130,7 +129,7 @@ void registerEditorTypes() {
   );
 
   type<EditorScreenState>(
-    location: 'package:velix_editor/editor/editor.dart:337:1',
+    location: 'package:velix_editor/editor/editor.dart:338:1',
     constructor: () => EditorScreenState(),
     fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
     fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
@@ -145,41 +144,12 @@ void registerEditorTypes() {
         getter: (obj) => obj.edit,
         setter: (obj, value) => (obj as EditorScreenState).edit = value,
       ), 
+      field<EditorScreenState,String>('path',
+        getter: (obj) => obj.path,
+        setter: (obj, value) => (obj as EditorScreenState).path = value,
+      ), 
       field<EditorScreenState,LocaleManager>('localeManager',
         getter: (obj) => obj.localeManager,
-      )
-    ],
-    methods: [
-      method<EditorScreenState,Future<void>>('open',
-        annotations: [
-          Method()
-        ],
-        isAsync: true,
-        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).open()
-      ), 
-      method<EditorScreenState,void>('save',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).save()
-      ), 
-      method<EditorScreenState,void>('revert',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).revert()
-      ), 
-      method<EditorScreenState,void>('undo',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).undo()
-      ), 
-      method<EditorScreenState,void>('play',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).play()
       )
     ],
   );
@@ -464,7 +434,7 @@ void registerEditorTypes() {
   );
 
   var widgetBuilderDescriptor =  type<WidgetBuilder>(
-    location: 'package:velix_editor/theme/widget_builder.dart:38:1',
+    location: 'package:velix_editor/theme/widget_builder.dart:44:1',
     annotations: [
       Injectable(factory: false, eager: false)
     ],
@@ -512,7 +482,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:258:1',
+    location: 'package:velix_editor/editor/editor.dart:259:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
@@ -998,7 +968,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:12:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:13:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1020,7 +990,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:72:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:82:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1192,7 +1162,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:14:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:15:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1214,7 +1184,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:56:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:42:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()

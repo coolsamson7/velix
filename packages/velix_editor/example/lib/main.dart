@@ -42,23 +42,6 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  // TEST TODO
-
-  enumeration<MainAxisAlignment>(
-      name: 'asset:velix_mapper/test/model.dart.MainAxisAlignment',
-      values: MainAxisAlignment.values
-  );
-
-  enumeration<CrossAxisAlignment>(
-      name: 'asset:velix_mapper/test/model.dart.MainAxisAlignment',
-      values: CrossAxisAlignment.values
-  );
-
-  enumeration<MainAxisSize>(
-      name: 'asset:velix_mapper/test/model.dart.MainAxisSize',
-      values: MainAxisSize.values
-  );
-
   // tracer
 
   Tracer(
@@ -104,7 +87,9 @@ void main() async {
 
   TypeViolationTranslationProvider();
 
-  var localeManager = LocaleManager(Locale('en'), supportedLocales: [Locale('en'), Locale('de')]);
+  var localeManager = LocaleManager(Locale('en'),
+      supportedLocales: [Locale('en'), Locale('de')]
+  );
 
   var i18n = I18N(
       fallbackLocale: Locale("en"),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
@@ -322,11 +324,11 @@ class EditContext {
 class EditorScreen extends StatefulWidget {
   // instance data
 
-  final List<WidgetData> models;
+  List<WidgetData> models;
 
   // constructor
 
-  const EditorScreen({super.key, required this.models});
+  EditorScreen({super.key, required this.models});
 
   // override
 
@@ -341,6 +343,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   late final Environment environment;
   late final CommandStack commandStack;
   bool edit = true;
+  String path = "";
 
   late final LocaleManager localeManager;
 
@@ -400,6 +403,29 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }
   }
 
+  Future<bool> showUnsavedChangesDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // force the user to choose
+      builder: (context) => AlertDialog(
+        title: const Text('Unsaved Changes'),
+        content: const Text('You have unsaved changes. Do you want to discard them?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // cancel / keep editing
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // discard changes
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    return result ?? false;
+  }
+
   // commands
 
   @Command(i18n: "editor:commands.open", icon: Icons.folder_open)
@@ -411,23 +437,55 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     );
 
     if (result != null && result.files.single.path != null) {
-      final file = File(result.files.single.path!);
+      final file = File(path = result.files.single.path!);
       final contents = await file.readAsString();
 
-      var widget = JSON.deserialize<WidgetData>(jsonDecode(contents));
+      var root = JSON.deserialize<WidgetData>(jsonDecode(contents));
 
       setState(() {
-       print(widget); // TODO
+        widget.models = [root];
+
+        updateCommandState();
       });
     }
   }
 
+  @Command(i18n: "editor:commands.new", name: "new", icon: Icons.note_add)
+  @override
+  Future<void> _newFile() async {
+    if (commandStack.isDirty()) {
+      final discard = await showUnsavedChangesDialog(context);
+      if (!discard) return; // user canceled
+    }
+
+    commandStack.clear();
+
+    widget.models = [ContainerWidgetData()];
+
+    updateCommandState();
+  }
+
   @Command(i18n: "editor:commands.save", icon: Icons.save)
   @override
-  void _save() {
-    var root = widget.models[0]; // TODO
+  Future<void> _save() async {
+    if ( path.isNotEmpty) {
+      if (validate()) {
+        var root = widget.models[0];
 
-    validate();
+        var map = JSON.serialize(root);
+        var str = jsonEncode(map);
+
+        final file = File(path);
+
+        // Write JSON string to file
+
+        await file.writeAsString(str);
+
+        commandStack.clear();
+
+        updateCommandState();
+      } // if
+    }
   }
 
   @Command(i18n: "editor:commands.revert", icon: Icons.restore)

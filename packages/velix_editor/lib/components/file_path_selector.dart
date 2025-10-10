@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 class FilePathSelector extends StatefulWidget {
   final String? initialFilePath;
@@ -20,6 +21,7 @@ class FilePathSelector extends StatefulWidget {
 class _FilePathSelectorState extends State<FilePathSelector> {
   late TextEditingController _controller;
   late List<String> _recentFiles;
+  bool _isHovering = false;
 
   @override
   void initState() {
@@ -42,6 +44,9 @@ class _FilePathSelectorState extends State<FilePathSelector> {
         _controller.text = path;
         if (!_recentFiles.contains(path)) {
           _recentFiles.insert(0, path);
+          if (_recentFiles.length > 5) {
+            _recentFiles = _recentFiles.sublist(0, 5);
+          }
         }
       });
     }
@@ -60,57 +65,216 @@ class _FilePathSelectorState extends State<FilePathSelector> {
     }
   }
 
+  String _getFileName(String path) {
+    if (path.isEmpty) return 'No file selected';
+    return path.split(Platform.pathSeparator).last;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // File path display
-        Expanded(
-          child: TextFormField(
-            controller: _controller,
-            readOnly: true,
-            decoration: const InputDecoration(
-              labelText: "File",
-              hintText: "No file selected",
-            ),
-          ),
-        ),
+    final theme = Theme.of(context);
+    final hasFile = _controller.text.isNotEmpty;
 
-        // Dropdown for recent + browse
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.arrow_drop_down),
-          tooltip: "Recent / Browse",
-          onSelected: (value) {
-            if (value == "__browse__") {
-              _browseFile();
-            } else {
-              _selectRecent(value);
-            }
-          },
-          itemBuilder: (context) {
-            return [
-              ..._recentFiles.map((f) => PopupMenuItem(
-                value: f,
-                child: Text(f),
-              )),
-              const PopupMenuDivider(),
-              const PopupMenuItem(
-                value: "__browse__",
-                child: Row(
-                  children: [Icon(Icons.folder_open), SizedBox(width: 8), Text("Browse...")],
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.insert_drive_file_outlined,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'File Selection',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
-            ];
-          },
-        ),
+            ],
+          ),
 
-        const SizedBox(width: 8),
+          const SizedBox(height: 12),
 
-        ElevatedButton(
-          onPressed: _load,
-          child: const Text("Load"),
-        ),
-      ],
+          // File display area
+          MouseRegion(
+            onEnter: (_) => setState(() => _isHovering = true),
+            onExit: (_) => setState(() => _isHovering = false),
+            child: InkWell(
+              onTap: _browseFile,
+              borderRadius: BorderRadius.circular(6),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _isHovering
+                      ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                      : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: _isHovering
+                        ? theme.colorScheme.primary.withOpacity(0.5)
+                        : theme.colorScheme.outline.withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: hasFile
+                            ? theme.colorScheme.primaryContainer
+                            : theme.colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Icon(
+                        hasFile ? Icons.description : Icons.folder_open,
+                        size: 20,
+                        color: hasFile
+                            ? theme.colorScheme.onPrimaryContainer
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _getFileName(_controller.text),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: hasFile ? FontWeight.w500 : FontWeight.normal,
+                              color: hasFile
+                                  ? theme.colorScheme.onSurface
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (hasFile) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              _controller.text,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                fontSize: 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Recent files
+          if (_recentFiles.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Recent Files',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 120),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _recentFiles.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 4),
+                itemBuilder: (context, index) {
+                  final file = _recentFiles[index];
+                  final isSelected = _controller.text == file;
+
+                  return InkWell(
+                    onTap: () => _selectRecent(file),
+                    borderRadius: BorderRadius.circular(4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.history,
+                            size: 14,
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _getFileName(file),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: isSelected
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface,
+                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 12),
+
+          // Actions
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (hasFile)
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _controller.clear();
+                    });
+                  },
+                  icon: const Icon(Icons.clear, size: 16),
+                  label: const Text('Clear'),
+                ),
+              const SizedBox(width: 8),
+              FilledButton.icon(
+                onPressed: hasFile ? _load : null,
+                icon: const Icon(Icons.upload_file, size: 18),
+                label: const Text('Load File'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

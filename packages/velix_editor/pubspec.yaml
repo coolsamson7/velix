@@ -20,19 +20,17 @@ dependencies:
     sdk: flutter
   provider: ^6.0.0
   build: ^3.0.0
-  easy_localization: ^3.0.8
   cupertino_icons: ^1.0.8
   velix: ^0.91.2
   velix_di: ^1.1.0
   velix_mapper: ^1.2.0
   velix_i18n: ^1.1.0
   velix_ui: ^1.2.0
-  #highlight: ^0.7.0
-  #flutter_highlight: ^0.7.0
   flutter_svg: ^2.1.1
   petitparser: ^7.0.1
   file_picker: ^8.0.0
   uuid: ^4.3.3
+  oktoast: ^3.4.0
 
 dev_dependencies:
   flutter_test:

@@ -20,7 +20,7 @@ abstract class Command {
   void execute();
 
   // Undo the command action (with stack cleanup)
-  void undo({bool deleteOnly = false}) {
+  void undo({bool deleteOnly = false, bool silent = false}) {
     if ( !deleteOnly )
       // Remove this command and all previous commands from the stack
       stack?.removeUpToAndIncluding(this);
@@ -31,7 +31,7 @@ abstract class Command {
       parent!.children.remove(this);
 
       if (parent!.children.isEmpty)
-        parent!.undo();
+        parent!.undo(silent: silent, deleteOnly: deleteOnly);
     }
   }
 }

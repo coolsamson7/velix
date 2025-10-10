@@ -35,9 +35,8 @@ class PropertyChangeCommand<T> extends Command {
     required this.property,
     super.parent,
     required dynamic newValue,
-  }) : oldValue = descriptor.get(target, property) as T { // TODO clone! compond, aber auch list<>
+  }) : oldValue = descriptor.get(target, property) as T {
     _newValue = newValue;
-
   }
 
   // override
@@ -48,11 +47,12 @@ class PropertyChangeCommand<T> extends Command {
   }
 
   @override
-  void undo({bool deleteOnly = false}) {
+  void undo({bool deleteOnly = false, bool silent = false}) {
     descriptor.set(target, property, oldValue);
 
-    bus.publish("property-changed", PropertyChangeEvent(widget: widget, source: this));
+    if (!silent)
+      bus.publish("property-changed", PropertyChangeEvent(widget: widget, source: this));
 
-    super.undo(deleteOnly: deleteOnly);
+    super.undo(deleteOnly: deleteOnly, silent: silent);
   }
 }

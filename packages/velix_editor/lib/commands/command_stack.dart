@@ -86,9 +86,9 @@ class CommandStack extends ChangeNotifier {
     return _stack.isNotEmpty ? _stack.last : null;
   }
 
-  void undo() {
+  void undo({bool silent = false}) {
     if ( isDirty())
-      tos()!.undo();
+      tos()!.undo(silent: silent);
   }
 
   Command execute(Command cmd) {

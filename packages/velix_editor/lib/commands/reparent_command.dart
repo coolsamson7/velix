@@ -68,16 +68,17 @@ class ReparentCommand extends Command {
   }
 
   @override
-  void undo({bool deleteOnly = false}) {
+  void undo({bool deleteOnly = false, bool silent = false}) {
     // remove from parent
 
     if ( newParent != null) {
       newParent!.children.remove(widget);
 
-      bus.publish(
-        "property-changed",
-        PropertyChangeEvent(widget: newParent, source: this),
-      );
+      if (!silent)
+        bus.publish(
+          "property-changed",
+          PropertyChangeEvent(widget: newParent, source: this),
+        );
     }
 
     widget.parent = oldParent;
@@ -91,10 +92,11 @@ class ReparentCommand extends Command {
       else
         oldParent!.children.add(widget);
 
-      bus.publish(
-        "property-changed",
-        PropertyChangeEvent(widget: oldParent, source: this),
-      );
+      if (!silent)
+        bus.publish(
+          "property-changed",
+          PropertyChangeEvent(widget: oldParent, source: this),
+        );
     }
 
     super.undo(deleteOnly: deleteOnly);

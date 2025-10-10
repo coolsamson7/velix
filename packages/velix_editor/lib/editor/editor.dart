@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/editor/settings_panel.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
@@ -15,9 +16,12 @@ import 'package:velix_di/di/di.dart';
 import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_ui/commands/command.dart';
 
+import 'package:oktoast/oktoast.dart' as ok;
+
 import '../actions/types.dart';
 import '../commands/command_stack.dart';
 import '../components/focusable_region.dart';
+import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../json/json_view.dart';
 import '../metadata/type_registry.dart';
@@ -234,7 +238,7 @@ String json = '''
 }
 ''';
 
-var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
+var testRegistry = ClassRegistry()..read(jsonDecode(json)["classes"]);
 
 @Dataclass()
 class Address {
@@ -344,10 +348,29 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   late final CommandStack commandStack;
   bool edit = true;
   String path = "";
+  String lastContent = "";
+  ClassRegistry registry = testRegistry;//ClassRegistry();
 
   late final LocaleManager localeManager;
 
   // internal
+
+  Future<void> loadRegistry(String path) async {
+    final file = File(path);
+    final json = await file.readAsString();
+
+    var registry =  ClassRegistry()..read(jsonDecode(json)["classes"]);
+
+    setRegistry(registry);
+  }
+
+  void setRegistry(ClassRegistry registry) {
+    this.registry = registry;
+
+    setState(() {
+
+    });
+  }
 
   bool isDirty() {
     return commandStack.isDirty();
@@ -426,11 +449,27 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     return result ?? false;
   }
 
+  void showToast(String msg, {ok.ToastPosition? position}) {
+    ok.showToast(
+      msg,
+      duration: const Duration(seconds: 2),
+      position: position ?? ok.ToastPosition.bottom,
+      backgroundColor: Colors.black87,
+      radius: 8.0,
+      textPadding: const EdgeInsets.all(12),
+    );
+  }
+
   // commands
 
   @Command(i18n: "editor:commands.open", icon: Icons.folder_open)
   @override
   Future<void> _open() async {
+    if (commandStack.isDirty()) {
+      final discard = await showUnsavedChangesDialog(context);
+      if (!discard) return; // user canceled
+    }
+
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -481,6 +520,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
         await file.writeAsString(str);
 
+        ok.showToast("Saved");
+
         commandStack.clear();
 
         updateCommandState();
@@ -491,7 +532,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @Command(i18n: "editor:commands.revert", icon: Icons.restore)
   @override
   void _revert() {
-    commandStack.undo(); // TODO
+    while ( commandStack.isDirty())
+      commandStack.undo(silent: true);
 
     updateCommandState();
   }
@@ -517,6 +559,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @override
   void updateCommandState() {
     setCommandEnabled("play", true);
+    setCommandEnabled("new", true);
+    setCommandEnabled("open", true);
+    setCommandEnabled("save", commandStack.isDirty());
     setCommandEnabled("undo", commandStack.isDirty());
     setCommandEnabled("revert", commandStack.isDirty());
   }
@@ -652,6 +697,16 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 tooltip: 'editor:docks.json.tooltip'.tr(),
                                 create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
                                 icon: Icons.code
+                            ),
+                            Panel(
+                                name: 'settings',
+                                label: 'editor:docks.settings.label'.tr(),
+                                tooltip: 'editor:docks.settings.tooltip'.tr(),
+                                create: (onClose) =>  PanelContainer(
+                                      title: "editor:docks.settings.label".tr(),
+                                      onClose: onClose,
+                                      child: SettingsPanel(editor: this)),
+                                icon: Icons.settings
                             )
                           ],
                           initialPanel: "tree",

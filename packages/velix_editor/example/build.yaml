@@ -30,3 +30,23 @@ targets:
           function_name: "registerTypes"
         generate_for:
           - lib/main.dart
+
+      velix|registry_json_builder:
+        options:
+        #package: "velix_editor/"
+        generate_for:
+          - lib/*.dart
+          - lib/**/*.dart
+          - "!lib/*.g.dart"
+          - "!lib/**/*.g.dart"
+          - "!lib/**/*.part.dart"
+          - "!lib/**/*.freezed.dart"
+          - "!lib/**/*.gr.dart"
+          - "!lib/combined_registry.dart"
+
+      velix|registry_json_aggregator:
+        options:
+          #prefix: "lib"
+          #function_name: "registerTypes"
+        generate_for:
+          - lib/main.dart

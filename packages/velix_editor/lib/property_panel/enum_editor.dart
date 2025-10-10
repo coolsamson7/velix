@@ -10,7 +10,7 @@ import 'editor_builder.dart';
 
 
 @Injectable(factory: false)
-class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
+abstract class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder<T> {
   // instance data
 
   final List<T> values;

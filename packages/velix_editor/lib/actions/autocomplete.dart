@@ -16,6 +16,20 @@ class Suggestion {
 
 }
 
+class CompletionContext {
+  final int tokenStart;
+  final int tokenEnd;
+  final String tokenType;
+  final Expression node;
+
+  CompletionContext({
+    required this.tokenStart,
+    required this.tokenEnd,
+    required this.tokenType,
+    required this.node,
+  });
+}
+
 class Autocomplete {
   // instance data
 
@@ -25,6 +39,106 @@ class Autocomplete {
   // constructor
 
   Autocomplete({required this.typeChecker});
+
+  // NEW
+
+  /// Get the token boundaries at the cursor position for inline completion
+  CompletionContext? getCompletionContext(String input, int cursorOffset) {
+    if (cursorOffset == -1) {
+      cursorOffset = input.length;
+    }
+
+    var result = parser.parsePrefix(input, typeChecker: typeChecker);
+
+    if (!result.success || result.value == null) {
+      return null;
+    }
+
+    final node = _findNodeAt(result.value!, cursorOffset);
+    if (node == null) {
+      return null;
+    }
+
+    // Determine what part of the node is being completed
+    int tokenStart;
+    int tokenEnd;
+    String tokenType;
+
+    if (node is MemberExpression) {
+      // Completing the property name after the dot
+      // e.g., "user.na|me" - we want token boundaries of "name"
+      tokenStart = node.property.start;
+      tokenEnd = node.property.end;
+      tokenType = "property";
+    }
+    else if (node is Variable) {
+      // Completing a variable name
+      // e.g., "us|er" - we want token boundaries of "user"
+      tokenStart = node.identifier.start;
+      tokenEnd = node.identifier.end;
+      tokenType = "variable";
+    }
+    else if (node is Identifier) {
+      // Direct identifier completion
+      tokenStart = node.start;
+      tokenEnd = node.end;
+      tokenType = "identifier";
+    }
+    else if (node is CallExpression) {
+      // Check if we're on the callee (function name)
+      if (cursorOffset >= node.callee.start && cursorOffset <= node.callee.end) {
+        // Recursively get context for the callee
+        final calleeContext = _getNodeContext(node.callee, cursorOffset);
+        if (calleeContext != null) return calleeContext;
+      }
+      // Otherwise we're in arguments
+      tokenStart = node.start;
+      tokenEnd = node.end;
+      tokenType = "call";
+    }
+    else {
+      // Fallback to the node boundaries
+      tokenStart = node.start;
+      tokenEnd = node.end;
+      tokenType = node.runtimeType.toString().toLowerCase();
+    }
+
+    return CompletionContext(
+      tokenStart: tokenStart,
+      tokenEnd: tokenEnd,
+      tokenType: tokenType,
+      node: node,
+    );
+  }
+
+// Helper to extract context from a specific node
+  CompletionContext? _getNodeContext(Expression node, int cursorOffset) {
+    if (node is MemberExpression) {
+      return CompletionContext(
+        tokenStart: node.property.start,
+        tokenEnd: node.property.end,
+        tokenType: "property",
+        node: node,
+      );
+    } else if (node is Variable) {
+      return CompletionContext(
+        tokenStart: node.identifier.start,
+        tokenEnd: node.identifier.end,
+        tokenType: "variable",
+        node: node,
+      );
+    } else if (node is Identifier) {
+      return CompletionContext(
+        tokenStart: node.start,
+        tokenEnd: node.end,
+        tokenType: "identifier",
+        node: node,
+      );
+    }
+    return null;
+  }
+
+  // NEW
 
   // public
 

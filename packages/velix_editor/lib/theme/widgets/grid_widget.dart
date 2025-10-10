@@ -9,8 +9,9 @@ import '../../util/message_bus.dart';
 import 'package:flutter/material.dart' show
 BuildContext, Widget, Colors, Border, BorderStyle, BorderRadius,
 BoxDecoration, FontStyle, TextStyle, Text, Center, Table, TableRow,
-DragTarget, SizedBox, TableCellVerticalAlignment, EdgeInsets, Padding, Align, TableColumnWidth, FixedColumnWidth,
-FlexColumnWidth, IntrinsicColumnWidth, Container, Alignment;
+DragTarget, SizedBox, TableCellVerticalAlignment, EdgeInsets, Padding, Align,
+TableColumnWidth, FixedColumnWidth, FlexColumnWidth, IntrinsicColumnWidth,
+Container, Alignment;
 
 import 'package:velix/util/collections.dart';
 import '../../commands/reparent_command.dart';
@@ -28,7 +29,6 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   Widget create(GridWidgetData data, Environment environment, BuildContext context) {
     final spacing = data.spacing.toDouble();
 
-    // Ensure we have at least some default columns/rows if empty
     if (data.cols.isEmpty || data.rows.isEmpty) {
       return Center(
         child: Text(
@@ -38,7 +38,6 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
       );
     }
 
-    // Determine column widths with proper defaults
     final columnWidths = <int, TableColumnWidth>{
       for (var i = 0; i < data.cols.length; i++)
         i: switch (data.cols[i].sizeMode) {
@@ -89,56 +88,45 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
     }
 
     Widget _alignedCellContent(GridAlignment rowAlignment, GridAlignment colAlignment, Widget content) {
-      // Combine row (vertical) and column (horizontal) alignment
-      Alignment alignment;
-
-      // Determine vertical alignment from row
-      double vertical = switch (rowAlignment) {
-        GridAlignment.start => -1.0,    // top
-        GridAlignment.center => 0.0,    // center
-        GridAlignment.end => 1.0,       // bottom
-        GridAlignment.stretch => 0.0,
-      };
-
-      // Determine horizontal alignment from column
       double horizontal = switch (colAlignment) {
-        GridAlignment.start => -1.0,    // left
-        GridAlignment.center => 0.0,    // center
-        GridAlignment.end => 1.0,       // right
+        GridAlignment.start => -1.0,
+        GridAlignment.center => 0.0,
+        GridAlignment.end => 1.0,
         GridAlignment.stretch => 0.0,
       };
 
-      alignment = Alignment(horizontal, vertical);
+      double vertical = switch (rowAlignment) {
+        GridAlignment.start => -1.0,
+        GridAlignment.center => 0.0,
+        GridAlignment.end => 1.0,
+        GridAlignment.stretch => 0.0,
+      };
 
-      // Handle stretch cases
-      if (rowAlignment == GridAlignment.stretch && colAlignment == GridAlignment.stretch) {
-        return SizedBox.expand(child: content);
-      } else if (rowAlignment == GridAlignment.stretch) {
-        return SizedBox(
-          height: double.infinity,
-          child: Align(alignment: alignment, child: content),
-        );
-      } else if (colAlignment == GridAlignment.stretch) {
-        return SizedBox(
-          width: double.infinity,
-          child: Align(alignment: alignment, child: content),
+      Widget aligned = Align(alignment: Alignment(horizontal, vertical), child: content);
+
+      double? widthFactor = colAlignment == GridAlignment.stretch ? 1.0 : null;
+      double? heightFactor = rowAlignment == GridAlignment.stretch ? 1.0 : null;
+
+      if (widthFactor != null || heightFactor != null) {
+        aligned = FractionallySizedBox(
+          widthFactor: widthFactor,
+          heightFactor: heightFactor,
+          child: aligned,
         );
       }
 
-      return Align(alignment: alignment, child: content);
+      return aligned;
     }
 
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: columnWidths,
-      defaultColumnWidth: const FlexColumnWidth(1.0), // CRITICAL: Default width for all columns
+      defaultColumnWidth: const FlexColumnWidth(1.0),
       children: List.generate(data.rows.length, (rowIndex) {
         final row = data.rows[rowIndex];
-
         return TableRow(
           children: List.generate(data.cols.length, (colIndex) {
             final col = data.cols[colIndex];
-
             final child = findElement(
               data.children,
                   (w) => w.cell?.row == rowIndex && w.cell?.col == colIndex,
@@ -146,10 +134,8 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
 
             Widget content = child != null ? EditWidget(model: child) : _buildDropArea(rowIndex, colIndex);
 
-            // Apply row alignment
             content = _alignedCellContent(row.alignment, col.alignment, content);
 
-            // Wrap with spacing
             return Padding(
               padding: EdgeInsets.all(spacing / 2),
               child: content,
@@ -171,12 +157,10 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   Widget create(GridWidgetData data, Environment environment, BuildContext context) {
     final spacing = data.spacing.toDouble();
 
-    // Ensure we have at least some default columns/rows if empty
     if (data.cols.isEmpty || data.rows.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    // Column widths based on GridItem config with proper defaults
     final columnWidths = <int, TableColumnWidth>{
       for (var i = 0; i < data.cols.length; i++)
         i: switch (data.cols[i].sizeMode) {
@@ -187,54 +171,45 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
     };
 
     Widget _alignedCellContent(GridAlignment rowAlignment, GridAlignment colAlignment, Widget content) {
-      // Combine row (vertical) and column (horizontal) alignment
-      Alignment alignment;
-
-      // Determine vertical alignment from row
-      double vertical = switch (rowAlignment) {
-        GridAlignment.start => -1.0,    // top
-        GridAlignment.center => 0.0,    // center
-        GridAlignment.end => 1.0,       // bottom
-        GridAlignment.stretch => 0.0,
-      };
-
-      // Determine horizontal alignment from column
       double horizontal = switch (colAlignment) {
-        GridAlignment.start => -1.0,    // left
-        GridAlignment.center => 0.0,    // center
-        GridAlignment.end => 1.0,       // right
+        GridAlignment.start => -1.0,
+        GridAlignment.center => 0.0,
+        GridAlignment.end => 1.0,
         GridAlignment.stretch => 0.0,
       };
 
-      alignment = Alignment(horizontal, vertical);
+      double vertical = switch (rowAlignment) {
+        GridAlignment.start => -1.0,
+        GridAlignment.center => 0.0,
+        GridAlignment.end => 1.0,
+        GridAlignment.stretch => 0.0,
+      };
 
-      // Handle stretch cases
-      if (rowAlignment == GridAlignment.stretch && colAlignment == GridAlignment.stretch) {
-        return SizedBox.expand(child: content);
-      } else if (rowAlignment == GridAlignment.stretch) {
-        return SizedBox(
-          height: double.infinity,
-          child: Align(alignment: alignment, child: content),
-        );
-      } else if (colAlignment == GridAlignment.stretch) {
-        return SizedBox(
-          width: double.infinity,
-          child: Align(alignment: alignment, child: content),
+      Widget aligned = Align(alignment: Alignment(horizontal, vertical), child: content);
+
+      double? widthFactor = colAlignment == GridAlignment.stretch ? 1.0 : null;
+      double? heightFactor = rowAlignment == GridAlignment.stretch ? 1.0 : null;
+
+      if (widthFactor != null || heightFactor != null) {
+        aligned = FractionallySizedBox(
+          widthFactor: widthFactor,
+          heightFactor: heightFactor,
+          child: aligned,
         );
       }
 
-      return Align(alignment: alignment, child: content);
+      return aligned;
     }
 
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: columnWidths,
-      defaultColumnWidth: const FlexColumnWidth(1.0), // CRITICAL: Default width for all columns
+      defaultColumnWidth: const FlexColumnWidth(1.0),
       children: List.generate(data.rows.length, (rowIndex) {
         final row = data.rows[rowIndex];
-
         return TableRow(
           children: List.generate(data.cols.length, (colIndex) {
+            final col = data.cols[colIndex];
             final child = findElement(
               data.children,
                   (w) => w.cell?.row == rowIndex && w.cell?.col == colIndex,
@@ -242,7 +217,6 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
 
             if (child != null) {
               Widget content = EditWidget(model: child);
-              final col = data.cols[colIndex];
               content = _alignedCellContent(row.alignment, col.alignment, content);
 
               return Padding(
@@ -251,7 +225,6 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
               );
             }
 
-            // Empty cell with minimum size to prevent collapse
             return Padding(
               padding: EdgeInsets.all(spacing / 2),
               child: Container(

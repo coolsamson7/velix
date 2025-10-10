@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix_di/velix_di.dart';
+import 'package:velix_editor/editor/editor.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
+
+import 'package:velix_editor/metadata/widget_data.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_ui/velix_ui.dart';
 
 import 'package:provider/provider.dart';
 
-import "screen.dart";
 
-class ExampleApp extends StatelessWidget {
+class EditorApp extends StatelessWidget {
   // instance data
 
   final I18N i18n;
   final LocaleManager localeManager;
   final Environment environment;
+  final List<WidgetData> widgets;
 
   // constructor
 
-  const ExampleApp({super.key, required this.i18n, required this.localeManager, required this.environment});
+  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment, required this.widgets});
 
   // override
 
@@ -45,7 +48,7 @@ class ExampleApp extends StatelessWidget {
                 child: Consumer<I18N>(
                     builder: (BuildContext context, I18N value, Widget? child) {
                       return MaterialApp(
-                        title: 'Example',
+                        title: 'Editor',
 
                         theme: ThemeData(
                           brightness: Brightness.light,
@@ -66,7 +69,7 @@ class ExampleApp extends StatelessWidget {
                         // main screen
 
                         home: Scaffold(
-                            body: ExampleScreen()
+                            body: EditorScreen(models: widgets)
                         ),
                       );
                     }

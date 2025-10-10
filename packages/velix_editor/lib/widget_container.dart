@@ -20,7 +20,7 @@ class WidgetContext {
 
   // constructor
 
-  WidgetContext({required this.instance}) :  formMapper = FormMapper(instance: instance, twoWay: true) {
+  WidgetContext({required this.instance, FormMapper? mapper}) :  formMapper = mapper ?? FormMapper(instance: instance, twoWay: true) {
     //formMapper.addListener((event) => onEvent, emitOnChange: true);
   }
 

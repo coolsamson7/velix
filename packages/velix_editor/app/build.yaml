@@ -7,13 +7,11 @@ targets:
       velix_ui|command_builder:
         generate_for:
           include:
-            - lib/**/*.dart
             - lib/*.dart
+            - lib/**/*.dart
           exclude:
             - lib/**.g.dart
       velix|registry_builder:
-        options:
-          #package: "velix_editor/"
         generate_for:
           - lib/*.dart
           - lib/**/*.dart
@@ -27,6 +25,5 @@ targets:
       velix|registry_aggregator:
         options:
           prefix: "lib"
-          function_name: "registerTypes"
         generate_for:
           - lib/main.dart

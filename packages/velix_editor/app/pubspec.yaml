@@ -1,11 +1,11 @@
-name: velix_editor_sample
-description: "Velix UI runtime sample."
-
-homepage: https://github.com/coolsamson7/velix
-repository: https://github.com/coolsamson7/velix
+name: app
+description: "velix editor app."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 resolution: workspace
-version: 0.1.2
+version: 1.0.0+1
 
 environment:
   sdk: ^3.9.0
@@ -41,8 +41,12 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/locales/en/
-    - assets/screens/
+    - assets/widgets.json
+    - assets/icons/
+    - assets/icons/widget/
+    - assets/icons/widget/button.svg
+    - assets/locales/en/sample.json
+    - assets/locales/de/sample.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

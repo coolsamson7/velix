@@ -95,9 +95,9 @@
         },
         {
           "type": "switch",
-          "databinding": "user.cool",
+          "databinding": "user.single",
           "children": [],
-          "label": "Cool"
+          "label": "Single"
         },
         {
           "type": "label",
@@ -110,8 +110,11 @@
         {
           "type": "button",
           "children": [],
-          "label": "PRESS",
-          "onClick": "user.hello(user.name)",
+          "label": {
+            "type":  "value",
+            "value": "Save"
+          },
+          "onClick": "this.save()",
           "color": "FFFF0000",
           "padding": {
             "left": 1,
@@ -123,4 +126,4 @@
       ]
     }
   ]
-  }
+}

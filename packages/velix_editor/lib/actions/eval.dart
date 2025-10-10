@@ -8,8 +8,25 @@ import 'package:velix_editor/actions/visitor.dart';
 
 import 'expressions.dart';
 
+class CallVisitorContext extends VisitorContext {
+  // instance data
+
+  final dynamic instance;
+
+  // constructor
+
+  CallVisitorContext({required this.instance});
+}
+
 abstract class Call {
   dynamic eval(dynamic value);
+}
+
+class This extends Call {
+  @override
+  dynamic eval(dynamic value) {
+    return value;
+  }
 }
 
 class Value extends Call {
@@ -85,7 +102,7 @@ class Method extends Call {
   }
 }
 
-class CallVisitor extends ExpressionVisitor<Call,VisitorContext> {
+class CallVisitor extends ExpressionVisitor<Call,CallVisitorContext> {
   // instance data
 
   final TypeDescriptor rootClass;
@@ -97,7 +114,7 @@ class CallVisitor extends ExpressionVisitor<Call,VisitorContext> {
   // visitors
 
   @override
-  Call visitLiteral(Literal expr, VisitorContext context) {
+  Call visitLiteral(Literal expr, CallVisitorContext context) {
     if (expr.value is int)
       return Value(value: expr.value);
 
@@ -111,18 +128,18 @@ class CallVisitor extends ExpressionVisitor<Call,VisitorContext> {
   }
 
   @override
-  Call visitVariable(Variable expr, VisitorContext context) {
+  Call visitVariable(Variable expr, CallVisitorContext context) {
     var field =  rootClass.getField(expr.identifier.name);
     return Field(field: field);
   }
 
   @override
-  Call visitUnary(UnaryExpression expr, VisitorContext context) {
+  Call visitUnary(UnaryExpression expr, CallVisitorContext context) {
     return expr.argument.accept(this, context);
   }
 
   @override
-  Call visitMember(MemberExpression expr, VisitorContext context) {
+  Call visitMember(MemberExpression expr, CallVisitorContext context) {
     var receiver = expr.object.accept(this, context);
     var type = expr.object.getType<ObjectType>();
 
@@ -135,7 +152,12 @@ class CallVisitor extends ExpressionVisitor<Call,VisitorContext> {
   }
 
   @override
-  Call visitCall(CallExpression expr, VisitorContext context) {
+  Call visitThis(ThisExpression expr, CallVisitorContext context) {
+    return This();
+  }
+
+  @override
+  Call visitCall(CallExpression expr, CallVisitorContext context) {
     var method = expr.callee.accept(this, context) as Method;
 
     method.arguments = expr.arguments.map((arg) => arg.accept(this, context)).toList();

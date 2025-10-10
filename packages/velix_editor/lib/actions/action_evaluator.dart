@@ -28,7 +28,7 @@ class ActionCompiler {
 
      var visitor = CallVisitor(context);
 
-     return result.value!.accept(visitor, VisitorContext());
+     return result.value!.accept(visitor, CallVisitorContext(instance: null));
    }
 }
 

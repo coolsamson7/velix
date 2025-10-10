@@ -42,7 +42,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  // TEST TODO
+  // TEST
 
   enumeration<MainAxisAlignment>(
       name: 'asset:velix_mapper/test/model.dart.MainAxisAlignment',
@@ -73,6 +73,7 @@ void main() async {
 
   // bootstrap types
 
+  Velix.bootstrap;
   EditorModule.boot; // this sucks
 
   registerTypes();
@@ -124,16 +125,25 @@ void main() async {
 
   await i18n.load();
 
+  // load json
+
+  final jsonString = await rootBundle.loadString('assets/widgets.json');
+
+  var json = jsonDecode(jsonString);
+
+  var widget = JSON.deserialize<WidgetData>(json);
+
   // boot environment
 
   var environment = Environment(forModule: ApplicationModule);
 
   // load namespaces
 
-  runApp(ExampleApp(
+  runApp(EditorApp(
       environment: environment,
       i18n: i18n,
-      localeManager: localeManager
+      localeManager: localeManager,
+      widgets: [widget]
   ));
 }
 

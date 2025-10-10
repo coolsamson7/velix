@@ -3,19 +3,113 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'package:editor_sample/main.dart';
-import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor_module.dart';
+import 'package:velix_editor_sample/main.dart' show ApplicationModule;
+import 'package:velix_di/di/di.dart' show Module, Environment;
+import 'package:velix_editor_sample/model.dart' show Address, User;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix_editor_sample/screen.dart' show ExampleScreenState;
+import 'package:velix_ui/databinding/form_mapper.dart' show FormMapper;
+import 'package:velix_editor/metadata/widget_data.dart' show WidgetData;
+import 'dart:async' show StreamSubscription;
 
 void registerTypes() {
   type<ApplicationModule>(
-    location: 'package:editor_sample/main.dart:35:1',
+    location: 'package:velix_editor_sample/main.dart:34:1',
     annotations: [
       Module(imports: [EditorModule])
     ],
     constructor: () => ApplicationModule(),
     fromMapConstructor: (Map<String,dynamic> args) => ApplicationModule(),
     fromArrayConstructor: (List<dynamic> args) => ApplicationModule(),
+  );
+
+  type<Address>(
+    location: 'package:velix_editor_sample/model.dart:4:1',
+    params: [
+      param<String>('city', isNamed: true, isRequired: true), 
+      param<String>('street', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String city = '', String street = ''}) => Address(city: city, street: street),
+    fromMapConstructor: (Map<String,dynamic> args) => Address(city: args['city'] as String? ?? '', street: args['street'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => Address(city: args[0] as String? ?? '', street: args[1] as String? ?? ''),
+    fields: [
+      field<Address,String>('city',
+        getter: (obj) => obj.city,
+        setter: (obj, value) => (obj as Address).city = value,
+      ), 
+      field<Address,String>('street',
+        getter: (obj) => obj.street,
+        setter: (obj, value) => (obj as Address).street = value,
+      )
+    ],
+  );
+
+  type<ExampleScreenState>(
+    location: 'package:velix_editor_sample/screen.dart:31:1',
+    constructor: () => ExampleScreenState(),
+    fromMapConstructor: (Map<String,dynamic> args) => ExampleScreenState(),
+    fromArrayConstructor: (List<dynamic> args) => ExampleScreenState(),
+    fields: [
+      field<ExampleScreenState,Environment>('environment',
+        getter: (obj) => obj.environment,
+      ), 
+      field<ExampleScreenState,FormMapper>('mapper',
+        getter: (obj) => obj.mapper,
+        setter: (obj, value) => (obj as ExampleScreenState).mapper = value,
+      ), 
+      field<ExampleScreenState,WidgetData>('screen',
+        getter: (obj) => obj.screen,
+        setter: (obj, value) => (obj as ExampleScreenState).screen = value,
+      ), 
+      field<ExampleScreenState,User>('user',
+        getter: (obj) => obj.user,
+        setter: (obj, value) => (obj as ExampleScreenState).user = value,
+      ), 
+      field<ExampleScreenState,StreamSubscription<dynamic>>('subscription',
+        getter: (obj) => obj.subscription,
+        setter: (obj, value) => (obj as ExampleScreenState).subscription = value,
+      ), 
+    ],
+    methods: [
+      method<ExampleScreenState,void>('save',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ExampleScreenState).save()
+      )
+    ],
+  );
+
+  type<User>(
+    location: 'package:velix_editor_sample/model.dart:18:1',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<Address>('address', isNamed: true, isRequired: true), 
+      param<int>('age', isNamed: true, isRequired: true), 
+      param<bool>('single', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required Address address, int age = 0, bool single = false}) => User(name: name, address: address, age: age, single: single),
+    fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address, age: args['age'] as int? ?? 0, single: args['single'] as bool? ?? false),
+    fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address, age: args[2] as int? ?? 0, single: args[3] as bool? ?? false),
+    fields: [
+      field<User,String>('name',
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as User).name = value,
+      ), 
+      field<User,int>('age',
+        getter: (obj) => obj.age,
+        setter: (obj, value) => (obj as User).age = value,
+      ), 
+      field<User,Address>('address',
+        getter: (obj) => obj.address,
+        setter: (obj, value) => (obj as User).address = value,
+      ), 
+      field<User,bool>('single',
+        getter: (obj) => obj.single,
+        setter: (obj, value) => (obj as User).single = value,
+      )
+    ],
   );
 
   TypeDescriptor.verify();

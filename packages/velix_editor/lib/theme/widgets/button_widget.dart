@@ -4,6 +4,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../actions/action_evaluator.dart';
+import '../../metadata/properties/properties.dart';
 import '../../metadata/widgets/button.dart';
 import '../../widget_container.dart';
 import '../abstract_widget.dart' show AbstractWidgetState;
@@ -44,7 +45,7 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
 
     // Only compile once per lifecycle if onClick is set
     if (widget.data.onClick != null && _onClick == null) {
-      final instance = Provider.of<WidgetContext>(context, listen: false).page;
+      final instance = Provider.of<WidgetContext>(context, listen: false).instance;
       final type = TypeDescriptor.forType(instance.runtimeType);
 
       final call = ActionCompiler.instance.compile(widget.data.onClick!, context: type);
@@ -54,8 +55,11 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var widgetContext = Provider.of<WidgetContext>(context);
 
-    return ElevatedButton(
+    var (label, typeProperty) = resolveValue(widgetContext, widget.data.label);
+
+    var result = ElevatedButton(
       onPressed: _onClick,
       style: ElevatedButton.styleFrom(
         //shape: ,
@@ -64,8 +68,14 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
         backgroundColor: widget.data.backgroundColor,
         padding: widget.data.padding?.edgeInsets(),
       ),
-      child: Text(widget.data.label),
+      child: Text(label),
     );
+
+    if (widget.data.label.type == ValueType.binding) {
+      widgetContext.addBinding(typeProperty!, widget.data);
+    }
+
+    return result;
   }
 }
 
@@ -91,7 +101,7 @@ class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
             textStyle: data.font?.textStyle(),
             padding: data.padding?.edgeInsets()
         ),
-        child: Text(data.label),
+        child: Text(data.label.value),
       ),
     );
   }

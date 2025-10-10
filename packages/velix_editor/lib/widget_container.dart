@@ -13,14 +13,14 @@ import 'package:velix_ui/provider/environment_provider.dart';
 class WidgetContext {
   // instance data
 
-  dynamic page;
+  dynamic instance;
   FormMapper formMapper;
   late WidgetContainer container;
   Map<TypeProperty,Set<WidgetData>> bindings = {};
 
   // constructor
 
-  WidgetContext({required this.page}) :  formMapper = FormMapper(instance: page, twoWay: true) {
+  WidgetContext({required this.instance}) :  formMapper = FormMapper(instance: instance, twoWay: true) {
     //formMapper.addListener((event) => onEvent, emitOnChange: true);
   }
 
@@ -85,7 +85,7 @@ class _WidgetContainerState extends State<WidgetContainer> {
     typeRegistry ??= EnvironmentProvider.of(context).get<TypeRegistry>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.context.formMapper.setValue(widget.context.page);
+      widget.context.formMapper.setValue(widget.context.instance);
 
       subscription ??= widget.context.formMapper.addListener((event) {
           for ( var widget in widget.context.bindings[event.property] ?? {})

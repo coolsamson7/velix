@@ -74,7 +74,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
     var widgetContext = Provider.of<WidgetContext>(context);
 
     var mapper = widgetContext.formMapper;
-    var instance = widgetContext.page;
+    var instance = widgetContext.instance;
 
     TextEditingController controller =  TextEditingController();
     FocusNode? focusNode = FocusNode();

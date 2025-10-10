@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:provider/provider.dart';
+import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
@@ -18,28 +19,13 @@ LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
 
   LabelWidgetBuilder() : super(name: "label");
 
-  // internal
-
   // override
 
   @override
   Widget create(LabelWidgetData data, Environment environment, BuildContext context) {
     var widgetContext = Provider.of<WidgetContext>(context);
 
-    var mapper = widgetContext.formMapper;
-    var instance = widgetContext.page;
-
-    var adapter = ValuedWidget.getAdapter("label");
-
-    var label = data.label.value;
-
-    TypeProperty? typeProperty;
-    if (data.label.type == ValueType.i18n)
-      label = label.tr();
-    if (data.label.type == ValueType.binding) {
-      typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), label);
-      label = typeProperty.get(instance, ValuedWidgetContext(mapper: mapper));
-    }
+    var (label, typeProperty) = resolveValue(Provider.of<WidgetContext>(context), data.label);
 
     var result = Text(label,
         style: data.font?.textStyle(color: data.color, backgroundColor: data.backgroundColor)

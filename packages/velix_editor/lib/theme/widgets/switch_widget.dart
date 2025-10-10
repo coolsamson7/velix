@@ -22,7 +22,7 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
     var widgetContext = Provider.of<WidgetContext>(context);
 
     var mapper = widgetContext.formMapper;
-    var instance = widgetContext.page;
+    var instance = widgetContext.instance;
 
     var adapter = environment.get<SwitchAdapter>();
 

@@ -15,7 +15,7 @@ class ButtonWidgetData extends WidgetData {
   // instance data
 
   @DeclareProperty(group: "general")
-  String label;
+  Value label;
   @DeclareProperty(group: "font")
   Font? font;
   @DeclareProperty(group: "style")

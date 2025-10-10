@@ -37,7 +37,10 @@ void main() {
       var input = ContainerWidgetData(
           children: [
             ButtonWidgetData(
-              label: "zwei",
+              label: Value(
+                      type: ValueType.value,
+                          value: "zwei"
+                      ),
               padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
               font: Font(
                   weight: FontWeight.normal,
@@ -56,7 +59,10 @@ void main() {
 
     test('serialize button', () {
       var input = ButtonWidgetData(
-          label: "zwei",
+          label: Value(
+              type: ValueType.value,
+              value: "zwei"
+          ),
           padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
           font: Font(
               weight: FontWeight.normal,
@@ -74,7 +80,10 @@ void main() {
 
     test('deserialize button', () {
       var input = ButtonWidgetData(
-          label: "zwei",
+          label: Value(
+              type: ValueType.value,
+              value: "zwei"
+          ),
           onClick: "click()",
           //padding: Insets(left: 1, top: 1, right: 1, bottom: 1),
           font: Font(

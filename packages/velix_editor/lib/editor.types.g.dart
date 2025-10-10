@@ -60,7 +60,7 @@ import 'package:velix_editor/theme/widgets/stack_widget.dart' show StackEditWidg
 import 'package:velix_editor/theme/widgets/switch_widget.dart' show SwitchWidgetBuilder, EditSwitchWidgetBuilder;
 import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuilder, TextEditWidgetBuilder;
 import 'package:velix_editor/util/message_bus.dart' show MessageBus;
-import 'package:velix_ui/module.dart' show UIModule;
+import 'package:velix_ui/module.dart';
 
 void registerEditorTypes() {
   type<CommandStack>(
@@ -1478,18 +1478,18 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "button"), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('label', isNamed: true, isRequired: true), 
+      param<Value>('label', isNamed: true, isRequired: true), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null), 
       param<Color>('foregroundColor', isNamed: true, isNullable: true, defaultValue: null), 
       param<Color>('backgroundColor', isNamed: true, isNullable: true, defaultValue: null), 
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "button", required Cell cell, required List<WidgetData> children, String label = '', required Font font, required Color foregroundColor, required Color backgroundColor, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, cell: cell, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
-    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as String? ?? '', font: args['font'] as Font?, foregroundColor: args['foregroundColor'] as Color?, backgroundColor: args['backgroundColor'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as String? ?? '', font: args[4] as Font?, foregroundColor: args[5] as Color?, backgroundColor: args[6] as Color?, padding: args[7] as Insets?, onClick: args[8] as String? ?? ''),
+    constructor: ({String type = "button", required Cell cell, required List<WidgetData> children, required Value label, required Font font, required Color foregroundColor, required Color backgroundColor, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, cell: cell, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
+    fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as Value, font: args['font'] as Font?, foregroundColor: args['foregroundColor'] as Color?, backgroundColor: args['backgroundColor'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as Value, font: args[4] as Font?, foregroundColor: args[5] as Color?, backgroundColor: args[6] as Color?, padding: args[7] as Insets?, onClick: args[8] as String? ?? ''),
     fields: [
-      field<ButtonWidgetData,String>('label',
+      field<ButtonWidgetData,Value>('label',
         annotations: [
           DeclareProperty(group: "general")
         ],

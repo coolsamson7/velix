@@ -4,6 +4,10 @@
       "label": "Palette",
       "tooltip": "Palette"
     },
+    "settings": {
+      "label": "Settings",
+      "tooltip": "Settings ..."
+    },
     "json": {
       "label": "JSON",
       "tooltip": "JSON"

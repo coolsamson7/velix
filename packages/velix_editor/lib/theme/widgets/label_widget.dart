@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:provider/provider.dart';
-import 'package:velix/i18n/translator.dart';
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
-import 'package:velix_ui/databinding/form_mapper.dart';
-import 'package:velix_ui/databinding/valued_widget.dart';
 
 import '../../metadata/widgets/label.dart';
 import '../../widget_container.dart';

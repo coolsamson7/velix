@@ -695,9 +695,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 ) :
 
                                 WidgetContainer(
-                                  context: WidgetContext(instance: environment.get<Page>()),
-                                  models: widget.models,
-                                  typeRegistry: environment.get<TypeRegistry>(),
+                                  instance:  environment.get<Page>(), // TODO
+                                  widget: widget.models[0]
                                 ),
                               )
                             //isActive: isActive,

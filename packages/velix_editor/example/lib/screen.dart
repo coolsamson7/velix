@@ -1,17 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_di/di/di.dart';
-import 'package:velix_editor/metadata/type_registry.dart';
 import 'package:velix_editor/metadata/widget_data.dart';
+import 'package:velix_editor/util/assets.dart';
 import 'package:velix_editor/widget_container.dart';
-import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_ui/commands/command.dart';
 import 'package:velix_ui/databinding/form_mapper.dart';
-import 'package:velix_ui/provider/environment_provider.dart';
 
 import 'model.dart';
 
@@ -32,18 +27,16 @@ class ExampleScreen extends StatefulWidget {
 class ExampleScreenState extends State<ExampleScreen> with CommandController<ExampleScreen>, ExampleScreenStateCommands {
   // instance data
 
-  late final Environment environment;
   late FormMapper mapper;
   late WidgetData screen;
 
   late User user;
   late StreamSubscription subscription;
 
-  Future<void>? _initFuture;
-
   // constructor
 
   ExampleScreenState() {
+    screen = Assets.assets().folder("screens")!.item("screen")!.get<WidgetData>();
     user = User(
         name: "Andreas",
         address: Address(
@@ -56,8 +49,6 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
     mapper = FormMapper(instance: this, twoWay: true);
 
     subscription = mapper.addListener((event) => onEvent, emitOnDirty: true);
-
-    _initFuture = _initialize();
   }
 
   // callbacks
@@ -67,16 +58,6 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
   }
 
   // internal
-
-  Future<void> _initialize() async {
-    final jsonString = await rootBundle.loadString('assets/screens/screen.json');
-
-    var json = jsonDecode(jsonString);
-
-    screen = JSON.deserialize<WidgetData>(json);
-
-    setState(() { });
-  }
 
   bool isDirty() {
     return mapper.isDirty;
@@ -95,13 +76,6 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
   // override
 
   @override
-  void initState() {
-    super.initState();
-
-    _initFuture = _initialize();
-  }
-
-  @override
   void dispose() {
     super.dispose();
 
@@ -111,8 +85,6 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
   @override
   void updateCommandState() {
     setCommandEnabled("save", true);
-    //setCommandEnabled("undo", commandStack.isDirty());
-    //setCommandEnabled("revert", commandStack.isDirty());
   }
 
   @override
@@ -124,18 +96,10 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        else return WidgetContainer(
-          context: WidgetContext(instance: this, mapper: mapper),
-          models: [screen],
-          typeRegistry: Environment(parent: EnvironmentProvider.of(context)).get<TypeRegistry>(),
+    return WidgetContainer(
+          widget: screen,
+          mapper: mapper,
+          instance: this
         );
-      }
-    );
   }
 }

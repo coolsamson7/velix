@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_editor/metadata/widget_data.dart';
+import 'package:velix_editor/util/assets.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
@@ -112,6 +111,15 @@ void main() async {
   // boot environment
 
   var environment = Environment(forModule: ApplicationModule);
+
+  // preload screens
+
+  await Assets.init();
+
+  Assets.assets().preloadTransform<Map<String,dynamic>,WidgetData>(
+      prefix: "screens",
+      transform: (json) => JSON.deserialize<WidgetData>(json)
+  );
 
   // load namespaces
 

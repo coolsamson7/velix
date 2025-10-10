@@ -49,13 +49,15 @@ class WidgetContext {
 class WidgetContainer extends StatefulWidget {
   // instance data
 
-  final List<WidgetData> models;
-  final TypeRegistry typeRegistry;
+  late List<WidgetData> models;
   final WidgetContext context;
 
   // constructor
 
-  WidgetContainer({super.key, required this.models, required this.typeRegistry, required this.context}) {
+  WidgetContainer({super.key, required dynamic instance, required WidgetData widget,  FormMapper? mapper})
+    :
+        context = WidgetContext(instance: instance, mapper: mapper),
+        models = [widget] {
     context.container = this;
   }
 

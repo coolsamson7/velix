@@ -10,7 +10,6 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
-import 'package:velix_editor/actions/visitor.dart';
 import 'package:velix_editor/editor.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_ui/velix_ui.types.g.dart';

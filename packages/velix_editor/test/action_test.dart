@@ -11,6 +11,9 @@ import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/actions/visitor.dart';
+import 'package:velix_editor/editor.dart';
+import 'package:velix_editor/editor_module.dart';
+import 'package:velix_ui/velix_ui.types.g.dart';
 
 import 'action_test.types.g.dart';
 
@@ -263,7 +266,7 @@ class Page {
   }
 }
 
-@Module(includeSiblings: false, includeSubdirectories: false)
+@Module(imports: [EditorModule], includeSiblings: false, includeSubdirectories: false)
 class TestModule {}
 
 void main() {
@@ -271,11 +274,13 @@ void main() {
 
   Velix.bootstrap;
 
+  registerEditorTypes();
+  registerUITypes();
   registerTypes();
 
   // boot environment
 
-  var environment = Environment(forModule: TestModule);
+  var environment = Environment(forModule: EditorModule);
   var page = environment.get<Page>();
   
   var registry = ClassRegistry();
@@ -329,7 +334,7 @@ void main() {
       var expression = parser.parse(code);
 
       expect(() {
-        expression.accept(checker, VisitorContext());
+        expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
       }, throwsA(isA<Exception>()));
     });
 
@@ -338,7 +343,7 @@ void main() {
 
       var expression = parser.parse(code);
       expect(() {
-        expression.accept(checker, VisitorContext());
+        expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
       }, throwsA(isA<Exception>()));
     });
   });

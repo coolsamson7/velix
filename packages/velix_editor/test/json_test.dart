@@ -17,6 +17,7 @@ void main() {
     JSON(
         validate: false,
         converters: [
+          BorderStyleConvert(),
           MainAxisSizeConvert(),
           MainAxisAlignmentConvert(),
           CrossAxisAlignmentConvert(),

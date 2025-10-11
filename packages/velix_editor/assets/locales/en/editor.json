@@ -121,9 +121,9 @@
   "widgets": {
     "column": {
       "title": "Column",
-      "mainAxisAlignment": {"label":  "Main Axis Alignment"},
-      "crossAxisAlignment": {"label":  "Cross Axis Alignment"},
-      "mainAxisSize": {"label":  "Main Axis Size"}
+      "mainAxisAlignment": {"label":  "Alignment"},
+      "crossAxisAlignment": {"label":  "Cross"},
+      "mainAxisSize": {"label":  "Size"}
     },
 
     "grid": {
@@ -136,9 +136,9 @@
 
     "row": {
       "title": "Row",
-      "mainAxisAlignment": {"label":  "Main Axis Alignment"},
-      "crossAxisAlignment": {"label":  "Cross Axis Alignment"},
-      "mainAxisSize": {"label":  "Main Axis Size"}
+      "mainAxisAlignment": {"label":  "Alignment"},
+      "crossAxisAlignment": {"label":  "Cross"},
+      "mainAxisSize": {"label":  "Size"}
     },
     "stack": {
       "title": "Stack"

@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/editor/settings.dart';
 import 'package:velix_editor/editor/settings_panel.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
@@ -22,6 +23,7 @@ import 'package:oktoast/oktoast.dart' as ok;
 import '../actions/types.dart';
 import '../commands/command_stack.dart';
 import '../components/focusable_region.dart';
+import '../components/locale_switcher.dart';
 import '../components/panel_header.dart';
 import '../event/events.dart';
 import '../json/json_view.dart';
@@ -161,6 +163,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   ClassDesc? clazz;
 
   late final LocaleManager localeManager;
+  SettingsManager settings = SettingsManager();
 
   // internal
 
@@ -211,6 +214,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }
 
     try {
+      settings.set("registry", path);
+      settings.flush();
+
       var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
 
       selectRegistry(registry);
@@ -223,6 +229,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
   void selectClass(ClassDesc? clazz) {
     this.clazz = clazz;
+
+    settings.set("class", clazz!.name);
+    settings.flush();
 
     setState(() {
     });
@@ -378,6 +387,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
       try {
         json = await file.readAsString();
+
+        settings.set("file", path);
+        settings.flush();
       }
       catch (e) {
         showErrorDialog(context, e.toString());
@@ -396,6 +408,28 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     catch(e) {
       showErrorDialog(context, e.toString());
     }
+  }
+
+  Future<void> loadSettings() async {
+    await settings.init();
+
+    var registry = settings.get("registry", defaultValue: "");
+    if (registry.isNotEmpty) {
+      await loadRegistry(registry);
+
+      var clazz = settings.get("class", defaultValue: "");
+
+      if (clazz.isNotEmpty) {
+        selectClass(this.registry.getClass(clazz));
+      }
+    }
+
+    var file = settings.get("file", defaultValue: "");
+    if (file.isNotEmpty) {
+      await loadFile(file);
+    }
+
+    updateCommandState();
   }
 
   // commands
@@ -478,10 +512,6 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @Command(label: "Play", icon: Icons.play_arrow)
   @override
   void _play() {
-    showToast("UP");
-    showToast("MY");
-    showToast("ASS");
-
     if (validate()) {
       setState(() { edit = !edit; });
     }
@@ -515,8 +545,12 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-        bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
+      loadSettings();
+
+      bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
     });
+
+
 
     updateCommandState();
 
@@ -561,6 +595,15 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                             },
                           ),
                           const Spacer(),
+
+                          LocaleSwitcher(
+                            currentLocale: Provider.of<LocaleManager>(context).locale.languageCode,
+                            supportedLocales: Provider.of<LocaleManager>(context).supportedLocales.map((loc) => loc.toString()) ,
+                            onLocaleChanged: (locale) {
+                              // Update your app locale
+                              Provider.of<LocaleManager>(context).locale = Locale(locale);
+                            },
+                          ),
 
                           // === Locale Switcher ===
                           Row(

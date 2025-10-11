@@ -36,7 +36,7 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
   // constructor
 
   ExampleScreenState() {
-    screen = Assets.assets().folder("screens")!.item("screen")!.get<WidgetData>();
+    screen = Assets.assets().folder("screens")!.item("screen.json")!.get<WidgetData>();
     user = User(
         name: "Andreas",
         address: Address(

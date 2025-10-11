@@ -116,7 +116,7 @@ void main() async {
 
   await Assets.init();
 
-  Assets.assets().preloadTransform<Map<String,dynamic>,WidgetData>(
+  await Assets.assets().preloadTransform<Map<String,dynamic>,WidgetData>(
       prefix: "screens",
       transform: (json) => JSON.deserialize<WidgetData>(json)
   );

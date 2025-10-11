@@ -44,7 +44,7 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
     super.didChangeDependencies();
 
     // Only compile once per lifecycle if onClick is set
-    if (widget.data.onClick != null && _onClick == null) {
+    if (widget.data.onClick != null && widget.data.onClick!.isNotEmpty && _onClick == null) {
       final instance = Provider.of<WidgetContext>(context, listen: false).instance;
       final type = TypeDescriptor.forType(instance.runtimeType);
 

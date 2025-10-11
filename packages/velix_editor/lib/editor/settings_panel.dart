@@ -51,8 +51,8 @@ class SettingsPanel extends StatelessWidget {
             const SizedBox(height: 8),
             // The actual selector (stateful)
             FilePathSelector(
-              recentFiles: [],
-              initialFilePath: "",
+              recentFiles: [editor.settings.get("registry" , defaultValue: "")],
+              initialFilePath: editor.settings.get("registry" , defaultValue: ""),
               onLoad: (path) async {
                 // Forward to your async callback
                 await onLoad(path);

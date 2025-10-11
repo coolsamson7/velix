@@ -15,7 +15,7 @@ abstract class AssetNode {
 
   static String _computeType(String path) {
     final last = path.split('/').last;
-    if (!last.contains('.') || last.endsWith('/')) return 'Folder';
+    if (!last.contains('.') || last.endsWith('/')) return 'folder';
     final dotIndex = last.lastIndexOf('.');
     if (dotIndex == -1 || dotIndex == last.length - 1) return '';
     return last.substring(dotIndex + 1);
@@ -28,7 +28,7 @@ abstract class AssetNode {
     return last.substring(0, dotIndex); // strip suffix
   }
 
-  bool get isFolder => type == 'Folder';
+  bool get isFolder => type == 'folder';
   bool get isFile => !isFolder;
 }
 
@@ -72,7 +72,7 @@ class AssetFolder extends AssetNode {
       final parts = prefix.split('/');
       AssetFolder? current = this;
 
-      for (var i = 1; i < parts.length; i++) {
+      for (var i = 0; i < parts.length; i++) {
         final folderPath = parts.sublist(0, i + 1).join('/');
         current = current?.subfolders[folderPath];
         if (current == null) return; // prefix not found
@@ -89,6 +89,42 @@ class AssetFolder extends AssetNode {
       yield* sub.list();
     }
   }
+}
+
+class AssetException implements Exception {
+  // instance data
+
+  final String message;
+  final Exception? cause;
+
+  // constructor
+
+  /// Create a new [AssetException]
+  /// [message] the message
+  /// [cause] optional chained exception
+  const AssetException(this.message, {this.cause});
+
+  @override
+  String toString() => 'AssetException: $message';
+}
+
+class AssetLoaderException extends AssetException {
+  // instance data
+
+  final String path;
+
+  // constructor
+
+  /// Create a new [AssetLoaderException]
+  /// [message] the message
+  /// [cause] optional chained exception
+  const AssetLoaderException(super.message, {
+    super.cause,
+    required this.path
+  });
+
+  @override
+  String toString() => 'AssetLoaderException: $message';
 }
 
 /// Represents a single asset file
@@ -126,10 +162,16 @@ class AssetItem extends AssetNode {
     if (_data.containsKey(R))
       return _data[R] as R;
 
-    final result = transformer(_data[T] as T);
-    _data[R] = result;
+    try {
+      final result = transformer(_data[T] as T);
+      _data[R] = result;
 
-    return result;
+      return result;
+    }
+    on Exception catch (e) {
+      throw AssetException("error transforming asset assets/$path", cause: e);
+    }
+
   }
 
   /// Load as string
@@ -137,15 +179,30 @@ class AssetItem extends AssetNode {
     var result = _data[T];
 
     if ( result == null) {
-      if (T == String)
-        result = _data[T] = await rootBundle.loadString("assets/$path");
-      else if (T == Uint8List) {
-        final bytes = await rootBundle.load("assets/$path");
-        final buffer = bytes.buffer.asUint8List();
-        result = _data[T] = buffer;
+      try {
+        if (T == String)
+          result = await rootBundle.loadString("assets/$path");
+        else if (T == Uint8List) {
+          final bytes = await rootBundle.load("assets/$path");
+
+          result = bytes.buffer.asUint8List();
+        }
+
+        else if (T == Map<String, dynamic>) {
+          var str = await load<String>();
+          result = jsonDecode(str);
+        }
+
+        _data[T] = result;
       }
-      else if (T == Map<String, dynamic>) {
-        result = _data[T] = jsonDecode(await load<String>());
+      on AssetLoaderException catch(e) {
+        rethrow;
+      }
+      on Exception catch (e) {
+        throw AssetLoaderException("error loading asset", cause: e, path: "assets/$path");
+      }
+      catch(e) {
+        print(e);
       }
     }
 
@@ -178,7 +235,7 @@ class Assets {
     final parts = path.split('/');
     var current = _root;
 
-    for (var i = 1; i < parts.length - 1; i++) {
+    for (var i = 0; i < parts.length - 1; i++) {
       final folderPath = parts.sublist(0, i + 1).join('/');
       current = current.subfolders.putIfAbsent(
         folderPath,

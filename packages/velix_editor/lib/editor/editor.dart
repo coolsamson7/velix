@@ -5,8 +5,10 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart' as ok show OKToast;
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
+import 'package:velix_editor/components/toast.dart';
 import 'package:velix_editor/editor/settings.dart';
 import 'package:velix_editor/editor/settings_panel.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
@@ -17,8 +19,6 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_i18n/i18n/locale.dart';
 import 'package:velix_ui/commands/command.dart';
-
-import 'package:oktoast/oktoast.dart' as ok;
 
 import '../actions/types.dart';
 import '../commands/command_stack.dart';
@@ -325,51 +325,6 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     return result ?? false;
   }
 
-  void showToast(String msg, {ok.ToastPosition? position}) {
-    ok.showToastWidget(
-        Padding(
-          padding: const EdgeInsets.only(bottom: 32, right: 24), // margin from edges
-          child: Container(
-            constraints: BoxConstraints(
-              minWidth: 200, // minimum width
-              maxWidth: 400, // optional maximum width
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: Offset(2, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, color: Colors.greenAccent),
-                SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    msg,
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-        ),
-        ),
-      duration: const Duration(seconds: 2),
-      position: position ?? ok.ToastPosition(align: Alignment.bottomRight),
-      dismissOtherToast: false,
-      //backgroundColor: Colors.grey,
-      //radius: 8.0,
-      //textPadding: const EdgeInsets.all(12),
-    );
-  }
-
   void test() async { // TODO TEST CODE
     await loadRegistry("assets:main.types.g.json");
 
@@ -483,7 +438,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
         await file.writeAsString(str);
 
-        ok.showToast("Saved");
+        showInfoToast("Saved $path");
 
         commandStack.clear();
 
@@ -545,7 +500,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadSettings();
+      //loadSettings();
 
       bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
     });

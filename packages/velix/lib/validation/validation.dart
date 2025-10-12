@@ -154,6 +154,14 @@ class AbstractType<T, B extends AbstractType<T, B>> {
     return '$value';
   }
 
+  bool hasTest(String name) {
+    return tests.any((test) => test.name == name);
+  }
+
+  Test getTest(String name) {
+    return tests.firstWhere((test) => test.name == name);
+  }
+
   void check(dynamic object, ValidationContext context) {
     for ( Test test in tests) {
       if (!test.run(object)) {

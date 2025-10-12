@@ -37,8 +37,10 @@ class GridWidgetData extends WidgetData {
   // instance data
 
   @DeclareProperty(group: "layout")
+  @Attribute(type: "min 1")
   List<GridItem> rows;
   @DeclareProperty(group: "layout")
+  @Attribute(type: "min 1")
   List<GridItem> cols;
   @DeclareProperty(group: "layout")
   int spacing;
@@ -46,7 +48,7 @@ class GridWidgetData extends WidgetData {
   // constructor
 
   GridWidgetData({super.type = "grid", super.children, super.cell, List<GridItem>? rows, List<GridItem>? cols, this.spacing = 0})
-      : rows = rows ?? <GridItem>[], cols = cols ?? <GridItem>[];
+      : rows = rows ?? <GridItem>[GridItem()], cols = cols ?? <GridItem>[GridItem()];
 
   // override
 

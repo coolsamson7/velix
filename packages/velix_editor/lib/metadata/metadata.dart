@@ -67,6 +67,9 @@ class PropertyDescriptor {
         return false;
     }
 
+    if (!field.typeDescriptor.constructorParameters.firstWhere((param) => param.name == name).isRequired)
+      return defaultValue;
+
     if (field.factoryConstructor != null)
       return field.factoryConstructor!();
 

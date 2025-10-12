@@ -24,6 +24,10 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     final containerFactory = property.field.factoryConstructor!;
     var items = value ?? containerFactory();
 
+    int min = 0;
+    if (property.field.type.hasTest("min"))
+      min = property.field.type.getTest("min").params["min"];
+
     void addItem() {
       var newItems = containerFactory();
       newItems.addAll(items);
@@ -56,6 +60,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
                 onChanged(items);
               },
             ),
+            deleteEnabled: i >= min,
             onAdd: addItem,
             onRemove: () => deleteItem(items[i]),
           ),
@@ -94,11 +99,13 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
 }
 
 class _HoverableListItem extends StatefulWidget {
+  final bool deleteEnabled;
   final Widget child;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
 
   const _HoverableListItem({
+    required this.deleteEnabled,
     required this.child,
     required this.onAdd,
     required this.onRemove,
@@ -144,16 +151,16 @@ class _HoverableListItemState extends State<_HoverableListItem> {
                       child: Icon(
                         Icons.add_circle_outline,
                         size: 18,
-                        color: Colors.green.shade700,
+                        //color: Colors.green.shade700,
                       ),
                     ),
                     const SizedBox(width: 6),
                     GestureDetector(
-                      onTap: widget.onRemove,
+                      onTap: widget.deleteEnabled ? widget.onRemove : null,
                       child: Icon(
                         Icons.remove_circle_outline,
                         size: 18,
-                        color: Colors.red.shade700,
+                        color: widget.deleteEnabled ? Colors.black : Colors.grey,
                       ),
                     ),
                   ],

@@ -7,8 +7,11 @@ import 'package:velix/velix.dart';
 import 'package:velix_editor/commands/command_stack.dart' show CommandStack;
 import 'package:velix_di/di/di.dart' show Injectable, Inject, Environment, Module, OnInit;
 import 'package:velix_editor/editor/editor.dart' show Address, User, Page, EditorScreenState;
-import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
+import 'package:velix_editor/actions/types.dart' show ClassRegistry, ClassDesc;
 import 'package:velix_i18n/i18n/locale.dart' show LocaleManager;
+import 'package:velix_editor/editor/settings.dart' show SettingsManager;
+import 'dart:async' show Future;
 import 'package:velix_editor/editor_module.dart' show EditorModule;
 import 'package:velix_editor/metadata/properties/properties.dart' show ColorConvert, BorderStyleConvert, MainAxisAlignmentConvert, MainAxisSizeConvert, CrossAxisAlignmentConvert, FontWeightConvert, FontStyleConvert, Value, ValueType, Insets, Border, Font;
 import 'package:velix_editor/metadata/annotations.dart' show DeclareProperty, DeclareWidget;
@@ -73,7 +76,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:238:1',
+    location: 'package:velix_editor/editor/editor.dart:47:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -105,7 +108,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:285:1',
+    location: 'package:velix_editor/editor/editor.dart:95:1',
     annotations: [
       Injectable()
     ],
@@ -124,12 +127,21 @@ void registerEditorTypes() {
           Inject()
         ],
         invoker: (List<dynamic> args)=> (args[0] as Page).setup()
+      ), 
+      method<Page,void>('hello',
+        annotations: [
+          Method()
+        ],
+        parameters: [
+          param<String>('message', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Page).hello(args[1])
       )
     ],
   );
 
   type<EditorScreenState>(
-    location: 'package:velix_editor/editor/editor.dart:338:1',
+    location: 'package:velix_editor/editor/editor.dart:153:1',
     constructor: () => EditorScreenState(),
     fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
     fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
@@ -148,8 +160,66 @@ void registerEditorTypes() {
         getter: (obj) => obj.path,
         setter: (obj, value) => (obj as EditorScreenState).path = value,
       ), 
+      field<EditorScreenState,String>('lastContent',
+        getter: (obj) => obj.lastContent,
+        setter: (obj, value) => (obj as EditorScreenState).lastContent = value,
+      ), 
+      field<EditorScreenState,ClassRegistry>('registry',
+        getter: (obj) => obj.registry,
+        setter: (obj, value) => (obj as EditorScreenState).registry = value,
+      ), 
+      field<EditorScreenState,ClassDesc>('clazz',
+        getter: (obj) => obj.clazz,
+        setter: (obj, value) => (obj as EditorScreenState).clazz = value,
+        isNullable: true
+      ), 
       field<EditorScreenState,LocaleManager>('localeManager',
         getter: (obj) => obj.localeManager,
+      ), 
+      field<EditorScreenState,SettingsManager>('settings',
+        getter: (obj) => obj.settings,
+        setter: (obj, value) => (obj as EditorScreenState).settings = value,
+      )
+    ],
+    methods: [
+      method<EditorScreenState,Future<void>>('open',
+        annotations: [
+          Method()
+        ],
+        isAsync: true,
+        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).open()
+      ), 
+      method<EditorScreenState,Future<void>>('newFile',
+        annotations: [
+          Method()
+        ],
+        isAsync: true,
+        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).newFile()
+      ), 
+      method<EditorScreenState,Future<void>>('save',
+        annotations: [
+          Method()
+        ],
+        isAsync: true,
+        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).save()
+      ), 
+      method<EditorScreenState,void>('revert',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).revert()
+      ), 
+      method<EditorScreenState,void>('undo',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).undo()
+      ), 
+      method<EditorScreenState,void>('play',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).play()
       )
     ],
   );
@@ -482,14 +552,14 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:259:1',
+    location: 'package:velix_editor/editor/editor.dart:69:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
       param<int>('age', isNamed: true, isRequired: true), 
       param<bool>('single', isNamed: true, isRequired: true)
     ],
-    constructor: ({String name = '', required Address address, int age = 0, bool cool = false}) => User(name: name, address: address, age: age, single: cool),
+    constructor: ({String name = '', required Address address, int age = 0, bool single = false}) => User(name: name, address: address, age: age, single: single),
     fromMapConstructor: (Map<String,dynamic> args) => User(name: args['name'] as String? ?? '', address: args['address'] as Address, age: args['age'] as int? ?? 0, single: args['single'] as bool? ?? false),
     fromArrayConstructor: (List<dynamic> args) => User(name: args[0] as String? ?? '', address: args[1] as Address, age: args[2] as int? ?? 0, single: args[3] as bool? ?? false),
     fields: [
@@ -926,7 +996,7 @@ void registerEditorTypes() {
   );
 
   var abstractEnumBuilderDescriptor =  type<AbstractEnumBuilder>(
-    location: 'package:velix_editor/property_panel/enum_editor.dart:12:1',
+    location: 'package:velix_editor/property_panel/enum_editor.dart:11:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable(factory: false)
@@ -1112,7 +1182,7 @@ void registerEditorTypes() {
   );
 
   type<GridEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:22:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:47:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1137,7 +1207,7 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:150:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:167:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1162,7 +1232,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:15:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:11:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1184,7 +1254,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:42:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:38:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1306,7 +1376,7 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:12:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:11:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1328,7 +1398,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:48:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:47:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1631,6 +1701,7 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>?, cell: args[2] as Cell?, rows: args[3] as List<GridItem>?, cols: args[4] as List<GridItem>?, spacing: args[5] as int? ?? 0),
     fields: [
       field<GridWidgetData,List<GridItem>>('rows',
+        type: ListType<List<GridItem>>(List<GridItem>).constraint("min 1"),
         annotations: [
           DeclareProperty(group: "layout")
         ],
@@ -1640,6 +1711,7 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as GridWidgetData).rows = value,
       ), 
       field<GridWidgetData,List<GridItem>>('cols',
+        type: ListType<List<GridItem>>(List<GridItem>).constraint("min 1"),
         annotations: [
           DeclareProperty(group: "layout")
         ],
@@ -1859,7 +1931,7 @@ void registerEditorTypes() {
   );
 
   type<CrossAxisAlignmentBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:6:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:14:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1881,7 +1953,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisAlignmentBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:12:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:194:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1903,7 +1975,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisSizeBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:18:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:375:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1925,7 +1997,7 @@ void registerEditorTypes() {
   );
 
   type<BorderStyleBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:23:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:432:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()

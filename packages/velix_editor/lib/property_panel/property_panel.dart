@@ -135,6 +135,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
       icon:  widgetDescriptor?.icon,
       onClose: widget.onClose,
       child: ListView(
+          key: ValueKey(selected?.id ?? selected),
         children: sortedGroupNames.map((groupName) {
           final props = groupedProps[groupName]!..sort((a, b) => a.name.compareTo(b.name));
           _expandedGroups.putIfAbsent(groupName, () => true);

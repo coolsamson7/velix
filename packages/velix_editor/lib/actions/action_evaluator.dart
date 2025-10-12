@@ -52,7 +52,7 @@ class ActionEvaluator {
 
     var visitor = CallVisitor(contextType);
 
-    var call = result.value!.accept(visitor, VisitorContext());
+    var call = result.value!.accept(visitor, CallVisitorContext(instance: instance));
 
     // eval
 

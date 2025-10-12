@@ -369,6 +369,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
         environment.get<MessageBus>().publish("load", LoadEvent(widget: root, source: this));
 
+        showInfoToast("loaded $path");
         updateCommandState();
       });
     }

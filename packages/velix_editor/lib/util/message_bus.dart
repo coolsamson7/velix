@@ -18,7 +18,6 @@ class MessageBus {
     if ( Tracer.enabled)
       Tracer.trace("editor.bus", TraceLevel.high, " public '$topic', data=$data (${data.runtimeType}");
 
-
     _streamController.add(_Message(topic, data));
   }
 

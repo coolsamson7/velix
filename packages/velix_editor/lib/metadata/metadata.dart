@@ -51,8 +51,8 @@ class PropertyDescriptor {
   // public
 
   void updateI18n(String widget) {
-    label = Translator.tr("editor:widgets.$widget.$name.label");
-    group = Translator.tr("editor:groups.${annotation.group}.label");
+    label = Translator.tr("editor:widgets.$widget.$name.label", defaultValue: name); // avoid ugly warnings fro children, cell, ...
+    group = Translator.tr("editor:groups.${annotation.group}.label", defaultValue: name);
   }
 
   dynamic createDefault() {

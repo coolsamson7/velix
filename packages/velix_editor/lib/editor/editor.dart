@@ -542,6 +542,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                         children: [
                           button("open"),
                           button("save"),
+                          button("new"),
                           button("revert"),
                           button("undo"),
 

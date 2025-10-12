@@ -23,12 +23,15 @@ class WidgetTreeController extends ChangeNotifier {
   WidgetData? selectedNode;
 
   late final StreamSubscription<SelectionEvent> _selectionSub;
+  late final StreamSubscription<LoadEvent> _loadSub;
   late final StreamSubscription<PropertyChangeEvent> _propertySub;
 
   final MessageBus bus;
 
   WidgetTreeController({required this.roots, required this.bus}) {
     _selectionSub = bus.subscribe<SelectionEvent>("selection", _onSelection);
+    _loadSub = bus.subscribe<LoadEvent>("load", _onLoad);
+
     _propertySub =
         bus.subscribe<PropertyChangeEvent>("property-changed", _onPropertyChanged);
   }
@@ -42,6 +45,12 @@ class WidgetTreeController extends ChangeNotifier {
       selectedNode = event.selection;
       notifyListeners();
     }
+  }
+
+  void _onLoad(LoadEvent event) {
+    selectedNode = null;
+
+    notifyListeners();
   }
 
   void _onPropertyChanged(PropertyChangeEvent event) {

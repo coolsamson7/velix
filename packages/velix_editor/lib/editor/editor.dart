@@ -367,6 +367,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       setState(() {
         widget.models = [root];
 
+        environment.get<MessageBus>().publish("load", LoadEvent(widget: root, source: this));
+
         updateCommandState();
       });
     }
@@ -389,10 +391,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       }
     }
 
-    var file = settings.get("file", defaultValue: "");
-    if (file.isNotEmpty) {
-      await loadFile(file);
-    }
+    //var file = settings.get("file", defaultValue: ""); TODO
+    //if (file.isNotEmpty) {
+    //  await loadFile(file);
+    //}
 
     updateCommandState();
   }
@@ -666,11 +668,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                       // Optionally inform your global state, e.g. via MessageBus
                       },
                         builder: (context, isActive) {
-                          return AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              color: isActive
-                                  ? Colors.blue.withOpacity(0.08)
-                                  : Colors.transparent,
+                          return PanelContainer(
+                              title: path,
                               child: LayoutCanvas(
                                 child: edit ?
                                 EditorCanvas(

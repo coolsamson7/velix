@@ -26,6 +26,7 @@ workspace:
   - packages/velix_ui
   - packages/velix_editor
   - packages/velix_editor/example
+  - packages/velix_editor/app
   - examples/example
 
 scripts:

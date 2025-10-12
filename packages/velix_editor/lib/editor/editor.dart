@@ -154,16 +154,20 @@ class EditorScreen extends StatefulWidget {
 class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, EditorScreenStateCommands, TickerProviderStateMixin  {
   // instance data
 
-  late final Environment environment;
-  late final CommandStack commandStack;
+  Environment? _environment;
+  CommandStack? _commandStack;
+  LocaleManager? _localeManager;
   bool edit = true;
   String path = "";
   String lastContent = "";
   ClassRegistry registry = ClassRegistry();
   ClassDesc? clazz;
 
-  late final LocaleManager localeManager;
   SettingsManager settings = SettingsManager();
+
+  Environment get environment => _environment ??= Environment(parent: EnvironmentProvider.of(context));
+  LocaleManager get localeManager => _localeManager ??=  Provider.of<LocaleManager>(context, listen: false);
+  CommandStack get commandStack => _commandStack ??=  environment.get<CommandStack>();
 
   // internal
 
@@ -262,7 +266,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   void switchLocale(String locale) {
-    Provider.of<LocaleManager>(context, listen: false).locale = Locale(locale);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      localeManager.locale = Locale(locale);
+    });
   }
 
   String message(Exception e) {
@@ -488,12 +494,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    environment = Environment(parent: EnvironmentProvider.of(context));
-
     // create
 
     var bus = environment.get<MessageBus>();
-    commandStack = environment.get<CommandStack>();
 
     commandStack.addListener(() => setState(() {
       updateCommandState();
@@ -505,8 +508,6 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
     });
 
-
-
     updateCommandState();
 
     // TEST
@@ -516,6 +517,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
   @override
   Widget build(BuildContext context) {
+    //final localeManager = context.watch<LocaleManager>();
+
     return EnvironmentProvider(
       environment: environment,
       child: Provider<EditContext>.value(
@@ -552,33 +555,13 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                           const Spacer(),
 
                           LocaleSwitcher(
-                            currentLocale: Provider.of<LocaleManager>(context).locale.languageCode,
-                            supportedLocales: Provider.of<LocaleManager>(context).supportedLocales.map((loc) => loc.toString()) ,
+                            currentLocale: localeManager.locale.languageCode,
+                            supportedLocales: localeManager.supportedLocales.map((loc) => loc.toString()) ,
                             onLocaleChanged: (locale) {
                               // Update your app locale
-                              Provider.of<LocaleManager>(context).locale = Locale(locale);
+                             switchLocale(locale);
                             },
-                          ),
-
-                          // === Locale Switcher ===
-                          Row(
-                            children: [
-                              IconButton(
-                                tooltip: "English",
-                                icon: const Text("🇬🇧", style: TextStyle(fontSize: 20)),
-                                onPressed: () {
-                                  switchLocale("en");
-                                },
-                              ),
-                              IconButton(
-                                tooltip: "Deutsch",
-                                icon: const Text("🇩🇪", style: TextStyle(fontSize: 20)),
-                                onPressed: () {
-                                  switchLocale("de");
-                                },
-                              ),
-                            ],
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -661,7 +644,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 name: 'errors',
                                 label: 'editor:docks.errors.label'.tr(),
                                 tooltip: 'editor:docks.errors.tooltip'.tr(),
-                                icon: Icons.bug_report,
+                                icon: Icons.forum_outlined , // chat_bubble_outline, report
                                 create:  (onClose) => MessagePane(onClose: onClose)
                             )
                           ],

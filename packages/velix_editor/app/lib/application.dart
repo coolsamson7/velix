@@ -10,7 +10,7 @@ import 'package:velix_ui/velix_ui.dart';
 import 'package:provider/provider.dart';
 
 
-class EditorApp extends StatelessWidget {
+class EditorApp extends StatefulWidget {
   // instance data
 
   final I18N i18n;
@@ -19,23 +19,39 @@ class EditorApp extends StatelessWidget {
 
   // constructor
 
-  const EditorApp({super.key, required this.i18n, required this.localeManager, required this.environment});
+  const EditorApp(
+      {super.key, required this.i18n, required this.localeManager, required this.environment});
 
   // override
 
   @override
-  Widget build(BuildContext context) {
-    i18n.addListenerAsync((state) =>
-        environment.get<TypeRegistry>().changedLocale(localeManager.locale)
-    );
+  State<EditorApp> createState() => EditorAppState();
+}
 
+class  EditorAppState  extends State<EditorApp> {
+  // override
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.i18n.addListenerAsync((state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.environment.get<TypeRegistry>().changedLocale(
+            widget.localeManager.locale);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-        value: i18n,
+        value: widget.i18n,
         child: EnvironmentProvider(
-            environment: environment,
+            environment: widget.environment,
             child:  MultiProvider(
                 providers: [
-                  ChangeNotifierProvider<LocaleManager>(create: (_) => localeManager),
+                  ChangeNotifierProvider<LocaleManager>(create: (_) => widget.localeManager),
                   Provider<CommandManager>(create: (_) => CommandManager(
                       interceptors: [
                         LockCommandInterceptor(),
@@ -56,13 +72,14 @@ class EditorApp extends StatelessWidget {
                         // localization
 
                         localizationsDelegates: [
-                          I18nDelegate(i18n: i18n),
+                          I18nDelegate(i18n: widget.i18n),
 
                           GlobalMaterialLocalizations.delegate,
                           GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate
                         ],
-                        supportedLocales: localeManager.supportedLocales,
-                        locale: localeManager.locale,
+                        supportedLocales: widget.localeManager.supportedLocales,
+                        locale: widget.localeManager.locale,
 
                         // main screen
 

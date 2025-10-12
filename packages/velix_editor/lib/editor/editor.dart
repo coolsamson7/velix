@@ -336,6 +336,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     selectClass(registry.getClass("Page"));
     await loadFile("assets:screen.json");
+
+    setState(() {
+      environment.get<MessageBus>().publish("load", LoadEvent(widget: widget.models.first, source: this));
+    });
   }
 
   Future<void> loadFile(String path) async {

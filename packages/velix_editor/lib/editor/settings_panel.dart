@@ -66,7 +66,7 @@ class SettingsPanel extends StatelessWidget {
 
             ClassSelector(
               registry: editor.registry,
-              initial: null,
+              initial: editor.clazz,
               onChanged: (clazz) => editor.selectClass(clazz),
             )
           ],

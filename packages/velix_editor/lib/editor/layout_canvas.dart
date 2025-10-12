@@ -21,6 +21,8 @@ class LayoutCanvas extends StatefulWidget {
 class _LayoutCanvasState extends State<LayoutCanvas> {
   late double _width;
   bool _isDragging = false;
+  bool _isLeftHovering = false;
+  bool _isRightHovering = false;
   double? _rulerX;
 
   @override
@@ -56,6 +58,13 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
     });
   }
 
+  Color _getBorderColor(bool isLeft) {
+    if (_isDragging) return Colors.blue.shade400;
+    if (isLeft && _isLeftHovering) return Colors.blue.shade300;
+    if (!isLeft && _isRightHovering) return Colors.blue.shade300;
+    return Colors.grey.shade300;
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -72,22 +81,23 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
               top: 0,
               bottom: 0,
               width: _width,
-              child: Container(
-                //color: Colors.white,
-                child: widget.child,
-                // Keep border inside container
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
                 decoration: BoxDecoration(
                   border: Border(
-                      left: BorderSide(color: _isDragging
-                          ? Colors.grey.shade600
-                          : Colors.grey.shade300, width: 2),
-                      right: BorderSide(color: _isDragging
-                          ? Colors.grey.shade600
-                          : Colors.grey.shade300, width: 2)
-                  ),
+                    left: BorderSide(
+                      color: _getBorderColor(true),
+                      width: 2,
+                    ),
+                    right: BorderSide(
+                      color: _getBorderColor(false),
+                      width: 2,
+                    ),
                   ),
                 ),
+                child: widget.child,
               ),
+            ),
 
             _buildHandle(
               containerLeft: containerLeft,
@@ -103,7 +113,6 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
               containerWidth: _width,
               left: false,
             ),
-
 
             // Ruler only while dragging
             if (_isDragging)
@@ -140,27 +149,52 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
     const lineCount = 2;
     const lineRadius = 1.0;
 
-    // Position outside the container
     final xPos = left
         ? containerLeft - handleWidth
         : containerLeft + containerWidth;
     final yPos = containerTop + (containerHeight - handleHeight) / 2;
+
+    final isHovering = left ? _isLeftHovering : _isRightHovering;
+    final handleColor = _isDragging
+        ? Colors.blue.shade400
+        : isHovering
+        ? Colors.blue.shade300
+        : Colors.grey.shade600;
 
     return Positioned(
       left: xPos,
       top: yPos,
       width: handleWidth,
       height: handleHeight,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onHorizontalDragStart: (d) => _startDrag(d, left),
-        onHorizontalDragUpdate: (d) => _updateDrag(d, left),
-        onHorizontalDragEnd: _endDrag,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.resizeLeftRight,
-          child: Container(
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            if (left) {
+              _isLeftHovering = true;
+            } else {
+              _isRightHovering = true;
+            }
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            if (left) {
+              _isLeftHovering = false;
+            } else {
+              _isRightHovering = false;
+            }
+          });
+        },
+        cursor: SystemMouseCursors.resizeLeftRight,
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onHorizontalDragStart: (d) => _startDrag(d, left),
+          onHorizontalDragUpdate: (d) => _updateDrag(d, left),
+          onHorizontalDragEnd: _endDrag,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
             decoration: BoxDecoration(
-              color: Colors.grey.shade600,
+              color: handleColor,
               borderRadius: BorderRadius.horizontal(
                 left: left ? const Radius.circular(6) : Radius.zero,
                 right: left ? Radius.zero : const Radius.circular(6),
@@ -194,8 +228,6 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
       ),
     );
   }
-
-
 }
 
 class _RulerPainter extends CustomPainter {

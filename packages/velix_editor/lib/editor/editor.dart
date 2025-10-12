@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:path/path.dart' as p;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -138,8 +139,6 @@ class EditContext {
 class EditorScreen extends StatefulWidget {
   // instance data
 
-  List<WidgetData> models = [ContainerWidgetData()];
-
   // constructor
 
   EditorScreen({super.key});
@@ -162,6 +161,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   String lastContent = "";
   ClassRegistry registry = ClassRegistry();
   ClassDesc? clazz;
+  List<WidgetData> models = [ContainerWidgetData()];
 
   SettingsManager settings = SettingsManager();
 
@@ -282,7 +282,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   bool validate() {
-    var root = widget.models[0];
+    var root = models[0];
 
     try {
       environment.get<WidgetValidator>().validate(root,
@@ -338,7 +338,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     await loadFile("assets:screen.json");
 
     setState(() {
-      environment.get<MessageBus>().publish("load", LoadEvent(widget: widget.models.first, source: this));
+      environment.get<MessageBus>().publish("load", LoadEvent(widget: models.first, source: this));
     });
   }
 
@@ -365,7 +365,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       var root = JSON.deserialize<WidgetData>(jsonDecode(json));
 
       setState(() {
-        widget.models = [root];
+        models = [root];
 
         environment.get<MessageBus>().publish("load", LoadEvent(widget: root, source: this));
 
@@ -419,7 +419,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }
   }
 
-  @Command(i18n: "editor:commands.new", name: "new", icon: Icons.note_add)
+  @Command(i18n: "editor:commands.new", name: "new", icon: Icons.post_add) // note_add
   @override
   Future<void> _newFile() async {
     if (commandStack.isDirty()) {
@@ -429,7 +429,13 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     commandStack.clear();
 
-    widget.models = [ContainerWidgetData()];
+    models = [ContainerWidgetData()];
+
+    environment.get<MessageBus>().publish("load", LoadEvent(widget:models[0], source: this));
+
+    setState(() {
+
+    });
 
     updateCommandState();
   }
@@ -439,7 +445,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   Future<void> _save() async {
     if ( path.isNotEmpty) {
       if (validate()) {
-        var root = widget.models[0];
+        var root = models[0];
 
         var map = JSON.serialize(root);
         var str = jsonEncode(map);
@@ -511,7 +517,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //loadSettings();
 
-      bus.publish("load", LoadEvent(widget: widget.models.first, source: this));
+      bus.publish("load", LoadEvent(widget: models.first, source: this));
     });
 
     updateCommandState();
@@ -594,7 +600,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                     color: isActive
                                         ? Colors.blue.withOpacity(0.08)
                                         : Colors.transparent,
-                                    child: WidgetTreePanel(models: widget.models, onClose: onClose, isActive: isActive)
+                                    child: WidgetTreePanel(models: models, onClose: onClose, isActive: isActive)
                                       //isActive: isActive,
                                       // Tree continues to handle keyboard events internally
                                     );
@@ -615,7 +621,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 name: 'editor',
                                 label: 'editor:docks.json.label'.tr(),
                                 tooltip: 'editor:docks.json.tooltip'.tr(),
-                                create: (onClose) => JsonEditorPanel(model: widget.models.first, onClose: onClose),
+                                create: (onClose) => JsonEditorPanel(model: models.first, onClose: onClose),
                                 icon: Icons.code
                             ),
                             Panel(
@@ -669,19 +675,20 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                       },
                         builder: (context, isActive) {
                           return PanelContainer(
-                              title: path,
+                              title: p.basenameWithoutExtension(path),
+                              tooltip:  path,
                               child: LayoutCanvas(
                                 child: edit ?
                                 EditorCanvas(
                                   messageBus: environment.get<MessageBus>(),
-                                  models: widget.models,
+                                  models: models,
                                   isActive: isActive,
                                   typeRegistry: environment.get<TypeRegistry>(),
                                 ) :
 
                                 WidgetContainer(
                                   instance:  environment.get<Page>(), // TODO
-                                  widget: widget.models[0]
+                                  widget: models[0]
                                 ),
                               )
                             //isActive: isActive,

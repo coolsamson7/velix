@@ -22,7 +22,7 @@ mixin EditorScreenStateCommands on CommandController<EditorScreen> {
       "new",
       _newFile,
       i18n: 'editor:commands.new',
-      icon: Icons.note_add,
+      icon: Icons.post_add,
     );
     addCommand("save", _save, i18n: 'editor:commands.save', icon: Icons.save);
     addCommand(

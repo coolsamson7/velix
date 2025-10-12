@@ -1,6 +1,5 @@
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/infer_types.dart';
-import 'package:velix_editor/actions/visitor.dart';
 
 import 'action_parser.dart';
 import 'eval.dart';

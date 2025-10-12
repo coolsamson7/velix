@@ -34,6 +34,9 @@
     "open":  {
       "label": "Open"
     },
+    "new":  {
+      "label": "New"
+    },
     "revert":  {
       "label": "Revert"
     },

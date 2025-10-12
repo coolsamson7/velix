@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class PanelHeader extends StatelessWidget {
   final String title;
+  final String? tooltip; // ✅ new optional tooltip text
   final VoidCallback? onClose;
   final Widget? icon; // optional left-side icon
 
   const PanelHeader({
     super.key,
     required this.title,
+    this.tooltip,
     this.onClose,
     this.icon,
   });
@@ -27,14 +29,21 @@ class PanelHeader extends StatelessWidget {
         children: [
           if (icon != null) ...[
             icon!,
-            //Icon(icon, size: 16, color: Colors.grey.shade800),
             const SizedBox(width: 4),
           ],
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+
+          // ✅ Tooltip wraps the title text
+          Tooltip(
+            message: tooltip ?? title, // defaults to title if tooltip not provided
+            waitDuration: const Duration(milliseconds: 400),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
           ),
+
           const Spacer(),
+
           if (onClose != null)
             InkWell(
               onTap: onClose,
@@ -43,7 +52,10 @@ class PanelHeader extends StatelessWidget {
                 width: 16,
                 height: 16,
                 child: Center(
-                  child: Text('×', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    '×',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
@@ -58,6 +70,7 @@ class PanelContainer extends StatelessWidget {
   // instance data
 
   final String title;
+  final String? tooltip; // ✅ new optional tooltip text
   final Widget? icon;
   final Widget child;
   final VoidCallback? onClose;
@@ -67,6 +80,7 @@ class PanelContainer extends StatelessWidget {
   const PanelContainer({
     super.key,
     required this.title,
+    this.tooltip,
     this.icon,
     required this.child,
     this.onClose,
@@ -77,14 +91,16 @@ class PanelContainer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch, // ✅ makes content stretch full width
       children: [
-        PanelHeader(title: title, icon: icon, onClose: onClose),
+        PanelHeader(
+          title: title,
+          tooltip: tooltip, // ✅ pass through
+          icon: icon,
+          onClose: onClose,
+        ),
         Expanded(
           child: Container(
             alignment: Alignment.topLeft, // ✅ force top-left alignment
-            //color: const Color(0xFF1E1E1E), // ✅ dark background
-            child: SizedBox.expand(
-                child: child
-            ),
+            child: SizedBox.expand(child: child),
           ),
         ),
       ],

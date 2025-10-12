@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class Breadcrumb extends StatelessWidget {
   final List<BreadcrumbItem> items;
 
-  const Breadcrumb({
-    super.key,
-    required this.items,
-  });
+  const Breadcrumb({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +17,7 @@ class Breadcrumb extends StatelessWidget {
           final isLast = index == items.length - 1;
 
           return Transform.translate(
-            offset: Offset(isFirst ? 0.0 : -13.0 * index, 0),
+            offset: Offset(isFirst ? 0.0 : -12.0 * index, 0), // lighter overlap
             child: _BreadcrumbItem(
               label: item.label,
               onTap: item.onTap,
@@ -74,13 +71,15 @@ class _BreadcrumbItemState extends State<_BreadcrumbItem> {
               isClickable: isClickable,
               backgroundColor: _isHovered && isClickable
                   ? theme.colorScheme.primary.withOpacity(0.1)
-                  : theme.colorScheme.surfaceVariant.withOpacity(0.3),
-              borderColor: theme.colorScheme.outline.withOpacity(0.5),
+                  : theme.colorScheme.surfaceVariant.withOpacity(0.15),
+              borderColor: _isHovered && isClickable
+                  ? theme.colorScheme.primary.withOpacity(0.5)
+                  : theme.colorScheme.outline.withOpacity(0.4),
             ),
             child: Padding(
               padding: EdgeInsets.only(
-                left: widget.isFirst ? 0 : 28, // flush first element
-                right: 28,
+                left: widget.isFirst ? 0 : 16, // flush first element
+                right: 16,
                 top: 0,
                 bottom: 0,
               ),
@@ -129,16 +128,7 @@ class _BreadcrumbShapePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final fillPaint = Paint()
-      ..color = backgroundColor
-      ..style = PaintingStyle.fill;
-
-    final borderPaint = Paint()
-      ..color = borderColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    final chevronSize = 14.0;
+    final chevronSize = 12.0;
     final path = Path();
 
     if (isFirst) {
@@ -166,15 +156,17 @@ class _BreadcrumbShapePainter extends CustomPainter {
       path.close();
     }
 
-    // Fill
-    canvas.drawPath(path, fillPaint);
+    final fillPaint = Paint()
+      ..color = backgroundColor
+      ..style = PaintingStyle.fill;
 
-    // Stroke path for chevron separators only, no top/bottom lines
-    final separatorPaint = Paint()
+    final borderPaint = Paint()
       ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
-    canvas.drawPath(path, separatorPaint);
+
+    canvas.drawPath(path, fillPaint);
+    canvas.drawPath(path, borderPaint);
   }
 
   @override
@@ -189,8 +181,36 @@ class BreadcrumbItem {
   final String label;
   final VoidCallback? onTap;
 
-  const BreadcrumbItem({
-    required this.label,
-    this.onTap,
-  });
+  const BreadcrumbItem({required this.label, this.onTap});
+}
+
+/// Example usage
+class BreadcrumbExample extends StatelessWidget {
+  const BreadcrumbExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Breadcrumb Examples')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Arrow-shaped Breadcrumbs',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Breadcrumb(
+              items: [
+                BreadcrumbItem(label: 'Home', onTap: () {}),
+                BreadcrumbItem(label: 'Products', onTap: () {}),
+                BreadcrumbItem(label: 'Electronics', onTap: () {}),
+                const BreadcrumbItem(label: 'Laptops'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

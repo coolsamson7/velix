@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:velix_editor/event/events.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
@@ -38,16 +37,35 @@ class _MessagePaneState extends State<MessagePane> {
     });
   }
 
-  // internal
-
   void selectMessage(Message message) {
     if (message.widget != null) {
       EnvironmentProvider.of(context)
-          .get<MessageBus>().publish("selection", SelectionEvent(selection: message.widget, source: this));
+          .get<MessageBus>()
+          .publish("selection", SelectionEvent(selection: message.widget, source: this));
     }
   }
 
-  // override
+  IconData _getMessageIcon(MessageType type) {
+    switch (type) {
+      case MessageType.error:
+        return Icons.error;
+      case MessageType.warning:
+        return Icons.warning;
+      default:
+        return Icons.info_outline;
+    }
+  }
+
+  Color _getMessageColor(MessageType type) {
+    switch (type) {
+      case MessageType.error:
+        return Colors.red.shade600;
+      case MessageType.warning:
+        return Colors.orange.shade600;
+      default:
+        return Colors.grey.shade600;
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -65,87 +83,119 @@ class _MessagePaneState extends State<MessagePane> {
   }
 
   @override
-  @override
-  @override
   Widget build(BuildContext context) {
     if (_messages.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
 
     return PanelContainer(
       title: "editor:docks.errors.label".tr(),
       onClose: widget.onClose,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          /* Header row
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            color: Colors.grey.shade800,
-            child: Row(
-              children: const [
-                Expanded(flex: 2, child: Text("Widget", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Text("Property", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold))),
-                Expanded(flex: 4, child: Text("Message", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold))),
-              ],
-            ),
-          )*/
+      child: ListView.builder(
+        padding: EdgeInsets.zero, // remove outer space
+        itemCount: _messages.length,
+        itemBuilder: (context, index) {
+          final message = _messages[index];
+          final messageColor = _getMessageColor(message.type);
 
-          // Message list
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(8),
-              itemCount: _messages.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 4),
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isWarning = message.type == MessageType.warning;
+          final bool isEven = index % 2 == 0;
+          final Color backgroundColor = isEven
+              ? theme.colorScheme.surfaceVariant.withOpacity(0.05)
+              : theme.colorScheme.surfaceVariant.withOpacity(0.1);
 
-                return InkWell(
-                  onTap: () => selectMessage(message),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: isWarning ? Colors.orange.shade700 : Colors.red.shade700,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Widget column
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            message.widget?.type ?? "",
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
-                          ),
-                        ),
-
-                        // Property column
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            message.property ?? "",
-                            style: const TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                        ),
-
-                        // Message column
-                        Expanded(
-                          flex: 4,
-                          child: Text(
-                            message.message,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          return _MessageRow(
+            message: message,
+            backgroundColor: backgroundColor,
+            hoverColor: theme.colorScheme.primary.withOpacity(0.1),
+            iconColor: messageColor,
+            onTap: () => selectMessage(message),
+          );
+        },
       ),
     );
   }
+}
 
+class _MessageRow extends StatefulWidget {
+  final Message message;
+  final Color backgroundColor;
+  final Color hoverColor;
+  final Color iconColor;
+  final VoidCallback? onTap;
+
+  const _MessageRow({
+    required this.message,
+    required this.backgroundColor,
+    required this.hoverColor,
+    required this.iconColor,
+    this.onTap,
+  });
+
+  @override
+  State<_MessageRow> createState() => _MessageRowState();
+}
+
+class _MessageRowState extends State<_MessageRow> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          color: _hovered ? widget.hoverColor : widget.backgroundColor,
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(widget.message.type == MessageType.error
+                  ? Icons.error
+                  : widget.message.type == MessageType.warning
+                  ? Icons.warning
+                  : Icons.info_outline,
+                  color: widget.iconColor, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  widget.message.widget?.type ?? "-",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  widget.message.property ?? "-",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 4,
+                child: Text(
+                  widget.message.message,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

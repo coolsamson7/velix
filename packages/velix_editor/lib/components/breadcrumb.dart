@@ -20,7 +20,7 @@ class Breadcrumb extends StatelessWidget {
           final isLast = index == items.length - 1;
 
           return Transform.translate(
-            offset: Offset(isFirst ? 0.0 : -13.0 * index, 0), // Cumulative overlap
+            offset: Offset(isFirst ? 0.0 : -13.0 * index, 0),
             child: _BreadcrumbItem(
               label: item.label,
               onTap: item.onTap,
@@ -65,7 +65,7 @@ class _BreadcrumbItemState extends State<_BreadcrumbItem> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: SizedBox(
-          height: 36, // Fixed height for proper clipping
+          height: 36,
           child: CustomPaint(
             painter: _BreadcrumbShapePainter(
               isFirst: widget.isFirst,
@@ -75,16 +75,14 @@ class _BreadcrumbItemState extends State<_BreadcrumbItem> {
               backgroundColor: _isHovered && isClickable
                   ? theme.colorScheme.primary.withOpacity(0.1)
                   : theme.colorScheme.surfaceVariant.withOpacity(0.3),
-              borderColor: _isHovered && isClickable
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.5),
+              borderColor: theme.colorScheme.outline.withOpacity(0.5),
             ),
             child: Padding(
               padding: EdgeInsets.only(
-                left: widget.isFirst ? 16 : 28, // Extra space for left notch
-                right: 28, // Space for right chevron
-                top: 8,
-                bottom: 8,
+                left: widget.isFirst ? 0 : 28, // flush first element
+                right: 28,
+                top: 0,
+                bottom: 0,
               ),
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -98,7 +96,8 @@ class _BreadcrumbItemState extends State<_BreadcrumbItem> {
                         ? theme.colorScheme.primary
                         : theme.colorScheme.primary.withOpacity(0.8))
                         : theme.colorScheme.onSurface.withOpacity(0.6)),
-                    fontWeight: widget.isLast ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight:
+                    widget.isLast ? FontWeight.w600 : FontWeight.w500,
                     fontSize: 14,
                   ),
                 ),
@@ -130,21 +129,19 @@ class _BreadcrumbShapePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final fillPaint = Paint()
       ..color = backgroundColor
       ..style = PaintingStyle.fill;
 
     final borderPaint = Paint()
       ..color = borderColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeJoin = StrokeJoin.miter;
+      ..strokeWidth = 1.0;
 
     final chevronSize = 14.0;
     final path = Path();
 
     if (isFirst) {
-      // First item: flat left side, chevron pointing right
       path.moveTo(0, 0);
       path.lineTo(size.width - chevronSize, 0);
       path.lineTo(size.width, size.height / 2);
@@ -152,7 +149,6 @@ class _BreadcrumbShapePainter extends CustomPainter {
       path.lineTo(0, size.height);
       path.close();
     } else if (isLast) {
-      // Last item: chevron on both sides (same as middle)
       path.moveTo(0, 0);
       path.lineTo(size.width - chevronSize, 0);
       path.lineTo(size.width, size.height / 2);
@@ -161,7 +157,6 @@ class _BreadcrumbShapePainter extends CustomPainter {
       path.lineTo(chevronSize, size.height / 2);
       path.close();
     } else {
-      // Middle items: chevron pointing right on left, chevron pointing right on right
       path.moveTo(0, 0);
       path.lineTo(size.width - chevronSize, 0);
       path.lineTo(size.width, size.height / 2);
@@ -171,11 +166,15 @@ class _BreadcrumbShapePainter extends CustomPainter {
       path.close();
     }
 
-    // Draw fill
-    canvas.drawPath(path, paint);
+    // Fill
+    canvas.drawPath(path, fillPaint);
 
-    // Draw border
-    canvas.drawPath(path, borderPaint);
+    // Stroke path for chevron separators only, no top/bottom lines
+    final separatorPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawPath(path, separatorPaint);
   }
 
   @override
@@ -194,130 +193,4 @@ class BreadcrumbItem {
     required this.label,
     this.onTap,
   });
-}
-
-// Example usage widget
-class BreadcrumbExample extends StatelessWidget {
-  const BreadcrumbExample({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Breadcrumb Examples')),
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Arrow-shaped Breadcrumbs',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Breadcrumb(
-                items: [
-                  BreadcrumbItem(
-                    label: 'Home',
-                    onTap: () => debugPrint('Navigate to Home'),
-                  ),
-                  BreadcrumbItem(
-                    label: 'Products',
-                    onTap: () => debugPrint('Navigate to Products'),
-                  ),
-                  BreadcrumbItem(
-                    label: 'Electronics',
-                    onTap: () => debugPrint('Navigate to Electronics'),
-                  ),
-                  const BreadcrumbItem(
-                    label: 'Laptops',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'Two items',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Breadcrumb(
-                items: [
-                  BreadcrumbItem(
-                    label: 'Dashboard',
-                    onTap: () => debugPrint('Navigate to Dashboard'),
-                  ),
-                  const BreadcrumbItem(
-                    label: 'Settings',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'Long path',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Breadcrumb(
-                items: [
-                  BreadcrumbItem(
-                    label: 'Home',
-                    onTap: () => debugPrint('Navigate to Home'),
-                  ),
-                  BreadcrumbItem(
-                    label: 'Documents',
-                    onTap: () => debugPrint('Navigate to Documents'),
-                  ),
-                  BreadcrumbItem(
-                    label: 'Projects',
-                    onTap: () => debugPrint('Navigate to Projects'),
-                  ),
-                  BreadcrumbItem(
-                    label: '2024',
-                    onTap: () => debugPrint('Navigate to 2024'),
-                  ),
-                  BreadcrumbItem(
-                    label: 'Q4',
-                    onTap: () => debugPrint('Navigate to Q4'),
-                  ),
-                  const BreadcrumbItem(
-                    label: 'Reports',
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

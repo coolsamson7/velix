@@ -45,7 +45,7 @@ class SettingsPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Select File",
+              "Metadat File",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -60,7 +60,7 @@ class SettingsPanel extends StatelessWidget {
             ),
 
             const Text(
-              "Select Class",
+              "Main Class",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
 

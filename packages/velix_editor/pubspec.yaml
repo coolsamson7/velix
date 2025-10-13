@@ -31,6 +31,7 @@ dependencies:
   file_picker: ^8.0.0
   uuid: ^4.3.3
   oktoast: ^3.4.0
+  file_selector: ^1.0.4
 
 dev_dependencies:
   flutter_test:

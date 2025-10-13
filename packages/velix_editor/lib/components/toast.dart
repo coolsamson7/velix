@@ -49,19 +49,6 @@ void showToast(
   final future = ok.showToastWidget(
     Padding(
       padding: EdgeInsets.only(bottom: 32 + offset, right: 24),
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 300),
-        tween: Tween(begin: 0.0, end: 1.0),
-        curve: Curves.easeOutBack,
-        builder: (context, value, child) {
-          return Transform.scale(
-            scale: value,
-            child: Opacity(
-              opacity: value,
-              child: child,
-            ),
-          );
-        },
         child: Container(
           constraints: const BoxConstraints(
             minWidth: 280,
@@ -138,7 +125,6 @@ void showToast(
           ),
         ),
       ),
-    ),
     duration: duration ?? const Duration(seconds: 3),
     position: position ?? ok.ToastPosition(align: Alignment.bottomRight),
     dismissOtherToast: false,

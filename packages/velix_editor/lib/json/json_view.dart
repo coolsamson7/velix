@@ -67,7 +67,9 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
     var bus = env.get<MessageBus>();
 
     _subscription = bus.subscribe<LoadEvent>("load", (event) {
-      setState(() {});
+      setState(() {
+        root = null;
+      });
     });
     _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed",
             (event) {

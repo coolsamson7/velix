@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
+import 'package:file_selector/file_selector.dart';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
+
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -368,6 +371,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
         models = [root];
 
         environment.get<MessageBus>().publish("load", LoadEvent(widget: root, source: this));
+        environment.get<MessageBus>().publish("selection", SelectionEvent(selection: null, source: this));
 
         showInfoToast("loaded $path");
         updateCommandState();
@@ -398,6 +402,23 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     //}
 
     updateCommandState();
+  }
+
+  String pathTitle() {
+    if (path.isNotEmpty) {
+      if ( path.contains("/"))
+        return p.basenameWithoutExtension(path);
+      else
+        return path;
+    }
+    else return "- new -";
+  }
+
+  String pathTooltip() {
+    if (path.isNotEmpty)
+      return path;
+    else
+      return "new widget";
   }
 
   // commands
@@ -432,6 +453,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     models = [ContainerWidgetData()];
 
+    path = "";
     environment.get<MessageBus>().publish("load", LoadEvent(widget:models[0], source: this));
 
     setState(() {
@@ -444,6 +466,16 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   @Command(i18n: "editor:commands.save", icon: Icons.save)
   @override
   Future<void> _save() async {
+    if (path.isEmpty) {
+      final typeGroup = XTypeGroup(label: 'text', extensions: ['json']);
+      final file = await FileSelectorPlatform.instance.getSavePath(suggestedName: 'untitled.txt', acceptedTypeGroups: [typeGroup]);
+
+      if (file == null)
+        return;
+
+        path = file;
+    }
+
     if ( path.isNotEmpty) {
       if (validate()) {
         var root = models[0];
@@ -458,6 +490,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
         await file.writeAsString(str);
 
         showInfoToast("Saved $path");
+
+        setState(() {
+
+        });
 
         commandStack.clear();
 
@@ -519,6 +555,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       //loadSettings();
 
       bus.publish("load", LoadEvent(widget: models.first, source: this));
+
+      setState(() {
+
+      });
     });
 
     updateCommandState();
@@ -676,8 +716,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                       },
                         builder: (context, isActive) {
                           return PanelContainer(
-                              title: p.basenameWithoutExtension(path),
-                              tooltip:  path,
+                              title: pathTitle(),
+                              tooltip:  pathTooltip(),
                               child: LayoutCanvas(
                                 child: edit ?
                                 EditorCanvas(

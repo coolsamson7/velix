@@ -15,7 +15,7 @@ import '../util/message_bus.dart';
 
 /// Controller to handle tree state, selection, expansion, and drag/drop
 class WidgetTreeController extends ChangeNotifier {
-  final List<WidgetData> roots;
+  List<WidgetData> roots;
 
   /// Tracks expanded state per node
   final Map<WidgetData, bool> _expanded = {};
@@ -43,12 +43,14 @@ class WidgetTreeController extends ChangeNotifier {
   void _onSelection(SelectionEvent event) {
     if (selectedNode != event.selection) {
       selectedNode = event.selection;
+
       notifyListeners();
     }
   }
 
   void _onLoad(LoadEvent event) {
     selectedNode = null;
+    roots = [event.widget!];
 
     notifyListeners();
   }

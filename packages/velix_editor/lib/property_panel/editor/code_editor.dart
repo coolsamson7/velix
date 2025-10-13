@@ -82,6 +82,13 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     lastResult = ActionParser.instance.parsePrefix(input, typeChecker: typeChecker);
 
+    if (input.isEmpty) {
+      lastResult.success = true;
+      lastResult.complete = true;
+
+      return ParseState.complete;
+    }
+
     if (lastResult.success)
       return ParseState.prefixOnly;
     else

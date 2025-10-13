@@ -8,9 +8,9 @@ import 'parser.dart';
 class ParseResult {
   //instance data
 
-  final bool success;
+  bool success;
   final Expression? value;
-  final bool complete;
+  bool complete;
   final String? message;
   final int? position;
 

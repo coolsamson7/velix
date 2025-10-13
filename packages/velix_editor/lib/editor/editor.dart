@@ -138,13 +138,24 @@ class EditContext {
   EditContext({required this.type});
 }
 
+/*
+init state
+*  widget.i18n.addListenerAsync((state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.environment.get<TypeRegistry>().changedLocale(
+            widget.localeManager.locale);
+      });
+    });*/
+
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
   // instance data
 
+  final I18N i18n;
+
   // constructor
 
-  EditorScreen({super.key});
+  EditorScreen({super.key, required this.i18n});
 
   // override
 
@@ -396,12 +407,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       }
     }
 
-    //var file = settings.get("file", defaultValue: ""); TODO
-    //if (file.isNotEmpty) {
-    //  await loadFile(file);
-    //}
-
-    updateCommandState();
+    var file = settings.get("file", defaultValue: "");
+    if (file.isNotEmpty) {
+      await loadFile(file);
+    }
   }
 
   String pathTitle() {
@@ -540,6 +549,17 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    widget.i18n.addListenerAsync((state) {
+     updateI18N();
+    });
+
+    // TODO i18n
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -552,7 +572,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //loadSettings();
+      loadSettings();
 
       bus.publish("load", LoadEvent(widget: models.first, source: this));
 

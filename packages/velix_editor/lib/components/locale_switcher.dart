@@ -106,7 +106,6 @@ class LocaleSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currentInfo = _getLocaleInfo(currentLocale);
 
     return PopupMenuButton<String>(
       offset: const Offset(0, 48),
@@ -215,37 +214,9 @@ class LocaleSwitcher extends StatelessWidget {
           }),
         ];
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: theme.colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              currentInfo.flag,
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              currentInfo.nativeName,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.arrow_drop_down,
-              size: 20,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ],
-        ),
+      icon: Icon(
+        Icons.language,
+        color: theme.colorScheme.onSurface,
       ),
     );
   }
@@ -283,21 +254,20 @@ class _LocaleSwitcherExampleState extends State<LocaleSwitcherExample> {
       appBar: AppBar(
         title: const Text('Locale Switcher Demo'),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: LocaleSwitcher(
-              currentLocale: _currentLocale,
-              supportedLocales: _supportedLocales,
-              onLocaleChanged: (locale) {
-                setState(() {
-                  _currentLocale = locale;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Language changed to: $locale')),
-                );
-              },
-            ),
+          // Clean toolbar integration
+          LocaleSwitcher(
+            currentLocale: _currentLocale,
+            supportedLocales: _supportedLocales,
+            onLocaleChanged: (locale) {
+              setState(() {
+                _currentLocale = locale;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Language changed to: $locale')),
+              );
+            },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Center(

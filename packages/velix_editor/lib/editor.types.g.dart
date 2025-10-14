@@ -592,7 +592,7 @@ void registerEditorTypes() {
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = '', required List<WidgetData> children, required Cell cell}) => WidgetData(type: type, children: children, cell: cell),
+    constructor: ({String type = '', List<WidgetData>? children, Cell? cell}) => WidgetData(type: type, children: children, cell: cell),
     fromMapConstructor: (Map<String,dynamic> args) => WidgetData(type: args['type'] as String? ?? '', children: args['children'] as List<WidgetData>?, cell: args['cell'] as Cell?),
     fromArrayConstructor: (List<dynamic> args) => WidgetData(type: args[0] as String? ?? '', children: args[1] as List<WidgetData>?, cell: args[2] as Cell?),
     fields: [
@@ -1127,7 +1127,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:15:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:18:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1152,7 +1152,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:90:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:106:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1174,7 +1174,7 @@ void registerEditorTypes() {
   );
 
   type<GridEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:47:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:48:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1199,7 +1199,7 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:167:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:168:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1564,7 +1564,7 @@ void registerEditorTypes() {
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('onClick', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "button", required Cell cell, required List<WidgetData> children, required Value label, required Font font, required Color foregroundColor, required Color backgroundColor, required Insets padding, String onClick = ''}) => ButtonWidgetData(type: type, cell: cell, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
+    constructor: ({String type = "button", Cell? cell, List<WidgetData>? children, required Value label, Font? font, Color? foregroundColor, Color? backgroundColor, Insets? padding, String? onClick}) => ButtonWidgetData(type: type, cell: cell, children: children, label: label, font: font, foregroundColor: foregroundColor, backgroundColor: backgroundColor, padding: padding, onClick: onClick),
     fromMapConstructor: (Map<String,dynamic> args) => ButtonWidgetData(type: args['type'] as String? ?? "button", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as Value, font: args['font'] as Font?, foregroundColor: args['foregroundColor'] as Color?, backgroundColor: args['backgroundColor'] as Color?, padding: args['padding'] as Insets?, onClick: args['onClick'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => ButtonWidgetData(type: args[0] as String? ?? "button", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as Value, font: args[4] as Font?, foregroundColor: args[5] as Color?, backgroundColor: args[6] as Color?, padding: args[7] as Insets?, onClick: args[8] as String? ?? ''),
     fields: [
@@ -1634,7 +1634,7 @@ void registerEditorTypes() {
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "column", required Cell cell, required List<WidgetData> children}) => ColumnWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, cell: cell, children: children),
+    constructor: ({MainAxisAlignment? mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment? crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize? mainAxisSize = MainAxisSize.min, String type = "column", Cell? cell, List<WidgetData>? children}) => ColumnWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, cell: cell, children: children),
     fromMapConstructor: (Map<String,dynamic> args) => ColumnWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "column", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?),
     fromArrayConstructor: (List<dynamic> args) => ColumnWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "column", cell: args[4] as Cell?, children: args[5] as List<WidgetData>?),
     fields: [
@@ -1681,7 +1681,7 @@ void registerEditorTypes() {
       param<Color>('color', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "container", required Cell cell, required Border border, required Insets margin, required Insets padding, required Color color, required List<WidgetData> children}) => ContainerWidgetData(type: type, cell: cell, border: border, margin: margin, padding: padding, color: color, children: children),
+    constructor: ({String type = "container", Cell? cell, Border? border, Insets? margin, Insets? padding, Color? color, List<WidgetData>? children}) => ContainerWidgetData(type: type, cell: cell, border: border, margin: margin, padding: padding, color: color, children: children),
     fromMapConstructor: (Map<String,dynamic> args) => ContainerWidgetData(type: args['type'] as String? ?? "container", cell: args['cell'] as Cell?, border: args['border'] as Border?, margin: args['margin'] as Insets?, padding: args['padding'] as Insets?, color: args['color'] as Color?, children: args['children'] as List<WidgetData>?),
     fromArrayConstructor: (List<dynamic> args) => ContainerWidgetData(type: args[0] as String? ?? "container", cell: args[1] as Cell?, border: args[2] as Border?, margin: args[3] as Insets?, padding: args[4] as Insets?, color: args[5] as Color?, children: args[6] as List<WidgetData>?),
     fields: [
@@ -1735,7 +1735,7 @@ void registerEditorTypes() {
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", required Cell cell, required List<WidgetData> children, required WidgetData template, required Insets padding, String databinding = ''}) => DropDownWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
+    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, required WidgetData template, Insets? padding, String? databinding}) => DropDownWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
     fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
     fields: [
@@ -1781,7 +1781,7 @@ void registerEditorTypes() {
       param<List<GridItem>>('cols', isNamed: true, isNullable: true, defaultValue: null), 
       param<int>('spacing', isNamed: true, isNullable: true, defaultValue: 0)
     ],
-    constructor: ({String type = "grid", required List<WidgetData> children, required Cell cell, required List<GridItem> rows, required List<GridItem> cols, int spacing = 0}) => GridWidgetData(type: type, children: children, cell: cell, rows: rows, cols: cols, spacing: spacing),
+    constructor: ({String type = "grid", List<WidgetData>? children, Cell? cell, List<GridItem>? rows, List<GridItem>? cols, int spacing = 0}) => GridWidgetData(type: type, children: children, cell: cell, rows: rows, cols: cols, spacing: spacing),
     fromMapConstructor: (Map<String,dynamic> args) => GridWidgetData(type: args['type'] as String? ?? "grid", children: args['children'] as List<WidgetData>?, cell: args['cell'] as Cell?, rows: args['rows'] as List<GridItem>?, cols: args['cols'] as List<GridItem>?, spacing: args['spacing'] as int? ?? 0),
     fromArrayConstructor: (List<dynamic> args) => GridWidgetData(type: args[0] as String? ?? "grid", children: args[1] as List<WidgetData>?, cell: args[2] as Cell?, rows: args[3] as List<GridItem>?, cols: args[4] as List<GridItem>?, spacing: args[5] as int? ?? 0),
     fields: [
@@ -1831,7 +1831,7 @@ void registerEditorTypes() {
       param<Color>('backgroundColor', isNamed: true, isNullable: true, defaultValue: null), 
       param<Font>('font', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "label", required Cell cell, required List<WidgetData> children, required Value label, required Color color, required Color backgroundColor, required Font font}) => LabelWidgetData(type: type, cell: cell, children: children, label: label, color: color, backgroundColor: backgroundColor, font: font),
+    constructor: ({String type = "label", Cell? cell, List<WidgetData>? children, required Value label, Color? color, Color? backgroundColor, Font? font}) => LabelWidgetData(type: type, cell: cell, children: children, label: label, color: color, backgroundColor: backgroundColor, font: font),
     fromMapConstructor: (Map<String,dynamic> args) => LabelWidgetData(type: args['type'] as String? ?? "label", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as Value, color: args['color'] as Color?, backgroundColor: args['backgroundColor'] as Color?, font: args['font'] as Font?),
     fromArrayConstructor: (List<dynamic> args) => LabelWidgetData(type: args[0] as String? ?? "label", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as Value, color: args[4] as Color?, backgroundColor: args[5] as Color?, font: args[6] as Font?),
     fields: [
@@ -1884,7 +1884,7 @@ void registerEditorTypes() {
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", required Cell cell, required List<WidgetData> children, required WidgetData template, required Insets padding, String databinding = ''}) => ListWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
+    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, required WidgetData template, Insets? padding, String? databinding}) => ListWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
     fromMapConstructor: (Map<String,dynamic> args) => ListWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => ListWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
     fields: [
@@ -1930,7 +1930,7 @@ void registerEditorTypes() {
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize mainAxisSize = MainAxisSize.min, String type = "row", required List<WidgetData> children, required Cell cell}) => RowWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, children: children, cell: cell),
+    constructor: ({MainAxisAlignment? mainAxisAlignment = MainAxisAlignment.start, CrossAxisAlignment? crossAxisAlignment = CrossAxisAlignment.start, MainAxisSize? mainAxisSize = MainAxisSize.min, String type = "row", List<WidgetData>? children, Cell? cell}) => RowWidgetData(mainAxisAlignment: mainAxisAlignment, crossAxisAlignment: crossAxisAlignment, mainAxisSize: mainAxisSize, type: type, children: children, cell: cell),
     fromMapConstructor: (Map<String,dynamic> args) => RowWidgetData(mainAxisAlignment: args['mainAxisAlignment'] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args['crossAxisAlignment'] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args['mainAxisSize'] as MainAxisSize? ?? MainAxisSize.min, type: args['type'] as String? ?? "row", children: args['children'] as List<WidgetData>?, cell: args['cell'] as Cell?),
     fromArrayConstructor: (List<dynamic> args) => RowWidgetData(mainAxisAlignment: args[0] as MainAxisAlignment? ?? MainAxisAlignment.start, crossAxisAlignment: args[1] as CrossAxisAlignment? ?? CrossAxisAlignment.start, mainAxisSize: args[2] as MainAxisSize? ?? MainAxisSize.min, type: args[3] as String? ?? "row", children: args[4] as List<WidgetData>?, cell: args[5] as Cell?),
     fields: [
@@ -1973,7 +1973,7 @@ void registerEditorTypes() {
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "stack", required Cell cell, required List<WidgetData> children}) => StackWidgetData(type: type, cell: cell, children: children),
+    constructor: ({String type = "stack", Cell? cell, List<WidgetData>? children}) => StackWidgetData(type: type, cell: cell, children: children),
     fromMapConstructor: (Map<String,dynamic> args) => StackWidgetData(type: args['type'] as String? ?? "stack", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?),
     fromArrayConstructor: (List<dynamic> args) => StackWidgetData(type: args[0] as String? ?? "stack", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?),
   );
@@ -1993,7 +1993,7 @@ void registerEditorTypes() {
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", required Cell cell, required List<WidgetData> children, String label = '', required Insets padding, String databinding = ''}) => SwitchWidgetData(type: type, cell: cell, children: children, label: label, padding: padding, databinding: databinding),
+    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, String label = '', Insets? padding, String? databinding}) => SwitchWidgetData(type: type, cell: cell, children: children, label: label, padding: padding, databinding: databinding),
     fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as String? ?? '', padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as String? ?? '', padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
     fields: [
@@ -2038,7 +2038,7 @@ void registerEditorTypes() {
       param<String>('label', isNamed: true, isRequired: true), 
       param<String>('databinding', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = "text", required Cell cell, required List<WidgetData> children, String label = '', String databinding = ''}) => TextWidgetData(type: type, cell: cell, children: children, label: label, databinding: databinding),
+    constructor: ({String type = "text", Cell? cell, List<WidgetData>? children, String label = '', String? databinding}) => TextWidgetData(type: type, cell: cell, children: children, label: label, databinding: databinding),
     fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
     fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as String? ?? '', databinding: args[4] as String? ?? ''),
     fields: [

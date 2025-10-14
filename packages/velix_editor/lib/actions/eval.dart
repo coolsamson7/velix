@@ -129,8 +129,10 @@ class CallVisitor extends ExpressionVisitor<Call,CallVisitorContext> {
 
   @override
   Call visitVariable(Variable expr, CallVisitorContext context) {
-    var field =  rootClass.getField(expr.identifier.name);
-    return Field(field: field);
+    var property =  rootClass.getProperty(expr.identifier.name);
+    return property.isField() ?
+      Field(field: property as FieldDescriptor) :
+      Method(receiver: This(), method: property as MethodDescriptor); // ?context.instance must be a call
   }
 
   @override

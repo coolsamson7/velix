@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:provider/provider.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
 
+import '../../actions/action_evaluator.dart';
+import '../../actions/eval.dart';
 import '../../dynamic_widget.dart';
 import '../../editor/editor.dart';
 import '../../metadata/type_registry.dart';
@@ -14,78 +17,88 @@ import '../widget_builder.dart';
 
 @Injectable()
 class DropDownWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
-  // instance data
-
-  TypeRegistry typeRegistry;
-
-  // constructor
+  final TypeRegistry typeRegistry;
 
   DropDownWidgetBuilder({required this.typeRegistry}) : super(name: "dropdown");
 
-  // override
-
   @override
   Widget create(DropDownWidgetData data, Environment environment, BuildContext context) {
-    var widgetContext =  WidgetContextScope.of(context);
+    return _DropDownWidget(
+      data: data,
+      typeRegistry: typeRegistry,
+      environment: environment,
+    );
+  }
+}
 
-    String? selectedValue = "f";
+class _DropDownWidget extends StatefulWidget {
+  final DropDownWidgetData data;
+  final TypeRegistry typeRegistry;
+  final Environment environment;
 
+  const _DropDownWidget({
+    required this.data,
+    required this.typeRegistry,
+    required this.environment,
+  });
 
-    List<User> users = [
-      User(
-          name: 'Andreas',
-          address: Address(
-              city: "Köln",
-              street: "Street"
-          ),
-          age: 60, single: true
-      ),
-      User(
-          name: 'Sandra',
-          address: Address(
-              city: "Köln",
-              street: "Street"
-          ),
-          age: 60, single: true
-      ),
-    ];
+  @override
+  State<_DropDownWidget> createState() => _DropDownWidgetState();
+}
 
+class _DropDownWidgetState extends State<_DropDownWidget> {
+  Call? _cachedCall;
+  String? _cachedBinding;
+  List<dynamic>? _cachedList;
 
-    //var (label, typeProperty) = resolveValue(widgetContext, data.label);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    DropdownMenuItem<User> createChild(User user) {
-      // TODO: formMapper, container, bindings?
+    final widgetContext = WidgetContextScope.of(context);
+    final instance = widgetContext.instance;
+    final binding = widget.data.databinding;
 
-      var newContext = WidgetContext(
-          instance: user
-      );
-
-      return DropdownMenuItem<User>(
-              value: user,
-              child:  WidgetContextScope(
-                  contextValue: newContext,
-                  child: DynamicWidget(
-                model: data.template,
-                meta: typeRegistry[data.template.type]
-          )
-            )
-      );
+    // Only (re)compile if the binding expression changed
+    if (binding != _cachedBinding) {
+      _cachedBinding = binding;
+      final type = TypeDescriptor.forType(instance.runtimeType);
+      _cachedCall = ActionCompiler.instance.compile(binding!, context: type);
     }
 
-    var result = DropdownButton<User>(
-        value: null,
-        hint: const Text('Select a user'),
-        items: users.map((user) => createChild(user)).toList(),
-        onChanged: (User? value) {  }
-    );
+    // Evaluate list if necessary
+    if (_cachedCall != null) {
+      _cachedList = _cachedCall!.eval(instance);
+    }
+  }
 
-   /* if (data.label.type == ValueType.binding) {
-        widgetContext.addBinding(typeProperty!, data);
-    }*/
+  DropdownMenuItem<dynamic> _createChild(dynamic item) {
+    return DropdownMenuItem<dynamic>(
+      value: item,
+      child: WidgetContextScope(
+        contextValue: WidgetContext(instance: item),
+        child: DynamicWidget(
+          model: widget.data.template,
+          meta: widget.typeRegistry[widget.data.template.type],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final list = _cachedList ?? const [];
 
     return SizedBox(
-        width: double.infinity,
-        child: result
+      width: double.infinity,
+      child: DropdownButton<dynamic>(
+        value: null, // TODO: connect to selection binding
+        hint: const Text('Select'),
+        items: list.map(_createChild).toList(growable: false),
+        onChanged: (dynamic value) {
+          // TODO: handle selection binding update
+        },
+      ),
     );
   }
 }

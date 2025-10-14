@@ -356,8 +356,8 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI, TypeChec
     List<TI> argumentTypes = expr.arguments.map((arg) => arg.accept(this, context)).toList();
 
     if (expr.callee is Variable) {
-      resolver.checkArguments(expr.getDescriptor(), argumentTypes);
       expr.type = context.resolved(resolver.resolve((expr.callee as Variable).identifier.name, forExpression: expr));
+      resolver.checkArguments(expr.getDescriptor(), argumentTypes);
     }
 
     else if (expr.callee is MemberExpression) {

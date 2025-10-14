@@ -64,14 +64,17 @@ class AssetTranslationLoader implements TranslationLoader {
     final result = Map<String, dynamic>.from(base);
 
     other.forEach((key, value) {
-      if (result.containsKey(key) &&
-          result[key] is Map<String, dynamic> &&
-          value is Map<String, dynamic>) {
-        result[key] = _deepMerge(
-          result[key] as Map<String, dynamic>,
-          value,
-        );
+      if (result.containsKey(key)) {
+        // Both are maps → recurse
+        if (result[key] is Map<String, dynamic> && value is Map<String, dynamic>) {
+          result[key] = _deepMerge(
+            result[key] as Map<String, dynamic>,
+            value,
+          );
+        }
+        // Otherwise, do nothing: do NOT overwrite existing non-map value
       } else {
+        // Key missing in base → add it
         result[key] = value;
       }
     });

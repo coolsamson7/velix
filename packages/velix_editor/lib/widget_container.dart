@@ -46,6 +46,26 @@ class WidgetContext {
    }
 }
 
+class WidgetContextScope extends InheritedWidget {
+  final WidgetContext contextValue;
+
+  const WidgetContextScope({
+    super.key,
+    required this.contextValue,
+    required super.child,
+  });
+
+  static WidgetContext of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<WidgetContextScope>();
+    return scope?.contextValue ??
+        (throw FlutterError('No WidgetContextScope found in context'));
+  }
+
+  @override
+  bool updateShouldNotify(WidgetContextScope old) =>
+      contextValue != old.contextValue;
+}
+
 class WidgetContainer extends StatefulWidget {
   // instance data
 
@@ -96,8 +116,9 @@ class _WidgetContainerState extends State<WidgetContainer> {
         }, emitOnChange: true);
     });
 
-    return Provider<WidgetContext>.value(
-        value: widget.context,
+    //return Provider<WidgetContext>.value(
+    return WidgetContextScope(contextValue: widget.context,
+        //value: widget.context,
         child: Container(
           color: Colors.grey.shade200,
           child: ListView(

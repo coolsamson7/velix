@@ -18,7 +18,7 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
 
   @override
   Widget create(SwitchWidgetData data, Environment environment, BuildContext context) {
-    var widgetContext = Provider.of<WidgetContext>(context);
+    var widgetContext =  WidgetContextScope.of(context);
 
     var mapper = widgetContext.formMapper;
     var instance = widgetContext.instance;

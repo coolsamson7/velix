@@ -123,6 +123,30 @@ class Page {
   }
 
   @Method()
+  List<User> users() {
+    return [
+      User(
+          name: "Andreas",
+          age: 60,
+          single: true,
+          address: Address(
+              city: "Cologne",
+              street: "Neumarkt"
+          ),
+      ),
+        User(
+            name: "Sandra",
+            age: 60,
+            single: true,
+            address: Address(
+                city: "Cologne",
+                street: "Neumarkt"
+            )
+        )
+    ];
+  }
+
+  @Method()
   void hello(String message) {
     print(message);
   }
@@ -163,7 +187,6 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => EditorScreenState();
 }
 
-@Dataclass()
 class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, EditorScreenStateCommands, TickerProviderStateMixin  {
   // instance data
 
@@ -556,7 +579,17 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
      updateI18N();
     });
 
-    // TODO i18n
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //loadSettings();
+
+      //TODO fuck zu oft!
+
+      environment.get<MessageBus>().publish("load", LoadEvent(widget: models.first, source: this));
+
+      setState(() {
+
+      });
+    });
   }
 
   @override
@@ -570,16 +603,6 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     commandStack.addListener(() => setState(() {
       updateCommandState();
     }));
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadSettings();
-
-      bus.publish("load", LoadEvent(widget: models.first, source: this));
-
-      setState(() {
-
-      });
-    });
 
     updateCommandState();
 

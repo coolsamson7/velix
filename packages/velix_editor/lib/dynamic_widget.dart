@@ -29,8 +29,7 @@ class DynamicWidget extends StatefulWidget {
 class _DynamicWidgetState extends AbstractWidgetState<DynamicWidget> {
   // instance data
 
-  late final WidgetFactory theme;
-  late final Environment environment;
+  WidgetFactory? theme;
 
   // override
 
@@ -38,14 +37,13 @@ class _DynamicWidgetState extends AbstractWidgetState<DynamicWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    environment = EnvironmentProvider.of(context);
-    theme = environment.get<WidgetFactory>();
+    theme ??= EnvironmentProvider.of(context).get<WidgetFactory>();
   }
 
   @override
   Widget build(BuildContext context) {
     widget.model.widget = this;
 
-    return theme.builder(widget.model.type).create(widget.model, environment, context);
+    return theme!.builder(widget.model.type).create(widget.model, EnvironmentProvider.of(context), context);
   }
 }

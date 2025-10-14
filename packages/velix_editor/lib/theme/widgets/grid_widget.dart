@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show Alignment, TableCellVerticalAlignmen
 import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
+import '../../dynamic_widget.dart';
 import '../../metadata/widgets/grid.dart';
 import '../../theme/widget_builder.dart';
 import '../../util/message_bus.dart';
@@ -206,7 +207,7 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
             Widget content;
 
             if (childModel != null) {
-              content = EditWidget(model: childModel);
+              content = DynamicWidget(model: childModel, meta: typeRegistry[childModel.type]);
 
               // 1. HORIZONTAL ALIGNMENT: Wrap the content in Align/Container
               if (col.alignment != GridAlignment.stretch) {

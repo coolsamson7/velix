@@ -19,9 +19,9 @@ LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
 
   @override
   Widget create(LabelWidgetData data, Environment environment, BuildContext context) {
-    var widgetContext = Provider.of<WidgetContext>(context);
+    var widgetContext =  WidgetContextScope.of(context);
 
-    var (label, typeProperty) = resolveValue(Provider.of<WidgetContext>(context), data.label);
+    var (label, typeProperty) = resolveValue(widgetContext, data.label);
 
     var result = Text(label,
         style: data.font?.textStyle(color: data.color, backgroundColor: data.backgroundColor)

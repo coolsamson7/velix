@@ -5,13 +5,9 @@
 import 'package:flutter/material.dart' show Colors;
 import 'package:velix/velix.dart';
 import 'package:velix_editor/commands/command_stack.dart' show CommandStack;
-import 'package:velix_di/di/di.dart' show Injectable, Inject, Environment, Module, OnInit;
-import 'package:velix_editor/editor/editor.dart' show Address, User, Page, EditorScreenState;
+import 'package:velix_di/di/di.dart' show Injectable, Inject, Module, OnInit;
+import 'package:velix_editor/editor/editor.dart' show Address, User, Page;
 import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
-import 'package:velix_editor/actions/types.dart' show ClassRegistry, ClassDesc;
-import 'package:velix_i18n/i18n/locale.dart' show LocaleManager;
-import 'package:velix_editor/editor/settings.dart' show SettingsManager;
-import 'dart:async' show Future;
 import 'package:velix_editor/editor_module.dart' show EditorModule;
 import 'package:velix_editor/metadata/properties/properties.dart' show ColorConvert, BorderStyleConvert, MainAxisAlignmentConvert, MainAxisSizeConvert, CrossAxisAlignmentConvert, FontWeightConvert, FontStyleConvert, Value, ValueType, Insets, Border, Font;
 import 'package:velix_editor/metadata/annotations.dart' show DeclareProperty, DeclareWidget;
@@ -29,8 +25,11 @@ import 'package:velix_editor/validate/validate.dart' show ExpressionPropertyVali
 import 'package:velix_editor/metadata/widgets/column.dart' show ColumnWidgetData;
 import 'package:flutter/src/rendering/flex.dart' show MainAxisAlignment, CrossAxisAlignment, MainAxisSize;
 import 'package:velix_editor/metadata/widgets/container.dart' show ContainerWidgetData;
+import 'package:velix_editor/metadata/widgets/dropdown.dart' show DropDownWidgetData;
+import 'package:velix_editor/property_panel/editor/template_editor.dart' show TemplateEditorBuilder;
 import 'package:velix_editor/metadata/widgets/grid.dart' show GridItem, GridSizeMode, GridAlignment, GridWidgetData;
 import 'package:velix_editor/metadata/widgets/label.dart' show LabelWidgetData;
+import 'package:velix_editor/metadata/widgets/list.dart' show ListWidgetData;
 import 'package:velix_editor/metadata/widgets/row.dart' show RowWidgetData;
 import 'package:velix_editor/metadata/widgets/stack.dart' show StackWidgetData;
 import 'package:velix_editor/metadata/widgets/switch.dart' show SwitchWidgetData;
@@ -55,8 +54,10 @@ import 'package:velix_editor/theme/widget_builder.dart' show WidgetBuilder;
 import 'package:velix_editor/theme/widgets/button_widget.dart' show ButtonWidgetBuilder, ButtonEditWidgetBuilder;
 import 'package:velix_editor/theme/widgets/column_widget.dart' show ColumnEditWidgetBuilder, ColumnWidgetBuilder;
 import 'package:velix_editor/theme/widgets/container_widget.dart' show ContainerEditWidgetBuilder, ContainerWidgetBuilder;
+import 'package:velix_editor/theme/widgets/dropdown_widget.dart' show DropDownWidgetBuilder, DropDownEditWidgetBuilder;
 import 'package:velix_editor/theme/widgets/grid_widget.dart' show GridEditWidgetBuilder, GridWidgetBuilder;
 import 'package:velix_editor/theme/widgets/label_widget.dart' show LabelWidgetBuilder, EditLabelWidgetBuilder;
+import 'package:velix_editor/theme/widgets/list_widget.dart' show ListWidgetBuilder, EditListWidgetBuilder;
 import 'package:velix_editor/theme/widgets/row_widget.dart' show RowEditWidgetBuilder, RowWidgetBuilder;
 import 'package:velix_editor/theme/widgets/stack_widget.dart' show StackEditWidgetBuilder, StackWidgetBuilder;
 import 'package:velix_editor/theme/widgets/switch_widget.dart' show SwitchWidgetBuilder, EditSwitchWidgetBuilder;
@@ -76,7 +77,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:47:1',
+    location: 'package:velix_editor/editor/editor.dart:51:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -108,7 +109,7 @@ void registerEditorTypes() {
   );
 
   type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:95:1',
+    location: 'package:velix_editor/editor/editor.dart:99:1',
     annotations: [
       Injectable()
     ],
@@ -128,6 +129,12 @@ void registerEditorTypes() {
         ],
         invoker: (List<dynamic> args)=> (args[0] as Page).setup()
       ), 
+      method<Page,List<User>>('users',
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Page).users()
+      ), 
       method<Page,void>('hello',
         annotations: [
           Method()
@@ -136,90 +143,6 @@ void registerEditorTypes() {
           param<String>('message', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as Page).hello(args[1])
-      )
-    ],
-  );
-
-  type<EditorScreenState>(
-    location: 'package:velix_editor/editor/editor.dart:153:1',
-    constructor: () => EditorScreenState(),
-    fromMapConstructor: (Map<String,dynamic> args) => EditorScreenState(),
-    fromArrayConstructor: (List<dynamic> args) => EditorScreenState(),
-    fields: [
-      field<EditorScreenState,Environment>('environment',
-        getter: (obj) => obj.environment,
-      ), 
-      field<EditorScreenState,CommandStack>('commandStack',
-        getter: (obj) => obj.commandStack,
-      ), 
-      field<EditorScreenState,bool>('edit',
-        getter: (obj) => obj.edit,
-        setter: (obj, value) => (obj as EditorScreenState).edit = value,
-      ), 
-      field<EditorScreenState,String>('path',
-        getter: (obj) => obj.path,
-        setter: (obj, value) => (obj as EditorScreenState).path = value,
-      ), 
-      field<EditorScreenState,String>('lastContent',
-        getter: (obj) => obj.lastContent,
-        setter: (obj, value) => (obj as EditorScreenState).lastContent = value,
-      ), 
-      field<EditorScreenState,ClassRegistry>('registry',
-        getter: (obj) => obj.registry,
-        setter: (obj, value) => (obj as EditorScreenState).registry = value,
-      ), 
-      field<EditorScreenState,ClassDesc>('clazz',
-        getter: (obj) => obj.clazz,
-        setter: (obj, value) => (obj as EditorScreenState).clazz = value,
-        isNullable: true
-      ), 
-      field<EditorScreenState,LocaleManager>('localeManager',
-        getter: (obj) => obj.localeManager,
-      ), 
-      field<EditorScreenState,SettingsManager>('settings',
-        getter: (obj) => obj.settings,
-        setter: (obj, value) => (obj as EditorScreenState).settings = value,
-      )
-    ],
-    methods: [
-      method<EditorScreenState,Future<void>>('open',
-        annotations: [
-          Method()
-        ],
-        isAsync: true,
-        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).open()
-      ), 
-      method<EditorScreenState,Future<void>>('newFile',
-        annotations: [
-          Method()
-        ],
-        isAsync: true,
-        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).newFile()
-      ), 
-      method<EditorScreenState,Future<void>>('save',
-        annotations: [
-          Method()
-        ],
-        isAsync: true,
-        invoker: (List<dynamic> args)async => (args[0] as EditorScreenState).save()
-      ), 
-      method<EditorScreenState,void>('revert',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).revert()
-      ), 
-      method<EditorScreenState,void>('undo',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).undo()
-      ), 
-      method<EditorScreenState,void>('play',
-        annotations: [
-          Method()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as EditorScreenState).play()
       )
     ],
   );
@@ -552,7 +475,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:69:1',
+    location: 'package:velix_editor/editor/editor.dart:73:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 
@@ -973,8 +896,30 @@ void registerEditorTypes() {
     ],
   );
 
+  type<TemplateEditorBuilder>(
+    location: 'package:velix_editor/property_panel/editor/template_editor.dart:12:1',
+    superClass: propertyEditorBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => TemplateEditorBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => TemplateEditorBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => TemplateEditorBuilder(),
+    methods: [
+      method<TemplateEditorBuilder,void>('setup',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<PropertyEditorBuilderFactory>('registry', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TemplateEditorBuilder).setup(args[1])
+      )
+    ],
+  );
+
   type<ValueEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/value_editor.dart:197:1',
+    location: 'package:velix_editor/property_panel/editor/value_editor.dart:290:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1181,6 +1126,53 @@ void registerEditorTypes() {
     ],
   );
 
+  type<DropDownWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:15:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => DropDownWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<DropDownWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as DropDownWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<DropDownEditWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:90:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => DropDownEditWidgetBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownEditWidgetBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => DropDownEditWidgetBuilder(),
+    methods: [
+      method<DropDownEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as DropDownEditWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
   type<GridEditWidgetBuilder>(
     location: 'package:velix_editor/theme/widgets/grid_widget.dart:47:1',
     superClass: widgetBuilderDescriptor,
@@ -1271,6 +1263,53 @@ void registerEditorTypes() {
           param<WidgetFactory>('theme', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as EditLabelWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<ListWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:15:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => ListWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => ListWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => ListWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<ListWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ListWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<EditListWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:82:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => EditListWidgetBuilder(),
+    fromMapConstructor: (Map<String,dynamic> args) => EditListWidgetBuilder(),
+    fromArrayConstructor: (List<dynamic> args) => EditListWidgetBuilder(),
+    methods: [
+      method<EditListWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as EditListWidgetBuilder).setThema(args[1])
       )
     ],
   );
@@ -1681,6 +1720,52 @@ void registerEditorTypes() {
     ],
   );
 
+  type<DropDownWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/dropdown.dart:10:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_switch"),
+      JsonSerializable(discriminator: "dropdown", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
+      param<WidgetData>('template', isNamed: true, isRequired: true), 
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "switch", required Cell cell, required List<WidgetData> children, required WidgetData template, required Insets padding, String databinding = ''}) => DropDownWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
+    fields: [
+      field<DropDownWidgetData,WidgetData>('template',
+        annotations: [
+          DeclareProperty(group: "general", editor: TemplateEditorBuilder)
+        ],
+        getter: (obj) => obj.template,
+        setter: (obj, value) => (obj as DropDownWidgetData).template = value,
+      ), 
+      field<DropDownWidgetData,Insets>('padding',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.padding,
+        setter: (obj, value) => (obj as DropDownWidgetData).padding = value,
+        isNullable: true
+      ), 
+      field<DropDownWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as DropDownWidgetData).databinding = value,
+        isNullable: true
+      )
+    ],
+  );
+
   type<GridWidgetData>(
     location: 'package:velix_editor/metadata/widgets/grid.dart:33:1',
     superClass: widgetDataDescriptor,
@@ -1779,6 +1864,52 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.backgroundColor,
         setter: (obj, value) => (obj as LabelWidgetData).backgroundColor = value,
+        isNullable: true
+      )
+    ],
+  );
+
+  type<ListWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/list.dart:10:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "list", group: "widgets", icon: "widget_switch"),
+      JsonSerializable(discriminator: "list", includeNull: false)
+    ],
+    params: [
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
+      param<WidgetData>('template', isNamed: true, isRequired: true), 
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String type = "switch", required Cell cell, required List<WidgetData> children, required WidgetData template, required Insets padding, String databinding = ''}) => ListWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => ListWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => ListWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
+    fields: [
+      field<ListWidgetData,WidgetData>('template',
+        annotations: [
+          DeclareProperty(group: "general", editor: TemplateEditorBuilder)
+        ],
+        getter: (obj) => obj.template,
+        setter: (obj, value) => (obj as ListWidgetData).template = value,
+      ), 
+      field<ListWidgetData,Insets>('padding',
+        annotations: [
+          DeclareProperty(group: "style")
+        ],
+        getter: (obj) => obj.padding,
+        setter: (obj, value) => (obj as ListWidgetData).padding = value,
+        isNullable: true
+      ), 
+      field<ListWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as ListWidgetData).databinding = value,
         isNullable: true
       )
     ],

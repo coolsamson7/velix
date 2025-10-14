@@ -71,7 +71,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 
   @override
   Widget create(TextWidgetData data, Environment environment, BuildContext context) {
-    var widgetContext = Provider.of<WidgetContext>(context);
+    var widgetContext =  WidgetContextScope.of(context);
 
     var mapper = widgetContext.formMapper;
     var instance = widgetContext.instance;

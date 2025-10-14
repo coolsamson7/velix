@@ -45,7 +45,7 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
 
     // Only compile once per lifecycle if onClick is set
     if (widget.data.onClick != null && widget.data.onClick!.isNotEmpty && _onClick == null) {
-      final instance = Provider.of<WidgetContext>(context, listen: false).instance;
+      final instance =  WidgetContextScope.of(context).instance;
       final type = TypeDescriptor.forType(instance.runtimeType);
 
       final call = ActionCompiler.instance.compile(widget.data.onClick!, context: type);
@@ -55,7 +55,7 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var widgetContext = Provider.of<WidgetContext>(context);
+    var widgetContext =  WidgetContextScope.of(context);
 
     var (label, typeProperty) = resolveValue(widgetContext, widget.data.label);
 

@@ -68,6 +68,14 @@ class CommandDescriptor extends ChangeNotifier {
 
   CommandDescriptor({required this.name, required this.function, this.i18n, this.label, this.icon, this.shortcut, this.tooltip, this.lock = LockType.command});
 
+  void updateI18N() {
+    if (i18n != null) {
+      label = Translator.tr("$i18n.label");
+      shortcut = Translator.tr("$i18n.shortcut", defaultValue: "");
+      tooltip = Translator.tr("$i18n.tooltip", defaultValue: "");
+    }
+  }
+
   // administrative
 
   void addInterceptor(CommandInterceptor interceptor) {
@@ -303,6 +311,11 @@ mixin CommandController<T extends StatefulWidget> on State<T> {
   late CommandManager commandManager;
 
   // public
+
+  void updateI18N() {
+    for ( var command in _commands.values)
+      command.updateI18N();
+  }
 
   Map<ShortcutActivator, Intent> computeShortcuts() {
     return {

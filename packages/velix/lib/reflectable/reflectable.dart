@@ -713,7 +713,7 @@ class TypeDescriptor<T> {
 
   /// return a named property.
   /// [name] the field name
-  P getProperty<P>(String name) {
+  P getProperty<P extends AbstractPropertyDescriptor>(String name) {
     var property =  _properties[name];
     if ( property != null)
       return property as P;

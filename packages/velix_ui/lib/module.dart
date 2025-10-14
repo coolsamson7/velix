@@ -1,4 +1,5 @@
 import 'package:velix_di/di/di.dart';
+import 'package:velix_di/velix_di.dart';
 import 'package:velix_ui/velix_ui.types.g.dart';
 
 @Module(imports: [])
@@ -7,6 +8,8 @@ class UIModule {
 
   static Type _init<T>() {
     registerUITypes();
+
+    Velix.bootstrap;
 
     return T;
   }

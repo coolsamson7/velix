@@ -9,6 +9,7 @@ import '../../actions/action_evaluator.dart';
 import '../../actions/eval.dart';
 import '../../commands/reparent_command.dart';
 import '../../dynamic_widget.dart';
+import '../../edit_widget.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/for.dart';
@@ -32,13 +33,13 @@ List<Widget> expandForWidget(
   }
 
   // Evaluate list at runtime
-  final items = compiledCall?.eval(instance) ?? const [];
+  List<dynamic> items = compiledCall?.eval(instance) ?? const [];
 
   if (data.children.isEmpty) return [];
 
   final templateChild = data.children[0];
 
-  return items.map((item) {
+  return items.map<Widget>((item) {
     return WidgetContextScope(
       contextValue: WidgetContext(instance: item),
       child: DynamicWidget(
@@ -94,15 +95,14 @@ class _ForEditWidgetState extends State<ForEditWidget> {
           environment: widget.environment,
           typeRegistry: widget.typeRegistry,
         );
-      } else {
-        return DynamicWidget(
-          model: childData,
-          meta: widget.typeRegistry[childData.type],
-        );
+      }
+      else {
+        return EditWidget(model: childData);
       }
     }).toList(growable: false);
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     final hasChildren = widget.data.children.isNotEmpty;
@@ -148,6 +148,13 @@ class _ForEditWidgetState extends State<ForEditWidget> {
           child: hasChildren
               ? Row(
             children: [
+              // Icon on the left with tooltip
+              Tooltip(
+                message: 'Binding: ${widget.data.context}',
+                child: const Icon(Icons.loop, color: Colors.blue),
+              ),
+              const SizedBox(width: 8),
+              // Render children
               for (int i = 0; i < _buildChildren().length; i++) ...[
                 _buildChildren()[i],
                 if (i < _buildChildren().length - 1) const SizedBox(width: 8),
@@ -169,6 +176,7 @@ class _ForEditWidgetState extends State<ForEditWidget> {
       },
     );
   }
+
 }
 
 @Injectable()
@@ -181,60 +189,6 @@ class ForWidgetBuilder extends  WidgetBuilder<ForWidgetData> {
   @override
   Widget create(ForWidgetData data, Environment environment, BuildContext context) {
     return ForWidget(data: data, environment: environment, typeRegistry: typeRegistry);
-  }
-}
-
-class WidgetList extends StatefulWidget {
-  final List<WidgetData> children;
-  final Environment environment;
-  final TypeRegistry typeRegistry;
-
-  const WidgetList({
-    required this.children,
-    required this.environment,
-    required this.typeRegistry,
-    super.key,
-  });
-
-  @override
-  State<WidgetList> createState() => _WidgetListState();
-}
-
-class _WidgetListState extends State<WidgetList> {
-  List<Widget> _buildChildren(BuildContext context) {
-    List<Widget> result = [];
-
-    for (var childData in widget.children) {
-      if (childData is ForWidgetData) {
-        /* Expand ForWidget dynamically
-        result.add(ForWidget(
-          data: childData,
-          environment: widget.environment,
-          typeRegistry: widget.typeRegistry,
-        ));*/
-
-        result.addAll(expandForWidget( context,
-          childData,
-          widget.typeRegistry,
-          widget.environment));
-      } else {
-        // Static widgets
-        result.add(DynamicWidget(
-          model: childData,
-          meta: widget.typeRegistry[childData.type],
-        ));
-      }
-    }
-
-    return result;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: _buildChildren(context),
-    );
   }
 }
 

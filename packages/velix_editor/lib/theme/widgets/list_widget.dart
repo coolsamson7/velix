@@ -3,10 +3,12 @@ import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/type_registry.dart';
 
 import '../../dynamic_widget.dart';
+import '../../edit_widget.dart';
 import '../../metadata/widgets/for.dart';
 import '../../metadata/widgets/list.dart';
 import '../widget_builder.dart';
 import 'for_widget.dart';
+
 @Injectable()
 class ListWidgetBuilder extends WidgetBuilder<ListWidgetData> {
   final TypeRegistry typeRegistry;
@@ -45,14 +47,12 @@ class _ListWidgetState extends State<_ListWidget> {
 
     for (var childData in widget.data.children) {
       if (childData is ForWidgetData) {
-        final forWidget = ForWidget(
-          data: childData,
-          environment: widget.environment,
-          typeRegistry: widget.typeRegistry,
-        );
-
-        children.addAll(forWidget.buildList(context));
-      } else {
+        children.addAll(expandForWidget( context,
+            childData,
+            widget.typeRegistry,
+            widget.environment));
+      }
+      else {
         children.add(DynamicWidget(
           model: childData,
           meta: widget.typeRegistry[childData.type],
@@ -101,23 +101,8 @@ class _EditListWidget extends StatelessWidget {
     final children = <Widget>[];
 
     for (var childData in data.children) {
-      if (childData is ForWidgetData) {
-        // show a placeholder for dynamic lists in edit mode
-        children.add(Container(
-          height: 20,
-          color: Colors.grey.shade200,
-          alignment: Alignment.centerLeft,
-          margin: const EdgeInsets.symmetric(vertical: 2),
-          child: Text('For Widget List Placeholder',
-              style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
-        ));
-      } else {
-        children.add(DynamicWidget(
-          model: childData,
-          meta: typeRegistry[childData.type],
-        ));
+        children.add(EditWidget(model: childData));
       }
-    }
 
     return SizedBox(
       height: 100, // adjust placeholder height

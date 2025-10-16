@@ -53,7 +53,7 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
 
     for (var childData in widget.data.children) {
       if (childData is ForWidgetData) {
-        for (var (instance, item) in expandForWidget(context, childData, widget.typeRegistry, widget.environment)) {
+        for (var (instance, item) in childData.expand(context, widget.typeRegistry, widget.environment)) {
           items.add(DropdownMenuItem(
             value: instance,
             child: item,

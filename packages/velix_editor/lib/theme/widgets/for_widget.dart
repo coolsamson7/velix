@@ -16,40 +16,37 @@ import '../../metadata/widgets/for.dart';
 import '../../widget_container.dart';
 import '../widget_builder.dart';
 
-Iterable<(dynamic, Widget)> expandForWidget(
-    BuildContext context,
-    ForWidgetData data,
-    TypeRegistry typeRegistry,
-    Environment environment,
-    ) {
-  final widgetContext = WidgetContextScope.of(context);
-  final instance = widgetContext.instance;
+extension ForWidgetDataExtensions on ForWidgetData {
+  Iterable<(dynamic, Widget)> expand(BuildContext buildContext, TypeRegistry typeRegistry, Environment environment) {
+    final widgetContext = WidgetContextScope.of(buildContext);
+    final instance = widgetContext.instance;
 
-  // Compile the binding once
-  Call? compiledCall;
-  if (data.context != null) {
-    final type = TypeDescriptor.forType(instance.runtimeType);
-    compiledCall = ActionCompiler.instance.compile(data.context!, context: type);
+    // Compile the binding once
+    Call? compiledCall;
+    if (context.isNotEmpty) {
+      final type = TypeDescriptor.forType(instance.runtimeType);
+      compiledCall =  ActionCompiler.instance.compile(context, context: type);
+    }
+
+    // Evaluate list at runtime
+
+    List<dynamic> items = compiledCall?.eval(instance) ?? const [];
+
+    if (children.isEmpty) return [];
+
+    final templateChild = children[0];
+
+    return items.map<(dynamic, Widget)>((item) {
+      return (item, WidgetContextScope(
+        contextValue: WidgetContext(instance: item),
+        child: DynamicWidget(
+          model: templateChild,
+          meta: typeRegistry[templateChild.type],
+        ),
+      ));
+    });
   }
-
-  // Evaluate list at runtime
-  List<dynamic> items = compiledCall?.eval(instance) ?? const [];
-
-  if (data.children.isEmpty) return [];
-
-  final templateChild = data.children[0];
-
-  return items.map<(dynamic, Widget)>((item) {
-    return (item, WidgetContextScope(
-      contextValue: WidgetContext(instance: item),
-      child: DynamicWidget(
-        model: templateChild,
-        meta: typeRegistry[templateChild.type],
-      ),
-    ));
-  });
 }
-
 
 @Injectable()
 class ForEditWidgetBuilder extends WidgetBuilder<ForWidgetData> {
@@ -89,16 +86,7 @@ class _ForEditWidgetState extends State<ForEditWidget> {
 
   List<Widget> _buildChildren() {
     return widget.data.children.map((childData) {
-      if (childData is ForWidgetData) {
-        return ForWidget(
-          data: childData,
-          environment: widget.environment,
-          typeRegistry: widget.typeRegistry,
-        );
-      }
-      else {
-        return EditWidget(model: childData);
-      }
+      return EditWidget(model: childData);
     }).toList(growable: false);
   }
 
@@ -188,66 +176,6 @@ class ForWidgetBuilder extends  WidgetBuilder<ForWidgetData> {
 
   @override
   Widget create(ForWidgetData data, Environment environment, BuildContext context) {
-    return ForWidget(data: data, environment: environment, typeRegistry: typeRegistry);
-  }
-}
-
-class ForWidget extends StatefulWidget {
-  final ForWidgetData data;
-  final Environment environment;
-  final TypeRegistry typeRegistry;
-
-  const ForWidget({
-    required this.data,
-    required this.environment,
-    required this.typeRegistry,
-    super.key,
-  });
-
-  /// Evaluate the list and produce widgets at runtime
-  List<Widget> buildList(
-      BuildContext context,
-      ) {
-    final widgetContext = WidgetContextScope.of(context);
-    final instance = widgetContext.instance;
-
-    Call? compiledCall;
-    if (data.context != null) {
-      final type = TypeDescriptor.forType(instance.runtimeType);
-      compiledCall = ActionCompiler.instance.compile(data.context!, context: type);
-    }
-
-    List<dynamic> items = compiledCall?.eval(instance) ?? const [];
-
-    if (data.children.isEmpty) return [];
-
-    final templateChild = data.children[0];
-
-    List<Widget> r = items.map((item) =>
-       WidgetContextScope(
-        contextValue: WidgetContext(instance: item),
-        child: DynamicWidget(
-          model: templateChild,
-          meta: typeRegistry[templateChild.type],
-        ),
-      )).toList(growable: false);
-
-    return r;
-  }
-
-  @override
-  State<ForWidget> createState() => _ForWidgetState();
-}
-
-class _ForWidgetState extends State<ForWidget> {
-  @override
-  Widget build(BuildContext context) {
-    // By default, render a Column of children
-    final children = widget.buildList(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: children,
-    );
+    throw Exception("a for widget should not be created");
   }
 }

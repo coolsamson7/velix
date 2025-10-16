@@ -47,11 +47,8 @@ class _ListWidgetState extends State<_ListWidget> {
 
     for (var childData in widget.data.children) {
       if (childData is ForWidgetData) {
-        for (var (instance, widget) in expandForWidget( context,
-            childData,
-            widget.typeRegistry,
-            widget.environment) )
-        children.add(widget);
+        for (var (instance, widget) in childData.expand(context, widget.typeRegistry, widget.environment))
+          children.add(widget);
       }
       else {
         children.add(DynamicWidget(

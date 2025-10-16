@@ -16,7 +16,7 @@ import '../../metadata/widgets/for.dart';
 import '../../widget_container.dart';
 import '../widget_builder.dart';
 
-List<Widget> expandForWidget(
+Iterable<(dynamic, Widget)> expandForWidget(
     BuildContext context,
     ForWidgetData data,
     TypeRegistry typeRegistry,
@@ -39,15 +39,15 @@ List<Widget> expandForWidget(
 
   final templateChild = data.children[0];
 
-  return items.map<Widget>((item) {
-    return WidgetContextScope(
+  return items.map<(dynamic, Widget)>((item) {
+    return (item, WidgetContextScope(
       contextValue: WidgetContext(instance: item),
       child: DynamicWidget(
         model: templateChild,
         meta: typeRegistry[templateChild.type],
       ),
-    );
-  }).toList(growable: false);
+    ));
+  });
 }
 
 

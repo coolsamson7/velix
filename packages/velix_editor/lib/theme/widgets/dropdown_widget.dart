@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:velix_di/di/di.dart';
 
 import '../../dynamic_widget.dart';
+import '../../edit_widget.dart';
 import '../../event/events.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widgets/dropdown.dart';
@@ -45,24 +46,17 @@ class _DropDownWidget extends StatefulWidget {
 class _DropDownWidgetState extends State<_DropDownWidget> {
   dynamic _selectedValue;
 
-  List<DropdownMenuItem<dynamic>> _buildItems() {
+  List<DropdownMenuItem<dynamic>> _buildItems(BuildContext context) {
     final items = <DropdownMenuItem<dynamic>>[];
+
+    List<Widget> children = [];
 
     for (var childData in widget.data.children) {
       if (childData is ForWidgetData) {
-        final forWidget = ForWidget(
-          data: childData,
-          environment: widget.environment,
-          typeRegistry: widget.typeRegistry,
-        );
-
-        // Evaluate runtime children using buildList()
-        final children = forWidget.buildList(context);
-
-        for (var w in children) {
+        for (var (instance, item) in expandForWidget(context, childData, widget.typeRegistry, widget.environment)) {
           items.add(DropdownMenuItem(
-            value: (w as DynamicWidget).model,
-            child: w,
+            value: instance,
+            child: item,
           ));
         }
       } else {
@@ -85,7 +79,7 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
     return DropdownButton<dynamic>(
       value: _selectedValue,
       hint: const Text('Select'),
-      items: _buildItems(),
+      items: _buildItems(context),
       onChanged: (value) {
         setState(() {
           _selectedValue = value;
@@ -110,42 +104,21 @@ class DropDownEditWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
 
   @override
   Widget create(DropDownWidgetData data, Environment environment, BuildContext context) {
-    final items = <DropdownMenuItem<dynamic>>[];
+    final items = <Widget>[];
 
     for (var childData in data.children) {
-      if (childData is ForWidgetData) {
-        final children = ForWidget(
-          data: childData,
-          environment: environment,
-          typeRegistry: typeRegistry, // adjust if you have DI
-        ).buildList(context);
-
-        for (var w in children) {
-          items.add(DropdownMenuItem(
-            value: (w as DynamicWidget).model,
-            child: w,
-          ));
-        }
-      } else {
-        items.add(DropdownMenuItem(
-          value: childData,
-          child: DynamicWidget(
-            model: childData,
-            meta: typeRegistry[childData.type],
-          ),
-        ));
+        items.add(EditWidget(model: childData));
       }
-    }
 
     return IgnorePointer(
       ignoring: true,
       child: SizedBox(
         width: double.infinity,
-        child: DropdownButton<dynamic>(
-          value: null,
-          hint: const Text('Select an item'),
-          items: items,
-          onChanged: (_) {},
+        child: Column(
+          //value: null,
+          //hint: const Text('Select an item'), // TODO
+          children: items,
+          //onChanged: (_) {},
         ),
       ),
     );

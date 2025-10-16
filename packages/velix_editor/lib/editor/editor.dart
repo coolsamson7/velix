@@ -162,15 +162,6 @@ class EditContext {
   EditContext({required this.type});
 }
 
-/*
-init state
-*  widget.i18n.addListenerAsync((state) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.environment.get<TypeRegistry>().changedLocale(
-            widget.localeManager.locale);
-      });
-    });*/
-
 // the overall screen, that combines all aspects
 class EditorScreen extends StatefulWidget {
   // instance data

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
-import 'package:provider/provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_i18n/i18n/i18n.dart';

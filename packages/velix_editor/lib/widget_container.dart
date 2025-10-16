@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:velix_ui/databinding/form_mapper.dart';
 
 import './dynamic_widget.dart';

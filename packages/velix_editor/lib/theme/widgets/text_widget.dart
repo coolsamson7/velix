@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:velix/i18n/translator.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/validation/validation.dart' show ValidationException;

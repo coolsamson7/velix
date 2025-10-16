@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/theme/abstract_widget.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 

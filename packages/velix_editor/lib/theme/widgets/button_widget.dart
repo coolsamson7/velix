@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, Padding, Page;
-import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 

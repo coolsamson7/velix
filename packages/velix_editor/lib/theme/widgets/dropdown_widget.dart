@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
-import 'package:provider/provider.dart';
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
-import 'package:velix_editor/metadata/properties/properties.dart';
-import 'package:velix_i18n/i18n/i18n.dart';
 
-import '../../actions/action_evaluator.dart';
-import '../../actions/eval.dart';
 import '../../dynamic_widget.dart';
-import '../../editor/editor.dart';
+import '../../event/events.dart';
 import '../../metadata/type_registry.dart';
 import '../../metadata/widgets/dropdown.dart';
-import '../../metadata/widgets/label.dart';
-import '../../widget_container.dart';
+import '../../metadata/widgets/for.dart';
+
+import '../../util/message_bus.dart';
 import '../widget_builder.dart';
+import 'for_widget.dart';
 
 @Injectable()
 class DropDownWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
@@ -47,87 +43,111 @@ class _DropDownWidget extends StatefulWidget {
 }
 
 class _DropDownWidgetState extends State<_DropDownWidget> {
-  Call? _cachedCall;
-  String? _cachedBinding;
-  List<dynamic>? _cachedList;
+  dynamic _selectedValue;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  List<DropdownMenuItem<dynamic>> _buildItems() {
+    final items = <DropdownMenuItem<dynamic>>[];
 
-    final widgetContext = WidgetContextScope.of(context);
-    final instance = widgetContext.instance;
-    final binding = widget.data.databinding;
+    for (var childData in widget.data.children) {
+      if (childData is ForWidgetData) {
+        final forWidget = ForWidget(
+          data: childData,
+          environment: widget.environment,
+          typeRegistry: widget.typeRegistry,
+        );
 
-    // Only (re)compile if the binding expression changed
-    if (binding != _cachedBinding) {
-      _cachedBinding = binding;
-      final type = TypeDescriptor.forType(instance.runtimeType);
-      _cachedCall = ActionCompiler.instance.compile(binding!, context: type);
+        // Evaluate runtime children using buildList()
+        final children = forWidget.buildList(context);
+
+        for (var w in children) {
+          items.add(DropdownMenuItem(
+            value: (w as DynamicWidget).model,
+            child: w,
+          ));
+        }
+      } else {
+        // Static widget
+        items.add(DropdownMenuItem(
+          value: childData,
+          child: DynamicWidget(
+            model: childData,
+            meta: widget.typeRegistry[childData.type],
+          ),
+        ));
+      }
     }
 
-    // Evaluate list if necessary
-    if (_cachedCall != null) {
-      _cachedList = _cachedCall!.eval(instance);
-    }
-  }
-
-  DropdownMenuItem<dynamic> _createChild(dynamic item) {
-    return DropdownMenuItem<dynamic>(
-      value: item,
-      child: WidgetContextScope(
-        contextValue: WidgetContext(instance: item),
-        child: DynamicWidget(
-          model: widget.data.template,
-          meta: widget.typeRegistry[widget.data.template.type],
-        ),
-      ),
-    );
+    return items;
   }
 
   @override
   Widget build(BuildContext context) {
-    final list = _cachedList ?? const [];
+    return DropdownButton<dynamic>(
+      value: _selectedValue,
+      hint: const Text('Select'),
+      items: _buildItems(),
+      onChanged: (value) {
+        setState(() {
+          _selectedValue = value;
+        });
 
-    return SizedBox(
-      width: double.infinity,
-      child: DropdownButton<dynamic>(
-        value: null, // TODO: connect to selection binding
-        hint: const Text('Select'),
-        items: list.map(_createChild).toList(growable: false),
-        onChanged: (dynamic value) {
-          // TODO: handle selection binding update
-        },
-      ),
+        widget.environment.get<MessageBus>().publish(
+          "selection",
+          SelectionEvent(selection: value, source: this),
+        );
+      },
     );
   }
 }
 
+
+
 @Injectable()
 class DropDownEditWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
-  // constructor
+  final TypeRegistry typeRegistry;
 
-  DropDownEditWidgetBuilder() : super(name: "dropdown", edit: true);
-
-  // override
+  DropDownEditWidgetBuilder({required this.typeRegistry}) : super(name: "dropdown", edit: true);
 
   @override
   Widget create(DropDownWidgetData data, Environment environment, BuildContext context) {
+    final items = <DropdownMenuItem<dynamic>>[];
+
+    for (var childData in data.children) {
+      if (childData is ForWidgetData) {
+        final children = ForWidget(
+          data: childData,
+          environment: environment,
+          typeRegistry: typeRegistry, // adjust if you have DI
+        ).buildList(context);
+
+        for (var w in children) {
+          items.add(DropdownMenuItem(
+            value: (w as DynamicWidget).model,
+            child: w,
+          ));
+        }
+      } else {
+        items.add(DropdownMenuItem(
+          value: childData,
+          child: DynamicWidget(
+            model: childData,
+            meta: typeRegistry[childData.type],
+          ),
+        ));
+      }
+    }
+
     return IgnorePointer(
       ignoring: true,
       child: SizedBox(
-          width: double.infinity,
-          child: DropdownButton<String>(
-          value: "item",
+        width: double.infinity,
+        child: DropdownButton<dynamic>(
+          value: null,
           hint: const Text('Select an item'),
-          items: <String>["item"].map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(), onChanged: (String? value) {  },
-      )
-      )
+          items: items,
+          onChanged: (_) {},
+        ),
+      ),
     );
   }
 }

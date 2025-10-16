@@ -26,11 +26,12 @@ import 'package:velix_editor/metadata/widgets/column.dart' show ColumnWidgetData
 import 'package:flutter/src/rendering/flex.dart' show MainAxisAlignment, CrossAxisAlignment, MainAxisSize;
 import 'package:velix_editor/metadata/widgets/container.dart' show ContainerWidgetData;
 import 'package:velix_editor/metadata/widgets/dropdown.dart' show DropDownWidgetData;
-import 'package:velix_editor/property_panel/editor/template_editor.dart' show TemplateEditorBuilder;
+import 'package:velix_editor/metadata/widgets/for.dart' show ForWidgetData;
 import 'package:velix_editor/metadata/widgets/grid.dart' show GridItem, GridSizeMode, GridAlignment, GridWidgetData;
 import 'package:velix_editor/metadata/widgets/label.dart' show LabelWidgetData;
 import 'package:velix_editor/metadata/widgets/list.dart' show ListWidgetData;
 import 'package:velix_editor/metadata/widgets/row.dart' show RowWidgetData;
+import 'package:velix_editor/metadata/widgets/sheet.dart' show SheetWidgetData;
 import 'package:velix_editor/metadata/widgets/stack.dart' show StackWidgetData;
 import 'package:velix_editor/metadata/widgets/switch.dart' show SwitchWidgetData;
 import 'package:velix_editor/metadata/widgets/text.dart' show TextWidgetData;
@@ -44,6 +45,7 @@ import 'package:velix_editor/property_panel/editor/grid_editor.dart' show GridIt
 import 'package:velix_editor/property_panel/editor/int_editor.dart' show IntEditorBuilder;
 import 'package:velix_editor/property_panel/editor/paddding_editor.dart' show PaddingEditorBuilder;
 import 'package:velix_editor/property_panel/editor/string_editor.dart' show StringEditorBuilder;
+import 'package:velix_editor/property_panel/editor/template_editor.dart' show TemplateEditorBuilder;
 import 'package:velix_editor/property_panel/editor/value_editor.dart' show ValueEditorBuilder;
 import 'package:velix_editor/property_panel/editor_builder.dart' show PropertyEditorBuilder;
 import 'package:velix_editor/property_panel/editor_registry.dart' show PropertyEditorBuilderFactory;
@@ -55,10 +57,12 @@ import 'package:velix_editor/theme/widgets/button_widget.dart' show ButtonWidget
 import 'package:velix_editor/theme/widgets/column_widget.dart' show ColumnEditWidgetBuilder, ColumnWidgetBuilder;
 import 'package:velix_editor/theme/widgets/container_widget.dart' show ContainerEditWidgetBuilder, ContainerWidgetBuilder;
 import 'package:velix_editor/theme/widgets/dropdown_widget.dart' show DropDownWidgetBuilder, DropDownEditWidgetBuilder;
+import 'package:velix_editor/theme/widgets/for_widget.dart' show ForEditWidgetBuilder, ForWidgetBuilder;
 import 'package:velix_editor/theme/widgets/grid_widget.dart' show GridEditWidgetBuilder, GridWidgetBuilder;
 import 'package:velix_editor/theme/widgets/label_widget.dart' show LabelWidgetBuilder, EditLabelWidgetBuilder;
 import 'package:velix_editor/theme/widgets/list_widget.dart' show ListWidgetBuilder, EditListWidgetBuilder;
 import 'package:velix_editor/theme/widgets/row_widget.dart' show RowEditWidgetBuilder, RowWidgetBuilder;
+import 'package:velix_editor/theme/widgets/sheet_widget.dart' show SheetEditWidgetBuilder, SheetWidgetBuilder;
 import 'package:velix_editor/theme/widgets/stack_widget.dart' show StackEditWidgetBuilder, StackWidgetBuilder;
 import 'package:velix_editor/theme/widgets/switch_widget.dart' show SwitchWidgetBuilder, EditSwitchWidgetBuilder;
 import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuilder, TextEditWidgetBuilder;
@@ -1127,7 +1131,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:18:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:22:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1152,14 +1156,17 @@ void registerEditorTypes() {
   );
 
   type<DropDownEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:106:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:113:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
     ],
-    constructor: () => DropDownEditWidgetBuilder(),
-    fromMapConstructor: (Map<String,dynamic> args) => DropDownEditWidgetBuilder(),
-    fromArrayConstructor: (List<dynamic> args) => DropDownEditWidgetBuilder(),
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => DropDownEditWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownEditWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => DropDownEditWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
     methods: [
       method<DropDownEditWidgetBuilder,void>('setThema',
         annotations: [
@@ -1169,6 +1176,56 @@ void registerEditorTypes() {
           param<WidgetFactory>('theme', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as DropDownEditWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<ForEditWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:54:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => ForEditWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => ForEditWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => ForEditWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<ForEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ForEditWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<ForWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:175:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => ForWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => ForWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => ForWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<ForWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ForWidgetBuilder).setThema(args[1])
       )
     ],
   );
@@ -1268,7 +1325,7 @@ void registerEditorTypes() {
   );
 
   type<ListWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/list_widget.dart:15:1',
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:16:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1298,9 +1355,12 @@ void registerEditorTypes() {
     annotations: [
       Injectable()
     ],
-    constructor: () => EditListWidgetBuilder(),
-    fromMapConstructor: (Map<String,dynamic> args) => EditListWidgetBuilder(),
-    fromArrayConstructor: (List<dynamic> args) => EditListWidgetBuilder(),
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => EditListWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => EditListWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => EditListWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
     methods: [
       method<EditListWidgetBuilder,void>('setThema',
         annotations: [
@@ -1360,6 +1420,56 @@ void registerEditorTypes() {
           param<WidgetFactory>('theme', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as RowWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<SheetEditWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:16:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => SheetEditWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => SheetEditWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => SheetEditWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<SheetEditWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as SheetEditWidgetBuilder).setThema(args[1])
+      )
+    ],
+  );
+
+  type<SheetWidgetBuilder>(
+    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:90:1',
+    superClass: widgetBuilderDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    params: [
+      param<TypeRegistry>('typeRegistry', isNamed: true, isRequired: true)
+    ],
+    constructor: ({required TypeRegistry typeRegistry}) => SheetWidgetBuilder(typeRegistry: typeRegistry),
+    fromMapConstructor: (Map<String,dynamic> args) => SheetWidgetBuilder(typeRegistry: args['typeRegistry'] as TypeRegistry),
+    fromArrayConstructor: (List<dynamic> args) => SheetWidgetBuilder(typeRegistry: args[0] as TypeRegistry),
+    methods: [
+      method<SheetWidgetBuilder,void>('setThema',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetFactory>('theme', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as SheetWidgetBuilder).setThema(args[1])
       )
     ],
   );
@@ -1728,24 +1838,15 @@ void registerEditorTypes() {
       JsonSerializable(discriminator: "dropdown", includeNull: false)
     ],
     params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "dropdown"), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<WidgetData>('template', isNamed: true, isRequired: true), 
-      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, required WidgetData template, Insets? padding, String? databinding}) => DropDownWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
+    constructor: ({String type = "dropdown", Cell? cell, List<WidgetData>? children, Insets? padding}) => DropDownWidgetData(type: type, cell: cell, children: children, padding: padding),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "dropdown", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, padding: args['padding'] as Insets?),
+    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "dropdown", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, padding: args[3] as Insets?),
     fields: [
-      field<DropDownWidgetData,WidgetData>('template',
-        annotations: [
-          DeclareProperty(group: "general", editor: TemplateEditorBuilder)
-        ],
-        getter: (obj) => obj.template,
-        setter: (obj, value) => (obj as DropDownWidgetData).template = value,
-      ), 
       field<DropDownWidgetData,Insets>('padding',
         annotations: [
           DeclareProperty(group: "style")
@@ -1753,15 +1854,33 @@ void registerEditorTypes() {
         getter: (obj) => obj.padding,
         setter: (obj, value) => (obj as DropDownWidgetData).padding = value,
         isNullable: true
-      ), 
-      field<DropDownWidgetData,String>('databinding',
-        type: StringType().optional(),
+      )
+    ],
+  );
+
+  type<ForWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/for.dart:10:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "for", group: "logic", icon: "widget_column"),
+      JsonSerializable(discriminator: "for", includeNull: false)
+    ],
+    params: [
+      param<String>('context', isNamed: true, isNullable: true, defaultValue: ""), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "for"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String context = "", String type = "for", Cell? cell, List<WidgetData>? children}) => ForWidgetData(context: context, type: type, cell: cell, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => ForWidgetData(context: args['context'] as String? ?? "", type: args['type'] as String? ?? "for", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?),
+    fromArrayConstructor: (List<dynamic> args) => ForWidgetData(context: args[0] as String? ?? "", type: args[1] as String? ?? "for", cell: args[2] as Cell?, children: args[3] as List<WidgetData>?),
+    fields: [
+      field<ForWidgetData,String>('context',
         annotations: [
-          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
+          DeclareProperty(group: "general", editor: CodeEditorBuilder)
         ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as DropDownWidgetData).databinding = value,
-        isNullable: true
+        getter: (obj) => obj.context,
+        setter: (obj, value) => (obj as ForWidgetData).context = value,
       )
     ],
   );
@@ -1877,39 +1996,21 @@ void registerEditorTypes() {
       JsonSerializable(discriminator: "list", includeNull: false)
     ],
     params: [
-      param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
-      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
-      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<WidgetData>('template', isNamed: true, isRequired: true), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "list"), 
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, required WidgetData template, Insets? padding, String? databinding}) => ListWidgetData(type: type, cell: cell, children: children, template: template, padding: padding, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => ListWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, template: args['template'] as WidgetData, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => ListWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, template: args[3] as WidgetData, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
+    constructor: ({String type = "list", Insets? padding, Cell? cell, List<WidgetData>? children}) => ListWidgetData(type: type, padding: padding, cell: cell, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => ListWidgetData(type: args['type'] as String? ?? "list", padding: args['padding'] as Insets?, cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?),
+    fromArrayConstructor: (List<dynamic> args) => ListWidgetData(type: args[0] as String? ?? "list", padding: args[1] as Insets?, cell: args[2] as Cell?, children: args[3] as List<WidgetData>?),
     fields: [
-      field<ListWidgetData,WidgetData>('template',
-        annotations: [
-          DeclareProperty(group: "general", editor: TemplateEditorBuilder)
-        ],
-        getter: (obj) => obj.template,
-        setter: (obj, value) => (obj as ListWidgetData).template = value,
-      ), 
       field<ListWidgetData,Insets>('padding',
         annotations: [
           DeclareProperty(group: "style")
         ],
         getter: (obj) => obj.padding,
         setter: (obj, value) => (obj as ListWidgetData).padding = value,
-        isNullable: true
-      ), 
-      field<ListWidgetData,String>('databinding',
-        type: StringType().optional(),
-        annotations: [
-          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
-        ],
-        getter: (obj) => obj.databinding,
-        setter: (obj, value) => (obj as ListWidgetData).databinding = value,
         isNullable: true
       )
     ],
@@ -1957,6 +2058,33 @@ void registerEditorTypes() {
         getter: (obj) => obj.mainAxisSize,
         setter: (obj, value) => (obj as RowWidgetData).mainAxisSize = value,
         isNullable: true
+      )
+    ],
+  );
+
+  type<SheetWidgetData>(
+    location: 'package:velix_editor/metadata/widgets/sheet.dart:9:1',
+    superClass: widgetDataDescriptor,
+    annotations: [
+      DeclareWidget(name: "sheet", group: "container", icon: "widget_column"),
+      JsonSerializable(discriminator: "sheet", includeNull: false)
+    ],
+    params: [
+      param<String>('name', isNamed: true, isNullable: true, defaultValue: ""), 
+      param<String>('type', isNamed: true, isNullable: true, defaultValue: "sheet"), 
+      param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
+      param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null)
+    ],
+    constructor: ({String name = "", String type = "sheet", Cell? cell, List<WidgetData>? children}) => SheetWidgetData(name: name, type: type, cell: cell, children: children),
+    fromMapConstructor: (Map<String,dynamic> args) => SheetWidgetData(name: args['name'] as String? ?? "", type: args['type'] as String? ?? "sheet", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?),
+    fromArrayConstructor: (List<dynamic> args) => SheetWidgetData(name: args[0] as String? ?? "", type: args[1] as String? ?? "sheet", cell: args[2] as Cell?, children: args[3] as List<WidgetData>?),
+    fields: [
+      field<SheetWidgetData,String>('name',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as SheetWidgetData).name = value,
       )
     ],
   );

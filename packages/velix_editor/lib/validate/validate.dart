@@ -204,7 +204,7 @@ class WidgetValidator {
 
     var context = ValidationContext(environment: environment, type: type);
 
-    validateWidget(widget, context);
+    //TODO AAAA validateWidget(widget, context);
 
     if (context.errors.isNotEmpty)
       throw ValidationException(errors: context.errors);

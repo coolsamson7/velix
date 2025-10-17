@@ -15,7 +15,6 @@ class ForWidgetData extends WidgetData {
   @DeclareProperty(group: "general",  editor: CodeEditorBuilder)
   String context;
 
-
   // constructor
 
   ForWidgetData({this.context = "", super.type = "for", super.cell, super.children});

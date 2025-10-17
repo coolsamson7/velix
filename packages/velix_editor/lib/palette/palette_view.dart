@@ -77,8 +77,9 @@ class _WidgetPaletteState extends State<WidgetPalette> {
   Widget build(BuildContext context) {
     // Group widgets by group name
     final Map<String, List<WidgetDescriptor>> groupedWidgets = {};
-    for (var meta in widget.typeRegistry.descriptor.values) {
-      groupedWidgets.putIfAbsent(meta.group, () => []).add(meta);
+    for (var meta in widget.typeRegistry.descriptor.values)
+      if (meta.name != "sheet"){
+        groupedWidgets.putIfAbsent(meta.group, () => []).add(meta);
     }
 
     return GestureDetector(

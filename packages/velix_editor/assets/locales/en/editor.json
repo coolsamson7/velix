@@ -50,7 +50,10 @@
         "label": "Widgets"
       },
       "container": {
-        "label": "Container"
+        "label": "Layout"
+      },
+      "logic": {
+        "label": "Logic"
       }
     }
   },
@@ -145,6 +148,15 @@
     },
     "stack": {
       "title": "Stack"
+    },
+    "list": {
+      "title": "List"
+    },
+    "dropdown": {
+      "title": "Dropdown"
+    },
+    "for": {
+      "title": "For Loop"
     },
     "switch": {
       "title": "Switch",

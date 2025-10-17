@@ -1,0 +1,194 @@
+{
+  "classes": [
+    {
+      "name": "Address",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "city",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "street",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "204:1"
+    },
+    {
+      "name": "User",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "name",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "address",
+          "type": "Address",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "225:1"
+    },
+    {
+      "name": "Page",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "user",
+          "type": "User",
+          "isNullable": false,
+          "isFinal": true,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "users",
+          "type": "List<User>",
+          "isNullable": false,
+          "isFinal": true,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "getUsers",
+          "parameters": [],
+          "returnType": "List<User>",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Method",
+              "value": "Method"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Injectable",
+          "value": "Injectable"
+        },
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "248:1"
+    },
+    {
+      "name": "TestModule",
+      "superClass": null,
+      "properties": [],
+      "methods": [],
+      "annotations": [
+        {
+          "name": "Module",
+          "value": "Module"
+        }
+      ],
+      "isAbstract": false,
+      "location": "273:1"
+    }
+  ]
+}

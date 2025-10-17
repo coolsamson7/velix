@@ -5,7 +5,7 @@
 import 'package:velix/velix.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'action_test.dart' show Address, User, Page, TestModule;
-import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
 import 'package:velix_di/di/di.dart' show Inject, Injectable, Module;
 
 void registerTypes() {
@@ -52,20 +52,25 @@ void registerTypes() {
     fields: [
       field<Page,User>('user',
         getter: (obj) => obj.user,
+      ), 
+      field<Page,List<User>>('users',
+        elementType: User,
+        factoryConstructor: () => <User>[],
+        getter: (obj) => obj.users,
       )
     ],
     methods: [
-      method<Page,void>('setup',
+      method<Page,List<User>>('getUsers',
         annotations: [
-          Inject()
+          Method()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as Page).setup()
+        invoker: (List<dynamic> args)=> (args[0] as Page).getUsers()
       )
     ],
   );
 
   type<TestModule>(
-    location: 'asset:velix_editor/test/action_test.dart:268:1',
+    location: 'asset:velix_editor/test/action_test.dart:273:1',
     annotations: [
       Module(imports: [EditorModule], includeSiblings: false, includeSubdirectories: false)
     ],

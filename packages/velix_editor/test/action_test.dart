@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,191 +16,6 @@ import 'package:velix_editor/editor_module.dart';
 import 'package:velix_ui/velix_ui.types.g.dart';
 
 import 'action_test.types.g.dart';
-
-String json = '''
-{
-  "classes": [
-    {
-      "name": "Address",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "city",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-        {
-          "name": "street",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "hello",
-          "parameters": [
-            {
-              "name": "message",
-              "type": "String",
-              "isNamed": false,
-              "isRequired": true,
-              "isNullable": false
-            }
-          ],
-          "returnType": "String",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "13:1"
-    },
-    {
-      "name": "User",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "name",
-          "type": "String",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        },
-        {
-          "name": "address",
-          "type": "Address",
-          "isNullable": false,
-          "isFinal": false,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "hello",
-          "parameters": [
-            {
-              "name": "message",
-              "type": "String",
-              "isNamed": false,
-              "isRequired": true,
-              "isNullable": false
-            }
-          ],
-          "returnType": "String",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "34:1"
-    },
-    {
-      "name": "Page",
-      "superClass": null,
-      "properties": [
-        {
-          "name": "user",
-          "type": "User",
-          "isNullable": false,
-          "isFinal": true,
-          "annotations": [
-            {
-              "name": "Attribute",
-              "value": "Attribute"
-            }
-          ]
-        }
-      ],
-      "methods": [
-        {
-          "name": "setup",
-          "parameters": [],
-          "returnType": "void",
-          "isAsync": false,
-          "annotations": [
-            {
-              "name": "Inject",
-              "value": "Inject"
-            }
-          ]
-        }
-      ],
-      "annotations": [
-        {
-          "name": "Injectable",
-          "value": "Injectable"
-        },
-        {
-          "name": "Dataclass",
-          "value": "Dataclass"
-        }
-      ],
-      "isAbstract": false,
-      "location": "56:1"
-    },
-    {
-      "name": "TestModule",
-      "superClass": null,
-      "properties": [],
-      "methods": [],
-      "annotations": [
-        {
-          "name": "Module",
-          "value": "Module"
-        }
-      ],
-      "isAbstract": false,
-      "location": "100:1"
-    }
-  ]
-}
-''';
 
 @Dataclass()
 class Address {
@@ -252,16 +68,21 @@ class Page {
 
   @Attribute()
   final User user;
+  @Attribute()
+  final List<User> users;
 
   // constructor
 
-  Page() : user = User(name: "andi", address: Address(city: "Köln", street: "Neumarkt"));
+  Page() : user = User(name: "andi", address: Address(city: "Köln", street: "Neumarkt")),
+  users = [
+    User(name: "andi", address: Address(city: "Köln", street: "Neumarkt")),
+    User(name: "sandra", address: Address(city: "Köln", street: "Neumarkt"))];
 
   // methods
 
-  @Inject()
-  void setup() {
-    print("setup");
+  @Method()
+  List<User> getUsers() {
+    return users;
   }
 }
 
@@ -284,10 +105,27 @@ void main() {
   
   var registry = ClassRegistry();
 
+  String json = "";
+
+  Future<void> load() async {
+    if (json.isEmpty) {
+      final file = File('test/resources/action_test.types.g.json');
+      json = await file.readAsString();
+    }
+  };
+
+
+  setUpAll(() async {
+    await load();
+  });
+
+
   // parser tests
 
   group('json', () {
-    test('parse ', () {
+    test('parse ', () async {
+      await load();
+
       final Map<String, dynamic> data = jsonDecode(json);
       
       registry.read(data["classes"]);
@@ -327,6 +165,20 @@ void main() {
 
     final checker = TypeChecker(RuntimeTypeTypeResolver(root: TypeDescriptor.forType(Page)));
 
+    test('methods ', () {
+      var code = "getUsers()";
+
+      var expression = parser.parse(code);
+
+      expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
+
+      print(expression);
+
+      //expect(() {
+      //  expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
+      //}, throwsA(isA<Exception>()));
+    });
+
     test('wrong parameter number ', () {
       var code = "user.hello()";
 
@@ -350,11 +202,19 @@ void main() {
   // auto completion
 
   group('autocompletion', () {
-    final Map<String, dynamic> data = jsonDecode(json);
+    late Map<String, dynamic> data;// = jsonDecode(json);
 
-    registry.read(data["classes"]);
+    //registry.read(data["classes"]);
 
-    var autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"))));
+    late Autocomplete autocomplete;// = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"))));
+
+    setUpAll(() async {
+      await load();
+      data = jsonDecode(json);
+      registry.read(data["classes"]);
+      autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"))));
+
+    });
     
     test('variable ', () {
       var suggestions = autocomplete.suggest("a");
@@ -390,6 +250,7 @@ void main() {
   // evaluator tests
 
   group('evaluator', () {
+
     var evaluator = ActionEvaluator(contextType: TypeDescriptor.forType(Page));
 
     // register types

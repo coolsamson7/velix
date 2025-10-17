@@ -3,6 +3,7 @@ import 'package:velix_di/di/di.dart';
 
 import '../../commands/command_stack.dart';
 import '../../metadata/metadata.dart';
+import '../../metadata/widget_data.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
@@ -15,6 +16,7 @@ class FontStyleEditorBuilder extends PropertyEditorBuilder<FontStyle> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,

@@ -3,12 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor/editor.dart';
+import 'package:velix_editor/metadata/widgets/for.dart';
 
 import '../../actions/action_parser.dart';
 import '../../actions/autocomplete.dart';
 import '../../actions/infer_types.dart';
+import '../../actions/types.dart';
 import '../../commands/command_stack.dart';
 import '../../metadata/metadata.dart';
+import '../../metadata/widget_data.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
@@ -19,6 +22,7 @@ class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,
@@ -26,6 +30,9 @@ class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return CodeEditor(
+      widget: widget,
+      object: object,
+      property: property,
       value: value ?? "",
       onChanged: onChanged,
     );
@@ -35,10 +42,13 @@ class CodeEditorBuilder extends PropertyEditorBuilder<Code> {
 class Code {}
 
 class CodeEditor extends StatefulWidget {
+  final WidgetData widget;
+  final dynamic object;
+  final PropertyDescriptor property;
   final dynamic value;
   final ValueChanged<dynamic> onChanged;
 
-  const CodeEditor({super.key, required this.value, required this.onChanged});
+  const CodeEditor({super.key, required this.widget, required this.object, required this.property, required this.value, required this.onChanged});
 
   @override
   State<CodeEditor> createState() => _CodeEditorState();
@@ -526,8 +536,55 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     var editContext = Provider.of<EditContext>(context);
 
-    typeChecker = TypeChecker(ClassDescTypeResolver(root: editContext.type!));
-    autocomplete = Autocomplete(typeChecker: typeChecker!);
+    //  TODO NEW
+
+    ClassDesc classContext = editContext.type!;
+    var resolver = ClassDescTypeResolver(root: classContext);
+    typeChecker = TypeChecker(resolver);
+
+    ClassDesc findContext() {
+      ClassDesc findWidgetContext(WidgetData widget) {
+        // recursion
+
+         var parentContext = widget.parent != null ? findWidgetContext(widget.parent!) :  editContext.type!;
+
+         // switch context in case of "for" widgets
+
+         var result = parentContext;
+         if (widget.type == "for") {
+           var forWidget = widget as ForWidgetData;
+
+           var pr = ActionParser.instance.parseStrict(forWidget.context, typeChecker: typeChecker);
+           if ( pr.success) {
+             var type = pr.value!.getType<Desc>();
+             if ( type.isList()) {
+               type = (type as ListDesc).elementType;
+               resolver =  ClassDescTypeResolver(root: type as ClassDesc);
+
+               typeChecker = TypeChecker(resolver);
+             }
+             else {
+               // TODO?
+             }
+           }
+           else {
+             // TODO ???
+           }
+
+         } // if
+
+         return result;
+      }
+
+      return findWidgetContext(widget.widget);
+    }
+
+    classContext = findContext();
+
+
+    autocomplete = Autocomplete(typeChecker: typeChecker!); // TODO in case of failure???
+
+    _parseState = checkParse(widget.value ?? "");
   }
 
   @override
@@ -565,7 +622,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
       curve: Curves.easeInOut,
     ));
 
-    _parseState = checkParse(initialValue);
+    //_parseState = checkParse(initialValue);
   }
 
   @override

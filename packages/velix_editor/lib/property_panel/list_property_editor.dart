@@ -3,6 +3,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import '../commands/command_stack.dart';
 import '../metadata/metadata.dart';
+import '../metadata/widget_data.dart';
 import '../util/message_bus.dart';
 import 'editor_builder.dart';
 import 'editor_registry.dart';
@@ -14,6 +15,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required dynamic object,
     required String label,
@@ -51,6 +53,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
               environment: environment,
               messageBus: messageBus,
               commandStack: commandStack,
+              widget: widget,
               property: property,
               object: object,
               elementType: elementType.type,
@@ -72,6 +75,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required dynamic object,
     required dynamic value,
@@ -88,6 +92,7 @@ class ListPropertyEditor extends PropertyEditorBuilder<List> {
         commandStack: commandStack,
         label: "",
         object: object,
+        widget: widget,
         property: property,
         value: value,
         onChanged: onChanged,

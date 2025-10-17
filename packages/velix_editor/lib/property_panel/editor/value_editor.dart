@@ -10,18 +10,21 @@ import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
 import '../../metadata/metadata.dart';
 import '../../metadata/properties/properties.dart' hide Border;
+import '../../metadata/widget_data.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 import 'code_editor.dart';
 
 class ValueField extends StatefulWidget {
   final PropertyDescriptor property;
+  final WidgetData widget;
   final dynamic object;
   final Value? value;
   final ValueChanged<dynamic> onChanged;
 
   const ValueField({
     super.key,
+    required this.widget,
     required this.property,
     required this.value,
     required this.object,
@@ -111,6 +114,7 @@ class _ValueFieldState extends State<ValueField> {
         environment: environment,
         messageBus: environment.get<MessageBus>(),
         commandStack: commandStack,
+        widget: widget.widget,
         property: findValueProperty("value"),
         object: value,
         label: "label",
@@ -294,6 +298,7 @@ class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,
@@ -301,6 +306,7 @@ class ValueEditorBuilder extends PropertyEditorBuilder<Value> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return ValueField(
+      widget: widget,
       object: object,
       property: property,
       value: value,

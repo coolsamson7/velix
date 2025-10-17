@@ -239,6 +239,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
                   environment: environment,
                   messageBus: widget.bus,
                   commandStack: widget.commandStack,
+                  widget: widget.target,
                   object: this.value,
                   property: property,
                   label: labels[property.name]!,

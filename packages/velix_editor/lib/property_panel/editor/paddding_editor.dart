@@ -7,6 +7,7 @@ import '../../commands/command_stack.dart';
 import '../../commands/property_changed_command.dart';
 import '../../metadata/metadata.dart';
 import '../../metadata/properties/properties.dart' as m show Insets;
+import '../../metadata/widget_data.dart';
 import '../../util/message_bus.dart';
 import '../editor_builder.dart';
 
@@ -17,6 +18,7 @@ class PaddingEditorBuilder extends PropertyEditorBuilder<m.Insets> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,

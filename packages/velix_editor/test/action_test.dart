@@ -129,6 +129,17 @@ void main() {
       final Map<String, dynamic> data = jsonDecode(json);
       
       registry.read(data["classes"]);
+
+      var getUsers = registry.getClass("Page").find("getUsers") as MethodDesc;
+
+      var returnType = getUsers.type;
+      if ( returnType.isList()) {
+        var elementType = (returnType as ListDesc).elementType;
+
+        print(elementType);
+      }
+
+      print(registry);
     });
   });
 

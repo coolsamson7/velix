@@ -5,7 +5,14 @@ class ClassRegistry {
   // instance data
 
   Map<String,ClassDesc> classes = {};
-  Map<String,Desc> types = {};
+  Map<String,Desc> types = {
+    "String": Desc("String"),
+    "int": Desc("int"),
+    "double": Desc("double"),
+    "bool": Desc("bool"),
+    "dynamic": Desc("dynamic"),
+    "void": Desc("void"),
+  };
 
   // constructor
 
@@ -20,12 +27,24 @@ class ClassRegistry {
   Desc getType(String name) {
     var result = types[name];
     if ( result == null) {
-      result = Desc.getType(name);
-      types[name] = result;
+      if (name.startsWith("List<")) {
+        var innerType = name.substring("List<".length, name.lastIndexOf(">"));
+
+        result = ListDesc(name, elementType: getType(innerType));
+
+        types[name] = result;
+      }
+      else {
+        result = Desc(name);
+        types[name] = result;
+        //throw Exception("unknown type $name");
+      }// TODO List<...> ????
     }
 
     return result;
   }
+
+  // constructor
 
   // public
 
@@ -35,8 +54,12 @@ class ClassRegistry {
     for (var item in items) {
       var name = item["name"];
 
-      classes[name] = ClassDesc(name);
-      types[name] = classes[name]!;
+      var desc = ClassDesc(name);
+
+      desc.registry = this; // TODO
+
+      classes[name] = desc;
+      types[name] = desc;
     }
 
     // parse
@@ -92,7 +115,7 @@ class Desc {
 
   // static
 
-  static Desc getType(String name) {
+  static Desc getType(String name) { // TODO sender?????
     var result = types[name];
     if ( result == null) {
       result = Desc(name);
@@ -102,13 +125,28 @@ class Desc {
     return result;
   }
 
+  // constructor
+
   // instance data
 
   final String name;
+  ClassRegistry? registry;
+
+  // public
+
+  bool isList() {
+    return this is ListDesc;
+  }
 
   // constructor
 
   Desc(this.name);
+}
+
+class ListDesc extends Desc {
+  final Desc elementType;
+
+  ListDesc(super.name, {required this.elementType});
 }
 
 class ParameterDesc extends Desc {
@@ -170,6 +208,14 @@ class MethodDesc extends ClassPropertyDesc {
   // constructor
 
   MethodDesc(String name, this.parameters, {required super.type}): super(name);
+
+  // public
+
+  dynamic getElementType() {
+    return null;
+  }
+
+  // override
 
   @override
   bool isMethod() => true;

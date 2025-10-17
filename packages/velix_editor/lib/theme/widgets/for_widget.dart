@@ -24,8 +24,8 @@ extension ForWidgetDataExtensions on ForWidgetData {
     // Compile the binding once
     Call? compiledCall;
     if (context.isNotEmpty) {
-      final type = TypeDescriptor.forType(instance.runtimeType);
-      compiledCall =  ActionCompiler.instance.compile(context, context: type);
+      final type = TypeDescriptor.forType(instance.runtimeType); // TODO -> WidgetContext
+      compiledCall = ActionCompiler.instance.compile(context, context: type);
     }
 
     // Evaluate list at runtime
@@ -176,6 +176,6 @@ class ForWidgetBuilder extends  WidgetBuilder<ForWidgetData> {
 
   @override
   Widget create(ForWidgetData data, Environment environment, BuildContext context) {
-    throw Exception("a for widget should not be created");
+    throw Exception("a for widget should not be created"); // TODO .> doch , wenn ncint in einem container???
   }
 }

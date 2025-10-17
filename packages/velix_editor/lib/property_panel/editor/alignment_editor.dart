@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:velix_editor/metadata/widgets/column.dart';
 import '../../commands/command_stack.dart';
 import '../../metadata/metadata.dart';
+import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/row.dart';
 import '../../util/message_bus.dart';
 
@@ -28,6 +29,7 @@ class CrossAxisAlignmentBuilder extends AbstractEnumBuilder<CrossAxisAlignment> 
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,
@@ -208,6 +210,7 @@ class MainAxisAlignmentBuilder extends AbstractEnumBuilder<MainAxisAlignment> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,
@@ -381,6 +384,7 @@ class MainAxisSizeBuilder extends AbstractEnumBuilder<MainAxisSize> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,

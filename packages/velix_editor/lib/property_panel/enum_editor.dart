@@ -5,6 +5,7 @@ import 'package:velix_i18n/i18n/i18n.dart';
 import '../../commands/command_stack.dart';
 import '../../util/message_bus.dart';
 import '../metadata/metadata.dart';
+import '../metadata/widget_data.dart';
 import 'editor_builder.dart';
 
 
@@ -25,6 +26,7 @@ abstract class AbstractEnumBuilder<T extends Enum> extends PropertyEditorBuilder
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,

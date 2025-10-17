@@ -16,6 +16,7 @@ class TemplateEditorBuilder extends PropertyEditorBuilder<bool> {
     required Environment environment,
     required MessageBus messageBus,
     required CommandStack commandStack,
+    required WidgetData widget,
     required PropertyDescriptor property,
     required String label,
     required dynamic object,

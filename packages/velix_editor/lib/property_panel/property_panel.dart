@@ -229,6 +229,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
                                 messageBus: bus,
                                 commandStack: commandStack,
                                 label: prop.name,
+                                widget: selected!,
                                 object: selected,
                                 property: prop,
                                 value: value,

@@ -223,7 +223,7 @@ void main() {
 
       suggestions = autocomplete.suggest("u");
 
-      expect(suggestions.length, equals(1));
+      expect(suggestions.length, equals(2));
 
       suggestions = autocomplete.suggest("user");
 

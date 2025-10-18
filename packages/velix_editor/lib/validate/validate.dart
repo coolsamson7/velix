@@ -20,12 +20,12 @@ class ValidationContext {
   // instance data
 
   Environment environment;
-  ClassDesc type;
-  List<ValidationError> errors = [];
+  TypeChecker typeChecker;
+  final List<ValidationError> errors;
 
   // constructor
 
-  ValidationContext({required this.type, required this.environment});
+  ValidationContext({required this.typeChecker, required this.environment, List<ValidationError>? errors}) : errors = errors ?? <ValidationError>[];
 
   // public
 
@@ -77,27 +77,43 @@ class ExpressionPropertyValidator extends PropertyValidator<String> {
 
   // internal
 
-  void validateExpression(String binding, ClassDesc type) {
-    if ( binding.isNotEmpty)
+  void validateExpression(String binding, TypeChecker typeChecker) {
+    if (binding.isNotEmpty)
       try {
-        var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true)));
+        var result = ActionParser.instance.parseStrict(binding, typeChecker: typeChecker);
         if (!result.success)
-          throw Exception(result.message); // TODO
-
-        // TODO
-
-        print(1);
+          throw Exception(result.message);
       }
       catch(e) {
         rethrow;
       }
   }
 
-  // implement
+  // override
 
   @override
   void validate(String value, ValidationContext context) {
-    validateExpression(value, context.type);
+    validateExpression(value, context.typeChecker);
+  }
+}
+
+@Injectable()
+class ContextPropertyValidator extends ExpressionPropertyValidator {
+  // override
+
+  @override
+  void validate(String value, ValidationContext context) {
+    var pr = ActionParser.instance.parseStrict(value, typeChecker: context.typeChecker);
+    if ( pr.success) {
+      var type = pr.value!.getType<Desc>();
+      if (type.isList()) {
+        type = (type as ListDesc).elementType;
+        context.typeChecker = TypeChecker(ClassDescTypeResolver(root: type as ClassDesc));
+      }
+    }
+    else {
+      throw Exception(pr.message);
+    }
   }
 }
 
@@ -114,10 +130,10 @@ class ValuePropertyValidator extends PropertyValidator<Value> {
 
   void validateI18N(String key) {}
 
-  void validateBinding(String binding, ClassDesc type) {
+  void validateBinding(String binding, TypeChecker typeChecker) {
     if ( binding.isNotEmpty)
       try {
-        var result = ActionParser.instance.parseStrict(binding, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true), fail: true));
+        var result = ActionParser.instance.parseStrict(binding, typeChecker: typeChecker);
         if (!result.success)
           throw Exception(result.message);
 
@@ -134,8 +150,9 @@ class ValuePropertyValidator extends PropertyValidator<Value> {
   void validate(Value value, ValidationContext context) {
     if (value.type == ValueType.i18n)
       validateI18N(value.value);
+
     else if (value.type == ValueType.binding)
-      validateBinding(value.value, context.type);
+      validateBinding(value.value, context.typeChecker);
   }
 }
 
@@ -165,11 +182,11 @@ class WidgetValidator {
   }
   
   // internal
-  
-  void _validate(WidgetData widget, ValidationContext context) {
-    var descriptor = registry[widget.type];
 
-    for (var property in descriptor.properties.values) {
+  ValidationContext _validateProperties(WidgetData widget, ValidationContext context) {
+    TypeChecker typeChecker = context.typeChecker;
+
+    for (var property in registry[widget.type].properties.values) {
       var validator = getValidator(property, context);
       if (validator != null) {
         try {
@@ -186,6 +203,17 @@ class WidgetValidator {
         }
       }
     }
+
+    if (typeChecker != context.typeChecker) {
+      var newContext = ValidationContext(typeChecker: context.typeChecker, environment: context.environment, errors: context.errors);
+
+      context.typeChecker = typeChecker; // restore
+
+      // and return new instance for child widgets
+
+      return newContext;
+    }
+    else return context;
   }
 
   // public
@@ -194,7 +222,7 @@ class WidgetValidator {
     // local function
 
     void validateWidget(WidgetData widget, ValidationContext context) {
-      _validate(widget, context);
+      context = _validateProperties(widget, context);
       
       // recursion
 
@@ -202,9 +230,9 @@ class WidgetValidator {
         validateWidget(child, context);
     }
 
-    var context = ValidationContext(environment: environment, type: type);
+    var context = ValidationContext(environment: environment, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true)));
 
-    //TODO AAAA validateWidget(widget, context);
+    validateWidget(widget, context);
 
     if (context.errors.isNotEmpty)
       throw ValidationException(errors: context.errors);

@@ -2,6 +2,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
 import '../../property_panel/editor/code_editor.dart';
+import '../../validate/validate.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
@@ -12,7 +13,7 @@ import '../widget_data.dart';
 class ForWidgetData extends WidgetData {
   // instance data
 
-  @DeclareProperty(group: "general",  editor: CodeEditorBuilder)
+  @DeclareProperty(group: "general",  editor: CodeEditorBuilder, validator: ContextPropertyValidator)
   String context;
 
   // constructor

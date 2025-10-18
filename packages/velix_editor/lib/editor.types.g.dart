@@ -21,7 +21,7 @@ import 'package:velix_editor/theme/abstract_widget.dart' show AbstractWidgetStat
 import 'package:flutter/src/widgets/framework.dart' show StatefulWidget;
 import 'package:velix_editor/metadata/widgets/button.dart' show ButtonWidgetData;
 import 'package:velix_editor/property_panel/editor/code_editor.dart' show CodeEditorBuilder;
-import 'package:velix_editor/validate/validate.dart' show ExpressionPropertyValidator, PropertyValidator, WidgetValidator, ValuePropertyValidator;
+import 'package:velix_editor/validate/validate.dart' show ExpressionPropertyValidator, ContextPropertyValidator, PropertyValidator, WidgetValidator, ValuePropertyValidator;
 import 'package:velix_editor/metadata/widgets/column.dart' show ColumnWidgetData;
 import 'package:flutter/src/rendering/flex.dart' show MainAxisAlignment, CrossAxisAlignment, MainAxisSize;
 import 'package:velix_editor/metadata/widgets/container.dart' show ContainerWidgetData;
@@ -392,7 +392,7 @@ void registerEditorTypes() {
   );
 
   var propertyEditorBuilderDescriptor =  type<PropertyEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor_builder.dart:9:1',
+    location: 'package:velix_editor/property_panel/editor_builder.dart:10:1',
     annotations: [
       Injectable()
     ],
@@ -574,7 +574,7 @@ void registerEditorTypes() {
   );
 
   type<WidgetValidator>(
-    location: 'package:velix_editor/validate/validate.dart:143:1',
+    location: 'package:velix_editor/validate/validate.dart:160:1',
     annotations: [
       Injectable()
     ],
@@ -681,7 +681,7 @@ void registerEditorTypes() {
   );
 
   type<BooleanEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/bool_editor.dart:11:1',
+    location: 'package:velix_editor/property_panel/editor/bool_editor.dart:12:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -703,7 +703,7 @@ void registerEditorTypes() {
   );
 
   type<CodeEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:15:1',
+    location: 'package:velix_editor/property_panel/editor/code_editor.dart:18:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -725,7 +725,7 @@ void registerEditorTypes() {
   );
 
   type<ColorEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/color_editor.dart:11:1',
+    location: 'package:velix_editor/property_panel/editor/color_editor.dart:12:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -747,7 +747,7 @@ void registerEditorTypes() {
   );
 
   type<FontEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/font_editor.dart:10:1',
+    location: 'package:velix_editor/property_panel/editor/font_editor.dart:11:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -769,7 +769,7 @@ void registerEditorTypes() {
   );
 
   type<FontStyleEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/font_style_editor.dart:9:1',
+    location: 'package:velix_editor/property_panel/editor/font_style_editor.dart:10:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -791,7 +791,7 @@ void registerEditorTypes() {
   );
 
   type<FontWeightEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/font_weight_editor.dart:10:1',
+    location: 'package:velix_editor/property_panel/editor/font_weight_editor.dart:11:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -813,7 +813,7 @@ void registerEditorTypes() {
   );
 
   type<GridItemEditor>(
-    location: 'package:velix_editor/property_panel/editor/grid_editor.dart:9:1',
+    location: 'package:velix_editor/property_panel/editor/grid_editor.dart:10:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -835,7 +835,7 @@ void registerEditorTypes() {
   );
 
   type<IntEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/int_editor.dart:10:1',
+    location: 'package:velix_editor/property_panel/editor/int_editor.dart:11:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -857,7 +857,7 @@ void registerEditorTypes() {
   );
 
   type<PaddingEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/paddding_editor.dart:13:1',
+    location: 'package:velix_editor/property_panel/editor/paddding_editor.dart:14:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -879,7 +879,7 @@ void registerEditorTypes() {
   );
 
   type<StringEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/string_editor.dart:9:1',
+    location: 'package:velix_editor/property_panel/editor/string_editor.dart:10:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -923,7 +923,7 @@ void registerEditorTypes() {
   );
 
   type<ValueEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/value_editor.dart:290:1',
+    location: 'package:velix_editor/property_panel/editor/value_editor.dart:294:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -945,7 +945,7 @@ void registerEditorTypes() {
   );
 
   var abstractEnumBuilderDescriptor =  type<AbstractEnumBuilder>(
-    location: 'package:velix_editor/property_panel/enum_editor.dart:11:1',
+    location: 'package:velix_editor/property_panel/enum_editor.dart:12:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable(factory: false)
@@ -965,7 +965,7 @@ void registerEditorTypes() {
   );
 
   type<ListPropertyEditor>(
-    location: 'package:velix_editor/property_panel/list_property_editor.dart:10:1',
+    location: 'package:velix_editor/property_panel/list_property_editor.dart:11:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -987,7 +987,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:13:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:12:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1009,7 +1009,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:82:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:81:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1131,7 +1131,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:22:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:18:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1156,7 +1156,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:113:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:102:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1181,7 +1181,7 @@ void registerEditorTypes() {
   );
 
   type<ForEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:54:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:51:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1206,7 +1206,7 @@ void registerEditorTypes() {
   );
 
   type<ForWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:175:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:170:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1281,7 +1281,7 @@ void registerEditorTypes() {
   );
 
   type<LabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:11:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:10:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1303,7 +1303,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:38:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:37:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1325,7 +1325,7 @@ void registerEditorTypes() {
   );
 
   type<ListWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/list_widget.dart:16:1',
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:12:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1350,7 +1350,7 @@ void registerEditorTypes() {
   );
 
   type<EditListWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/list_widget.dart:82:1',
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:74:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1425,7 +1425,7 @@ void registerEditorTypes() {
   );
 
   type<SheetEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:16:1',
+    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:15:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1450,7 +1450,7 @@ void registerEditorTypes() {
   );
 
   type<SheetWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:90:1',
+    location: 'package:velix_editor/theme/widgets/sheet_widget.dart:89:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1525,7 +1525,7 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:11:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:10:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1547,7 +1547,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:47:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:46:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1569,7 +1569,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:16:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:15:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1591,7 +1591,7 @@ void registerEditorTypes() {
   );
 
   type<TextEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:127:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:126:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1612,7 +1612,7 @@ void registerEditorTypes() {
     ],
   );
 
-  type<ExpressionPropertyValidator>(
+  var expressionPropertyValidatorDescriptor =  type<ExpressionPropertyValidator>(
     location: 'package:velix_editor/validate/validate.dart:68:1',
     superClass: propertyValidatorDescriptor,
     annotations: [
@@ -1635,7 +1635,7 @@ void registerEditorTypes() {
   );
 
   type<ValuePropertyValidator>(
-    location: 'package:velix_editor/validate/validate.dart:105:1',
+    location: 'package:velix_editor/validate/validate.dart:121:1',
     superClass: propertyValidatorDescriptor,
     annotations: [
       Injectable()
@@ -1831,7 +1831,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/dropdown.dart:10:1',
+    location: 'package:velix_editor/metadata/widgets/dropdown.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_switch"),
@@ -1877,7 +1877,7 @@ void registerEditorTypes() {
     fields: [
       field<ForWidgetData,String>('context',
         annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder)
+          DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ContextPropertyValidator)
         ],
         getter: (obj) => obj.context,
         setter: (obj, value) => (obj as ForWidgetData).context = value,
@@ -1989,7 +1989,7 @@ void registerEditorTypes() {
   );
 
   type<ListWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/list.dart:10:1',
+    location: 'package:velix_editor/metadata/widgets/list.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "list", group: "widgets", icon: "widget_switch"),
@@ -2063,7 +2063,7 @@ void registerEditorTypes() {
   );
 
   type<SheetWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/sheet.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/sheet.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "sheet", group: "container", icon: "widget_column"),
@@ -2190,7 +2190,7 @@ void registerEditorTypes() {
   );
 
   type<CrossAxisAlignmentBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:14:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:15:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2212,7 +2212,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisAlignmentBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:194:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:196:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2234,7 +2234,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisSizeBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:375:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:378:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2256,7 +2256,7 @@ void registerEditorTypes() {
   );
 
   type<BorderStyleBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:432:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:436:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2273,6 +2273,28 @@ void registerEditorTypes() {
           param<PropertyEditorBuilderFactory>('registry', isRequired: true)
         ],
         invoker: (List<dynamic> args)=> (args[0] as BorderStyleBuilder).setup(args[1])
+      )
+    ],
+  );
+
+  type<ContextPropertyValidator>(
+    location: 'package:velix_editor/validate/validate.dart:100:1',
+    superClass: expressionPropertyValidatorDescriptor,
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => ContextPropertyValidator(),
+    fromMapConstructor: (Map<String,dynamic> args) => ContextPropertyValidator(),
+    fromArrayConstructor: (List<dynamic> args) => ContextPropertyValidator(),
+    methods: [
+      method<ContextPropertyValidator,void>('set',
+        annotations: [
+          Inject()
+        ],
+        parameters: [
+          param<WidgetValidator>('validator', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as ContextPropertyValidator).set(args[1])
       )
     ],
   );

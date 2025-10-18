@@ -9,7 +9,7 @@ import 'expressions.dart';
 // we need a generalized mechanism, since we have to deal with real types ( e.g. TypeDescriptor )
 // as well as the information available from json files with no representation in the runtime. Gosh...
 
-class TypeInfo<T,D> {
+abstract class TypeInfo<T,D> {
   final T type;
   final D? descriptor;
 
@@ -48,6 +48,8 @@ abstract class TypeResolver<T extends TypeInfo<dynamic,dynamic>> {
   T rootType();
 
   bool isAssignableFrom(dynamic a, dynamic b);
+
+  TypeCheckerContext makeContext();
 }
 
 // this is the implementation for real types
@@ -79,6 +81,11 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   RuntimeTypeTypeResolver({required this.root});
 
   // override
+
+  @override
+  TypeCheckerContext makeContext() {
+    return TypeCheckerContext<RuntimeTypeInfo>();
+  }
 
   @override
   void checkArguments(dynamic descriptor, List<TypeInfo> arguments) {
@@ -189,6 +196,11 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   // override
 
   @override
+  TypeCheckerContext makeContext() {
+    return ClassTypeCheckerContext();
+  }
+
+  @override
   void checkArguments(dynamic descriptor, List<TypeInfo> arguments) {
     var method = descriptor as MethodDesc;
 
@@ -237,6 +249,10 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 }
 
 class TypeCheckerContext<TI> extends VisitorContext {
+  bool isValid() {
+    return true;
+  }
+
   TI resolved(TI type) {
     return type;
   }
@@ -262,6 +278,11 @@ class ClassTypeCheckerContext extends TypeCheckerContext<ClassDescTypeInfo> {
   }
 
   // override
+
+  @override
+  bool isValid() {
+    return unknown.isEmpty;
+  }
 
   @override
   ClassDescTypeInfo resolved(ClassDescTypeInfo type) {

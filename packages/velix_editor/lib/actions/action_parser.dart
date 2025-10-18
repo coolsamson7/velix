@@ -99,6 +99,7 @@ class ActionParser {
 
   /// Parse input requiring complete success.
   ParseResult parseStrict(String input, { TypeChecker? typeChecker}) {
+    print(input);
     final result = parser.expression.end().parse(input);
     if (result is Success<Expression>) {
       // check types
@@ -107,19 +108,14 @@ class ActionParser {
       var message = "unknown property";
       if (typeChecker != null) {
         var expr = result.value;
-// TODO this sucks
-        var runtime = typeChecker.resolver is RuntimeTypeTypeResolver;
-
-        var context = runtime ? TypeCheckerContext<RuntimeTypeInfo>() : ClassTypeCheckerContext();
 
         try {
+          var context = typeChecker.resolver.makeContext();
           expr.accept(typeChecker, context);
 
-          if (!runtime) {
-            valid = (context as ClassTypeCheckerContext).unknown.isEmpty;
-            if (!valid) {
-              message = "unknown property " + (context as ClassTypeCheckerContext).unknown[0].property;
-            }
+          valid = context.isValid();
+          if (!valid) {
+            message = "unknown property ${(context as ClassTypeCheckerContext).unknown[0].property}";
           }
         }
         catch(e) {

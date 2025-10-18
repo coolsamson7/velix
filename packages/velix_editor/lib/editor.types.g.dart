@@ -1010,7 +1010,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:81:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:80:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1182,7 +1182,7 @@ void registerEditorTypes() {
   );
 
   type<ForEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:51:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:50:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1207,7 +1207,7 @@ void registerEditorTypes() {
   );
 
   type<ForWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:170:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:169:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1548,7 +1548,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:46:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:45:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1592,7 +1592,7 @@ void registerEditorTypes() {
   );
 
   type<TextEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:126:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:125:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1832,7 +1832,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/dropdown.dart:8:1',
+    location: 'package:velix_editor/metadata/widgets/dropdown.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_switch"),
@@ -1842,11 +1842,14 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "dropdown"), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null)
+      param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('onSelect', isNamed: true, isNullable: true, defaultValue: null), 
+      param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null), 
+      param<Value>('placeholder', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = "dropdown", Cell? cell, List<WidgetData>? children, Insets? padding}) => DropDownWidgetData(type: type, cell: cell, children: children, padding: padding),
-    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "dropdown", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, padding: args['padding'] as Insets?),
-    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "dropdown", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, padding: args[3] as Insets?),
+    constructor: ({String type = "dropdown", Cell? cell, List<WidgetData>? children, Insets? padding, String? onSelect, String? databinding, required Value placeholder}) => DropDownWidgetData(type: type, cell: cell, children: children, padding: padding, onSelect: onSelect, databinding: databinding, placeholder: placeholder),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownWidgetData(type: args['type'] as String? ?? "dropdown", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, padding: args['padding'] as Insets?, onSelect: args['onSelect'] as String? ?? '', databinding: args['databinding'] as String? ?? '', placeholder: args['placeholder'] as Value),
+    fromArrayConstructor: (List<dynamic> args) => DropDownWidgetData(type: args[0] as String? ?? "dropdown", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, padding: args[3] as Insets?, onSelect: args[4] as String? ?? '', databinding: args[5] as String? ?? '', placeholder: args[6] as Value),
     fields: [
       field<DropDownWidgetData,Insets>('padding',
         annotations: [
@@ -1854,6 +1857,31 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.padding,
         setter: (obj, value) => (obj as DropDownWidgetData).padding = value,
+        isNullable: true
+      ), 
+      field<DropDownWidgetData,Value>('placeholder',
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.placeholder,
+        setter: (obj, value) => (obj as DropDownWidgetData).placeholder = value,
+      ), 
+      field<DropDownWidgetData,String>('databinding',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "general")
+        ],
+        getter: (obj) => obj.databinding,
+        setter: (obj, value) => (obj as DropDownWidgetData).databinding = value,
+        isNullable: true
+      ), 
+      field<DropDownWidgetData,String>('onSelect',
+        type: StringType().optional(),
+        annotations: [
+          DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
+        ],
+        getter: (obj) => obj.onSelect,
+        setter: (obj, value) => (obj as DropDownWidgetData).onSelect = value,
         isNullable: true
       )
     ],
@@ -2118,15 +2146,15 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "switch"), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('label', isNamed: true, isRequired: true), 
+      param<Value>('label', isNamed: true, isRequired: true), 
       param<Insets>('padding', isNamed: true, isNullable: true, defaultValue: null), 
       param<String>('databinding', isNamed: true, isNullable: true, defaultValue: null)
     ],
-    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, String label = '', Insets? padding, String? databinding}) => SwitchWidgetData(type: type, cell: cell, children: children, label: label, padding: padding, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as String? ?? '', padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as String? ?? '', padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
+    constructor: ({String type = "switch", Cell? cell, List<WidgetData>? children, required Value label, Insets? padding, String? databinding}) => SwitchWidgetData(type: type, cell: cell, children: children, label: label, padding: padding, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => SwitchWidgetData(type: args['type'] as String? ?? "switch", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as Value, padding: args['padding'] as Insets?, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => SwitchWidgetData(type: args[0] as String? ?? "switch", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as Value, padding: args[4] as Insets?, databinding: args[5] as String? ?? ''),
     fields: [
-      field<SwitchWidgetData,String>('label',
+      field<SwitchWidgetData,Value>('label',
         annotations: [
           DeclareProperty(group: "general")
         ],
@@ -2154,7 +2182,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/text.dart:9:1',
+    location: 'package:velix_editor/metadata/widgets/text.dart:11:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "text", group: "widgets", icon: "widget_text"),
@@ -2164,14 +2192,14 @@ void registerEditorTypes() {
       param<String>('type', isNamed: true, isNullable: true, defaultValue: "text"), 
       param<Cell>('cell', isNamed: true, isNullable: true, defaultValue: null), 
       param<List<WidgetData>>('children', isNamed: true, isNullable: true, defaultValue: null), 
-      param<String>('label', isNamed: true, isRequired: true), 
+      param<Value>('label', isNamed: true, isRequired: true), 
       param<String>('databinding', isNamed: true, isRequired: true)
     ],
-    constructor: ({String type = "text", Cell? cell, List<WidgetData>? children, String label = '', String? databinding}) => TextWidgetData(type: type, cell: cell, children: children, label: label, databinding: databinding),
-    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as String? ?? '', databinding: args['databinding'] as String? ?? ''),
-    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as String? ?? '', databinding: args[4] as String? ?? ''),
+    constructor: ({String type = "text", Cell? cell, List<WidgetData>? children, required Value label, String? databinding}) => TextWidgetData(type: type, cell: cell, children: children, label: label, databinding: databinding),
+    fromMapConstructor: (Map<String,dynamic> args) => TextWidgetData(type: args['type'] as String? ?? "text", cell: args['cell'] as Cell?, children: args['children'] as List<WidgetData>?, label: args['label'] as Value, databinding: args['databinding'] as String? ?? ''),
+    fromArrayConstructor: (List<dynamic> args) => TextWidgetData(type: args[0] as String? ?? "text", cell: args[1] as Cell?, children: args[2] as List<WidgetData>?, label: args[3] as Value, databinding: args[4] as String? ?? ''),
     fields: [
-      field<TextWidgetData,String>('label',
+      field<TextWidgetData,Value>('label',
         annotations: [
           DeclareProperty(group: "general")
         ],

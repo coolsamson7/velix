@@ -73,14 +73,13 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
     var widgetContext =  WidgetContextScope.of(context);
 
     var mapper = widgetContext.formMapper;
-    var instance = widgetContext.instance;
 
     TextEditingController controller =  TextEditingController();
     FocusNode? focusNode = FocusNode();
 
     var adapter = environment.get<MaterialTextFormFieldAdapter>();
 
-    var typeProperty = data.databinding != null && data.databinding!.isNotEmpty ? mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!) : null;
+    var typeProperty = data.databinding != null && data.databinding!.isNotEmpty ? mapper.computeProperty(widgetContext.typeDescriptor, data.databinding!) : null;
 
     TextFormField result;
 
@@ -103,7 +102,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
           key: ValueKey(data.databinding),
           controller: controller,
           focusNode: focusNode,
-          decoration: InputDecoration(labelText: data.label),
+          decoration: InputDecoration(labelText: resolveValue(widgetContext, data.label).$1),
           validator: validate,
           keyboardType: textInputType,
           inputFormatters: inputFormatters
@@ -115,7 +114,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
         key: ValueKey(data.databinding),
         controller: controller,
         focusNode: focusNode,
-        decoration: InputDecoration(labelText: data.label)
+        decoration: InputDecoration(labelText:  resolveValue(widgetContext, data.label).$1)
     );
 
 
@@ -131,14 +130,13 @@ class TextEditWidgetBuilder extends WidgetBuilder<TextWidgetData> {
 
   // override
 
-
   @override
   Widget create(TextWidgetData data, Environment environment, BuildContext context) {
     // In edit mode, make the text field non-interactive
     return IgnorePointer(
       ignoring: true,
       child: TextField(
-        decoration: InputDecoration(labelText: data.label),
+        decoration: InputDecoration(labelText: data.label.value),
         // Optional: You might also want to disable the field visually
         enabled: false, // This makes it look disabled but IgnorePointer is what actually blocks interaction
       ),

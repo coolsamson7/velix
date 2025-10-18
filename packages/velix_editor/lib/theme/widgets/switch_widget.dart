@@ -20,11 +20,10 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
     var widgetContext =  WidgetContextScope.of(context);
 
     var mapper = widgetContext.formMapper;
-    var instance = widgetContext.instance;
 
     var adapter = environment.get<SwitchAdapter>();
 
-    var typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), data.databinding!);
+    var typeProperty = mapper.computeProperty(widgetContext.typeDescriptor, data.databinding!);
 
     var result = Switch(
       padding: data.padding?.edgeInsets(),

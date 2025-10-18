@@ -4,7 +4,7 @@ import 'package:velix_editor/actions/infer_types.dart';
 import 'action_parser.dart';
 import 'eval.dart';
 
-class ActionCompiler {
+class ActionCompiler { // TODO: sender???
   ActionCompiler._internal();
 
   // static singleton instance (initialized on first call)
@@ -20,12 +20,12 @@ class ActionCompiler {
 
   // public
 
-   Call compile(String input, {required TypeDescriptor context}) {
+   Eval compile(String input, {required TypeDescriptor context}) {
      var result = parser.parseStrict(input, typeChecker: TypeChecker(RuntimeTypeTypeResolver(root: context)));
 
      // compute call
 
-     var visitor = CallVisitor(context);
+     var visitor = EvalVisitor(context);
 
      return result.value!.accept(visitor, CallVisitorContext(instance: null));
    }
@@ -49,7 +49,7 @@ class ActionEvaluator {
 
     // compute call
 
-    var visitor = CallVisitor(contextType);
+    var visitor = EvalVisitor(contextType);
 
     var call = result.value!.accept(visitor, CallVisitorContext(instance: instance));
 

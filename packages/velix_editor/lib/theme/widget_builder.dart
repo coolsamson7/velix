@@ -74,7 +74,7 @@ abstract class WidgetBuilder<T extends WidgetData> {
       result = Translator.tr(result);
 
     else if (value.type == ValueType.binding) {
-      typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), result);
+      typeProperty = mapper.computeProperty(widgetContext.typeDescriptor, result);
       result = typeProperty.get(instance, ValuedWidgetContext(mapper: mapper));
     }
 

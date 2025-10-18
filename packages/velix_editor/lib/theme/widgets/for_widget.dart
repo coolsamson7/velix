@@ -19,18 +19,17 @@ import '../widget_builder.dart';
 extension ForWidgetDataExtensions on ForWidgetData {
   Iterable<(dynamic, Widget)> expand(BuildContext buildContext, TypeRegistry typeRegistry, Environment environment) {
     final widgetContext = WidgetContextScope.of(buildContext);
-    final instance = widgetContext.instance;
 
     // Compile the binding once
-    Call? compiledCall;
+
+    Eval? compiledCall;
     if (context.isNotEmpty) {
-      final type = TypeDescriptor.forType(instance.runtimeType); // TODO -> WidgetContext
-      compiledCall = ActionCompiler.instance.compile(context, context: type);
+      compiledCall = ActionCompiler.instance.compile(context, context: widgetContext.typeDescriptor);
     }
 
     // Evaluate list at runtime
 
-    List<dynamic> items = compiledCall?.eval(instance) ?? const [];
+    List<dynamic> items = compiledCall?.eval(widgetContext.instance) ?? const [];
 
     if (children.isEmpty) return [];
 

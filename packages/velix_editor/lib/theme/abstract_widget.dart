@@ -21,7 +21,7 @@ abstract class AbstractWidgetState<T extends StatefulWidget> extends State<T> {
       result = Translator.tr(result);
 
     else if (value.type == ValueType.binding) {
-      typeProperty = mapper.computeProperty(TypeDescriptor.forType(instance.runtimeType), result);
+      typeProperty = mapper.computeProperty(widgetContext.typeDescriptor, result);
       result = typeProperty.get(instance, ValuedWidgetContext(mapper: mapper));
     }
 

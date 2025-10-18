@@ -18,25 +18,25 @@ class CallVisitorContext extends VisitorContext {
   CallVisitorContext({required this.instance});
 }
 
-abstract class Call {
+abstract class Eval {
   dynamic eval(dynamic value);
 }
 
-class This extends Call {
+class This extends Eval {
   @override
   dynamic eval(dynamic value) {
     return value;
   }
 }
 
-class Value extends Call {
+class EvalValue extends Eval {
   // instance data
 
   dynamic value;
 
   // constructor
 
-  Value({required this.value});
+  EvalValue({required this.value});
 
   // override
 
@@ -46,14 +46,14 @@ class Value extends Call {
   }
 }
 
-class Field extends Call {
+class EvalField extends Eval {
   // instance data
 
   FieldDescriptor field;
 
   // constructor
 
-  Field({required this.field});
+  EvalField({required this.field});
 
   // override
 
@@ -63,15 +63,15 @@ class Field extends Call {
   }
 }
 
-class Member extends Call {
+class EvalMember extends Eval {
   // instance data
 
-  Call receiver;
+  Eval receiver;
   FieldDescriptor field;
 
   // constructor
 
-  Member({required this.receiver, required this.field});
+  EvalMember({required this.receiver, required this.field});
 
   // override
 
@@ -81,16 +81,16 @@ class Member extends Call {
   }
 }
 
-class Method extends Call {
+class EvalMethod extends Eval {
   // instance data
 
-  Call receiver;
+  Eval receiver;
   MethodDescriptor method;
-  late List<Call> arguments;
+  late List<Eval> arguments;
 
   // constructor
 
-  Method({required this.receiver, required this.method});
+  EvalMethod({required this.receiver, required this.method});
 
   // override
 
@@ -102,46 +102,46 @@ class Method extends Call {
   }
 }
 
-class CallVisitor extends ExpressionVisitor<Call,CallVisitorContext> {
+class EvalVisitor extends ExpressionVisitor<Eval,CallVisitorContext> {
   // instance data
 
   final TypeDescriptor rootClass;
 
   // constructor
 
-  CallVisitor(this.rootClass);
+  EvalVisitor(this.rootClass);
 
   // visitors
 
   @override
-  Call visitLiteral(Literal expr, CallVisitorContext context) {
+  Eval visitLiteral(Literal expr, CallVisitorContext context) {
     if (expr.value is int)
-      return Value(value: expr.value);
+      return EvalValue(value: expr.value);
 
     if (expr.value is String)
-      return Value(value: expr.value);
+      return EvalValue(value: expr.value);
 
     if (expr.value is bool)
-      return Value(value: expr.value);
+      return EvalValue(value: expr.value);
 
-    return Value(value: null); // TODO?
+    return EvalValue(value: null); // TODO?
   }
 
   @override
-  Call visitVariable(Variable expr, CallVisitorContext context) {
+  Eval visitVariable(Variable expr, CallVisitorContext context) {
     var property =  rootClass.getProperty(expr.identifier.name);
     return property.isField() ?
-      Field(field: property as FieldDescriptor) :
-      Method(receiver: This(), method: property as MethodDescriptor); // ?context.instance must be a call
+      EvalField(field: property as FieldDescriptor) :
+      EvalMethod(receiver: This(), method: property as MethodDescriptor); // ?context.instance must be a call
   }
 
   @override
-  Call visitUnary(UnaryExpression expr, CallVisitorContext context) {
+  Eval visitUnary(UnaryExpression expr, CallVisitorContext context) {
     return expr.argument.accept(this, context);
   }
 
   @override
-  Call visitMember(MemberExpression expr, CallVisitorContext context) {
+  Eval visitMember(MemberExpression expr, CallVisitorContext context) {
     var receiver = expr.object.accept(this, context);
     var type = expr.object.getType<ObjectType>();
 
@@ -149,18 +149,18 @@ class CallVisitor extends ExpressionVisitor<Call,CallVisitorContext> {
     var descriptor = type.typeDescriptor.getProperty<AbstractPropertyDescriptor>(property);
 
     return descriptor.isField() ?
-      Member(receiver: receiver, field: descriptor as FieldDescriptor) :
-      Method(receiver: receiver, method: descriptor as MethodDescriptor);
+      EvalMember(receiver: receiver, field: descriptor as FieldDescriptor) :
+      EvalMethod(receiver: receiver, method: descriptor as MethodDescriptor);
   }
 
   @override
-  Call visitThis(ThisExpression expr, CallVisitorContext context) {
+  Eval visitThis(ThisExpression expr, CallVisitorContext context) {
     return This();
   }
 
   @override
-  Call visitCall(CallExpression expr, CallVisitorContext context) {
-    var method = expr.callee.accept(this, context) as Method;
+  Eval visitCall(CallExpression expr, CallVisitorContext context) {
+    var method = expr.callee.accept(this, context) as EvalMethod;
 
     method.arguments = expr.arguments.map((arg) => arg.accept(this, context)).toList();
 

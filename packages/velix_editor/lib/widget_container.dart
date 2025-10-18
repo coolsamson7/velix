@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_ui/databinding/form_mapper.dart';
 
 import './dynamic_widget.dart';
@@ -13,13 +14,14 @@ class WidgetContext {
   // instance data
 
   dynamic instance;
+  TypeDescriptor typeDescriptor;
   FormMapper formMapper;
   late WidgetContainer container;
   Map<TypeProperty,Set<WidgetData>> bindings = {};
 
   // constructor
 
-  WidgetContext({required this.instance, FormMapper? mapper}) :  formMapper = mapper ?? FormMapper(instance: instance, twoWay: true) {
+  WidgetContext({required this.instance, FormMapper? mapper}) : typeDescriptor = TypeDescriptor.forType(instance.runtimeType),   formMapper = mapper ?? FormMapper(instance: instance, twoWay: true) {
     //formMapper.addListener((event) => onEvent, emitOnChange: true);
   }
 

@@ -44,11 +44,10 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
 
     // Only compile once per lifecycle if onClick is set
     if (widget.data.onClick != null && widget.data.onClick!.isNotEmpty && _onClick == null) {
-      final instance =  WidgetContextScope.of(context).instance;
-      final type = TypeDescriptor.forType(instance.runtimeType);
+      var widgetContext = WidgetContextScope.of(context);
 
-      final call = ActionCompiler.instance.compile(widget.data.onClick!, context: type);
-      _onClick = () => call.eval(instance);
+      final call = ActionCompiler.instance.compile(widget.data.onClick!, context: widgetContext.typeDescriptor);
+      _onClick = () => call.eval(widgetContext.instance);
     }
   }
 

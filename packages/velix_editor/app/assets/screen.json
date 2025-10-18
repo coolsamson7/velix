@@ -25,6 +25,12 @@
         },
         {
           "type": "dropdown",
+          "placeholder": {
+            "type": "value",
+            "value": "Select..."
+          },
+          "databinding": "user",
+          "onSelect": "selectUser(value)",
           "children": [
             {
               "type": "for",
@@ -46,7 +52,10 @@
           "children": [
             {
               "databinding": "",
-              "label": "1/0",
+              "label": {
+                "type": "value",
+                "value": "1/0"
+              },
               "children": [],
               "type": "text",
               "cell": {
@@ -56,7 +65,10 @@
             },
             {
               "databinding": "",
-              "label": "1/1",
+              "label": {
+                "type": "value",
+                "value": "1/1"
+              },
               "children": [],
               "type": "text",
               "cell": {
@@ -94,25 +106,37 @@
         },
         {
           "databinding": "user.name",
-          "label": "Name",
+          "label": {
+            "type": "value",
+            "value": "Name"
+          },
           "children": [],
           "type": "text"
         },
         {
           "databinding": "user.address.city",
-          "label": "City",
+          "label": {
+            "type": "value",
+            "value": "City"
+          },
           "children": [],
           "type": "text"
         },
         {
           "databinding": "user.address.street",
-          "label": "Street",
+          "label": {
+            "type": "value",
+            "value": "Street"
+          },
           "children": [],
           "type": "text"
         },
         {
           "databinding": "user.single",
-          "label": "Single",
+          "label": {
+            "type": "value",
+            "value": "Single"
+          },
           "children": [],
           "type": "switch"
         },

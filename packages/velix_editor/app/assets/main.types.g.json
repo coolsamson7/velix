@@ -1,0 +1,239 @@
+{
+  "classes": [
+    {
+      "name": "Address",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "city",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "street",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "4:1"
+    },
+    {
+      "name": "User",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "name",
+          "type": "String",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "address",
+          "type": "Address",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "single",
+          "type": "bool",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "String",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Inject",
+              "value": "Inject"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "26:1"
+    },
+    {
+      "name": "TestPage",
+      "superClass": null,
+      "properties": [
+        {
+          "name": "user",
+          "type": "User",
+          "isNullable": true,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        },
+        {
+          "name": "users",
+          "type": "List<User>",
+          "isNullable": false,
+          "isFinal": false,
+          "annotations": [
+            {
+              "name": "Attribute",
+              "value": "Attribute"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "selectUser",
+          "parameters": [
+            {
+              "name": "user",
+              "type": "User",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "void",
+          "isAsync": false,
+          "annotations": []
+        },
+        {
+          "name": "getUsers",
+          "parameters": [],
+          "returnType": "List<User>",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Method",
+              "value": "Method"
+            }
+          ]
+        },
+        {
+          "name": "hello",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "String",
+              "isNamed": false,
+              "isRequired": true,
+              "isNullable": false
+            }
+          ],
+          "returnType": "void",
+          "isAsync": false,
+          "annotations": [
+            {
+              "name": "Method",
+              "value": "Method"
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Injectable",
+          "value": "Injectable"
+        },
+        {
+          "name": "Dataclass",
+          "value": "Dataclass"
+        }
+      ],
+      "isAbstract": false,
+      "location": "73:1"
+    }
+  ]
+}

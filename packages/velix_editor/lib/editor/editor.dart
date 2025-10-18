@@ -15,6 +15,7 @@ import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/components/toast.dart';
 import 'package:velix_editor/editor/settings.dart';
 import 'package:velix_editor/editor/settings_panel.dart';
+import 'package:velix_editor/editor/test_model.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
@@ -47,110 +48,6 @@ import 'layout_canvas.dart';
 import 'widget_breadcrumb.dart';
 
 part "editor.command.g.dart";
-
-@Dataclass()
-class Address {
-  // instance data
-
-  @Attribute()
-  String city = "";
-  @Attribute()
-  String street = "";
-
-  // constructor
-
-  Address({required this.city, required this.street});
-
-  // methods
-
-  @Inject()
-  String hello(String message) {
-    print(message);
-    return "world";
-  }
-}
-
-@Dataclass()
-class User {
-  // instance data
-
-  @Attribute()
-  String name = "";
-  @Attribute()
-  int age;
-  @Attribute()
-  Address address;
-  @Attribute()
-  bool single;
-
-  // constructor
-
-  User({required this.name, required this.address, required this.age, required this.single});
-
-  // methods
-
-  @Inject()
-  String hello(String message) {
-    print(message);
-    return "hello $message";
-  }
-}
-
-@Injectable()
-@Dataclass()
-class Page {
-  // instance data
-
-  @Attribute()
-  User user;
-
-  // constructor
-
-  Page() : user = User(
-      name: "Andreas",
-      age: 60,
-      single: true,
-      address: Address(
-          city: "Cologne",
-          street: "Neumarkt"
-      ));
-
-  // methods
-
-  @Inject()
-  void setup() {
-    print("setup");
-  }
-
-  @Method()
-  List<User> users() {
-    return [
-      User(
-          name: "Andreas",
-          age: 60,
-          single: true,
-          address: Address(
-              city: "Cologne",
-              street: "Neumarkt"
-          ),
-      ),
-        User(
-            name: "Sandra",
-            age: 60,
-            single: true,
-            address: Address(
-                city: "Cologne",
-                street: "Neumarkt"
-            )
-        )
-    ];
-  }
-
-  @Method()
-  void hello(String message) {
-    print(message);
-  }
-}
 
 class EditContext {
   // instance data
@@ -362,7 +259,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   void test() async { // TODO TEST CODE
     await loadRegistry("assets:main.types.g.json");
 
-    selectClass(registry.getClass("Page"));
+    selectClass(registry.getClass("TestPage"));
     await loadFile("assets:screen.json");
 
     setState(() {
@@ -762,7 +659,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 ) :
 
                                 WidgetContainer(
-                                  instance:  environment.get<Page>(), // TODO
+                                  instance:  environment.get<TestPage>(), // TODO
                                   widget: models[0]
                                 ),
                               )

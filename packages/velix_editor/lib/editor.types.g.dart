@@ -6,7 +6,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:velix/velix.dart';
 import 'package:velix_editor/commands/command_stack.dart' show CommandStack;
 import 'package:velix_di/di/di.dart' show Injectable, Inject, Module, OnInit;
-import 'package:velix_editor/editor/editor.dart' show Address, User, Page;
+import 'package:velix_editor/editor/test_model.dart' show Address, User, TestPage;
 import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
 import 'package:velix_editor/editor_module.dart' show EditorModule;
 import 'package:velix_editor/metadata/properties/properties.dart' show ColorConvert, BorderStyleConvert, MainAxisAlignmentConvert, MainAxisSizeConvert, CrossAxisAlignmentConvert, FontWeightConvert, FontStyleConvert, Value, ValueType, Insets, Border, Font;
@@ -81,7 +81,7 @@ void registerEditorTypes() {
   );
 
   type<Address>(
-    location: 'package:velix_editor/editor/editor.dart:51:1',
+    location: 'package:velix_editor/editor/test_model.dart:4:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -112,41 +112,42 @@ void registerEditorTypes() {
     ],
   );
 
-  type<Page>(
-    location: 'package:velix_editor/editor/editor.dart:99:1',
+  type<TestPage>(
+    location: 'package:velix_editor/editor/test_model.dart:73:1',
     annotations: [
       Injectable()
     ],
-    constructor: () => Page(),
-    fromMapConstructor: (Map<String,dynamic> args) => Page(),
-    fromArrayConstructor: (List<dynamic> args) => Page(),
+    constructor: () => TestPage(),
+    fromMapConstructor: (Map<String,dynamic> args) => TestPage(),
+    fromArrayConstructor: (List<dynamic> args) => TestPage(),
     fields: [
-      field<Page,User>('user',
+      field<TestPage,User>('user',
         getter: (obj) => obj.user,
-        setter: (obj, value) => (obj as Page).user = value,
+        setter: (obj, value) => (obj as TestPage).user = value,
+        isNullable: true
+      ), 
+      field<TestPage,List<User>>('users',
+        elementType: User,
+        factoryConstructor: () => <User>[],
+        getter: (obj) => obj.users,
+        setter: (obj, value) => (obj as TestPage).users = value,
       )
     ],
     methods: [
-      method<Page,void>('setup',
-        annotations: [
-          Inject()
-        ],
-        invoker: (List<dynamic> args)=> (args[0] as Page).setup()
-      ), 
-      method<Page,List<User>>('users',
+      method<TestPage,List<User>>('getUsers',
         annotations: [
           Method()
         ],
-        invoker: (List<dynamic> args)=> (args[0] as Page).users()
+        invoker: (List<dynamic> args)=> (args[0] as TestPage).getUsers()
       ), 
-      method<Page,void>('hello',
+      method<TestPage,void>('hello',
         annotations: [
           Method()
         ],
         parameters: [
           param<String>('message', isRequired: true)
         ],
-        invoker: (List<dynamic> args)=> (args[0] as Page).hello(args[1])
+        invoker: (List<dynamic> args)=> (args[0] as TestPage).hello(args[1])
       )
     ],
   );
@@ -479,7 +480,7 @@ void registerEditorTypes() {
   );
 
   type<User>(
-    location: 'package:velix_editor/editor/editor.dart:73:1',
+    location: 'package:velix_editor/editor/test_model.dart:26:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true), 

@@ -1,0 +1,148 @@
+{
+  "children": [
+    {
+      "crossAxisAlignment": "start",
+      "mainAxisAlignment": "start",
+      "children": [
+        {
+          "type": "list",
+          "children": [
+            {
+              "type": "for",
+              "context":  "getUsers()",
+              "children": [
+                {
+                  "type": "label",
+                  "label": {
+                    "type": "binding",
+                    "value": "name"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "dropdown",
+          "children": [
+            {
+              "type": "for",
+              "context":  "getUsers()",
+              "children": [
+                {
+                  "type": "label",
+                  "label": {
+                    "type": "binding",
+                    "value": "name"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "databinding": "",
+              "label": "1/0",
+              "children": [],
+              "type": "text",
+              "cell": {
+                "col": 0,
+                "row": 1
+              }
+            },
+            {
+              "databinding": "",
+              "label": "1/1",
+              "children": [],
+              "type": "text",
+              "cell": {
+                "col": 1,
+                "row": 1
+              }
+            }
+          ],
+          "type": "grid",
+          "spacing": 10,
+          "rows": [
+            {
+              "alignment": "start",
+              "size": 1.0,
+              "sizeMode": "auto"
+            },
+            {
+              "alignment": "start",
+              "size": 1.0,
+              "sizeMode": "auto"
+            }
+          ],
+          "cols": [
+            {
+              "alignment": "start",
+              "size": 1.0,
+              "sizeMode": "auto"
+            },
+            {
+              "alignment": "start",
+              "size": 1.0,
+              "sizeMode": "auto"
+            }
+          ]
+        },
+        {
+          "databinding": "user.name",
+          "label": "Name",
+          "children": [],
+          "type": "text"
+        },
+        {
+          "databinding": "user.address.city",
+          "label": "City",
+          "children": [],
+          "type": "text"
+        },
+        {
+          "databinding": "user.address.street",
+          "label": "Street",
+          "children": [],
+          "type": "text"
+        },
+        {
+          "databinding": "user.single",
+          "label": "Single",
+          "children": [],
+          "type": "switch"
+        },
+        {
+          "label": {
+            "value": "user.name",
+            "type": "binding"
+          },
+          "children": [],
+          "type": "label"
+        },
+        {
+          "padding": {
+            "left": 1,
+            "right": 1,
+            "top": 1,
+            "bottom": 1
+          },
+          "label": {
+            "value": "PRESS",
+            "type": "value"
+          },
+          "children": [],
+          "type": "button",
+          "onClick": "user.hello(user.name)"
+        }
+      ],
+      "type": "column",
+      "mainAxisSize": "min"
+    }
+  ],
+  "type": "container"
+}

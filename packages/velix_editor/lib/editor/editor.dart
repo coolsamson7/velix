@@ -509,10 +509,6 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
   @override
   void initState() {
-    //settings = environment.get<SettingsManager>();
-
-    state = widget.environment.get<SettingsManager>().getSettings(stateName); // is already loaded
-
     super.initState();
 
     widget.i18n.addListenerAsync((state) {

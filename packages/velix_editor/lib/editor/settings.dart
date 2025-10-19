@@ -50,8 +50,8 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
 
   // public
 
-  void flushSettings() {
-    EnvironmentProvider.of(context).get<SettingsManager>().flush(_getRoot()!.state);
+  Future<void> flushSettings() async {
+    await EnvironmentProvider.of(context).get<SettingsManager>().flush(_getRoot()!.state);
   }
 
   void applySettings() {

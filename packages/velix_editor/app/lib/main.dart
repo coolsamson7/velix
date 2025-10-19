@@ -9,6 +9,7 @@ import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
 import 'package:velix_ui/velix_ui.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'main.types.g.dart';
 import 'application.dart';
@@ -38,6 +39,8 @@ void main() async {
   ValuedWidget.platform = TargetPlatform.android;
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  await windowManager.ensureInitialized();
 
   // tracer
 

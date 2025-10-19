@@ -45,14 +45,14 @@ class SettingsPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Metadat File",
+              "Metadata File",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             // The actual selector (stateful)
             FilePathSelector(
-              recentFiles: [editor.settings.get("registry" , defaultValue: "")],
-              initialFilePath: editor.settings.get("registry" , defaultValue: ""),
+              recentFiles: [editor.registryPath],
+              initialFilePath: editor.registryPath,
               onLoad: (path) async {
                 // Forward to your async callback
                 await onLoad(path);

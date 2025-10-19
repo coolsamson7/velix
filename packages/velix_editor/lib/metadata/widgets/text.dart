@@ -1,7 +1,6 @@
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_mapper/mapper/json.dart';
 
-import '../../actions/eval.dart';
 import '../../property_panel/editor/code_editor.dart';
 import '../../validate/validate.dart';
 import '../annotations.dart';

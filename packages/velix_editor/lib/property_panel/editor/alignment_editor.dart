@@ -103,9 +103,6 @@ class CrossAxisAlignmentBuilder extends AbstractEnumBuilder<CrossAxisAlignment> 
       case CrossAxisAlignment.baseline:
       // “Baseline” refers to text alignment — use a text-alignment-style icon
         return horizontal ? Icons.text_decrease : Icons.text_increase;
-
-      default:
-        return Icons.help_outline;
     }
   }
 
@@ -118,7 +115,7 @@ class CrossAxisAlignmentBuilder extends AbstractEnumBuilder<CrossAxisAlignment> 
     required IconData Function(T) iconFor,
   }) {
     final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context)!;
+    final overlay = Overlay.of(context);
     final target = renderBox.localToGlobal(Offset.zero) & renderBox.size;
 
     late OverlayEntry overlayEntry;
@@ -286,9 +283,6 @@ class MainAxisAlignmentBuilder extends AbstractEnumBuilder<MainAxisAlignment> {
 
       case MainAxisAlignment.spaceEvenly:
         return horizontal ? Icons.linear_scale : Icons.drag_handle;
-
-      default:
-        return Icons.help_outline;
     }
   }
 
@@ -301,7 +295,7 @@ class MainAxisAlignmentBuilder extends AbstractEnumBuilder<MainAxisAlignment> {
     required IconData Function(T) iconFor,
   }) {
     final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context)!;
+    final overlay = Overlay.of(context);
     final target = renderBox.localToGlobal(Offset.zero) & renderBox.size;
 
     late OverlayEntry overlayEntry;
@@ -427,8 +421,6 @@ class MainAxisSizeBuilder extends AbstractEnumBuilder<MainAxisSize> {
       case MainAxisSize.max:
       // “Expand to fill” icon — arrows outward
         return Icons.expand;
-      default:
-        return Icons.help_outline;
     }
   }
 }

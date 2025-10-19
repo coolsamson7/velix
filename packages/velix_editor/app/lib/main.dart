@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:velix/velix.dart';
 import 'package:velix_di/velix_di.dart';
+import 'package:velix_editor/editor/settings.dart';
 import 'package:velix_editor/editor_module.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_i18n/velix_i18n.dart';
@@ -106,6 +107,10 @@ void main() async {
   // boot environment
 
   var environment = Environment(forModule: ApplicationModule);
+
+  // load settings
+
+  await environment.get<SettingsManager>().init();
 
   // load namespaces
 

@@ -52,8 +52,6 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
   List<DropdownMenuItem<dynamic>> _buildItems(BuildContext context) {
     final items = <DropdownMenuItem<dynamic>>[];
 
-    List<Widget> children = [];
-
     for (var childData in widget.data.children) {
       if (childData is ForWidgetData) {
         for (var (instance, item) in childData.expand(context, widget.typeRegistry, widget.environment)) {
@@ -72,7 +70,7 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
           ),
         ));
       }
-    }
+    } // for
 
     return items;
   }

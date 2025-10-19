@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
 import 'package:velix_editor/event/events.dart';
@@ -29,7 +28,7 @@ extension ForWidgetDataExtensions on ForWidgetData {
 
     // Evaluate list at runtime
 
-    List<dynamic> items = compiledCall?.eval(widgetContext.instance) ?? const [];
+    List<dynamic> items = compiledCall?.eval(widgetContext.instance, EvalContext(instance: widgetContext.instance, variables: {})) ?? const [];
 
     if (children.isEmpty) return [];
 

@@ -444,7 +444,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     var editContext = Provider.of<EditContext>(context);
     ClassDesc classContext = editContext.type!;
-    var resolver = ClassDescTypeResolver(root: classContext);
+    Map<String,ClassDesc> variables = {};
+    var resolver = ClassDescTypeResolver(root: classContext, variables: variables);
     typeChecker = TypeChecker(resolver);
 
     ClassDesc findContext() {
@@ -460,7 +461,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
             var type = pr.value!.getType<Desc>();
             if (type.isList()) {
               type = (type as ListDesc).elementType;
-              resolver = ClassDescTypeResolver(root: type as ClassDesc);
+              resolver = ClassDescTypeResolver(root: type as ClassDesc, variables: variables);
               typeChecker = TypeChecker(resolver);
             }
           }
@@ -472,6 +473,15 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     }
 
     classContext = findContext();
+
+    // TODO:just a test
+
+    if ( widget.property.name == "onSelect") {
+      variables["\$value"] = ClassDesc("kkk");
+    }
+    //
+
+
     autocomplete = Autocomplete(typeChecker: typeChecker!);
     _parseState = checkParse(widget.value ?? "");
   }

@@ -112,8 +112,7 @@ void main() {
       final file = File('test/resources/action_test.types.g.json');
       json = await file.readAsString();
     }
-  };
-
+  }
 
   setUpAll(() async {
     await load();
@@ -223,7 +222,7 @@ void main() {
       await load();
       data = jsonDecode(json);
       registry.read(data["classes"]);
-      autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"))));
+      autocomplete = Autocomplete(typeChecker: TypeChecker(ClassDescTypeResolver(root: registry.getClass("Page"), variables: {})));
 
     });
     

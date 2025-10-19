@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart' hide Padding;
 import 'package:velix/i18n/translator.dart';
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_ui/databinding/form_mapper.dart';
 import 'package:velix_ui/databinding/valued_widget.dart';
 import '../../metadata/properties/properties.dart' as Props;

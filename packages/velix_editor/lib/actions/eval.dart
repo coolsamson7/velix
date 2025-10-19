@@ -18,13 +18,24 @@ class CallVisitorContext extends VisitorContext {
   CallVisitorContext({required this.instance});
 }
 
+class EvalContext {
+  dynamic instance;
+  Map<String,dynamic> variables = {};
+
+  EvalContext({required this.instance, required this.variables});
+
+  dynamic get(String name) {
+    return variables[name];
+  }
+}
+
 abstract class Eval {
-  dynamic eval(dynamic value);
+  dynamic eval(dynamic value, EvalContext context);
 }
 
 class This extends Eval {
   @override
-  dynamic eval(dynamic value) {
+  dynamic eval(dynamic value, EvalContext context) {
     return value;
   }
 }
@@ -41,8 +52,25 @@ class EvalValue extends Eval {
   // override
 
   @override
-  dynamic eval(dynamic value) {
+  dynamic eval(dynamic value, EvalContext context) {
     return this.value;
+  }
+}
+
+class EvalContextVar extends Eval {
+  // instance data
+
+  final String variable;
+
+  // constructor
+
+  EvalContextVar({required this.variable});
+
+  // override
+
+  @override
+  dynamic eval(dynamic value, EvalContext context) {
+    return context.get(variable);
   }
 }
 
@@ -58,7 +86,7 @@ class EvalField extends Eval {
   // override
 
   @override
-  dynamic eval(dynamic value) {
+  dynamic eval(dynamic value, EvalContext context) {
     return field.get(value);
   }
 }
@@ -76,8 +104,8 @@ class EvalMember extends Eval {
   // override
 
   @override
-  dynamic eval(dynamic value) {
-    return field.get(receiver.eval(value));
+  dynamic eval(dynamic value, EvalContext context) {
+    return field.get(receiver.eval(value, context));
   }
 }
 
@@ -95,10 +123,10 @@ class EvalMethod extends Eval {
   // override
 
   @override
-  dynamic eval(dynamic value) {
-    var args = arguments.map((arg) => arg.eval(value));
+  dynamic eval(dynamic value, EvalContext context) {
+    var args = arguments.map((arg) => arg.eval(value, context));
 
-    return method.invoker!([receiver.eval(value), ...args]);
+    return method.invoker!([receiver.eval(value, context), ...args]);
   }
 }
 

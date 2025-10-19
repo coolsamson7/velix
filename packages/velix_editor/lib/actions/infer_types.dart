@@ -168,6 +168,7 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   ClassDescTypeInfo root;
   final bool fail;
   Map<String,Desc> types = {};
+  final Map<String,Desc> variables;
 
 
   Desc getType(String name) {
@@ -182,7 +183,7 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   // constructor
 
-  ClassDescTypeResolver({required ClassDesc root, this.fail = false}): root = ClassDescTypeInfo(root, null);
+  ClassDescTypeResolver({required ClassDesc root, this.fail = false, required this.variables}): root = ClassDescTypeInfo(root, null);
 
   // internal
 
@@ -219,6 +220,10 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
 
   @override
   ClassDescTypeInfo resolve(String name, {required Expression forExpression, ClassDescTypeInfo? parent}) {
+    if ( variables.containsKey(name)) {
+      return ClassDescTypeInfo(variables[name]!, null);
+    }
+
     var parentType = (parent ?? root).type;
 
     if ( parentType is ClassDesc) {

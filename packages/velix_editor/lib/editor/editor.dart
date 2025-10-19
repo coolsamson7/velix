@@ -64,10 +64,11 @@ class EditorScreen extends StatefulWidget {
   // instance data
 
   final I18N i18n;
+  final Environment environment;
 
   // constructor
 
-  EditorScreen({super.key, required this.i18n});
+  EditorScreen({super.key, required this.i18n, required this.environment});
 
   // override
 
@@ -75,24 +76,54 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => EditorScreenState();
 }
 
-class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, EditorScreenStateCommands, TickerProviderStateMixin  {
+class EditorScreenState extends State<EditorScreen> with CommandController<EditorScreen>, EditorScreenStateCommands, TickerProviderStateMixin, StatefulMixin<EditorScreen>  {
   // instance data
 
   Environment? _environment;
   CommandStack? _commandStack;
   LocaleManager? _localeManager;
   bool edit = true;
+  String registryPath = "";
   String path = "";
   String lastContent = "";
   ClassRegistry registry = ClassRegistry();
   ClassDesc? clazz;
   List<WidgetData> models = [ContainerWidgetData()];
 
-  SettingsManager settings = SettingsManager();
+  late SettingsManager settings;
 
   Environment get environment => _environment ??= Environment(parent: EnvironmentProvider.of(context));
   LocaleManager get localeManager => _localeManager ??=  Provider.of<LocaleManager>(context, listen: false);
   CommandStack get commandStack => _commandStack ??=  environment.get<CommandStack>();
+
+  @override
+  String get stateName => "editor";
+
+  // override
+
+  @override
+  Future<void> apply(Map<String,dynamic> data) async {
+    String registry = data["registry"] ?? "";
+    if ( registry.isNotEmpty) {
+      await loadRegistry(registry);
+
+      String clazz = data["class"] ?? "";
+      if ( clazz.isNotEmpty)
+        selectClass(this.registry.getClass(clazz));
+    }
+
+    String file = data["file"] ?? "";
+    if ( file.isNotEmpty)
+      await loadFile(file);
+
+  }
+
+  @override
+  Future<void> write(Map<String,dynamic> data) async {
+    data["registry"] = registryPath;
+    data["file"] = path;
+    data["class"] = clazz?.name ?? "";
+  }
 
   // internal
 
@@ -143,12 +174,16 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     }
 
     try {
-      settings.set("registry", path);
-      settings.flush();
+      //settings.set("registry", path);
+      //settings.flush();
 
       var registry = ClassRegistry()..read(jsonDecode(json)["classes"]);
 
+      registryPath = path;
+
       selectRegistry(registry);
+
+      flushSettings();
     }
     catch(e) {
       print(e);
@@ -159,8 +194,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   void selectClass(ClassDesc? clazz) {
     this.clazz = clazz;
 
-    settings.set("class", clazz!.name);
-    settings.flush();
+    flushSettings();
+
+    //settings.set("class", clazz!.name);
+    //settings.flush();
 
     setState(() {
     });
@@ -265,6 +302,11 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     setState(() {
       environment.get<MessageBus>().publish("load", LoadEvent(widget: models.first, source: this));
     });
+
+
+    writeSettings();
+
+    flushSettings();
   }
 
   Future<void> loadFile(String path) async {
@@ -273,13 +315,12 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
       json = await rootBundle.loadString(path.replaceFirst(":", "/"));
     }
     else {
-      final file = File(this.path = path);
+      final file = File(path);
 
       try {
         json = await file.readAsString();
 
-        settings.set("file", path);
-        settings.flush();
+        //settings.set("file", path);
       }
       catch (e) {
         showErrorDialog(context, e.toString());
@@ -288,6 +329,11 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     try {
       var root = JSON.deserialize<WidgetData>(jsonDecode(json));
+
+      this.path = path;
+
+      writeSettings(); // ?? TODO
+      flushSettings();
 
       setState(() {
         models = [root];
@@ -305,9 +351,11 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   Future<void> loadSettings() async {
-    await settings.init();
+    state = settings.getSettings(stateName);
 
-    var registry = settings.get("registry", defaultValue: "");
+    applySettings();
+
+    /*var registry = settings.get("registry", defaultValue: "");
     if (registry.isNotEmpty) {
       await loadRegistry(registry);
 
@@ -321,7 +369,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     var file = settings.get("file", defaultValue: "");
     if (file.isNotEmpty) {
       await loadFile(file);
-    }
+    }*/
   }
 
   String pathTitle() {
@@ -461,6 +509,10 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
   @override
   void initState() {
+    //settings = environment.get<SettingsManager>();
+
+    state = widget.environment.get<SettingsManager>().getSettings(stateName); // is already loaded
+
     super.initState();
 
     widget.i18n.addListenerAsync((state) {
@@ -486,15 +538,13 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     // create
 
-    var bus = environment.get<MessageBus>();
-
     commandStack.addListener(() => setState(() {
       updateCommandState();
     }));
 
     updateCommandState();
 
-    // TEST
+    // TODO TEST
 
     test();
   }

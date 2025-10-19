@@ -69,7 +69,19 @@ import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuil
 import 'package:velix_editor/util/message_bus.dart' show MessageBus;
 import 'package:velix_ui/module.dart';
 
+import 'editor/settings.dart';
+
 void registerEditorTypes() {
+  type<SettingsManager>(
+    location: 'package:velix_editor/editor/settings.dart:96:1',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => SettingsManager(),
+    fromMapConstructor: (Map<String,dynamic> args) => SettingsManager(),
+    fromArrayConstructor: (List<dynamic> args) => SettingsManager(),
+  );
+
   type<CommandStack>(
     location: 'package:velix_editor/commands/command_stack.dart:11:1',
     annotations: [

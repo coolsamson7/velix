@@ -84,7 +84,7 @@ class  EditorAppState  extends State<EditorApp> {
                         // main screen
 
                         home: Scaffold(
-                            body: EditorScreen(i18n: widget.i18n)
+                            body: EditorScreen(i18n: widget.i18n, environment: widget.environment)
                         ),
                       );
                     }

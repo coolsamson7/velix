@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' hide WidgetBuilder, Padding, Page;
-import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_di/di/di.dart';
 
 import '../../actions/action_evaluator.dart';
+import '../../actions/eval.dart';
 import '../../metadata/properties/properties.dart';
 import '../../metadata/widgets/button.dart';
 import '../../widget_container.dart';
@@ -47,7 +47,7 @@ class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
       var widgetContext = WidgetContextScope.of(context);
 
       final call = ActionCompiler.instance.compile(widget.data.onClick!, context: widgetContext.typeDescriptor);
-      _onClick = () => call.eval(widgetContext.instance);
+      _onClick = () => call.eval(widgetContext.instance, EvalContext(instance: widgetContext.instance, variables: {}));
     }
   }
 

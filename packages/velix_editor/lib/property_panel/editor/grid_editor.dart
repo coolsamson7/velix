@@ -140,8 +140,6 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
           return Icons.align_horizontal_right;
         case GridAlignment.stretch:
           return Icons.height;
-        default:
-          return Icons.help_outline;
       }
     } else {
       // vertical alignment (rows)
@@ -154,8 +152,6 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
           return Icons.vertical_align_bottom;
         case GridAlignment.stretch:
           return Icons.height;
-        default:
-          return Icons.help_outline;
       }
     }
   }

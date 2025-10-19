@@ -28,7 +28,7 @@ class WidgetContext {
   //( callback
 
   void onEvent(FormEvent event) {
-    var widgets = bindings[event.path];
+    var widgets = bindings[event.path]; // TODO
     if (widgets != null) {
       for ( var widget in widgets)
         widget.update();

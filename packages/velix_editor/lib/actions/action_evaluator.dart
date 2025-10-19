@@ -55,6 +55,6 @@ class ActionEvaluator {
 
     // eval
 
-    return call.eval(instance);
+    return call.eval(instance, EvalContext(instance: instance, variables: {})); // TODO
   }
 }

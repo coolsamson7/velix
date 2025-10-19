@@ -110,13 +110,13 @@ class _EnumEditorState<T extends Enum> extends State<_EnumEditor> {
           style: const TextStyle(color: Colors.black),
           items: widget.values.map((value) => DropdownMenuItem<T>(
               value: value as T,
-              child: Text(labelOf(value as T)),
+              child: Text(labelOf(value)),
             ),
           )
               .toList(),
           onChanged: (value) {
             if (value != null) {
-              setState(() => _selected = value as T);
+              setState(() => _selected = value);
               widget.onChanged(value);
             }
           },

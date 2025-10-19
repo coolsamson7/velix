@@ -45,17 +45,6 @@ class _MessagePaneState extends State<MessagePane> {
     }
   }
 
-  IconData _getMessageIcon(MessageType type) {
-    switch (type) {
-      case MessageType.error:
-        return Icons.error;
-      case MessageType.warning:
-        return Icons.warning;
-      default:
-        return Icons.info_outline;
-    }
-  }
-
   Color _getMessageColor(MessageType type) {
     switch (type) {
       case MessageType.error:

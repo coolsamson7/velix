@@ -129,7 +129,7 @@ class AssetLoaderException extends AssetException {
 
 /// Represents a single asset file
 class AssetItem extends AssetNode {
-  Map<Type, dynamic> _data = {};
+  final Map<Type, dynamic> _data = {};
 
   AssetItem(super.path);
 

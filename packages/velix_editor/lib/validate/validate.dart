@@ -108,7 +108,7 @@ class ContextPropertyValidator extends ExpressionPropertyValidator {
       var type = pr.value!.getType<Desc>();
       if (type.isList()) {
         type = (type as ListDesc).elementType;
-        context.typeChecker = TypeChecker(ClassDescTypeResolver(root: type as ClassDesc));
+        context.typeChecker = TypeChecker(ClassDescTypeResolver(root: type as ClassDesc, variables: {})); // TODO
       }
     }
     else {
@@ -230,7 +230,7 @@ class WidgetValidator {
         validateWidget(child, context);
     }
 
-    var context = ValidationContext(environment: environment, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true)));
+    var context = ValidationContext(environment: environment, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true, variables: {}))); // TODO
 
     validateWidget(widget, context);
 

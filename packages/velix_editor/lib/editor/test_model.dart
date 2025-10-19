@@ -86,7 +86,10 @@ class TestPage {
 
   // methods
 
+  @Method()
   void selectUser(User user) {
+    print("user = ${user.name}");
+
     this.user = user;
   }
 

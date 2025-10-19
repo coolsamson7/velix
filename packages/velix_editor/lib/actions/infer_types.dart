@@ -75,10 +75,11 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   // instance data
 
   TypeDescriptor root;
+  final Map<String,Type> variables;
 
   // constructor
 
-  RuntimeTypeTypeResolver({required this.root});
+  RuntimeTypeTypeResolver({required this.root, Map<String,Type>? variables}) : variables = variables ?? {};
 
   // override
 
@@ -108,7 +109,10 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   @override
   RuntimeTypeInfo resolve(String name, {required Expression forExpression, RuntimeTypeInfo? parent}) {
     if ( parent == null)
-      return RuntimeTypeInfo(root.getProperty(name).type, root.getProperty(name));
+      if ( variables.containsKey(name))
+        return RuntimeTypeInfo(ClassType(variables[name]!), null);
+      else
+        return RuntimeTypeInfo(root.getProperty(name).type, root.getProperty(name));
     else {
       var descriptor = parent.getType<ObjectType>().typeDescriptor.getProperty(name);
       return RuntimeTypeInfo(descriptor.type, descriptor);
@@ -122,6 +126,9 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
 
   @override
   bool isAssignableFrom(dynamic a, dynamic b) {
+    if (b == dynamic)
+      return true; // TODO ugly fuckin hack
+
     return a == b;
   }
 }

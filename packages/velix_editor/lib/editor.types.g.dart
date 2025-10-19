@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:velix/velix.dart';
 import 'package:velix_editor/commands/command_stack.dart' show CommandStack;
 import 'package:velix_di/di/di.dart' show Injectable, Inject, Module, OnInit;
+import 'package:velix_editor/editor/settings.dart' show SettingsManager;
 import 'package:velix_editor/editor/test_model.dart' show Address, User, TestPage;
 import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
 import 'package:velix_editor/editor_module.dart' show EditorModule;
@@ -69,19 +70,7 @@ import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuil
 import 'package:velix_editor/util/message_bus.dart' show MessageBus;
 import 'package:velix_ui/module.dart';
 
-import 'editor/settings.dart';
-
 void registerEditorTypes() {
-  type<SettingsManager>(
-    location: 'package:velix_editor/editor/settings.dart:96:1',
-    annotations: [
-      Injectable()
-    ],
-    constructor: () => SettingsManager(),
-    fromMapConstructor: (Map<String,dynamic> args) => SettingsManager(),
-    fromArrayConstructor: (List<dynamic> args) => SettingsManager(),
-  );
-
   type<CommandStack>(
     location: 'package:velix_editor/commands/command_stack.dart:11:1',
     annotations: [
@@ -90,6 +79,16 @@ void registerEditorTypes() {
     constructor: () => CommandStack(),
     fromMapConstructor: (Map<String,dynamic> args) => CommandStack(),
     fromArrayConstructor: (List<dynamic> args) => CommandStack(),
+  );
+
+  type<SettingsManager>(
+    location: 'package:velix_editor/editor/settings.dart:116:1',
+    annotations: [
+      Injectable()
+    ],
+    constructor: () => SettingsManager(),
+    fromMapConstructor: (Map<String,dynamic> args) => SettingsManager(),
+    fromArrayConstructor: (List<dynamic> args) => SettingsManager(),
   );
 
   type<Address>(
@@ -146,6 +145,15 @@ void registerEditorTypes() {
       )
     ],
     methods: [
+      method<TestPage,void>('selectUser',
+        annotations: [
+          Method()
+        ],
+        parameters: [
+          param<User>('user', isRequired: true)
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as TestPage).selectUser(args[1])
+      ), 
       method<TestPage,List<User>>('getUsers',
         annotations: [
           Method()
@@ -444,7 +452,7 @@ void registerEditorTypes() {
   );
 
   var widgetBuilderDescriptor =  type<WidgetBuilder>(
-    location: 'package:velix_editor/theme/widget_builder.dart:44:1',
+    location: 'package:velix_editor/theme/widget_builder.dart:43:1',
     annotations: [
       Injectable(factory: false, eager: false)
     ],
@@ -716,7 +724,7 @@ void registerEditorTypes() {
   );
 
   type<CodeEditorBuilder>(
-    location: 'package:velix_editor/property_panel/editor/code_editor.dart:18:1',
+    location: 'package:velix_editor/property_panel/editor/code_editor.dart:19:1',
     superClass: propertyEditorBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1144,7 +1152,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:18:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:24:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1169,7 +1177,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:102:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:184:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1194,7 +1202,7 @@ void registerEditorTypes() {
   );
 
   type<ForEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:50:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:49:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1219,7 +1227,7 @@ void registerEditorTypes() {
   );
 
   type<ForWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:169:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:168:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1538,7 +1546,7 @@ void registerEditorTypes() {
   );
 
   type<SwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:10:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:9:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1560,7 +1568,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:45:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:44:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1582,7 +1590,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:15:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:14:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1604,7 +1612,7 @@ void registerEditorTypes() {
   );
 
   type<TextEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/text_widget.dart:125:1',
+    location: 'package:velix_editor/theme/widgets/text_widget.dart:124:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2194,7 +2202,7 @@ void registerEditorTypes() {
   );
 
   type<TextWidgetData>(
-    location: 'package:velix_editor/metadata/widgets/text.dart:11:1',
+    location: 'package:velix_editor/metadata/widgets/text.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
       DeclareWidget(name: "text", group: "widgets", icon: "widget_text"),
@@ -2253,7 +2261,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisAlignmentBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:196:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:193:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2275,7 +2283,7 @@ void registerEditorTypes() {
   );
 
   type<MainAxisSizeBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:378:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:372:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()
@@ -2297,7 +2305,7 @@ void registerEditorTypes() {
   );
 
   type<BorderStyleBuilder>(
-    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:436:1',
+    location: 'package:velix_editor/property_panel/editor/alignment_editor.dart:428:1',
     superClass: abstractEnumBuilderDescriptor,
     annotations: [
       Injectable()

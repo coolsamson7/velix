@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart' hide WidgetBuilder;
+import 'package:velix/validation/validation.dart';
 import 'package:velix_di/di/di.dart';
+import 'package:velix_editor/actions/infer_types.dart';
 
+import '../../actions/action_evaluator.dart';
+import '../../actions/action_parser.dart';
+import '../../actions/eval.dart';
 import '../../commands/command_stack.dart';
 import '../../commands/reparent_command.dart';
 import '../../dynamic_widget.dart';
@@ -12,6 +17,7 @@ import '../../metadata/widgets/dropdown.dart';
 import '../../metadata/widgets/for.dart';
 
 import '../../util/message_bus.dart';
+import '../../widget_container.dart';
 import '../widget_builder.dart';
 import 'for_widget.dart';
 
@@ -46,8 +52,15 @@ class _DropDownWidget extends StatefulWidget {
   State<_DropDownWidget> createState() => _DropDownWidgetState();
 }
 
+typedef SelectCallback = void Function(dynamic selection);
+
 class _DropDownWidgetState extends State<_DropDownWidget> {
+  // instance data
+
   dynamic _selectedValue;
+  SelectCallback? _onSelect;
+
+  // internal
 
   List<DropdownMenuItem<dynamic>> _buildItems(BuildContext context) {
     final items = <DropdownMenuItem<dynamic>>[];
@@ -75,6 +88,80 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
     return items;
   }
 
+  RuntimeTypeInfo? getItemType() {
+    var widgetContext = WidgetContextScope.of(context);
+
+    var dropDown = widget.data;
+
+    ForWidgetData forWidget = dropDown.children[0] as ForWidgetData;
+
+    var binding = forWidget.context;
+
+    if ( binding.isNotEmpty) {
+      var typeChecker = TypeChecker(RuntimeTypeTypeResolver(root: widgetContext.typeDescriptor));
+      var parseResult = ActionParser.instance.parseStrict(binding, typeChecker: typeChecker);
+
+      if ( parseResult.success && parseResult.complete) {
+        var type = parseResult.value!.type as RuntimeTypeInfo;
+
+        return type; // TODO missing elementTyoe parameter. fuck it
+      }
+    } // if
+
+
+    return null;
+  }
+
+ /* void _prepareVariables() {
+    var widgetContext = WidgetContextScope.of(context);
+
+    var dropDown = widget.data;
+
+    var itemType = getItemType();
+
+    var typeChecker = TypeChecker(RuntimeTypeTypeResolver(root: widgetContext.typeDescriptor, variables: variables);
+    var parseResult = ActionParser.instance.parseStrict(dropDown.onSelect, typeChecker: typeChecker);
+
+    if ( parseResult.success && parseResult.complete) {
+      var type = parseResult.value!.getType<RuntimeTypeInfo>();
+    }
+  }*/
+
+  // override
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Only compile once per lifecycle if onClick is set
+    if (widget.data.onSelect != null && widget.data.onSelect!.isNotEmpty && _onSelect == null) {
+      var widgetContext = WidgetContextScope.of(context);
+
+      var itemType = getItemType(); // do we actually need it? we are sure that the validation was ok, so maybe dynamic is sufficient?
+
+      print(itemType);
+
+
+      var typeChecker = TypeChecker(RuntimeTypeTypeResolver(root: widgetContext.typeDescriptor, variables: {
+        "value": dynamic // HMMM???
+      }));
+
+
+      var result = ActionParser.instance.parseStrict(widget.data.onSelect!, typeChecker: typeChecker);
+
+      var visitor = EvalVisitor(widgetContext.typeDescriptor);
+
+      var call = result.value!.accept(visitor, CallVisitorContext(instance: null, contextVars: {
+        "value": (name) => EvalContextVar(variable: name)
+      }));
+
+      //final call = ActionCompiler.instance.compile(widget.data.onSelect!, context: widgetContext.typeDescriptor);
+      _onSelect = (item) => call.eval(widgetContext.instance, EvalContext(instance: widgetContext.instance, variables: {
+        "value": item
+      }));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DropdownButton<dynamic>(
@@ -84,12 +171,9 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
       onChanged: (value) {
         setState(() {
           _selectedValue = value;
+          if (_onSelect != null)
+            _onSelect!(value);
         });
-
-        widget.environment.get<MessageBus>().publish(
-          "selection",
-          SelectionEvent(selection: value, source: this),
-        );
       },
     );
   }

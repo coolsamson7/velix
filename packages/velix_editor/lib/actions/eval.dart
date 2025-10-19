@@ -12,10 +12,11 @@ class CallVisitorContext extends VisitorContext {
   // instance data
 
   final dynamic instance;
+  final Map<String,Eval Function(String)> contextVars;
 
   // constructor
 
-  CallVisitorContext({required this.instance});
+  CallVisitorContext({required this.instance, Map<String,Eval Function(String)>? contextVars}) :contextVars = contextVars ?? {};
 }
 
 class EvalContext {
@@ -157,6 +158,10 @@ class EvalVisitor extends ExpressionVisitor<Eval,CallVisitorContext> {
 
   @override
   Eval visitVariable(Variable expr, CallVisitorContext context) {
+    if ( context.contextVars.containsKey(expr.identifier.name)) {
+      return EvalContextVar(variable: expr.identifier.name);
+    }
+
     var property =  rootClass.getProperty(expr.identifier.name);
     return property.isField() ?
       EvalField(field: property as FieldDescriptor) :

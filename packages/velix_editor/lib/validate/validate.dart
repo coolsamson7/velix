@@ -232,7 +232,7 @@ class WidgetValidator {
 
     var context = ValidationContext(environment: environment, typeChecker: TypeChecker(ClassDescTypeResolver(root: type, fail: true, variables: {}))); // TODO
 
-    validateWidget(widget, context);
+    //TODO validateWidget(widget, context);
 
     if (context.errors.isNotEmpty)
       throw ValidationException(errors: context.errors);

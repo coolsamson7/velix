@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/editor/editor.dart';
+import 'package:velix_editor/metadata/widgets/dropdown.dart';
 import 'package:velix_editor/metadata/widgets/for.dart';
 
 import '../../actions/action_parser.dart';
@@ -476,11 +477,34 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     // TODO:just a test
 
-    if ( widget.property.name == "onSelect") {
-      variables["\$value"] = ClassDesc("kkk");
-    }
-    //
+    var property = widget.property;
+    if ( property.name == "onSelect") {
+      //variables["\$value"] = ClassDesc("kkk");
 
+      var dropDown = widget.object as DropDownWidgetData;
+
+      if (dropDown.children.isNotEmpty && dropDown.children[0].type == "for") {
+        ForWidgetData forWidget = dropDown.children[0] as ForWidgetData;
+
+        var binding = forWidget.context;
+
+        if ( binding.isNotEmpty) {
+          var parseResult = ActionParser.instance.parseStrict(binding, typeChecker: typeChecker);
+
+          if ( parseResult.success && parseResult.complete) {
+            var type = parseResult.value!.getType<Desc>();
+
+            if ( type is ListDesc) {
+              var elementType = type.elementType;
+
+              ClassDescTypeResolver descResolver = typeChecker!.resolver as ClassDescTypeResolver;
+
+              descResolver.variables["value"] = elementType;
+            }
+          }
+        } // if
+      } // if
+    } // if
 
     autocomplete = Autocomplete(typeChecker: typeChecker!);
     _parseState = checkParse(widget.value ?? "");

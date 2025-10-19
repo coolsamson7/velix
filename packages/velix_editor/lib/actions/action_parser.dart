@@ -99,7 +99,6 @@ class ActionParser {
 
   /// Parse input requiring complete success.
   ParseResult parseStrict(String input, { TypeChecker? typeChecker}) {
-    print(input);
     final result = parser.expression.end().parse(input);
     if (result is Success<Expression>) {
       // check types

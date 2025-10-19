@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:velix_editor/editor/panel_switcher.dart';
+import 'package:velix_editor/editor/settings.dart';
 
-/// Config for a docking panel
-///
 
 class Panel {
   String name;
@@ -11,13 +10,17 @@ class Panel {
   IconData? icon;
   Function(VoidCallback onClose) create;
 
-  Panel({required this.name, required this.label, required this.icon, required this.create, required this.tooltip});
+  Panel({
+    required this.name,
+    required this.label,
+    required this.icon,
+    required this.create,
+    required this.tooltip,
+  });
 }
 
 class Dock {
-
   final List<Panel> panels;
-
   final String? initialPanel;
   final bool overlay;
   final double? size; // width for side, height for bottom
@@ -30,7 +33,7 @@ class Dock {
   });
 }
 
-/// A container that arranges a central child with optional side/bottom panels
+/// Container that arranges a central child with optional side/bottom panels
 class DockingContainer extends StatefulWidget {
   final Widget child;
   final Dock? left;
@@ -49,169 +52,132 @@ class DockingContainer extends StatefulWidget {
   State<DockingContainer> createState() => _DockingContainerState();
 }
 
-class _DockingContainerState extends State<DockingContainer> {
-  double? leftSize;
-  double? rightSize;
-  double? bottomSize;
-
-  String? leftPanel;
-  String? rightPanel;
-  String? bottomPanel;
+class _DockingContainerState extends State<DockingContainer> with StatefulMixin {
+  @override
+  String get stateName => "dockingContainer";
 
   @override
-  void initState() {
-    super.initState();
-    leftSize = widget.left?.size ?? 200;
-    rightSize = widget.right?.size ?? 200;
-    bottomSize = widget.bottom?.size ?? 200;
+  Future<void> apply(Map<String, dynamic> data) async {
+    // Could restore general container state here if needed
+  }
 
-    leftPanel = widget.left?.initialPanel;
-    rightPanel = widget.right?.initialPanel;
-    bottomPanel = widget.bottom?.initialPanel;
+  @override
+  Future<void> write(Map<String, dynamic> data) async {
+    // Could write general container state here if needed
   }
 
   @override
   Widget build(BuildContext context) {
-    // If any panels are overlays, use Stack layout
     final hasOverlays = (widget.left?.overlay ?? false) ||
         (widget.right?.overlay ?? false) ||
         (widget.bottom?.overlay ?? false);
 
-    if (hasOverlays) {
-      return _buildStackLayout();
-    } else {
-      return _buildFlexLayout();
-    }
+    return hasOverlays ? _buildStackLayout() : _buildFlexLayout();
   }
 
   Widget _buildStackLayout() {
     return Stack(
       children: [
-        // Main content
         Positioned.fill(child: widget.child),
-
-        // Overlay panels
         if (widget.left != null && widget.left!.overlay)
-          _buildOverlayPanel(widget.left!, Alignment.centerLeft, leftPanel, leftSize!),
-
+          SidePanelWidget(dock: widget.left!, position: DockPosition.left),
         if (widget.right != null && widget.right!.overlay)
-          _buildOverlayPanel(widget.right!, Alignment.centerRight, rightPanel, rightSize!),
-
+          SidePanelWidget(dock: widget.right!, position: DockPosition.right),
         if (widget.bottom != null && widget.bottom!.overlay)
-          _buildOverlayPanel(widget.bottom!, Alignment.bottomCenter, bottomPanel, bottomSize!),
+          SidePanelWidget(dock: widget.bottom!, position: DockPosition.bottom),
       ],
     );
   }
 
-  Widget _buildOverlayPanel(
-      Dock config, Alignment alignment, String? selectedPanel, double size) {
-    final isBottom = alignment == Alignment.bottomCenter;
-    return Align(
-      alignment: alignment,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: isBottom ? null : (selectedPanel != null ? size : 40),
-        height: isBottom ? (selectedPanel != null ? size : 40) : null,
-        constraints: BoxConstraints(
-          maxHeight: isBottom ? size : double.infinity,
-          maxWidth: isBottom ? double.infinity : size,
-        ),
-        child: Material(
-          elevation: 8,
-          child: DockedPanelSwitcher(
-            panels: config.panels,
-            initialPanel: config.initialPanel,
-            position: _getPositionFromAlignment(alignment),
-            panelSize: size,
-            onPanelChanged: (panel) => _updatePanelSelection(alignment, panel),
-          ),
-        ),
-      ),
-    );
-  }
-
-
   Widget _buildFlexLayout() {
     Widget content = widget.child;
 
-    // Wrap with bottom panel if present
     if (widget.bottom != null && !widget.bottom!.overlay) {
       content = Column(
         children: [
           Expanded(child: content),
-          SizedBox(
-            height: bottomPanel != null ? bottomSize! : 40, // Always allocate space for bar
-            child: DockedPanelSwitcher(
-              panels: widget.bottom!.panels,
-              initialPanel: widget.bottom!.initialPanel,
-              position: DockPosition.bottom,
-              panelSize: bottomSize!,
-              onPanelChanged: (panel) => setState(() => bottomPanel = panel),
-              onSizeChanged: (size) => setState(() => bottomSize = size),
-            ),
-          ),
+          SidePanelWidget(dock: widget.bottom!, position: DockPosition.bottom),
         ],
       );
     }
 
-    // Wrap with side panels if present
-    if (widget.left != null && !widget.left!.overlay ||
-        widget.right != null && !widget.right!.overlay) {
+    if ((widget.left != null && !widget.left!.overlay) ||
+        (widget.right != null && !widget.right!.overlay)) {
       content = Row(
         children: [
-          // Left panel
           if (widget.left != null && !widget.left!.overlay)
-            SizedBox(
-              width: leftPanel != null ? leftSize! : 40, // Always allocate space for bar
-              child: DockedPanelSwitcher(
-                panels: widget.left!.panels,
-                initialPanel: widget.left!.initialPanel,
-                position: DockPosition.left,
-                panelSize: leftSize!,
-                onPanelChanged: (panel) => setState(() => leftPanel = panel),
-                onSizeChanged: (size) => setState(() => leftSize = size),
-              ),
-            ),
-
-          // Main content - Always wrap in Expanded to handle flex layout
+            SidePanelWidget(dock: widget.left!, position: DockPosition.left),
           Expanded(child: content),
-
-          // Right panel
           if (widget.right != null && !widget.right!.overlay)
-            SizedBox(
-              width: rightPanel != null ? rightSize! : 40, // Always allocate space for bar
-              child: DockedPanelSwitcher(
-                panels: widget.right!.panels,
-                initialPanel: widget.right!.initialPanel,
-                position: DockPosition.right,
-                panelSize: rightSize!,
-                onPanelChanged: (panel) => setState(() => rightPanel = panel),
-                onSizeChanged: (size) => setState(() => rightSize = size),
-              ),
-            ),
+            SidePanelWidget(dock: widget.right!, position: DockPosition.right),
         ],
       );
     }
 
     return content;
   }
+}
 
-  DockPosition _getPositionFromAlignment(Alignment alignment) {
-    switch (alignment) {
-      case Alignment.centerLeft: return DockPosition.left;
-      case Alignment.centerRight: return DockPosition.right;
-      case Alignment.bottomCenter: return DockPosition.bottom;
-      default: return DockPosition.left;
-    }
+/// Wraps a dock as a stateful panel that remembers its size and open panel
+class SidePanelWidget extends StatefulWidget {
+  final Dock dock;
+  final DockPosition position;
+
+  const SidePanelWidget({super.key, required this.dock, required this.position});
+
+  @override
+  State<SidePanelWidget> createState() => _SidePanelWidgetState();
+}
+
+class _SidePanelWidgetState extends State<SidePanelWidget> with StatefulMixin {
+  late double panelSize = widget.dock.size ?? 200;
+  String? selectedPanel;
+
+  @override
+  String get stateName => "panel-${widget.position.name}";
+
+  @override
+  Future<void> apply(Map<String, dynamic> data) async {
+    if ( data["panelSize"] != null)
+      panelSize = data["panelSize"] ?? widget.dock.size ?? 200;
+    else
+      panelSize = widget.dock.size ?? 200;
+
+    if (data["selectedPanel"] != null)
+      selectedPanel = data["selectedPanel"];
+    else
+      selectedPanel = widget.dock.initialPanel;
   }
 
-  void _updatePanelSelection(Alignment alignment, String? panel) {
-    setState(() {
-      switch (alignment) {
-        case Alignment.centerLeft: leftPanel = panel; break;
-        case Alignment.centerRight: rightPanel = panel; break;
-        case Alignment.bottomCenter: bottomPanel = panel; break;
-      }
-    });
+  @override
+  Future<void> write(Map<String, dynamic> data) async {
+    data["panelSize"] = panelSize;
+    data["selectedPanel"] = selectedPanel;
+  }
+
+  void _onPanelChanged(String? panel) {
+    setState(() => selectedPanel = panel);
+
+    writeSettings();
+    flushSettings();
+  }
+
+  void _onSizeChanged(double size) {
+    setState(() => panelSize = size);
+
+    writeSettings();
+    flushSettings();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DockedPanelSwitcher(
+      panels: widget.dock.panels,
+      initialPanel: selectedPanel,
+      position: widget.position,
+      panelSize: panelSize,
+      onPanelChanged: _onPanelChanged,
+      onSizeChanged: _onSizeChanged,
+    );
   }
 }

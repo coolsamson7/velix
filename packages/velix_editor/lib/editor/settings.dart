@@ -82,7 +82,7 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
       _parent = _getParent();
       _parent!._children.add(this);
 
-      var persistentState = findElement<Map<String,dynamic>>(_getParent()!.state["children"], (state) => state["owner"] == stateName);
+      var persistentState = findElement<dynamic>(_getParent()!.state["children"], (state) => state["owner"] == stateName);
 
       if ( persistentState != null)
         apply((state = persistentState)["data"]);

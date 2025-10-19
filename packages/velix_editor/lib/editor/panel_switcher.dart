@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'docking_container.dart';
 
 typedef OnClose<T> = void Function(T value);
 
 enum DockPosition { left, right, top, bottom }
-
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
-}
 
 class DockedPanelSwitcher extends StatefulWidget {
   final List<Panel> panels;
@@ -45,8 +40,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
   @override
   void initState() {
     super.initState();
-
-    selectedPanel = widget.initialPanel ?? widget.panels.first.name;
+    selectedPanel = widget.initialPanel;
     panelSize = widget.panelSize;
   }
 
@@ -55,11 +49,6 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
       selectedPanel = (selectedPanel == name) ? null : name;
     });
     widget.onPanelChanged?.call(selectedPanel);
-  }
-
-  void _closePanel() {
-    setState(() => selectedPanel = null);
-    widget.onPanelChanged?.call(null);
   }
 
   void _onDragUpdate(DragUpdateDetails details) {
@@ -71,7 +60,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
 
     final screen = MediaQuery.of(context).size;
     final maxSize = isHorizontal
-        ? screen.width - widget.barSize - 48 // keep some room
+        ? screen.width - widget.barSize - 48
         : screen.height - widget.barSize - 48;
 
     final clampedSize = newSize.clamp(100.0, maxSize);
@@ -83,10 +72,7 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
 
   @override
   Widget build(BuildContext context) {
-    // If no panel selected, show just the bar
-    if (selectedPanel == null) {
-      return _buildBar();
-    }
+    if (selectedPanel == null) return _buildBar();
 
     final bar = _buildBar();
     final panel = Container(
@@ -102,41 +88,13 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
 
     switch (widget.position) {
       case DockPosition.left:
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            bar,
-            Flexible(child: SizedBox(width: panelSize, child: panel)),
-            resizeHandle,
-          ],
-        );
+        return Row(children: [bar, SizedBox(width: panelSize, child: panel), resizeHandle]);
       case DockPosition.right:
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            resizeHandle,
-            Flexible(child: SizedBox(width: panelSize, child: panel)),
-            bar,
-          ],
-        );
+        return Row(children: [resizeHandle, SizedBox(width: panelSize, child: panel), bar]);
       case DockPosition.top:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            bar,
-            Flexible(child: SizedBox(height: panelSize, child: panel)),
-            resizeHandle,
-          ],
-        );
+        return Column(children: [bar, SizedBox(height: panelSize, child: panel), resizeHandle]);
       case DockPosition.bottom:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            resizeHandle,
-            Flexible(child: SizedBox(height: panelSize, child: panel)),
-            bar,
-          ],
-        );
+        return Column(children: [resizeHandle, SizedBox(height: panelSize, child: panel), bar]);
     }
   }
 
@@ -177,7 +135,9 @@ class _DockedPanelSwitcherState extends State<DockedPanelSwitcher> {
   Widget _buildPanel() {
     return Container(
       color: Colors.grey.shade100,
-      child: widget.panels.firstWhere((panel) => panel.name == selectedPanel).create(_closePanel),
+      child: widget.panels.firstWhere((p) => p.name == selectedPanel).create(() {
+        _openPanel(selectedPanel!);
+      }),
     );
   }
 

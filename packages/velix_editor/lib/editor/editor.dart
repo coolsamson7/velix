@@ -546,7 +546,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     // TODO TEST
 
-    test();
+    //test();
   }
 
   @override

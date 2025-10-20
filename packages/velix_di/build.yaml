@@ -17,6 +17,8 @@ targets:
       #    - example/main.dart
 
       velix|registry_builder:
+        options:
+          package: "velix_di/"
         generate_for:
           - lib/**/*.dart
           - lib/*.dart

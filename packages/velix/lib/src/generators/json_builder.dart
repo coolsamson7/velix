@@ -10,9 +10,6 @@ import 'package:async/async.dart';
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 
-Builder registryJSONBuilder(BuilderOptions options) =>  JsonDescriptorBuilder();
-
-
 class JsonDescriptorBuilder extends Builder {
   @override
   final buildExtensions = const {
@@ -80,7 +77,7 @@ class JsonDescriptorBuilder extends Builder {
           .where((field) => !field.isStatic && !field.isPrivate)
           .map((f) => {
             'name': f.name,
-            'type': f.type.getDisplayString(withNullability: true),
+            'type': f.type.getDisplayString(withNullability: false),
             'isNullable': f.type.nullabilitySuffix == NullabilitySuffix.question,
             'isFinal': f.isFinal,
             'annotations': [
@@ -99,7 +96,7 @@ class JsonDescriptorBuilder extends Builder {
               for (final p in m.formalParameters)
                 {
                   'name': p.name,
-                  'type': p.type.getDisplayString(withNullability: true),
+                  'type': p.type.getDisplayString(withNullability: false),
                   'isNamed': p.isNamed,
                   'isRequired': p.isRequiredNamed || p.isRequiredPositional,
                   'isNullable': p.isOptional || p.isOptionalNamed,
@@ -207,11 +204,13 @@ class JsonDescriptorAggregator extends Builder {
 /// ----------------------------
 /// Builder factory
 /// ----------------------------
-///
+
+Builder registryJSONBuilder(BuilderOptions options) =>  JsonDescriptorBuilder();
+
+
 Builder jsonRegistryAggregator(BuilderOptions options) {
   final config = options.config;
-  final functionName = config['function_name'] as String? ?? 'registerTypes';
-  final partOf = config['part_of'] as String? ?? '';
   final prefix = config['prefix'] as String? ?? 'lib';
+
   return JsonDescriptorAggregator(prefix: prefix);
 }

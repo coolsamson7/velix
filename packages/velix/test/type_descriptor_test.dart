@@ -21,6 +21,15 @@ class Derived extends Base {
 }
 
 @Dataclass()
+class Lists {
+  String name;
+  @Attribute(type: "min 1")
+  List<Base> items = [];
+
+  Lists({required this.name, required this.items});
+}
+
+@Dataclass()
 class Lazy {
   Lazy? parent;
 

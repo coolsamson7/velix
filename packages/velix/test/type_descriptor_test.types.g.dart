@@ -3,8 +3,8 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'type_descriptor_test.dart';
-import 'package:velix/reflectable/reflectable.dart';
+import 'type_descriptor_test.dart' show Base, Derived, Lists, Lazy;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
 
 void registerTypes() {
   var baseDescriptor =  type<Base>(
@@ -20,6 +20,30 @@ void registerTypes() {
         type: StringType().minLength(10).maxLength(10),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Base).id = value,
+      )
+    ],
+  );
+
+  type<Lists>(
+    location: 'asset:velix/test/type_descriptor_test.dart:23:1',
+    params: [
+      param<String>('name', isNamed: true, isRequired: true), 
+      param<List<Base>>('items', isNamed: true, isRequired: true)
+    ],
+    constructor: ({String name = '', required List<Base> items}) => Lists(name: name, items: items),
+    fromMapConstructor: (Map<String,dynamic> args) => Lists(name: args['name'] as String? ?? '', items: args['items'] as List<Base>),
+    fromArrayConstructor: (List<dynamic> args) => Lists(name: args[0] as String? ?? '', items: args[1] as List<Base>),
+    fields: [
+      field<Lists,String>('name',
+        getter: (obj) => obj.name,
+        setter: (obj, value) => (obj as Lists).name = value,
+      ), 
+      field<Lists,List<Base>>('items',
+        type: ListType<List<Base>>(List<Base>).constraint("min 1"),
+        elementType: Base,
+        factoryConstructor: () => <Base>[],
+        getter: (obj) => obj.items,
+        setter: (obj, value) => (obj as Lists).items = value,
       )
     ],
   );
@@ -45,7 +69,7 @@ void registerTypes() {
 
   // watchout: is part of a cycle
   type<Lazy>(
-    location: 'asset:velix/test/type_descriptor_test.dart:23:1',
+    location: 'asset:velix/test/type_descriptor_test.dart:32:1',
     params: [
       param<Lazy>('parent', isNamed: true, isRequired: true)
     ],

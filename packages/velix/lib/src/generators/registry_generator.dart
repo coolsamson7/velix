@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:async/async.dart';
 
 import 'package:analyzer/dart/analysis/results.dart';
@@ -27,6 +28,23 @@ String assetIdToImportUri(AssetId id) {
   }
 
   return 'asset:${id.package}/${id.path}';
+}
+
+String findAnnotationValue(List<ElementAnnotation> annotations, String annotationName, String field) {
+  for (final annotation in annotations) {
+    final constant = annotation.computeConstantValue();
+    if (constant == null) continue;
+
+    final type = constant.type;
+    if (type != null && type.getDisplayString() == annotationName) {
+      final typeValue = constant.getField(field);
+      if (typeValue != null && typeValue.toStringValue() != "") {
+        return typeValue.toStringValue()!;
+      }
+    }
+  }
+
+  return "";
 }
 
 String getReturnTypeFQN(MethodElement method) {
@@ -72,7 +90,7 @@ String getTypeFQN(DartType type) {
     return 'Function'; // optionally expand signature
   }
   else {
-    return type.getDisplayString(withNullability: true);
+    return type.getDisplayString();
   }
 }
 
@@ -432,24 +450,30 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
+  // NEW
+
+
+
+
+  // NEW
   @override
   void collectImports(ClassElement element) {
     super.collectImports(element);
 
     /* TODO  Supertype
-    if (element.supertype != null) {
-      _collectTypeImports(element.supertype!);
-    }
+  if (element.supertype != null) {
+    _collectTypeImports(element.supertype!);
+  }
 
-    // Interfaces
-    for (final interface in element.interfaces) {
-      _collectTypeImports(interface);
-    }
+  // Interfaces
+  for (final interface in element.interfaces) {
+    _collectTypeImports(interface);
+  }
 
-    // Mixins
-    for (final mixin in element.mixins) {
-      _collectTypeImports(mixin);
-    }*/
+  // Mixins
+  for (final mixin in element.mixins) {
+    _collectTypeImports(mixin);
+  }*/
 
     // Fields
     if (generateProperties) {
@@ -457,7 +481,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         if (field.isStatic || field.isPrivate) continue;
 
         // Field type
-
         _collectTypeImports(field.type);
 
         // Field annotations
@@ -467,7 +490,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
 
     // Methods
-
     for (final method in element.methods.where((method) => hasAnnotation(method, ["OnInit", "OnDestroy", "OnRunning", "Create", "Inject", "Method"]))) {
       if (!method.isPublic) continue;
 
@@ -476,7 +498,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       _collectAnnotationTypeImports(method.metadata.annotations);
 
       // Return type
-
       _collectTypeImports(method.returnType);
 
       // Parameters
@@ -498,23 +519,101 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         collectAnnotationImports(param.metadata.annotations);
         _collectAnnotationTypeImports(param.metadata.annotations);
 
+        // Handle default values like Colors.white, Icons.home, etc.
         if (param.defaultValueCode != null) {
-          final defaultValue = param.defaultValueCode;
-          if (defaultValue != null) {
-            final match = RegExp(r'^([A-Z]\w*)\.').firstMatch(defaultValue);
-            if (match != null) {
-              final className = match.group(1)!;
-              var lib = param.library;
-              /*var element = [
-                ...?lib?.classes,
-                ...?lib?.enums,
-                ...?lib?.mixins,
-              ].firstWhere((el) => el.name == className);*/
-
-              addImport(lib!.identifier, className);
-            }
-          }
+          _collectDefaultValueImports(param.defaultValueCode!, param.library);
         }
+      }
+    }
+  }
+
+  /// Collect imports from default value expressions
+  void _collectDefaultValueImports(String defaultValue, LibraryElement? library) {
+    if (library == null) return;
+
+    // Pattern for ClassName.staticMember or ClassName.constructor
+    final staticAccessPattern = RegExp(r'\b([A-Z][a-zA-Z0-9_]*)\s*\.');
+    final matches = staticAccessPattern.allMatches(defaultValue);
+
+    for (final match in matches) {
+      final className = match.group(1)!;
+      _findAndAddImportForClass(className, library);
+    }
+
+    // Also handle constructor calls: ClassName(...)
+    final constructorPattern = RegExp(r'\bnew\s+([A-Z][a-zA-Z0-9_]*)\s*\(|(?<!\.)([A-Z][a-zA-Z0-9_]*)\s*\(');
+    final ctorMatches = constructorPattern.allMatches(defaultValue);
+
+    for (final match in ctorMatches) {
+      final className = match.group(1) ?? match.group(2);
+      if (className != null) {
+        _findAndAddImportForClass(className, library);
+      }
+    }
+  }
+
+  /// Find a class by name and add its import
+  void _findAndAddImportForClass(String className, LibraryElement sourceLibrary) {
+    //print("find import for $className");
+    // Check in the source library itself
+    for (final element in [...sourceLibrary.classes, ...sourceLibrary.enums, ...sourceLibrary.mixins, ...sourceLibrary.typeAliases]) {
+      if (element is ClassElement ) // TODO
+      if (element.name == className) {
+        addImport(element.library.identifier, className);
+        return;
+      }
+
+      if (element is EnumElement ) // TODO
+        if (element.name == className) {
+          addImport(sourceLibrary.identifier, className);
+          return;
+        }
+    }
+
+    // Check in imported libraries (via imports property which gives Import objects
+
+    var imports = sourceLibrary.fragments
+        .expand((fragment) => fragment.libraryImports)
+        .map((import) => import.importedLibrary)
+        .nonNulls
+        .toSet()
+        .toList();
+
+    for (final import in imports) {
+      //final importedLibrary = import.importedLibrary;
+      //if (importedLibrary == null) continue;
+
+      for (final element in [...import.classes, ...import.enums, ...import.mixins, ...import.typeAliases]) {
+        if (element is ClassElement) // TODO
+          if (element.name == className) {
+            addImport(element.library.identifier, className);
+            return;
+          }
+
+        if (element is EnumElement) // TODO
+          if (element.name == className) {
+            addImport(element.library.identifier, className);
+            return;
+          }
+      }
+    }
+
+
+
+    // Check in exported libraries
+    for (final exportedLibrary in sourceLibrary.exportedLibraries) {
+      for (final element in [...exportedLibrary.classes, ...exportedLibrary.enums, ...exportedLibrary.mixins, ...exportedLibrary.typeAliases]) {
+        if (element is ClassElement) // TODO
+        if (element.name == className) {
+          addImport(element.library.identifier, className);
+          return;
+        }
+
+        if (element is EnumElement) // TODO
+          if (element.name == className) {
+            addImport(exportedLibrary.name, className);
+            return;
+          }
       }
     }
   }
@@ -530,32 +629,96 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       // Get types used in annotation constructor arguments
       final classElement = annotationType.element as ClassElement;
 
-      // Instead of iterating fields, we need to look at what was actually passed
-      // Check if the constant value has any fields with Type values
+      // Collect imports from annotation fields
       for (final field in classElement.fields) {
         if (field.isStatic) continue;
 
         final fieldValue = constantValue.getField(field.name!);
         if (fieldValue == null) continue;
 
+        _collectAnnotationFieldValue(fieldValue);
+      }
+    }
+  }
 
-        // Check if this field holds a Type value
-        if (fieldValue.toTypeValue() != null) {
-          // This is a Type parameter - get the actual type it represents
-          final actualType = fieldValue.toTypeValue()!;
-          _collectTypeImports(actualType);
-        }
-        else if (fieldValue.toListValue() != null) {
-          for (final item in fieldValue.toListValue()!) {
-            final t = item.toTypeValue();
-            if (t != null) _collectTypeImports(t);
-          }
-        }
-        else if (fieldValue.type != null) {
-          // Regular field - collect its type
-          _collectTypeImports(fieldValue.type!);
+  /// Recursively collect imports from annotation field values
+  void _collectAnnotationFieldValue(DartObject fieldValue) {
+    // Check if this field holds a Type value (e.g., type: SomeClass)
+    final typeValue = fieldValue.toTypeValue();
+    if (typeValue != null) {
+      _collectTypeImports(typeValue);
+
+      // Also add import for the class itself if it's a class type
+      if (typeValue.element is ClassElement) {
+        final classElement = typeValue.element as ClassElement;
+        final library = classElement.library;
+        if (library != null) {
+          addImport(library.identifier, classElement.name!);
         }
       }
+      return;
+    }
+
+    // Check if this is a list (e.g., imports: [UIModule, AuthModule])
+    final listValue = fieldValue.toListValue();
+    if (listValue != null) {
+      for (final item in listValue) {
+        // Each item in the list could be a Type or an object
+        final itemType = item.toTypeValue();
+        if (itemType != null) {
+          // It's a Type reference
+          _collectTypeImports(itemType);
+
+          if (itemType.element is ClassElement) {
+            final classElement = itemType.element as ClassElement;
+            final library = classElement.library;
+            if (library != null) {
+              addImport(library.identifier, classElement.name!);
+            }
+          }
+        } else {
+          // It's an object instance - recurse
+          _collectAnnotationFieldValue(item);
+        }
+      }
+      return;
+    }
+
+    // Check if this is a map
+    final mapValue = fieldValue.toMapValue();
+    if (mapValue != null) {
+      for (final entry in mapValue.entries) {
+        _collectAnnotationFieldValue(entry.key!);
+        _collectAnnotationFieldValue(entry.value!);
+      }
+      return;
+    }
+
+    // Check if this is another annotation/object (e.g., nested Module())
+    if (fieldValue.type != null && fieldValue.type!.element is ClassElement) {
+      final classElement = fieldValue.type!.element as ClassElement;
+
+      // Add import for this class itself
+      final library = classElement.library;
+      if (library != null) {
+        addImport(library.identifier, classElement.name!);
+      }
+
+      // Recursively collect from this object's fields
+      for (final field in classElement.fields) {
+        if (field.isStatic) continue;
+
+        final nestedValue = fieldValue.getField(field.name!);
+        if (nestedValue != null) {
+          _collectAnnotationFieldValue(nestedValue);
+        }
+      }
+      return;
+    }
+
+    // Regular field type
+    if (fieldValue.type != null) {
+      _collectTypeImports(fieldValue.type!);
     }
   }
 
@@ -617,28 +780,25 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
       // add constraints
 
-      for (final annotation in field.metadata.annotations) {
-        final constant = annotation.computeConstantValue();
-        if (constant == null) continue;
-
-        final type = constant.type;
-        if (type != null &&
-            type.getDisplayString() == 'Attribute') {
-          final typeValue = constant.getField('type');
-          if (typeValue != null && typeValue.toStringValue() != "") {
-            (constraint as dynamic).constraint(typeValue.toStringValue()!);
-          }
-        }
-      }
+      var type = findAnnotationValue(field.metadata.annotations, "Attribute", "type");
+      if (type.isNotEmpty)
+        (constraint as dynamic).constraint(type);
 
       return  (constraint as dynamic).code();
     }
     else {
       if ( typeName.startsWith("List<")) {
-        return "ListType($typeName)";
+        //
+
+        var type = findAnnotationValue(field.metadata.annotations, "Attribute", "type");
+
+        if (type.isNotEmpty)
+          return "ListType<$typeName>($typeName).constraint(\"$type\")";
+        //
+        return "ListType<$typeName>($typeName)";
       }
       else
-        return "ObjectType($typeName)";
+        return "ObjectType<$typeName>($typeName)"; // TODO?
     }
   }
 
@@ -1061,7 +1221,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       final paramsBuffer = StringBuffer();
 
       for (final param in firstCtor.formalParameters) {
-        var paramType = param.type.getDisplayString(withNullability: false);
+        var paramType = param.type.getDisplayString();
         final paramName = param.name;
 
         // Use param.defaultValueCode or default literal for some common types if null
@@ -1205,7 +1365,9 @@ class RegistryFragmentBuilder extends Builder {
 
   // constructor
 
-  RegistryFragmentBuilder({required this.package});
+  RegistryFragmentBuilder({required this.package}) {
+    print("new RegistryFragmentBuilder on package $package");
+  }
 
   // override
 
@@ -1219,6 +1381,8 @@ class RegistryFragmentBuilder extends Builder {
     final path = buildStep.inputId.path;
     final inputPackage = buildStep.inputId.package; // the current package
 
+    print("registry fragment build on path $path, input package $inputPackage, package $package");
+
     // Skip generated or irrelevant files
     if (!path.endsWith('.dart') ||
         path.contains('.g.dart') ||
@@ -1231,13 +1395,16 @@ class RegistryFragmentBuilder extends Builder {
     try {
       final lib = await buildStep.resolver.libraryFor(buildStep.inputId);
 
-      if (lib.library.identifier != 'package:$inputPackage/${path.substring(4)}' &&
-          !path.startsWith('lib/')) {
-        return;
+      if (lib.library.identifier != 'package:$inputPackage/${path.substring(4)}'
+      //    !path.startsWith('lib/')
+      ) {
+        //print("skip because ${lib.library.identifier} != package:$inputPackage/${path.substring(4)}");
+        //return;
       }
 
       if ( !lib.uri.path.startsWith(package)) {
         //print("ignore ${lib.uri.path}");
+        print("skip because ${lib.uri.path} doesnt start with $package");
         return;
       }
 
@@ -1296,6 +1463,8 @@ class RegistryFragmentBuilder extends Builder {
 
       if (buffer.isNotEmpty) {
         final codeOut = buildStep.inputId.changeExtension('.registry.dart');
+
+        //print("write $codeOut");
 
         await buildStep.writeAsString(codeOut, buffer.toString());
       }

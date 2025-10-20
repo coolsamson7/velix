@@ -484,7 +484,7 @@ class JSONMapper {
                   type: List<dynamic>,
                   includeNull: includeNull,
                   defaultValue: defaultValue,
-                  containerConstructor: () => []
+                  containerConstructor: field.factoryConstructor,// TODO() => field.factoryConstructor//[]
               ),
               to: field.name,
               deep: true,

@@ -3,10 +3,11 @@ targets:
     sources:
       - example/**
       - lib/**
-      - test/**
       - $package$
     builders:
       velix|registry_builder:
+        options:
+          package: "velix_mapper/"
         generate_for:
           - example/*.dart
           - example/**/*.dart

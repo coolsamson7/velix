@@ -126,13 +126,15 @@ void registerUITypes() {
     fromMapConstructor: (Map<String,dynamic> args) => UIModule(),
     fromArrayConstructor: (List<dynamic> args) => UIModule(),
     methods: [
-      method<UIModule,void>('onInit',
+      method<UIModule, void>('onInit',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as UIModule).onInit()
       ), 
-      method<UIModule,void>('onDestroy',
+      method<UIModule, void>('onDestroy',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],

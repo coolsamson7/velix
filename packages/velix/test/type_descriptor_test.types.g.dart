@@ -4,7 +4,7 @@
 
 import 'package:velix/velix.dart';
 import 'type_descriptor_test.dart' show Base, Derived, Lists, Lazy;
-import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute, Method;
 
 void registerTypes() {
   var baseDescriptor =  type<Base>(
@@ -17,7 +17,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Base(id: args[0] as String? ?? ''),
     fields: [
       field<Base,String>('id',
-        type: StringType().minLength(10).maxLength(10),
+        type: StringType().constraint("length 10"),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Base).id = value,
       )
@@ -39,11 +39,20 @@ void registerTypes() {
         setter: (obj, value) => (obj as Lists).name = value,
       ), 
       field<Lists,List<Base>>('items',
-        type: ListType<List<Base>>(List<Base>).constraint("min 1"),
+        type: ListType<List<Base>>(elementType: ObjectType<Base>()),
         elementType: Base,
         factoryConstructor: () => <Base>[],
         getter: (obj) => obj.items,
         setter: (obj, value) => (obj as Lists).items = value,
+      )
+    ],
+    methods: [
+      method<Lists, List<Base>>('getItems',
+      type: ListType<List<Base>>(elementType: ObjectType<Base>()),
+        annotations: [
+          Method()
+        ],
+        invoker: (List<dynamic> args)=> (args[0] as Lists).getItems()
       )
     ],
   );
@@ -60,7 +69,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Derived(number: args[0] as int? ?? 0, id: args[1] as String? ?? ''),
     fields: [
       field<Derived,int>('number',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("> 0"),
         getter: (obj) => obj.number,
         setter: (obj, value) => (obj as Derived).number = value,
       )
@@ -69,15 +78,16 @@ void registerTypes() {
 
   // watchout: is part of a cycle
   type<Lazy>(
-    location: 'asset:velix/test/type_descriptor_test.dart:32:1',
+    location: 'asset:velix/test/type_descriptor_test.dart:37:1',
     params: [
       param<Lazy>('parent', isNamed: true, isRequired: true)
     ],
-    constructor: ({required Lazy parent}) => Lazy(parent: parent),
+    constructor: ({Lazy? parent}) => Lazy(parent: parent),
     fromMapConstructor: (Map<String,dynamic> args) => Lazy(parent: args['parent'] as Lazy),
     fromArrayConstructor: (List<dynamic> args) => Lazy(parent: args[0] as Lazy),
     fields: [
       field<Lazy,Lazy>('parent',
+        type: ObjectType<Lazy>(),
         getter: (obj) => obj.parent,
         setter: (obj, value) => (obj as Lazy).parent = value,
         isNullable: true

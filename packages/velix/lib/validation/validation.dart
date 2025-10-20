@@ -767,7 +767,7 @@ class LazyObjectType<T> extends AbstractType<T, ObjectType<T>> {
   // public
 
   void resolve() {
-    resolveFunc(ObjectType<T>(TypeDescriptor.forType(T)));
+    resolveFunc(ObjectType<T>());
   }
 
   // static
@@ -803,7 +803,7 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
 
   static AbstractType create<T>(ResolveFunction? resolve) {
     if (TypeDescriptor.hasType(T))
-      return ObjectType<T>(TypeDescriptor.forType<T>());
+      return ObjectType<T>();
     else
       return LazyObjectType.create<T>(resolve!);
   }
@@ -814,15 +814,15 @@ class ObjectType<T> extends AbstractType<T, ObjectType<T>> {
   };
   
   // instance data
+
+  TypeDescriptor? _typeDescriptor;
   
-  late TypeDescriptor typeDescriptor;
+  TypeDescriptor get typeDescriptor => _typeDescriptor != null ? _typeDescriptor! : (_typeDescriptor = TypeDescriptor.forType(this.type));
 
   // constructor
 
-  ObjectType(TypeDescriptor type) : super(type: type.type) {
-    baseType<T>(type.type);
-
-    typeDescriptor = type;
+  ObjectType([Type? type]) : super(type: type ?? T) {
+    baseType<T>(type ?? T);
   }
 
   @override
@@ -857,15 +857,17 @@ class ListType<T> extends AbstractType<T, ListType<T>> {
     'max': MethodSpec(1, [ArgType.intType], (t, a) => (t as dynamic).max(a[0])),
   };
 
+  // instance data
+
+  AbstractType elementType;
+
   // constructor
 
   /// Create a new [ListType]
   /// [type] the element type
-  ListType(Type type) : super(type: type) {
-    this.type = type;
-
+  ListType({Type? type, required this.elementType}) : super(type: type ?? T) {
     test<dynamic>(
-        type: type,
+        type: type ?? T,
         name: "type",
         params: {
           "type": type

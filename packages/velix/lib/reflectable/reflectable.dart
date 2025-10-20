@@ -110,13 +110,13 @@ class AbstractPropertyDescriptor<T> extends AbstractDescriptor {
 
     if ( result == null)
       if ( type.toString().startsWith("List<")) {
-        result = ListType(type);
+        result = ListType(type: type, elementType: ClassType<dynamic>()); // TODO?
         if ( isNullable )
           result = (result as dynamic).optional();
       }
       else {
         if ( TypeDescriptor.hasType(type)) {
-          result = ObjectType(TypeDescriptor.forType(type));
+          result = ObjectType(type);
           if ( isNullable )
             result = result.optional() as AbstractType<dynamic, AbstractType>?;
         }
@@ -141,6 +141,9 @@ class FieldDescriptor<T, V> extends AbstractPropertyDescriptor<T> {
   // instance data
 
   final Type? elementType;
+
+  //Type? get elementType => this.type is ListType ? this.type.type : null;
+
   final Function? factoryConstructor;
 
   final Getter getter;
@@ -194,6 +197,7 @@ class MethodDescriptor<T,V> extends AbstractPropertyDescriptor<T> {
   final bool isAsync;
   final bool isStatic;
   final Function? invoker;
+  final bool isNullable;
 
   // constructor
 
@@ -204,9 +208,15 @@ class MethodDescriptor<T,V> extends AbstractPropertyDescriptor<T> {
     required this.parameters,
     this.isAsync = false,
     this.isStatic = false,
+    this.isNullable = false,
     this.invoker,
+
+    AbstractType<dynamic, AbstractType>? type
   }) {
-    inferType(V, false);
+    if ( type != null)
+      this.type = type;
+    else
+      inferType(V, isNullable);
   }
 
   // override
@@ -310,7 +320,7 @@ class TypePatch extends Patch<AbstractType> {
   @override
   AbstractType resolve() {
     if (TypeDescriptor.hasType(type))
-      return ObjectType(TypeDescriptor.forType(type));
+      return ObjectType(type);
     else
       return ClassType(type);
   }
@@ -440,11 +450,14 @@ class TypeDescriptor<T> {
     return instance;
   }
 
-  static bool deepEquals(Object a, Object? b) {
+  static bool deepEquals(Object? a, Object? b) {
     if (identical(a, b))
       return true;
 
-    if (b == null || b.runtimeType != a.runtimeType)
+    if (a == null || b == null)
+      return a == b;
+
+    if (b.runtimeType != a.runtimeType)
       return false;
 
     final typeDescriptor = TypeDescriptor.forType(a.runtimeType);
@@ -453,35 +466,47 @@ class TypeDescriptor<T> {
       final valueA = field.getter(a);
       final valueB = field.getter(b);
 
-      if ( field.type.runtimeType == ObjectType ) {
+      if ( field.type is ObjectType ) {
         if (!deepEquals(valueA, valueB))
           return false;
       }
-      else if (field.type.runtimeType == ListType) {
+      else if (field.type is ListType) {
         final listA = valueA as List?;
         final listB = valueB as List?;
         if (listA == null || listB == null) {
-          if (listA != listB) return false;
+          if (listA != listB)
+            return false;
+
           continue;
         }
-        if (listA.length != listB.length) return false;
+        if (listA.length != listB.length)
+          return false;
+
         for (var i = 0; i < listA.length; ++i) {
-          if (!deepEquals(listA[i], listB[i])) return false;
+          if (!deepEquals(listA[i], listB[i]))
+            return false;
         }
       }
       else if (valueA is Map && valueB is Map) {
-        if (valueA.length != valueB.length) return false;
+        if (valueA.length != valueB.length)
+          return false;
+
         for (final key in valueA.keys) {
-          if (!valueB.containsKey(key)) return false;
-          if (!deepEquals(valueA[key], valueB[key])) return false;
+          if (!valueB.containsKey(key))
+            return false;
+
+          if (!deepEquals(valueA[key], valueB[key]))
+            return false;
         }
       }
       else if (valueA is Set && valueB is Set) {
-        if (valueA.length != valueB.length) return false;
+        if (valueA.length != valueB.length)
+          return false;
         // Both must contain the same elements (unordered)
         for (final entry in valueA) {
           // Use `any` with deepEquals to handle nested set elements
-          if (!valueB.any((b) => deepEquals(entry, b))) return false;
+          if (!valueB.any((b) => deepEquals(entry, b)))
+            return false;
         }
       }
       else {
@@ -540,7 +565,7 @@ class TypeDescriptor<T> {
   }
 
   void setup(List<FieldDescriptor> fields, List<MethodDescriptor>? methods) {
-    objectType = ObjectType(this);
+    objectType = ObjectType<T>();
 
     // super class
 
@@ -803,11 +828,11 @@ ParameterDescriptor param<T>(String name, {
   return ParameterDescriptor(name: name, type: T, isNamed: isNamed, isRequired: isRequired, isNullable: isNullable, defaultValue: defaultValue, annotations: annotations ?? []);
 }
 
-MethodDescriptor method<T,R>(String name, {List<ParameterDescriptor>? parameters, bool isAsync = false,
+MethodDescriptor method<T,R>(String name, {AbstractType<dynamic, AbstractType>? type, List<ParameterDescriptor>? parameters, bool isAsync = false,
   bool isStatic = false,
   annotations = const [],
   required Function invoker}) {
-  return MethodDescriptor<T,R>(name: name, parameters: parameters ?? [], annotations: annotations, invoker: invoker);
+  return MethodDescriptor<T,R>(name: name, type: type, parameters: parameters ?? [], annotations: annotations, invoker: invoker);
 }
 
 FieldDescriptor field<T,V>(String name, {

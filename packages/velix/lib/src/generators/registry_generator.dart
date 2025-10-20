@@ -333,7 +333,7 @@ abstract class CodeGenerator<T extends InterfaceElement> {
 
   // abstract
 
-  Map<String,dynamic> generate(StringBuffer buffer, T element,  AssetId assetId, CharacterLocation location);
+  Map<String,dynamic> generate(RegistryFragmentBuilder builder, StringBuffer buffer, T element,  AssetId assetId, CharacterLocation location);
 }
 
 class EnumCodeGenerator extends CodeGenerator<EnumElement> {
@@ -348,7 +348,7 @@ class EnumCodeGenerator extends CodeGenerator<EnumElement> {
   // override
 
   @override
-  Map<String, dynamic> generate(StringBuffer buffer, EnumElement element, AssetId assetId, CharacterLocation location) {
+  Map<String, dynamic> generate(RegistryFragmentBuilder builder, StringBuffer buffer, EnumElement element, AssetId assetId, CharacterLocation location) {
     collectDependencies(element);
     collectImports(element);
 
@@ -450,12 +450,6 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
-  // NEW
-
-
-
-
-  // NEW
   @override
   void collectImports(ClassElement element) {
     super.collectImports(element);
@@ -490,6 +484,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
 
     // Methods
+
     for (final method in element.methods.where((method) => hasAnnotation(method, ["OnInit", "OnDestroy", "OnRunning", "Create", "Inject", "Method"]))) {
       if (!method.isPublic) continue;
 
@@ -509,6 +504,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
 
     // Constructors
+
     for (final ctor in element.constructors) {
       if (!ctor.isPublic) continue;
 
@@ -752,57 +748,60 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
 
   String fieldType(FieldElement field) {
-    var nullable = false;
-    var typeName =  field.type.getDisplayString();
+    DartType type = field.type;
+    bool nullable = type.nullabilitySuffix == NullabilitySuffix.question;
 
-    if (typeName.endsWith("?")) {
-      typeName = typeName.substring(0, typeName.length - 1);
-      nullable = true;
-    }
+    // Recursive helper
+    String genType(DartType t) {
+      bool isNullable = t.nullabilitySuffix == NullabilitySuffix.question;
+      String baseName = t.getDisplayString(withNullability: false);
 
-    AbstractType? constraint = switch (typeName) {
-      "DateTime" => DateTimeType(),
-      "String" => StringType(),
-      "int" => IntType(),
-      "double" => DoubleType(),
-      "bool" => BoolType(),
-      _ => null
-    };
-
-    // literal types
-
-    if ( constraint != null) {
-      // add optional
-
-      if ( nullable) {
-        constraint = (constraint as dynamic).optional();
+      // Handle literal types
+      String? base;
+      switch (baseName) {
+        case 'String': base = 'StringType()'; break;
+        case 'int': base = 'IntType()'; break;
+        case 'double': base = 'DoubleType()'; break;
+        case 'bool': base = 'BoolType()'; break;
+        case 'DateTime': base = 'DateTimeType()'; break;
       }
 
-      // add constraints
-
-      var type = findAnnotationValue(field.metadata.annotations, "Attribute", "type");
-      if (type.isNotEmpty)
-        (constraint as dynamic).constraint(type);
-
-      return  (constraint as dynamic).code();
-    }
-    else {
-      if ( typeName.startsWith("List<")) {
-        //
-
-        var type = findAnnotationValue(field.metadata.annotations, "Attribute", "type");
-
-        if (type.isNotEmpty)
-          return "ListType<$typeName>($typeName).constraint(\"$type\")";
-        //
-        return "ListType<$typeName>($typeName)";
+      if (base != null) {
+        if (isNullable) base = '$base.optional()';
+        return base;
       }
-      else
-        return "ObjectType<$typeName>($typeName)"; // TODO?
+
+      // Handle List<T>
+      if (t is ParameterizedType &&
+          t.element?.name == 'List' &&
+          t.typeArguments.isNotEmpty) {
+        var inner = t.typeArguments.first;
+        var innerCode = genType(inner); // recursion
+        var outerName = t.getDisplayString(withNullability: false);
+        return 'ListType<$outerName>(elementType: $innerCode)';
+      }
+
+      // Fallback for custom types
+      return 'ClassType<$baseName>()';
     }
+
+    // Generate the main type code
+    var code = genType(type);
+
+    // Apply Attribute constraint if present
+    var typeConstraint =
+    findAnnotationValue(field.metadata.annotations, 'Attribute', 'type');
+    if (typeConstraint.isNotEmpty) {
+      code = '$code.constraint("$typeConstraint")';
+    }
+
+    // Apply optional if the field itself is nullable
+    if (nullable) code = '$code.optional()';
+
+    return code;
   }
 
-  void generateMethods(ClassElement element) {
+  void generateMethods(RegistryFragmentBuilder builder, ClassElement element) {
     // Collect methods from this class and all superclasses/mixins
     final methods = <MethodElement>[];
 
@@ -831,7 +830,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     int len = methods.length;
     int i = 0;
     for (final method in methods) {
-      generateMethod(element.name!, method, i == len - 1);
+      generateMethod(builder, element.name!, method, i == len - 1);
 
       // add dependency, in case of @Create
 
@@ -888,55 +887,76 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     indent(-1).tab().writeln("],");
   }
 
-  void generateMethod(String className, MethodElement method, bool last) {
+  String generateAbstractType(RegistryFragmentBuilder builder, DartType type) {
+    bool nullable = type.nullabilitySuffix == NullabilitySuffix.question;
+
+    String gen(DartType t) {
+      String name = t.getDisplayString(withNullability: false);
+
+      // primitive types
+      switch (name) {
+        case 'String': return 'StringType()';
+        case 'int': return 'IntType()';
+        case 'double': return 'DoubleType()';
+        case 'bool': return 'BoolType()';
+        case 'DateTime': return 'DateTimeType()';
+      }
+
+      bool knownClass = builder.knownType(t);
+
+      // List<T>
+      if (t is ParameterizedType &&
+          t.element?.name == 'List' &&
+          t.typeArguments.isNotEmpty) {
+        var inner = t.typeArguments.first;
+
+        return 'ListType<${t.getDisplayString(withNullability: false)}>(elementType: ${gen(inner)})';
+      }
+
+      // Fallback
+      return '${knownClass ? "ObjectType" : "ClassType"}<$name>()';
+    }
+
+    var expr = gen(type);
+    if (nullable) expr = '$expr.optional()';
+    return expr;
+  }
+
+
+  void generateMethod(RegistryFragmentBuilder builder, String className, MethodElement method, bool last) {
     final methodName = method.name;
     final returnType = method.returnType;
-    final isAsync = method.returnType.isDartAsyncFuture;
+    final isAsync = returnType.isDartAsyncFuture;
 
-    addImport(typeLibrary(method.returnType), method.returnType.name!);
+    addImport(typeLibrary(returnType), returnType.name!);
 
-    // Find the lifecycle annotation
+    // Generate the AbstractType expression for the return type
+    final returnTypeExpr = generateAbstractType(builder, returnType);
 
-    for (final annotation in method.metadata.annotations) {
-      final value = annotation.computeConstantValue();
-      if (value != null) {
-        final typeName = value.type?.getDisplayString();
-        if (typeName == 'OnInit' || typeName == 'OnDestroy' ||  typeName == 'Create') {
-          break;
-        }
-      }
-    }
-
-    tab().writeln("method<$className,$returnType>('$methodName',").indent(1);
+    tab()
+        .writeln("method<$className, ${returnType.getDisplayString(withNullability: false)}>("
+            "'$methodName',")
+        .tab().writeln("type: $returnTypeExpr,")
+        .indent(1);
 
     generateAnnotations(method.metadata.annotations);
-    if (method.formalParameters.isNotEmpty) generateParameters(method.formalParameters);
 
-    if (isAsync)
-      tab().writeln("isAsync: $isAsync,");
-
-    tab().write("invoker: (List<dynamic> args)");
-
-    if (isAsync) {
-      write("async ");
+    if (method.formalParameters.isNotEmpty) {
+      generateParameters(method.formalParameters);
     }
 
-    write("=> ");
-    write("(args[0] as $className).$methodName(");
+    if (isAsync) tab().writeln("isAsync: true,");
 
-    // Generate parameter passing for injection methods
-    if (method.formalParameters.isNotEmpty) {
-      for (int i = 0; i < method.formalParameters.length; i++) {
-        var parameter =  method.formalParameters[i];
+    tab().write("invoker: (List<dynamic> args)");
+    if (isAsync) write(" async ");
+    write("=> (args[0] as $className).$methodName(");
 
-        if (i > 0)
-          write(", ");
-
-        if ( parameter.isNamed)
-          write(parameter.displayName).write(": ");
-
-        write("args[${i + 1}]");
-      }
+    // Pass parameters
+    for (int i = 0; i < method.formalParameters.length; i++) {
+      final p = method.formalParameters[i];
+      if (i > 0) write(", ");
+      if (p.isNamed) write("${p.displayName}: ");
+      write("args[${i + 1}]");
     }
 
     write(")");
@@ -944,6 +964,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
     indent(-1).tab().write(')').writeln(last ? "" : ", ");
   }
+
 
   void generateConstructorParams(ClassElement element) {
     // collect parameters
@@ -1003,53 +1024,72 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     }
   }
 
-  void generateField(String className, FieldElement field, bool last) {
+  void generateField(RegistryFragmentBuilder builder, String className, FieldElement field, bool last) {
     final name = field.name;
     final type = field.type.getDisplayString(withNullability: false);
 
     final isFinal = field.isFinal;
     final isNullable = isTypeNullable(field.type);
 
-    String typeCode = fieldType(field);
+    // Determine typeCode: wrap lists/maps in ListType/MapType, else ObjectType
+    String? typeCode;
+    final elementType = getElementType(field);
+    if (elementType != null) {
+      var knowClass = builder.knownType(elementType);
+
+      final elementTypeName = elementType.getDisplayString(withNullability: false);
+
+      typeCode = "ListType<$type>(elementType: ${knowClass ? 'ObjectType' : 'ClassType'}<$elementTypeName>())";
+    }
+    else {
+      typeCode = fieldType(field);
+      // Fallback for single objects
+      if (builder.isPrimitiveType(field.type)) {
+        if (!typeCode.contains("."))
+          typeCode = null;
+      }
+      else
+        typeCode = "${builder.knownType(field.type) ? 'ObjectType' : 'ClassType'}<$type>()";
+    }
 
     tab().writeln("field<$className,$type>('$name',").indent(1);
 
-    if ( typeCode.contains("."))
+    // Only write type if typeCode is set
+    if (typeCode != null) {
+      //builder.knownType(elementType!); TODO
+
       tab().writeln("type: $typeCode,");
+    }
 
     generateAnnotations(field.metadata.annotations);
 
-    final elementType = getElementType(field);
     if (elementType != null) {
       final elementTypeName = elementType.getDisplayString(withNullability: false);
-
       tab().writeln("elementType: $elementTypeName,");
       tab().writeln("factoryConstructor: () => <$elementTypeName>[],");
     }
 
-    tab().writeln("getter: (obj) => obj.$name,"); // (obj as $className).$name
+    tab().writeln("getter: (obj) => obj.$name,");
 
-    if ( !isFinal) {
+    if (!isFinal) {
       tab().writeln("setter: (obj, value) => (obj as $className).$name = value,");
     }
-    //else {
-    //  tab().writeln("isFinal: $isFinal,");
-    //}
 
-    if ( isNullable )
+    if (isNullable) {
       tab().writeln("isNullable: true");
+    }
 
     indent(-1).tab().write(')').writeln(last ? "" : ", ");
   }
 
-  void generateFields(ClassElement element) {
+  void generateFields(RegistryFragmentBuilder builder, ClassElement element) {
     tab().writeln("fields: [").indent(1);
 
     int len = element.fields.length;
     int i = 0;
     for (final field in element.fields) {
       if (!field.isStatic && !field.isPrivate)
-        generateField(element.name!, field, i == len - 1);
+        generateField(builder, element.name!, field, i == len - 1);
 
       i++;
     } // for
@@ -1297,7 +1337,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   // override
 
   @override
-  Map<String,dynamic> generate(StringBuffer buffer, ClassElement element, AssetId assetId, CharacterLocation location) {
+  Map<String,dynamic> generate(RegistryFragmentBuilder builder, StringBuffer buffer, ClassElement element, AssetId assetId, CharacterLocation location) {
     collectDependencies(element);
     collectImports(element);
 
@@ -1340,9 +1380,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     else tab().writeln("isAbstract: true,");
 
     if ( generateProperties && element.fields.isNotEmpty)
-      generateFields(element);
+      generateFields(builder, element);
 
-    generateMethods(element);
+    generateMethods(builder, element);
 
     indent(-1).tab().writeln(");");
 
@@ -1358,15 +1398,37 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
   }
 }
 
+
 class RegistryFragmentBuilder extends Builder {
   // instance data
 
   String package;
+  List<ClassElement> handledClasses = [];
 
   // constructor
 
   RegistryFragmentBuilder({required this.package}) {
     print("new RegistryFragmentBuilder on package $package");
+  }
+
+  // internal
+
+  bool isPrimitiveType(DartType type) {
+    return
+          type.isDartCoreInt ||
+          type.isDartCoreString ||
+          type.isDartCoreNum ||
+          type.isDartCoreDouble ||
+          type.isDartCoreBool;
+  }
+
+  bool knownType(DartType type)   {
+    final typeElement = type.element;
+    if (typeElement == null) return false;
+
+    var name = type.name;
+
+    return handledClasses.any((cls) => cls.name == name);
   }
 
   // override
@@ -1429,7 +1491,11 @@ class RegistryFragmentBuilder extends Builder {
 
       // scan all classes
 
-      for (final cls in [...lib.classes, ...lib.enums].where(handle)) {
+      handledClasses = [...lib.classes].where(handle).toList();
+
+      var all = [...handledClasses, ...lib.enums].where(handle);
+
+      for (final cls in all) {
         // Find AST node for line/col
 
         final node = [
@@ -1443,10 +1509,10 @@ class RegistryFragmentBuilder extends Builder {
         var location = lineInfo.getLocation(node.offset);
 
         if ( cls is EnumElement) {
-          classes.add(EnumCodeGenerator(forInput: buildStep.inputId, variable: false).generate(buffer, cls, buildStep.inputId, location));
+          classes.add(EnumCodeGenerator(forInput: buildStep.inputId, variable: false).generate(this, buffer, cls, buildStep.inputId, location));
         }
         else if ( cls is ClassElement)
-          classes.add(ClassCodeGenerator(forInput: buildStep.inputId, variable: false, generateProperties: isDataclass(cls)).generate(buffer, cls, buildStep.inputId, location));
+          classes.add(ClassCodeGenerator(forInput: buildStep.inputId, variable: false, generateProperties: isDataclass(cls)).generate(this, buffer, cls, buildStep.inputId, location));
       }
 
       // write JSON metadata

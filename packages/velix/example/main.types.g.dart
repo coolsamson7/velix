@@ -18,11 +18,11 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.currency,
       ), 
       field<Money,int>('value',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         getter: (obj) => obj.value,
       )
     ],

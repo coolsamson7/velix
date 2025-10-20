@@ -29,7 +29,7 @@ builders:
     builder_factories: [ "registryAggregator" ]
     build_extensions:
       ".dart": [ ".types.g.dart" ]  # Generate .g.dart part file
-    auto_apply: none  # manual trigger only
+    auto_apply: none  # none manual trigger only
     build_to: source
 
 targets:
@@ -40,6 +40,7 @@ targets:
       - lib/**
     builders:
       velix|registry_builder:
+        enabled: true
         options:
           package: "velix/"
         generate_for:
@@ -48,6 +49,7 @@ targets:
           - "!example/**/*.g.dart"
           - "!example/**/*.part.dart"
       velix|registry_aggregator:
+        enabled: true
         options:
           prefix: "example"
         generate_for:
@@ -56,7 +58,6 @@ targets:
     sources:
       - test/**
       - $package$
-      - lib/**
     builders:
       velix|registry_json_builder:
         generate_for:

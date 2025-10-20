@@ -3,13 +3,13 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'conflict/conflict.dart';
-import 'cycle/cycle.dart';
-import 'di.dart';
-import 'mock/mock.dart';
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_di/configuration/configuration.dart';
-import 'package:velix_di/di/di.dart';
+import 'conflict/conflict.dart' show ConflictModule, Conflict;
+import 'package:velix_di/di/di.dart' show Module, Create, Injectable, OnInit, Environment, OnDestroy, Inject, Conditional, OnRunning, feature;
+import 'cycle/cycle.dart' show CycleModule, CycleSource, CycleTarget;
+import 'di.dart' show TestModule, Bar, Baz, Foo, Factory, Collections, Money, ImmutableRoot, ImmutableProduct, MutableRoot, Product, Mutable, Base, Derived, ConditionalBase, ConditionalProd, ConditionalDev, RootType, DerivedType, Types, Status, Invoice, Flat, Immutable;
+import 'package:velix_di/configuration/configuration.dart' show ConfigurationManager, ConfigurationValues, Value;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'mock/mock.dart' show MockModule, MockBase;
 
 void registerTypes() {
   type<Conflict>(
@@ -41,13 +41,15 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => TestModule(),
     fromArrayConstructor: (List<dynamic> args) => TestModule(),
     methods: [
-      method<TestModule,ConfigurationManager>('createConfigurationManager',
+      method<TestModule, ConfigurationManager>('createConfigurationManager',
+      type: ObjectType<ConfigurationManager>(),
         annotations: [
           Create()
         ],
         invoker: (List<dynamic> args)=> (args[0] as TestModule).createConfigurationManager()
       ), 
-      method<TestModule,ConfigurationValues>('createConfigurationValues',
+      method<TestModule, ConfigurationValues>('createConfigurationValues',
+      type: ObjectType<ConfigurationValues>(),
         annotations: [
           Create()
         ],
@@ -86,6 +88,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Collections(prices: args[0] as List<Money>),
     fields: [
       field<Collections,List<Money>>('prices',
+        type: ListType<List<Money>>(elementType: ObjectType<Money>()),
         elementType: Money,
         factoryConstructor: () => <Money>[],
         getter: (obj) => obj.prices,
@@ -104,11 +107,11 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.currency,
       ), 
       field<Money,int>('value',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         getter: (obj) => obj.value,
       )
     ],
@@ -136,13 +139,15 @@ void registerTypes() {
     ],
     isAbstract: true,
     methods: [
-      method<ConditionalBase,void>('initBase',
+      method<ConditionalBase, void>('initBase',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalBase).initBase()
       ), 
-      method<ConditionalBase,void>('destroyBase',
+      method<ConditionalBase, void>('destroyBase',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -197,9 +202,11 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.date,
       ), 
       field<Invoice,List<Product>>('products',
+        type: ListType<List<Product>>(elementType: ObjectType<Product>()),
         elementType: Product,
         factoryConstructor: () => <Product>[],
         getter: (obj) => obj.products,
@@ -219,7 +226,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Flat(id: args[0] as String? ?? '', priceCurrency: args[1] as String? ?? '', priceValue: args[2] as int? ?? 0),
     fields: [
       field<Flat,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
       ), 
       field<Flat,String>('priceCurrency',
@@ -255,7 +262,8 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => ConflictModule(),
     fromArrayConstructor: (List<dynamic> args) => ConflictModule(),
     methods: [
-      method<ConflictModule,Conflict>('create',
+      method<ConflictModule, Conflict>('create',
+      type: ObjectType<Conflict>(),
         annotations: [
           Create()
         ],
@@ -286,7 +294,8 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => Factory(),
     fromArrayConstructor: (List<dynamic> args) => Factory(),
     methods: [
-      method<Factory,void>('onInit',
+      method<Factory, void>('onInit',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
@@ -295,13 +304,15 @@ void registerTypes() {
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).onInit(args[1])
       ), 
-      method<Factory,void>('onDestroy',
+      method<Factory, void>('onDestroy',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).onDestroy()
       ), 
-      method<Factory,void>('setFoo',
+      method<Factory, void>('setFoo',
+      type: ClassType<void>(),
         annotations: [
           Inject()
         ],
@@ -315,7 +326,8 @@ void registerTypes() {
         ],
         invoker: (List<dynamic> args)=> (args[0] as Factory).setFoo(args[1], args[2])
       ), 
-      method<Factory,Baz>('createBaz',
+      method<Factory, Baz>('createBaz',
+      type: ObjectType<Baz>(),
         annotations: [
           Create()
         ],
@@ -334,21 +346,22 @@ void registerTypes() {
       param<Money>('price', isNamed: true, isRequired: true), 
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
-    constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
+    constructor: ({String id = '', required Money price, DateTime? dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
     fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String? ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String? ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
     fields: [
       field<Mutable,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Mutable).id = value,
       ), 
       field<Mutable,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Mutable).price = value,
       ), 
       field<Mutable,DateTime>('dateTime',
-        type: DateTimeType().optional(),
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.dateTime,
         setter: (obj, value) => (obj as Mutable).dateTime = value,
         isNullable: true
@@ -367,10 +380,11 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String? ?? '', price: args[1] as Money),
     fields: [
       field<Immutable,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
       ), 
       field<Immutable,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
       )
     ],
@@ -404,31 +418,36 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalProd(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalProd(),
     methods: [
-      method<ConditionalProd,void>('initProd',
+      method<ConditionalProd, void>('initProd',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).initProd()
       ), 
-      method<ConditionalProd,void>('destroyProd',
+      method<ConditionalProd, void>('destroyProd',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).destroyProd()
       ), 
-      method<ConditionalProd,void>('runProd',
+      method<ConditionalProd, void>('runProd',
+      type: ClassType<void>(),
         annotations: [
           OnRunning()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).runProd()
       ), 
-      method<ConditionalProd,void>('initBase',
+      method<ConditionalProd, void>('initBase',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalProd).initBase()
       ), 
-      method<ConditionalProd,void>('destroyBase',
+      method<ConditionalProd, void>('destroyBase',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -448,13 +467,15 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => ConditionalDev(),
     fromArrayConstructor: (List<dynamic> args) => ConditionalDev(),
     methods: [
-      method<ConditionalDev,void>('initBase',
+      method<ConditionalDev, void>('initBase',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ConditionalDev).initBase()
       ), 
-      method<ConditionalDev,void>('destroyBase',
+      method<ConditionalDev, void>('destroyBase',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -473,13 +494,15 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => MockBase(),
     fromArrayConstructor: (List<dynamic> args) => MockBase(),
     methods: [
-      method<MockBase,void>('initBase',
+      method<MockBase, void>('initBase',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as MockBase).initBase()
       ), 
-      method<MockBase,void>('destroyBase',
+      method<MockBase, void>('destroyBase',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -514,9 +537,11 @@ void registerTypes() {
         getter: (obj) => obj.name,
       ), 
       field<ImmutableProduct,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
       ), 
       field<ImmutableProduct,Status>('status',
+        type: ClassType<Status>(),
         getter: (obj) => obj.status,
       )
     ],
@@ -538,10 +563,12 @@ void registerTypes() {
         setter: (obj, value) => (obj as Product).name = value,
       ), 
       field<Product,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Product).price = value,
       ), 
       field<Product,Status>('status',
+        type: ClassType<Status>(),
         getter: (obj) => obj.status,
         setter: (obj, value) => (obj as Product).status = value,
       )
@@ -558,6 +585,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => ImmutableRoot(product: args[0] as ImmutableProduct),
     fields: [
       field<ImmutableRoot,ImmutableProduct>('product',
+        type: ObjectType<ImmutableProduct>(),
         getter: (obj) => obj.product,
       )
     ],
@@ -573,6 +601,7 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => MutableRoot(product: args[0] as Product),
     fields: [
       field<MutableRoot,Product>('product',
+        type: ObjectType<Product>(),
         getter: (obj) => obj.product,
       )
     ],

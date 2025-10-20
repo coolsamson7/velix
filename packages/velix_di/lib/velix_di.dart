@@ -4,6 +4,8 @@
 
 // imports ( required by the generated code )
 
+import 'package:velix/validation/validation.dart';
+
 import './configuration/configuration.dart';
 import './configuration/source/json_source.dart';
 

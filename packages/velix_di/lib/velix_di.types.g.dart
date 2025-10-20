@@ -23,7 +23,8 @@ void registerVelixDescriptors() {
     ],
     isAbstract: true,
     methods: [
-      method<ConfigurationSource,void>('setManager',
+      method<ConfigurationSource, void>('setManager',
+      type: ClassType<void>(),
         annotations: [
           Inject()
         ],
@@ -128,7 +129,8 @@ void registerVelixDescriptors() {
     fromMapConstructor: (Map<String,dynamic> args) => ConfigurationValues(args['values'] as Map<String, dynamic>),
     fromArrayConstructor: (List<dynamic> args) => ConfigurationValues(args[0] as Map<String, dynamic>),
     methods: [
-      method<ConfigurationValues,void>('setManager',
+      method<ConfigurationValues, void>('setManager',
+      type: ClassType<void>(),
         annotations: [
           Inject()
         ],
@@ -153,7 +155,8 @@ void registerVelixDescriptors() {
     fromMapConstructor: (Map<String,dynamic> args) => JsonFileConfigurationSource(args['filePath'] as String),
     fromArrayConstructor: (List<dynamic> args) => JsonFileConfigurationSource(args[0] as String),
     methods: [
-      method<JsonFileConfigurationSource,void>('setManager',
+      method<JsonFileConfigurationSource, void>('setManager',
+      type: ClassType<void>(),
         annotations: [
           Inject()
         ],

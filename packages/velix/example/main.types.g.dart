@@ -3,8 +3,8 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'main.dart';
-import 'package:velix/reflectable/reflectable.dart';
+import 'main.dart' show Money;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
 
 void registerTypes() {
   type<Money>(

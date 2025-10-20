@@ -144,6 +144,9 @@ class SettingsManager {
     if (!initialized) {
       dir = await getApplicationSupportDirectory();
 
+      if (dir.path.isEmpty)
+        return; // test fake
+
       file = File('${dir.path}/settings.json');
       if (await file.exists()) {
         var settings = await file.readAsString();

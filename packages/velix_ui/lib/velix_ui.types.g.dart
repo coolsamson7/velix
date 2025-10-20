@@ -13,6 +13,7 @@ import 'package:velix_ui/databinding/widgets/common/switch.dart' show SwitchAdap
 import 'package:velix_ui/databinding/widgets/cupertino/datepicker.dart' show CupertinoDatePickerAdapter;
 import 'package:velix_ui/databinding/widgets/cupertino/text.dart' show CupertinoTextFieldAdapter;
 import 'package:velix_ui/databinding/widgets/material/datepicker.dart' show MaterialDatePickerAdapter;
+import 'package:velix_ui/databinding/widgets/material/dropdown.dart' show DropDownAdapter;
 import 'package:velix_ui/databinding/widgets/material/text.dart' show MaterialTextFormFieldAdapter;
 import 'package:velix_ui/module.dart' show UIModule;
 
@@ -94,6 +95,17 @@ void registerUITypes() {
     fromArrayConstructor: (List<dynamic> args) => MaterialDatePickerAdapter(),
   );
 
+  type<DropDownAdapter>(
+    location: 'package:velix_ui/databinding/widgets/material/dropdown.dart:8:1',
+    annotations: [
+      WidgetAdapter(platforms: [TargetPlatform.android]),
+      Injectable()
+    ],
+    constructor: () => DropDownAdapter(),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownAdapter(),
+    fromArrayConstructor: (List<dynamic> args) => DropDownAdapter(),
+  );
+
   type<MaterialTextFormFieldAdapter>(
     location: 'package:velix_ui/databinding/widgets/material/text.dart:11:1',
     annotations: [
@@ -106,7 +118,7 @@ void registerUITypes() {
   );
 
   type<UIModule>(
-    location: 'package:velix_ui/module.dart:3:1',
+    location: 'package:velix_ui/module.dart:4:1',
     annotations: [
       Module(imports: [])
     ],

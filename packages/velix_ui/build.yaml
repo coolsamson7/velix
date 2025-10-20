@@ -10,19 +10,24 @@ builders:
 targets:
   $default:
     sources:
-      - example/**
       - lib/**
       - $package$
     builders:
       velix|registry_builder:
+        options:
+          #prefix: "example"
+          package: "velix_ui/"
         generate_for:
-          - example/*.dart
-          - example/**/*.dart
+          #- example/*.dart
+          - lib/*.dart
+          #- example/**/*.dart
           - lib/**/*.dart
           - "!example/**/*.g.dart"
           - "!example/**/*.part.dart"
       velix|registry_aggregator:
         options:
-          prefix: "example"
+          prefix: "lib"
+          function_name: "registerUITypes"
         generate_for:
-          - example/main.dart
+          #- databinding/widgets.dart
+          - lib/velix_ui.dart

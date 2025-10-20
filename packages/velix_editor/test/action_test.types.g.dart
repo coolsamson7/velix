@@ -10,7 +10,7 @@ import 'package:velix_di/di/di.dart' show Inject, Injectable, Module;
 
 void registerTypes() {
   type<Address>(
-    location: 'asset:velix_editor/test/action_test.dart:20:1',
+    location: 'asset:velix_editor/test/action_test.dart:22:1',
     params: [
       param<String>('city', isNamed: true, isRequired: true), 
       param<String>('street', isNamed: true, isRequired: true)
@@ -29,7 +29,8 @@ void registerTypes() {
       )
     ],
     methods: [
-      method<Address,String>('hello',
+      method<Address, String>('hello',
+      type: StringType(),
         annotations: [
           Inject()
         ],
@@ -42,7 +43,7 @@ void registerTypes() {
   );
 
   type<Page>(
-    location: 'asset:velix_editor/test/action_test.dart:64:1',
+    location: 'asset:velix_editor/test/action_test.dart:66:1',
     annotations: [
       Injectable()
     ],
@@ -51,16 +52,19 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Page(),
     fields: [
       field<Page,User>('user',
+        type: ObjectType<User>(),
         getter: (obj) => obj.user,
       ), 
       field<Page,List<User>>('users',
+        type: ListType<List<User>>(elementType: ObjectType<User>()),
         elementType: User,
         factoryConstructor: () => <User>[],
         getter: (obj) => obj.users,
       )
     ],
     methods: [
-      method<Page,List<User>>('getUsers',
+      method<Page, List<User>>('getUsers',
+      type: ListType<List<User>>(elementType: ObjectType<User>()),
         annotations: [
           Method()
         ],
@@ -70,7 +74,7 @@ void registerTypes() {
   );
 
   type<TestModule>(
-    location: 'asset:velix_editor/test/action_test.dart:89:1',
+    location: 'asset:velix_editor/test/action_test.dart:91:1',
     annotations: [
       Module(imports: [EditorModule], includeSiblings: false, includeSubdirectories: false)
     ],
@@ -80,7 +84,7 @@ void registerTypes() {
   );
 
   type<User>(
-    location: 'asset:velix_editor/test/action_test.dart:41:1',
+    location: 'asset:velix_editor/test/action_test.dart:43:1',
     params: [
       param<String>('name', isNamed: true, isRequired: true), 
       param<Address>('address', isNamed: true, isRequired: true)
@@ -94,12 +98,14 @@ void registerTypes() {
         setter: (obj, value) => (obj as User).name = value,
       ), 
       field<User,Address>('address',
+        type: ObjectType<Address>(),
         getter: (obj) => obj.address,
         setter: (obj, value) => (obj as User).address = value,
       )
     ],
     methods: [
-      method<User,String>('hello',
+      method<User, String>('hello',
+      type: StringType(),
         annotations: [
           Inject()
         ],

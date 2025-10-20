@@ -3,9 +3,9 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'main.dart';
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_mapper/mapper/json.dart';
+import 'main.dart' show Product, Money, Status, Invoice;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix_mapper/mapper/json.dart' show JsonSerializable, Json;
 
 void registerTypes() {
   type<Invoice>(
@@ -19,14 +19,16 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.date,
       ), 
       field<Invoice,List<Product>>('products',
+        type: ListType<List<Product>>(elementType: ObjectType<Product>()),
         elementType: Product,
         factoryConstructor: () => <Product>[],
         getter: (obj) => obj.products,
       )
-    ]
+    ],
   );
 
   type<Money>(
@@ -43,20 +45,20 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         annotations: [
           Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false)
         ],
         getter: (obj) => obj.currency,
       ), 
       field<Money,int>('value',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         annotations: [
           Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
         ],
         getter: (obj) => obj.value,
       )
-    ]
+    ],
   );
 
   enumeration<Status>(
@@ -80,14 +82,16 @@ void registerTypes() {
         setter: (obj, value) => (obj as Product).name = value,
       ), 
       field<Product,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Product).price = value,
       ), 
       field<Product,Status>('status',
+        type: ClassType<Status>(),
         getter: (obj) => obj.status,
         setter: (obj, value) => (obj as Product).status = value,
       )
-    ]
+    ],
   );
 
   TypeDescriptor.verify();

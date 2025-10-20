@@ -3,9 +3,9 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'model.dart';
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_mapper/mapper/json.dart';
+import 'model.dart' show Mutable, Money, Collections, Product, Status, Invoice, MyConverter, Base, Derived, Polymorph, Types, Immutable;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:velix_mapper/mapper/json.dart' show JsonSerializable, Json;
 
 void registerTypes() {
   type<Collections>(
@@ -18,11 +18,12 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Collections(prices: args[0] as List<Money>),
     fields: [
       field<Collections,List<Money>>('prices',
+        type: ListType<List<Money>>(elementType: ObjectType<Money>()),
         elementType: Money,
         factoryConstructor: () => <Money>[],
         getter: (obj) => obj.prices,
       )
-    ]
+    ],
   );
 
   type<Invoice>(
@@ -36,14 +37,16 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Invoice(products: args[0] as List<Product>, date: args[1] as DateTime),
     fields: [
       field<Invoice,DateTime>('date',
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.date,
       ), 
       field<Invoice,List<Product>>('products',
+        type: ListType<List<Product>>(elementType: ObjectType<Product>()),
         elementType: Product,
         factoryConstructor: () => <Product>[],
         getter: (obj) => obj.products,
       )
-    ]
+    ],
   );
 
   type<MyConverter>(
@@ -67,20 +70,20 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Money(currency: args[0] as String? ?? '', value: args[1] as int? ?? 0),
     fields: [
       field<Money,String>('currency',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         annotations: [
           Json(name: "currency", includeNull: true, required: true, defaultValue: "EU", ignore: false, converter: MyConverter)
         ],
         getter: (obj) => obj.currency,
       ), 
       field<Money,int>('value',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         annotations: [
           Json(includeNull: true, required: true, defaultValue: 1, ignore: false)
         ],
         getter: (obj) => obj.value,
       )
-    ]
+    ],
   );
 
   var baseDescriptor =  type<Base>(
@@ -102,7 +105,7 @@ void registerTypes() {
       field<Base,String>('name',
         getter: (obj) => obj.name,
       )
-    ]
+    ],
   );
 
   type<Types>(
@@ -129,7 +132,7 @@ void registerTypes() {
       field<Types,String>('string_var',
         getter: (obj) => obj.string_var,
       )
-    ]
+    ],
   );
 
   enumeration<Status>(
@@ -144,26 +147,27 @@ void registerTypes() {
       param<Money>('price', isNamed: true, isRequired: true), 
       param<DateTime>('dateTime', isNamed: true, isRequired: true)
     ],
-    constructor: ({String id = '', required Money price, required DateTime dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
+    constructor: ({String id = '', required Money price, DateTime? dateTime}) => Mutable(id: id, price: price, dateTime: dateTime),
     fromMapConstructor: (Map<String,dynamic> args) => Mutable(id: args['id'] as String? ?? '', price: args['price'] as Money, dateTime: args['dateTime'] as DateTime),
     fromArrayConstructor: (List<dynamic> args) => Mutable(id: args[0] as String? ?? '', price: args[1] as Money, dateTime: args[2] as DateTime),
     fields: [
       field<Mutable,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Mutable).id = value,
       ), 
       field<Mutable,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Mutable).price = value,
       ), 
       field<Mutable,DateTime>('dateTime',
-        type: DateTimeType().optional(),
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.dateTime,
         setter: (obj, value) => (obj as Mutable).dateTime = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   type<Immutable>(
@@ -177,13 +181,14 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Immutable(id: args[0] as String? ?? '', price: args[1] as Money),
     fields: [
       field<Immutable,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
       ), 
       field<Immutable,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
       )
-    ]
+    ],
   );
 
   type<Derived>(
@@ -204,7 +209,7 @@ void registerTypes() {
       field<Derived,int>('number',
         getter: (obj) => obj.number,
       )
-    ]
+    ],
   );
 
   type<Polymorph>(
@@ -218,14 +223,16 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Polymorph(bases: args[0] as List<Base>, base: args[1] as Base),
     fields: [
       field<Polymorph,List<Base>>('bases',
+        type: ListType<List<Base>>(elementType: ObjectType<Base>()),
         elementType: Base,
         factoryConstructor: () => <Base>[],
         getter: (obj) => obj.bases,
       ), 
       field<Polymorph,Base>('base',
+        type: ObjectType<Base>(),
         getter: (obj) => obj.base,
       )
-    ]
+    ],
   );
 
   type<Product>(
@@ -244,14 +251,16 @@ void registerTypes() {
         setter: (obj, value) => (obj as Product).name = value,
       ), 
       field<Product,Money>('price',
+        type: ObjectType<Money>(),
         getter: (obj) => obj.price,
         setter: (obj, value) => (obj as Product).price = value,
       ), 
       field<Product,Status>('status',
+        type: ClassType<Status>(),
         getter: (obj) => obj.status,
         setter: (obj, value) => (obj as Product).status = value,
       )
-    ]
+    ],
   );
 
   TypeDescriptor.verify();

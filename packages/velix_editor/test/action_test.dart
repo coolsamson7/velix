@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:velix_di/velix_di.dart';
@@ -89,7 +91,17 @@ class Page {
 @Module(imports: [EditorModule], includeSiblings: false, includeSubdirectories: false)
 class TestModule {}
 
+class FakePathProviderPlatform extends PathProviderPlatform {
+  @override
+  Future<String> getApplicationSupportPath() async => '';
+}
+
+
 void main() {
+  PathProviderPlatform.instance = FakePathProviderPlatform();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
   // register types
 
   Velix.bootstrap;

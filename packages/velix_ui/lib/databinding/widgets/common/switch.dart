@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:velix/velix.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -18,6 +19,7 @@ class SwitchAdapter extends AbstractValuedWidgetAdapter<Switch> {
   @override
   Switch build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     Switch widget = Switch.adaptive(
+      key: ValueKey("$name:${property.path}"),
       value: mapper.getValue(property),
       onChanged: (bool newValue) {
         (context as Element).markNeedsBuild();

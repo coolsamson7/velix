@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:velix/velix.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -20,6 +21,7 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
     var initialValue = mapper.getValue(property);
 
     Slider widget = Slider.adaptive(
+      key: ValueKey("$name:${property.path}"),
       value:  double.parse(initialValue.toString()),
       min: double.parse(args["min"].toString()),
       max: double.parse(args["max"].toString()),

@@ -16,13 +16,19 @@ class WidgetAdapter {
   const WidgetAdapter({required this.platforms});
 }
 
+abstract class AbstractWidgetState<T extends StatefulWidget> extends State<T> {
+   String extractId(Object widget) {
+       return (this.widget.key as ValueKey<String>).value; // hmm....
+   }
+}
+
 dynamic identity(dynamic value) => value;
 
 class WidgetProperty extends Property<ValuedWidgetContext> {
   // instance data
 
   ValuedWidgetAdapter adapter;
-  Widget widget;
+  Object widget;
   Map<String, dynamic> args = {};
   DisplayValue<dynamic,dynamic> displayValue;
   ParseValue<dynamic,dynamic> parseValue;
@@ -68,6 +74,8 @@ abstract class ValuedWidgetAdapter<T> {
 
   bool supports(TargetPlatform platform);
 
+  String getId(T widget);
+
   /// return the element name
   String getName();
 
@@ -98,7 +106,6 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   // instance data
 
   final String name;
-  //final String theme;
   late WidgetAdapter annotation;
   List<TargetPlatform> platforms;
 
@@ -111,6 +118,17 @@ abstract class AbstractValuedWidgetAdapter<T> extends ValuedWidgetAdapter<T> {
   }
 
   // override
+
+  @override
+  String getId(T widget) {
+    if (widget is Widget)
+      return (widget.key as ValueKey<String>).value;
+
+    if ( widget is AbstractWidgetState)
+      return widget.extractId(widget);
+
+    throw Exception("ouch");
+  }
 
   @override
   List<TargetPlatform> supportedPlatforms() {

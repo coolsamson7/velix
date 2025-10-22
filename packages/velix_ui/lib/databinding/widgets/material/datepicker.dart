@@ -25,7 +25,7 @@ class MaterialDatePickerAdapter extends AbstractValuedWidgetAdapter<FormField<Da
     final DateTime maxDate = args['lastDate'] ?? DateTime(2100);
 
     var result = FormField<DateTime>(
-      key: ValueKey(property.path),
+      key: ValueKey("$name:${property.path}"),
       initialValue: initialValue,
       validator: (date) {
         try {

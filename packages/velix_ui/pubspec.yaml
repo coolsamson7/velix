@@ -23,6 +23,7 @@ dependencies:
   analyzer: '^8.0.0'
   build: ^3.0.0
   glob: ^2.1.3
+  uuid: ^4.3.3
   velix: ^0.91.2
   velix_di: ^1.1.0
   velix_mapper: ^1.2.0

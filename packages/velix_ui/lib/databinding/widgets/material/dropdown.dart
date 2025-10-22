@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:velix/velix.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -32,6 +33,7 @@ class DropDownAdapter extends AbstractValuedWidgetAdapter<DropdownButton> {
     }).toList();
 
     final dropdown = DropdownButton(
+      key: ValueKey("$name:${property.path}"),
       value: value,
       items: items,
       isExpanded: args["expanded"] ?? true,

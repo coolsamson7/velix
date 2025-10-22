@@ -30,7 +30,7 @@ class CupertinoTextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextF
     TextEditingController? controller;
     FocusNode? focusNode;
 
-    WidgetProperty? widgetProperty = mapper.findWidget(property.path);
+    WidgetProperty? widgetProperty = mapper.findWidgetById("$name:${property.path}"); // TODO
 
     var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(property);
 
@@ -89,7 +89,7 @@ class CupertinoTextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextF
     }
 
     CupertinoTextFormFieldRow result = CupertinoTextFormFieldRow(
-          key: ValueKey(property.path), // key
+          key: ValueKey("$name:${property.path}"), // todo -> was path
           controller: controller,
           focusNode: focusNode,
           prefix: args.get<String>('prefix') != null ? Text(args.get<String>('prefix')!) : null,
@@ -108,7 +108,7 @@ class CupertinoTextFieldAdapter extends AbstractTextWidgetAdapter<CupertinoTextF
     mapper.map(property: property, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
     if ( widgetProperty == null) {
-      widgetProperty = mapper.findWidget(property.path)!;
+      widgetProperty = mapper.findWidgetById("$name:${property.path}")!;
 
       widgetProperty.setArg("controller", controller);
       widgetProperty.setArg("focusNode", focusNode);

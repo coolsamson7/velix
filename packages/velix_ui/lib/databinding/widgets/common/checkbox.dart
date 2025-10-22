@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:velix/velix.dart';
 import 'package:velix_di/di/di.dart';
@@ -19,6 +20,7 @@ class CheckboxAdapter extends AbstractValuedWidgetAdapter<Checkbox> {
   @override
   Checkbox build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     Checkbox widget = Checkbox.adaptive(
+      key: ValueKey("$name:${property.path}"),
       value: mapper.getValue(property),
       onChanged: (newValue) {
         (context as Element).markNeedsBuild();

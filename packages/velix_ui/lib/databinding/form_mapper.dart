@@ -280,7 +280,7 @@ class FormMapper {
   late TypeDescriptor type;
   RootProperty? rootProperty;
   final List<Operation<ValuedWidgetContext>> operations = [];
-  final Map<String,Operation<ValuedWidgetContext>> path2Operation = {};
+  final Map<String,WidgetProperty> widgetBindings = {}; // key is the widget id
   late Transformer transformer;
   final _formKey = GlobalKey<FormState>();
 
@@ -412,38 +412,23 @@ class FormMapper {
       (operation.target as WidgetProperty).dispose();
   }
 
-  void map({required TypeProperty property, required Widget widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, ParseValue<dynamic,dynamic> parseValue=identity}) {
-    var operation = findOperation(property.path);
-    if (operation == null) {
-      operations.add(Operation(
-          property,
-          WidgetProperty(widget: widget, adapter: adapter, displayValue: displayValue, parseValue: parseValue)
-      ));
+  WidgetProperty? findWidgetById(String id) => widgetBindings[id];
 
-      path2Operation[property.path] = operations.last;
+  void map({required TypeProperty property, required Object widget, required ValuedWidgetAdapter adapter, DisplayValue<dynamic,dynamic> displayValue=identity, ParseValue<dynamic,dynamic> parseValue=identity}) {
+    var id = adapter.getId(widget);
+
+    var widgetProperty = findWidgetById(id);
+    if ( widgetProperty == null) {
+      var widgetProperty = WidgetProperty(widget: widget, adapter: adapter, displayValue: displayValue, parseValue: parseValue);
+      operations.add(Operation(property, widgetProperty));
+
+      widgetBindings[id] = widgetProperty;
     }
     else {
-      // just replace
+      // hmm ? anything to do?
 
-      (operation.target as WidgetProperty).widget = widget;
-      (operation.target as WidgetProperty).adapter = adapter;
+      widgetProperty.widget = widget; // ?
     }
-  }
-
-  Operation<ValuedWidgetContext>? findOperation(String path) {
-    return path2Operation[path];
-  }
-
-  TypeProperty findProperty(String path) {
-    return findOperation(path)!.source as TypeProperty;
-  }
-
-  WidgetProperty? findWidget(String path) {
-    var operation = findOperation(path);
-    if ( operation != null)
-      return operation.target as WidgetProperty;
-
-    return null;
   }
 
   void notifyChange({required TypeProperty property, required dynamic value}) {

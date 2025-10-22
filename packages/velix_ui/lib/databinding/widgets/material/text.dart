@@ -14,7 +14,7 @@ import '../text.dart';
 class MaterialTextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormField> {
   // constructor
 
-  MaterialTextFormFieldAdapter():super("text", [TargetPlatform.android]);
+  MaterialTextFormFieldAdapter():super("text", [TargetPlatform.android]); // TODO doppelt! annotation!
 
   // override
 
@@ -26,15 +26,9 @@ class MaterialTextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormFie
 
   @override
   Widget build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
-    WidgetProperty? widgetProperty = mapper.findWidget(property.path);
+    WidgetProperty? widgetProperty = mapper.findWidgetById("$name:${property.path}"); // TODO
 
-    DisplayValue<dynamic,dynamic> displayValue;
-    ParseValue<dynamic, dynamic> parseValue;
-    FormFieldValidator<String> validate;
-    TextInputType textInputType;
-    List<TextInputFormatter> inputFormatters;
-
-    (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(property);
+    var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(property);
 
     TextEditingController? controller;
     FocusNode? focusNode;
@@ -53,7 +47,7 @@ class MaterialTextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormFie
     } // else
 
     TextFormField result = TextFormField(
-      key: ValueKey(property.path),
+      key: ValueKey("$name:${property.path}"), // TODO was path
       controller: controller,
       focusNode: focusNode,
       style: args.get<TextStyle>('style'),
@@ -65,7 +59,7 @@ class MaterialTextFormFieldAdapter extends AbstractTextWidgetAdapter<TextFormFie
     mapper.map(property: property, widget: result, adapter: this, displayValue: displayValue, parseValue: parseValue);
 
     if ( widgetProperty == null) {
-      widgetProperty = mapper.findWidget(property.path)!;
+      widgetProperty = mapper.findWidgetById("$name:${property.path}")!;
 
       widgetProperty.args["controller"] = controller;
       widgetProperty.args["focusNode"] = focusNode;

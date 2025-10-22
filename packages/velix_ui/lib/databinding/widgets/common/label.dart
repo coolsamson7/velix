@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:velix/velix.dart';
 import 'package:velix_di/di/di.dart';
 
@@ -19,7 +20,7 @@ class LabelAdapter extends AbstractValuedWidgetAdapter<Text> {
   Text build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     var initialValue = mapper.getValue(property);
 
-    var widget = Text(initialValue);
+    var widget = Text(initialValue, key: ValueKey("$name:${property.path}"));
 
     //mapper.map(property: property, widget: widget, adapter: this);
 

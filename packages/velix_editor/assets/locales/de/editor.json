@@ -89,7 +89,7 @@
     "button": {
       "title": "Button",
       "label": {
-        "label": "Das Label"
+        "label": "Button"
       },
       "weight": {
         "label":  "Weight"

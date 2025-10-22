@@ -2,7 +2,7 @@
   "docks": {
     "palette": {
       "label": "Palette",
-      "tooltip": "Palette"
+      "tooltip": "All availabe widgets"
     },
     "settings": {
       "label": "Settings",
@@ -10,7 +10,7 @@
     },
     "json": {
       "label": "JSON",
-      "tooltip": "JSON"
+      "tooltip": "The internal JSON based representation"
     },
     "tree": {
       "label": "Widgets",
@@ -18,17 +18,17 @@
     },
     "properties": {
       "label": "Properties",
-      "tooltip": "Properties"
+      "tooltip": "Widget Properties"
     },
     "errors": {
-      "label": "Errors",
-      "tooltip": "Errors"
+      "label": "Messages",
+      "tooltip": "Errors adn Messages"
     }
   },
   "commands": {
     "save": {
       "label": "Save",
-      "tooltip": "Save tooltip",
+      "tooltip": "Save the current page",
       "shortcut": "ctrl+s"
     },
     "open":  {
@@ -61,7 +61,7 @@
     "widgets": {
       "label": "Widgets"
     },
-    "databinding": {
+    "data": {
       "label": "Data"
     },
     "style": {
@@ -150,13 +150,20 @@
       "title": "Stack"
     },
     "list": {
-      "title": "List"
+      "title": "List",
+      "padding": {"label":  "Padding"}
     },
     "dropdown": {
-      "title": "Dropdown"
+      "title": "Dropdown",
+
+      "onSelect": {"label":  "onSelect"},
+      "padding": {"label":  "Padding"},
+      "placeholder": {"label":  "Placeholder"},
+      "databinding": {"label":  "Binding"}
     },
     "for": {
-      "title": "For Loop"
+      "title": "For Loop",
+      "context": {"label":  "Context"}
     },
     "switch": {
       "title": "Switch",

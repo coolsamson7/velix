@@ -42,7 +42,7 @@ enum Direction {
   @Json(ignore: true)
   final id = Uuid().v4();
   @Json(ignore: true)
-  AbstractWidgetState? widget;
+  AbstractEditorWidgetState? widget;
 
   // constructor
 

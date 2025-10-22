@@ -16,7 +16,7 @@ class SwitchWidgetData extends WidgetData {
   Value label;
   @DeclareProperty(group: "style")
   Insets? padding;
-  @DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
+  @DeclareProperty(group: "data", editor: CodeEditorBuilder)
   String? databinding;
 
   // constructor

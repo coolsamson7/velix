@@ -6,7 +6,7 @@ import '../../actions/eval.dart';
 import '../../metadata/properties/properties.dart';
 import '../../metadata/widgets/button.dart';
 import '../../widget_container.dart';
-import '../abstract_widget.dart' show AbstractWidgetState;
+import '../abstract_widget.dart' show AbstractEditorWidgetState;
 import '../widget_builder.dart';
 
 @Injectable()
@@ -19,7 +19,7 @@ class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
 
   @override
   Widget create(ButtonWidgetData data, Environment environment, BuildContext context) {
-    return ButtonWidget(data: data);
+    return ButtonWidget(data: data, key: ValueKey(data.id));
   }
 }
 
@@ -35,8 +35,13 @@ class ButtonWidget extends StatefulWidget {
   State<ButtonWidget> createState() => _ButtonWidgetState();
 }
 
-class _ButtonWidgetState extends AbstractWidgetState<ButtonWidget> {
+class _ButtonWidgetState extends AbstractEditorWidgetState<ButtonWidget> {
   VoidCallback? _onClick;
+
+  @override
+  String extractId(Object widget) {
+    return (this.widget as ValueKey<String>).value;
+  }
 
   @override
   void didChangeDependencies() {

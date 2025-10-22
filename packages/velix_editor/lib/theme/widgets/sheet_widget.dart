@@ -95,6 +95,6 @@ class SheetWidgetBuilder extends WidgetBuilder<SheetWidgetData> {
 
   @override
   Widget create(SheetWidgetData data, Environment environment, BuildContext context) {
-    return DynamicWidget(model: data.children[0], meta: typeRegistry[data.children[0].type]);
+    return DynamicWidget(key: ValueKey(data.id), model: data.children[0], meta: typeRegistry[data.children[0].type]);
   }
 }

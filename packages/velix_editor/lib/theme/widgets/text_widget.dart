@@ -98,7 +98,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
       // TODO Form!
 
       result = TextFormField(
-          key: ValueKey(data.databinding),
+          key: ValueKey(data.id), // was databinding TODO
           controller: controller,
           focusNode: focusNode,
           decoration: InputDecoration(labelText: resolveValue(widgetContext, data.label).$1),
@@ -110,7 +110,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
       mapper.map(property: typeProperty, widget: result, adapter: adapter, displayValue: displayValue, parseValue: parseValue);
     }
     else result = TextFormField(
-        key: ValueKey(data.databinding),
+        key: ValueKey(data.id), // TODO databinding
         controller: controller,
         focusNode: focusNode,
         decoration: InputDecoration(labelText:  resolveValue(widgetContext, data.label).$1)

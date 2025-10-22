@@ -6,7 +6,7 @@ import 'package:velix_ui/databinding/valued_widget.dart';
 import '../metadata/properties/properties.dart';
 import '../widget_container.dart';
 
-abstract class AbstractWidgetState<T extends StatefulWidget> extends State<T> {
+abstract class AbstractEditorWidgetState<T extends StatefulWidget> extends AbstractWidgetState<T> {
   // protected
 
   (String, TypeProperty?) resolveValue(WidgetContext widgetContext, Value value) {

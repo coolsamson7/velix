@@ -18,6 +18,7 @@ class ListWidgetBuilder extends WidgetBuilder<ListWidgetData> {
   @override
   Widget create(ListWidgetData data, Environment environment, BuildContext context) {
     return _ListWidget(
+      key: ValueKey(data.id),
       data: data,
       typeRegistry: typeRegistry,
       environment: environment,

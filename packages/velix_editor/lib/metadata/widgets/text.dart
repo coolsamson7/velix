@@ -15,7 +15,7 @@ class TextWidgetData extends WidgetData {
 
   @DeclareProperty(group: "general")
   Value label;
-  @DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
+  @DeclareProperty(group: "data", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
   String? databinding;
 
   // constructor

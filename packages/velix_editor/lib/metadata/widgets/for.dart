@@ -13,7 +13,7 @@ import '../widget_data.dart';
 class ForWidgetData extends WidgetData {
   // instance data
 
-  @DeclareProperty(group: "general",  editor: CodeEditorBuilder, validator: ContextPropertyValidator)
+  @DeclareProperty(group: "data",  editor: CodeEditorBuilder, validator: ContextPropertyValidator)
   String context;
 
   // constructor

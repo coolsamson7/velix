@@ -1,4 +1,5 @@
 // --- SIMPLIFIED IMPORTS ---
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Alignment, TableCellVerticalAlignment, BuildContext, Widget, Center, TableColumnWidth, IntrinsicColumnWidth, BoxConstraints, FlexColumnWidth, SizedBox, Colors, TextStyle, Text, FixedColumnWidth, Border, BorderStyle, BorderRadius, BoxDecoration, FontStyle, Container, DragTarget, Align, EdgeInsets, Padding, TableCell, TableRow, Table;
 import 'package:velix_di/di/di.dart';
 
@@ -191,6 +192,7 @@ class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
     // REMOVED _alignedCellContent for the same reasons as above.
 
     return Table(
+      key: ValueKey(data.id),
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: columnWidths,
       defaultColumnWidth: const FlexColumnWidth(1.0),

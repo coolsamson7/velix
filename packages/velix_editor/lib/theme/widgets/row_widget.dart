@@ -99,6 +99,7 @@ class RowWidgetBuilder extends WidgetBuilder<RowWidgetData> {
   @override
   Widget create(RowWidgetData data, Environment environment, BuildContext context) {
     return Row(
+        key: ValueKey(data.id),
         mainAxisAlignment: data.mainAxisAlignment ?? MainAxisAlignment.start,
         crossAxisAlignment: data.crossAxisAlignment ?? CrossAxisAlignment.center,
         mainAxisSize: data.mainAxisSize ??  MainAxisSize.max,

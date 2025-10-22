@@ -25,7 +25,7 @@ class DynamicWidget extends StatefulWidget {
   State<DynamicWidget> createState() => _DynamicWidgetState();
 }
 
-class _DynamicWidgetState extends AbstractWidgetState<DynamicWidget> {
+class _DynamicWidgetState extends AbstractEditorWidgetState<DynamicWidget> {
   // instance data
 
   WidgetFactory? theme;

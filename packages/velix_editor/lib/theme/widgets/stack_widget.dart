@@ -98,6 +98,7 @@ class StackWidgetBuilder extends WidgetBuilder<StackWidgetData> {
   @override
   Widget create(StackWidgetData data, Environment environment, BuildContext context) {
     return Stack(
+        key: ValueKey(data.id),
       children: data.children.map((child) => DynamicWidget(
         model: child,
         meta: typeRegistry[child.type]

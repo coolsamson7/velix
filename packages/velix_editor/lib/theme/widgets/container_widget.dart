@@ -108,6 +108,7 @@ class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   @override
   Widget create(ContainerWidgetData data, Environment environment, BuildContext context) {
     return Container(
+      key: ValueKey(data.id),
       color: data.border == null ? data.color : null,
       padding: data.padding?.edgeInsets(),
       margin: data.margin?.edgeInsets(),

@@ -17,7 +17,7 @@ class DropDownWidgetData extends WidgetData {
   Insets? padding;
   @DeclareProperty(group: "general")
   Value placeholder;
-  @DeclareProperty(group: "general")
+  @DeclareProperty(group: "data")
   String? databinding;
   @DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
   String? onSelect;

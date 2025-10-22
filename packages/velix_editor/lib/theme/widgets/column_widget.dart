@@ -99,6 +99,7 @@ class ColumnWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   @override
   Widget create(ColumnWidgetData data, Environment environment, BuildContext context) {
     return Column(
+        key: ValueKey(data.id),
         mainAxisAlignment: data.mainAxisAlignment ?? MainAxisAlignment.start,
         crossAxisAlignment: data.crossAxisAlignment ?? CrossAxisAlignment.center,
         mainAxisSize: data.mainAxisSize ??  MainAxisSize.max,

@@ -127,8 +127,7 @@ class _PropertyPanelState extends State<PropertyPanel> {
       }
     }
 
-    final sortedGroupNames = groupedProps.keys.toList()..sort();
-
+    final sortedGroupNames = groupedProps.keys.toList();//..sort(); don't sort!
 
     return PanelContainer(
       title: selected!.type,

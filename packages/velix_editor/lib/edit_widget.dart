@@ -20,7 +20,7 @@ class EditWidget extends StatefulWidget {
   State<EditWidget> createState() => EditWidgetState();
 }
 
-class EditWidgetState extends AbstractWidgetState<EditWidget> {
+class EditWidgetState extends AbstractEditorWidgetState<EditWidget> {
   late final Environment environment;
   late final WidgetFactory theme;
   bool selected = false;

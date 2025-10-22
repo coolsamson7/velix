@@ -56,6 +56,7 @@ class ForEditWidgetBuilder extends WidgetBuilder<ForWidgetData> {
   @override
   Widget create(ForWidgetData data, Environment environment, BuildContext context) {
     return ForEditWidget(
+      key: ValueKey(data.id),
       data: data,
       environment: environment,
       typeRegistry: typeRegistry,

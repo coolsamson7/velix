@@ -20,6 +20,7 @@ import '../../metadata/widgets/for.dart';
 
 import '../../util/message_bus.dart';
 import '../../widget_container.dart';
+import '../abstract_widget.dart';
 import '../widget_builder.dart';
 import 'for_widget.dart';
 
@@ -32,6 +33,7 @@ class DropDownWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
   @override
   Widget create(DropDownWidgetData data, Environment environment, BuildContext context) {
     return _DropDownWidget(
+      key: ValueKey(data.id),
       data: data,
       typeRegistry: typeRegistry,
       environment: environment,
@@ -45,6 +47,7 @@ class _DropDownWidget extends StatefulWidget {
   final Environment environment;
 
   const _DropDownWidget({
+    super.key,
     required this.data,
     required this.typeRegistry,
     required this.environment,
@@ -56,7 +59,8 @@ class _DropDownWidget extends StatefulWidget {
 
 typedef SelectCallback = void Function(dynamic selection);
 
-//
+@WidgetAdapter(platforms: [TargetPlatform.android])
+@Injectable()
 class DropDownStateAdapter extends AbstractValuedWidgetAdapter<_DropDownWidgetState> {
   // constructor
 
@@ -81,13 +85,15 @@ class DropDownStateAdapter extends AbstractValuedWidgetAdapter<_DropDownWidgetSt
 }
 //
 
-class _DropDownWidgetState extends State<_DropDownWidget> {
+class _DropDownWidgetState extends AbstractEditorWidgetState<_DropDownWidget> {
   dynamic _selectedValue;
   SelectCallback? _onSelect;
 
   // Form binding support
   late FormMapper _mapper;
   TypeProperty? _property;
+
+  _DropDownWidgetState();
 
   // internal
 
@@ -135,6 +141,11 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
   }
 
   @override
+  String extractId(Object widget) {
+    return (this.widget.key as ValueKey<String>).value;
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -145,7 +156,7 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
     if (widget.data.databinding != null && widget.data.databinding!.isNotEmpty) {
       _property = _mapper.computeProperty(widgetContext.typeDescriptor, widget.data.databinding!);
       _selectedValue = _mapper.getValue(_property!);
-      _mapper.map(property: _property!, widget: widget, adapter: widget.environment.get<DropDownStateAdapter>());
+      _mapper.map(property: _property!, widget: this, adapter: widget.environment.get<DropDownStateAdapter>());
     }
 
     // ✅ dynamic onSelect handling
@@ -172,6 +183,7 @@ class _DropDownWidgetState extends State<_DropDownWidget> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<dynamic>(
+      //key: ValueKey(data.id),
       value: _selectedValue,
       hint: const Text('Select'),
       items: _buildItems(context),

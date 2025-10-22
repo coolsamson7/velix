@@ -23,6 +23,7 @@ LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
     var (label, typeProperty) = resolveValue(widgetContext, data.label);
 
     var result = Text(label,
+        key: ValueKey(data.id),
         style: data.font?.textStyle(color: data.color, backgroundColor: data.backgroundColor)
     );
 

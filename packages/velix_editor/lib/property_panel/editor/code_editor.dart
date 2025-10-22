@@ -378,7 +378,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     Color color;
     String message;
 
-    // WTF
+    // WTF TODO
 
     if (lastResult.success) {
       if (lastResult.complete)

@@ -15,7 +15,6 @@ import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 
 import '../../util/collections.dart';
-import '../../validation/validation.dart';
 
 String assetIdToImportUri(AssetId id) {
   if (id.path.startsWith('lib/')) {
@@ -782,7 +781,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       }
 
       // Fallback for custom types
-      return 'ClassType<$baseName>()';
+      return '\$CLASS($baseName)';
     }
 
     // Generate the main type code
@@ -914,7 +913,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       }
 
       // Fallback
-      return '${knownClass ? "ObjectType" : "ClassType"}<$name>()';
+      return '\$CLASS($name)';
     }
 
     var expr = gen(type);
@@ -1035,11 +1034,11 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
     String? typeCode;
     final elementType = getElementType(field);
     if (elementType != null) {
-      var knowClass = builder.knownType(elementType);
+      //var knowClass = builder.knownType(elementType);
 
       final elementTypeName = elementType.getDisplayString(withNullability: false);
 
-      typeCode = "ListType<$type>(elementType: ${knowClass ? 'ObjectType' : 'ClassType'}<$elementTypeName>())";
+      typeCode = "ListType<$type>(elementType: \$CLASS($elementTypeName))";
     }
     else {
       typeCode = fieldType(field);
@@ -1049,7 +1048,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           typeCode = null;
       }
       else
-        typeCode = "${builder.knownType(field.type) ? 'ObjectType' : 'ClassType'}<$type>()";
+        typeCode = "\$CLASS($type)";
     }
 
     tab().writeln("field<$className,$type>('$name',").indent(1);
@@ -1664,6 +1663,74 @@ class RegistryAggregator extends Builder {
         return (package, path);
       }
 
+      final _placeholderPattern = RegExp(r'\$(\w+)\(([^)]+)\)');
+
+      /// Replaces placeholders in [template] by calling [resolver(tag, value)].
+      String replacePlaceholders(
+          String template,
+          String Function(String tag, String value) resolver,
+          ) {
+        return template.replaceAllMapped(_placeholderPattern, (match) {
+          final tag = match.group(1)!;
+          final value = match.group(2)!;
+          return resolver(tag, value);
+        });
+      }
+
+      String afterLastColon(String input) {
+        final index = input.lastIndexOf(':');
+        return index == -1 ? input : input.substring(index + 1);
+      }
+
+      // Load metadata for sorting and dependency resolution
+
+      final Set<String> classNames = HashSet();
+      final Map<String, Element> elements = {};
+      for (final assetId in allJsonAssets) {
+        try {
+          final content = await buildStep.readAsString(assetId);
+
+          final Map<String, dynamic> data = json.decode(content);
+
+          final List<dynamic> classes = data['classes'];
+
+          // create and remember wrapper classes
+
+          for ( var cl in classes) {
+            var name = cl["name"];
+
+            classNames.add(afterLastColon(name));
+
+            elements[name] = Element(
+              name: name,
+              type: cl["type"],
+              dependencies: (cl["dependencies"] as List<dynamic>).cast<
+                  String>(),
+              imports: (cl["imports"] as Map<String, dynamic>).map(
+                      (key, value) =>
+                      MapEntry(
+                        key,
+                        List<String>.from(
+                            value as List), // forces list of strings
+                      )
+              ),
+              offset: (cl["offset"] as List<dynamic>).cast<int>(),
+            );
+          }
+        }
+        catch (e) {
+          log.warning('Could not read JSON ${assetId.path}: $e');
+        }
+      }
+
+      Element findElement(String ref) { // "sample:/lib/foo.dart:Foo"
+        var element = elements[ref];
+        if (element != null)
+          return element;
+        else
+          throw Exception("unknown element $ref");
+      }
+
       Future<String> getCode(String name, List<int> offset) async {
         var (package, path) = packagePath(name);
 
@@ -1677,47 +1744,18 @@ class RegistryAggregator extends Builder {
 
         var code = await getAsset(AssetId(package, fragmentPath));
 
-        return code.substring(offset[0], offset[1]);
-      }
+        // replace $CLASS(foo)
 
-      // Load metadata for sorting and dependency resolution
+        return replacePlaceholders(code.substring(offset[0], offset[1]), (tag, value) {
+          if ( tag == "CLASS") {
+            if ( classNames.contains(value))
+              return "ObjectType<$value>()";
+            else
+              return  "ClassType<$value>()";
+          }
 
-      final Map<String, Element> elements = {};
-      for (final assetId in allJsonAssets) {
-        try {
-          final content = await buildStep.readAsString(assetId);
-
-          final Map<String, dynamic> data = json.decode(content);
-
-          final List<dynamic> classes = data['classes'];
-
-          // create and remember wrapper classes
-
-          for ( var cl in classes)
-            elements[cl["name"]] = Element(
-              name: cl["name"],
-              type: cl["type"],
-              dependencies: (cl["dependencies"] as List<dynamic>).cast<String>(),
-              imports: (cl["imports"] as Map<String,dynamic>).map(
-                      (key, value) => MapEntry(
-                    key,
-                    List<String>.from(value as List), // forces list of strings
-                  )
-              ),
-              offset: (cl["offset"] as List<dynamic>).cast<int>(),
-            );
-        }
-        catch (e) {
-          log.warning('Could not read JSON ${assetId.path}: $e');
-        }
-      }
-
-      Element findElement(String ref) { // "sample:/lib/foo.dart:Foo"
-        var element = elements[ref];
-        if (element != null)
-          return element;
-        else
-          throw Exception("unknown element $ref");
+          return value;
+        });
       }
 
       // resolve elements

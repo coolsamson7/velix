@@ -47,5 +47,5 @@ class SvgIcons {
     "toolbar_play": toolbar_play,
     "widgets": widgets,
   };
-  static String? get(String key) => registry[key];
+  static String? get(String key) => "packages/velix_editor/${registry[key]}";
 }

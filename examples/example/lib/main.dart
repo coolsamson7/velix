@@ -1,11 +1,13 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:velix/velix.dart' hide Property;
+import 'package:velix_ui/velix_ui.dart';
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_i18n/velix_i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
 import 'package:velix_mapper/mapper/mapper.dart';
-import 'package:velix_ui/velix_ui.dart';
 import 'package:provider/provider.dart';
 
 import 'main.types.g.dart';
@@ -25,26 +27,26 @@ class EasyLocalizationTranslator extends Translator {
 }
 
 /// Application module
-@Module(imports: [])
+@Module(imports: [UIModule])
 class ApplicationModule {
   @OnInit()
   void onInit() {
-    print("ServiceModule.onInit()");
+    print("ApplicationModule.onInit()");
   }
 
   @OnDestroy()
   void onDestroy() {
-    print("ServiceModule.onDestroy()");
+    print("ApplicationModule.onDestroy()");
   }
 }
 
 void main() async {
+  //ValuedWidget.platform = TargetPlatform.iOS;
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  // bootstrap Velix
-  Velix.bootstrap;
-
   // JSON setup
+
   JSON(
     validate: false,
     converters: [
@@ -57,10 +59,14 @@ void main() async {
   );
 
   TypeViolationTranslationProvider();
+
+  // types
+
+  UIModule.boot; // loads ui types
   registerTypes();
-  ValuedWidget.platform = TargetPlatform.iOS;
 
   // Tracing
+
   Tracer(
     isEnabled: true,
     trace: ConsoleTrace("%d [%l] %p: %m [%f]"),
@@ -74,7 +80,10 @@ void main() async {
   // I18N setup
   final localeManager = LocaleManager(
     const Locale('en', "EN"),
-    supportedLocales: const [Locale('en', "EN"), Locale('de', "DE")],
+    supportedLocales: const [
+      Locale('en', "EN"),
+      Locale('de', "DE")
+    ],
   );
 
   final i18n = I18N(
@@ -89,7 +98,10 @@ void main() async {
     preloadNamespaces: ["validation", "example"],
   );
 
+  await i18n.load();
+
   // Run app with proper provider hierarchy
+
   runApp(
     MultiProvider(
       providers: [
@@ -114,7 +126,6 @@ void main() async {
   );
 }
 
-/// Main TODO App
 class TODOApp extends StatelessWidget {
   final I18N i18n;
 
@@ -127,12 +138,12 @@ class TODOApp extends StatelessWidget {
 
     return EnvironmentProvider(
       environment: environment,
-      child: MaterialApp(
+      child: CupertinoApp(
         title: 'TODO',
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primarySwatch: Colors.blue,
-        ),
+        //theme: ThemeData(
+          //  brightness: Brightness.light,
+          //  primarySwatch: Colors.blue,
+        //),
         localizationsDelegates: const [
           GlobalCupertinoLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

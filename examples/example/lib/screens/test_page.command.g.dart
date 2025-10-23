@@ -28,10 +28,12 @@ mixin TestPageStateCommands on CommandController<TestPage> {
 
   // command bodies
 
+  @Method()
   void save() {
     execute("save", []);
   }
 
+  @Method()
   void revert() {
     execute("revert", []);
   }

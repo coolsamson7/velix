@@ -43,18 +43,22 @@ mixin _TodoHomePageStateCommands on CommandController<TodoHomePage> {
 
   // command bodies
 
+  @Method()
   Future<Todo> addTodo() async {
     return await execute("addTodo", []);
   }
 
+  @Method()
   void removeTodo(String id) {
     execute("removeTodo", []);
   }
 
+  @Method()
   void toggleTodo(String id) {
     execute("toggleTodo", []);
   }
 
+  @Method()
   void switchLocale() {
     execute("switchLocale", []);
   }

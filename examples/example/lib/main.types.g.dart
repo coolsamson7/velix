@@ -3,30 +3,33 @@
 // ignore_for_file: unnecessary_import, unused_local_variable
 
 import 'package:velix/velix.dart';
-import 'package:sample/main.dart';
-import 'package:sample/models/todo.dart';
-import 'package:sample/providers/todo_provider.dart';
-import 'package:sample/services/services.dart';
-import 'package:velix/reflectable/reflectable.dart';
-import 'package:velix_di/di/di.dart';
+import 'package:sample/main.dart' show ApplicationModule;
+import 'package:velix_di/di/di.dart' show Module, OnInit, OnDestroy, Injectable;
+import 'package:sample/models/todo.dart' show Details, Todo, TestData;
+import 'package:velix/reflectable/reflectable.dart' show Dataclass, Attribute;
+import 'package:sample/providers/todo_provider.dart' show TodoProvider;
+import 'package:sample/services/services.dart' show TodoService, PerWidgetState;
+import 'package:velix_ui/module.dart';
 
 void registerTypes() {
   type<ApplicationModule>(
-    location: 'package:sample/main.dart:32:1',
+    location: 'package:sample/main.dart:28:1',
     annotations: [
-      Module(imports: [])
+      Module(imports: [UIModule])
     ],
     constructor: () => ApplicationModule(),
     fromMapConstructor: (Map<String,dynamic> args) => ApplicationModule(),
     fromArrayConstructor: (List<dynamic> args) => ApplicationModule(),
     methods: [
-      method<ApplicationModule,void>('onInit',
+      method<ApplicationModule, void>('onInit',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as ApplicationModule).onInit()
       ), 
-      method<ApplicationModule,void>('onDestroy',
+      method<ApplicationModule, void>('onDestroy',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -47,17 +50,18 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => Details(author: args[0] as String? ?? '', priority: args[1] as int? ?? 0, date: args[2] as DateTime),
     fields: [
       field<Details,String>('author',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.author,
       ), 
       field<Details,int>('priority',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         getter: (obj) => obj.priority,
       ), 
       field<Details,DateTime>('date',
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.date,
       )
-    ]
+    ],
   );
 
   type<TestData>(
@@ -74,17 +78,17 @@ void registerTypes() {
     fromArrayConstructor: (List<dynamic> args) => TestData(string_data: args[0] as String? ?? '', int_data: args[1] as int? ?? 0, slider_int_data: args[2] as int? ?? 0, bool_data: args[3] as bool? ?? false, datetime_data: args[4] as DateTime),
     fields: [
       field<TestData,String>('string_data',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.string_data,
         setter: (obj, value) => (obj as TestData).string_data = value,
       ), 
       field<TestData,int>('int_data',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         getter: (obj) => obj.int_data,
         setter: (obj, value) => (obj as TestData).int_data = value,
       ), 
       field<TestData,int>('slider_int_data',
-        type: IntType().greaterThan(0),
+        type: IntType().constraint("greaterThan 0"),
         getter: (obj) => obj.slider_int_data,
         setter: (obj, value) => (obj as TestData).slider_int_data = value,
       ), 
@@ -93,9 +97,10 @@ void registerTypes() {
         setter: (obj, value) => (obj as TestData).bool_data = value,
       ), 
       field<TestData,DateTime>('datetime_data',
+        type: ClassType<DateTime>(),
         getter: (obj) => obj.datetime_data,
       )
-    ]
+    ],
   );
 
   type<TodoService>(
@@ -107,13 +112,15 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => TodoService(),
     fromArrayConstructor: (List<dynamic> args) => TodoService(),
     methods: [
-      method<TodoService,void>('onInit',
+      method<TodoService, void>('onInit',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as TodoService).onInit()
       ), 
-      method<TodoService,void>('onDestroy',
+      method<TodoService, void>('onDestroy',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -131,13 +138,15 @@ void registerTypes() {
     fromMapConstructor: (Map<String,dynamic> args) => PerWidgetState(),
     fromArrayConstructor: (List<dynamic> args) => PerWidgetState(),
     methods: [
-      method<PerWidgetState,void>('onInit',
+      method<PerWidgetState, void>('onInit',
+      type: ClassType<void>(),
         annotations: [
           OnInit()
         ],
         invoker: (List<dynamic> args)=> (args[0] as PerWidgetState).onInit()
       ), 
-      method<PerWidgetState,void>('onDestroy',
+      method<PerWidgetState, void>('onDestroy',
+      type: ClassType<void>(),
         annotations: [
           OnDestroy()
         ],
@@ -154,17 +163,17 @@ void registerTypes() {
       param<Details>('details', isNamed: true, isNullable: true, defaultValue: null), 
       param<bool>('completed', isNamed: true, isNullable: true, defaultValue: false)
     ],
-    constructor: ({String id = '', String title = '', required Details details, bool completed = false}) => Todo(id: id, title: title, details: details, completed: completed),
+    constructor: ({String id = '', String title = '', Details? details, bool completed = false}) => Todo(id: id, title: title, details: details, completed: completed),
     fromMapConstructor: (Map<String,dynamic> args) => Todo(id: args['id'] as String? ?? '', title: args['title'] as String? ?? '', details: args['details'] as Details?, completed: args['completed'] as bool? ?? false),
-    fromArrayConstructor: (List<dynamic> args) => Todo(id: args[0] as String? ?? '', title: args[1] as String? ?? '', details: args[2] as Details, completed: args[3] as bool? ?? false),
+    fromArrayConstructor: (List<dynamic> args) => Todo(id: args[0] as String? ?? '', title: args[1] as String? ?? '', details: args[2] as Details?, completed: args[3] as bool? ?? false),
     fields: [
       field<Todo,String>('id',
-        type: StringType().maxLength(7),
+        type: StringType().constraint("maxLength 7"),
         getter: (obj) => obj.id,
         setter: (obj, value) => (obj as Todo).id = value,
       ), 
       field<Todo,String>('title',
-        type: StringType().maxLength(10),
+        type: StringType().constraint("maxLength 10"),
         getter: (obj) => obj.title,
         setter: (obj, value) => (obj as Todo).title = value,
       ), 
@@ -173,11 +182,12 @@ void registerTypes() {
         setter: (obj, value) => (obj as Todo).completed = value,
       ), 
       field<Todo,Details>('details',
+        type: ObjectType<Details>(),
         getter: (obj) => obj.details,
         setter: (obj, value) => (obj as Todo).details = value,
         isNullable: true
       )
-    ]
+    ],
   );
 
   type<TodoProvider>(

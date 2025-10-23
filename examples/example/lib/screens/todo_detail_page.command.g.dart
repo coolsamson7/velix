@@ -23,10 +23,12 @@ mixin _TodoDetailPageStateCommands on CommandController<TodoDetailPage> {
 
   // command bodies
 
+  @Method()
   void save() {
     execute("save", []);
   }
 
+  @Method()
   void cancel() {
     execute("cancel", []);
   }

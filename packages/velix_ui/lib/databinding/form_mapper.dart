@@ -311,7 +311,7 @@ class FormMapper {
       rootProperty = RootProperty(mapper: this);
   }
 
-  StreamSubscription addListener(void onData(FormEvent event), {emitOnDirty = false, emitOnChange=false}) {
+  StreamSubscription addListener(void Function(FormEvent event) onData, {emitOnDirty = false, emitOnChange=false}) {
     this.emitOnDirty = emitOnDirty;
     this.emitOnChange = emitOnChange;
 

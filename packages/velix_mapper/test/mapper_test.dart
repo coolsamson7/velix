@@ -60,7 +60,7 @@ void main() {
 
       var source = Collections(prices: [Money(currency: "EU", value: 1)]);
 
-      var result = mapper.map(source);
+      mapper.map(source);
 
       var loops = 100000;
       final stopwatch = Stopwatch()..start();

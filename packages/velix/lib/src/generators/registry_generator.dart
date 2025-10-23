@@ -51,7 +51,7 @@ String getReturnTypeFQN(MethodElement method) {
 
   if (type is InterfaceType) {
     final element = type.element; // ClassElement of the return type
-    final libraryUri = element.library.identifier ?? '<unknown>';
+    final libraryUri = element.library.identifier;
     final name = element.name;
 
     // Handle generic type arguments
@@ -73,7 +73,7 @@ String getReturnTypeFQN(MethodElement method) {
 String getTypeFQN(DartType type) {
   if (type is InterfaceType) {
     final element = type.element;
-    final libraryUri = element.library.identifier ?? '<unknown>';
+    final libraryUri = element.library.identifier;
     final name = element.name;
     final generics = type.typeArguments;
     if (generics.isNotEmpty) {
@@ -436,7 +436,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
   void _addTypeDependency(DartType type) {
     return; // TODO
-    if (type is InterfaceType) {
+    /*if (type is InterfaceType) {
       final element = type.element;
       //if (isDataclass(element) || isInjectable(element)) {
       //  addDependency("${element.library.uri}:${element.name}");
@@ -446,7 +446,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       for (final typeArg in type.typeArguments) {
         _addTypeDependency(typeArg);
       }
-    }
+    }*/
   }
 
   @override
@@ -647,9 +647,8 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
       if (typeValue.element is ClassElement) {
         final classElement = typeValue.element as ClassElement;
         final library = classElement.library;
-        if (library != null) {
-          addImport(library.identifier, classElement.name!);
-        }
+
+        addImport(library.identifier, classElement.name!);
       }
       return;
     }
@@ -667,9 +666,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
           if (itemType.element is ClassElement) {
             final classElement = itemType.element as ClassElement;
             final library = classElement.library;
-            if (library != null) {
-              addImport(library.identifier, classElement.name!);
-            }
+
+            addImport(library.identifier, classElement.name!);
+
           }
         } else {
           // It's an object instance - recurse
@@ -695,9 +694,9 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
 
       // Add import for this class itself
       final library = classElement.library;
-      if (library != null) {
-        addImport(library.identifier, classElement.name!);
-      }
+
+      addImport(library.identifier, classElement.name!);
+
 
       // Recursively collect from this object's fields
       for (final field in classElement.fields) {
@@ -901,7 +900,7 @@ class ClassCodeGenerator extends CodeGenerator<ClassElement> {
         case 'DateTime': return 'DateTimeType()';
       }
 
-      bool knownClass = builder.knownType(t);
+      //bool knownClass = builder.knownType(t);
 
       // List<T>
       if (t is ParameterizedType &&
@@ -1663,14 +1662,14 @@ class RegistryAggregator extends Builder {
         return (package, path);
       }
 
-      final _placeholderPattern = RegExp(r'\$(\w+)\(([^)]+)\)');
+      final placeholderPattern = RegExp(r'\$(\w+)\(([^)]+)\)');
 
       /// Replaces placeholders in [template] by calling [resolver(tag, value)].
       String replacePlaceholders(
           String template,
           String Function(String tag, String value) resolver,
           ) {
-        return template.replaceAllMapped(_placeholderPattern, (match) {
+        return template.replaceAllMapped(placeholderPattern, (match) {
           final tag = match.group(1)!;
           final value = match.group(2)!;
           return resolver(tag, value);

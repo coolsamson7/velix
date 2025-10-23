@@ -23,7 +23,7 @@ class PropertyDescriptor {
   final Type? editor; // TODO
   final bool hide;
 
-  dynamic defaultValue = null;
+  dynamic defaultValue;
 
   Type get type => field.type.type;
 

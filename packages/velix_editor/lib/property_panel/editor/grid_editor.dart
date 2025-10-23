@@ -166,7 +166,7 @@ class GridItemEditor extends PropertyEditorBuilder<GridItem> {
     String Function(T)? textFor,
   }) {
     final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context)!;
+    final overlay = Overlay.of(context);
     final target = renderBox.localToGlobal(Offset.zero) & renderBox.size;
 
     late OverlayEntry overlayEntry;

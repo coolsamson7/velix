@@ -51,8 +51,6 @@ class _MessagePaneState extends State<MessagePane> {
         return Colors.red.shade600;
       case MessageType.warning:
         return Colors.orange.shade600;
-      default:
-        return Colors.grey.shade600;
     }
   }
 

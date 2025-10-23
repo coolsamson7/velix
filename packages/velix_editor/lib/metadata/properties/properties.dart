@@ -14,13 +14,13 @@ class ColorConvert extends Convert<Color,String> {
   }
 
   @override
-  Color convertTarget(String value) {
-    value = value.replaceAll('#', ''); // remove hash if present
-    if (value.length == 6) {
+  Color convertTarget(String source) {
+    source = source.replaceAll('#', ''); // remove hash if present
+    if (source.length == 6) {
       // If only RGB is provided, add full opacity
-      value = 'FF$value';
+      source = 'FF$source';
     }
-    return Color(int.parse(value, radix: 16));
+    return Color(int.parse(source, radix: 16));
   }
 }
 
@@ -32,8 +32,8 @@ class BorderStyleConvert extends Convert<BorderStyle,String> {
   }
 
   @override
-  BorderStyle convertTarget(String value) {
-    return BorderStyle.values.firstWhere((alignment) => alignment.name == value);
+  BorderStyle convertTarget(String source) {
+    return BorderStyle.values.firstWhere((alignment) => alignment.name == source);
   }
 }
 
@@ -45,8 +45,8 @@ class MainAxisAlignmentConvert extends Convert<MainAxisAlignment,String> {
   }
 
   @override
-  MainAxisAlignment convertTarget(String value) {
-    return MainAxisAlignment.values.firstWhere((alignment) => alignment.name == value);
+  MainAxisAlignment convertTarget(String source) {
+    return MainAxisAlignment.values.firstWhere((alignment) => alignment.name == source);
   }
 }
 
@@ -58,8 +58,8 @@ class MainAxisSizeConvert extends Convert<MainAxisSize,String> {
   }
 
   @override
-  MainAxisSize convertTarget(String value) {
-    return MainAxisSize.values.firstWhere((alignment) => alignment.name == value);
+  MainAxisSize convertTarget(String source) {
+    return MainAxisSize.values.firstWhere((alignment) => alignment.name == source);
   }
 }
 
@@ -71,8 +71,8 @@ class CrossAxisAlignmentConvert extends Convert<CrossAxisAlignment,String> {
   }
 
   @override
-  CrossAxisAlignment convertTarget(String value) {
-    return CrossAxisAlignment.values.firstWhere((alignment) => alignment.name == value);
+  CrossAxisAlignment convertTarget(String source) {
+    return CrossAxisAlignment.values.firstWhere((alignment) => alignment.name == source);
   }
 }
 
@@ -84,8 +84,8 @@ class FontWeightConvert extends Convert<FontWeight,int> {
   }
 
   @override
-  FontWeight convertTarget(int value) {
-    return FontWeight.values.firstWhere((fw) => fw.value == value, orElse: () => FontWeight.normal,
+  FontWeight convertTarget(int source) {
+    return FontWeight.values.firstWhere((fw) => fw.value == source, orElse: () => FontWeight.normal,
     );
   }
 }

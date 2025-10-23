@@ -220,27 +220,3 @@ class AutoCompleteResult {
     return AutoCompleteResult._(valid: false, complete: false);
   }
 }
-
-void main() {
-  var result = ActionParser.instance.parsePrefix("user.hello(");
-
-  result = ActionParser.instance.parseStrict("user.hello(");
-
-  var r =  ActionParser.instance.tryAutoComplete('user.hello(user.name');
-  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
-  // → valid=false, complete=false, expected="')' expected"
-
-  r =  ActionParser.instance.tryAutoComplete('user.hello(');
-  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
-  // → valid=false, complete=false, expected="')' expected"
-
-  r =  ActionParser.instance.tryAutoComplete('user.hello(1');
-  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
-
-  r =  ActionParser.instance.tryAutoComplete('user.hello(1,');
-  print("valid=${r.valid}, complete=${r.complete}, expected=${r.expected}");
-
-  r = ActionParser.instance.tryAutoComplete('user.hello(1)');
-  print("valid=${r.valid}, complete=${r.complete}");
-  // → valid=true, complete=true
-}

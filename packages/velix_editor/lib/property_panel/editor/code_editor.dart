@@ -364,7 +364,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final overlay = Overlay.of(context, rootOverlay: true);
-        overlay?.insert(_overlayEntry!);
+        overlay.insert(_overlayEntry!);
       }
     });
   }

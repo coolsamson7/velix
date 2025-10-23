@@ -27,7 +27,7 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
   // instance data
 
   StatefulMixin? _parent;
-  List<StatefulMixin> _children = [];
+  final List<StatefulMixin> _children = [];
   late Map<String,dynamic> state;
 
   String get stateName;
@@ -89,7 +89,7 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
       else {
         write(state = {
           'owner': stateName,
-          'data': Map<String,dynamic>(),
+          'data': <String,dynamic>{},
           'children': <Map<String,dynamic>>[]
         });
 
@@ -133,7 +133,7 @@ class SettingsManager {
   Map<String, dynamic> getSettings(String owner) {
     if (settings["owner"] == null) {
       settings["owner"] = owner;
-      settings["data"] = Map<String, dynamic>();
+      settings["data"] = <String, dynamic>{};
       settings["children"] = <Map<String, dynamic>>[];
     }
 

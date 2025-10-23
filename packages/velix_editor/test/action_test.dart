@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:velix_di/velix_di.dart';
-import 'package:velix_editor/actions/action_evaluator.dart';
 import 'package:velix_editor/actions/action_parser.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
@@ -79,7 +78,7 @@ class Page {
   Page() : user = User(name: "andi", address: Address(city: "Köln", street: "Neumarkt")),
   users = [
     User(name: "andi", address: Address(city: "Köln", street: "Neumarkt")),
-    User(name: "sandra", address: Address(city: "Köln", street: "Neumarkt"))];
+    User(name: "nika", address: Address(city: "Köln", street: "Neumarkt"))];
 
   // methods
 

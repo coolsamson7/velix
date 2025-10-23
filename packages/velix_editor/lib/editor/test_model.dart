@@ -60,7 +60,7 @@ class User {
     ),
   ),
   User(
-      name: "Sandra",
+      name: "Nika",
       age: 60,
       single: true,
       address: Address(

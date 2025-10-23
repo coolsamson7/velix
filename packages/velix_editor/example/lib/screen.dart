@@ -53,7 +53,7 @@ class ExampleScreenState extends State<ExampleScreen> with CommandController<Exa
 
   // callbacks
 
-  void onEvent(event) {
+  void onEvent(dynamic event) {
     print(mapper.isDirty);
   }
 

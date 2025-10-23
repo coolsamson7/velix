@@ -83,7 +83,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
     TextFormField result;
 
     if (typeProperty != null) {
-      var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty!);
+      var (displayValue, parseValue, validate, textInputType, inputFormatters) = customize(typeProperty);
 
       controller.addListener(() {
         var value = parseValue(controller.text);

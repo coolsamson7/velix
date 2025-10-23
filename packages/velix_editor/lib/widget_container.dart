@@ -28,7 +28,7 @@ class WidgetContext {
   //( callback
 
   void onEvent(FormEvent event) {
-    var widgets = bindings[event.path]; // TODO
+    var widgets = bindings[event.path]; // TODO FOO
     if (widgets != null) {
       for ( var widget in widgets)
         widget.update();
@@ -70,7 +70,7 @@ class WidgetContextScope extends InheritedWidget {
 class WidgetContainer extends StatefulWidget {
   // instance data
 
-  late List<WidgetData> models;
+  late final List<WidgetData> models;
   final WidgetContext context;
 
   // constructor

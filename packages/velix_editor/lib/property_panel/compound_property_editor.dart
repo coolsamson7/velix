@@ -87,7 +87,7 @@ class _CompoundPropertyEditorState extends State<CompoundPropertyEditor> {
 
   // internal
 
-  static Map<TypeDescriptor,Map<String,String>> labels = {};
+  //static Map<TypeDescriptor,Map<String,String>> labels = {};
 
   Map<String,String> getLabels(TypeDescriptor descriptor) {
     var result = null;// TODO  labels[descriptor];

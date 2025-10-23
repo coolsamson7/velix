@@ -195,7 +195,7 @@ class AssetItem extends AssetNode {
 
         _data[T] = result;
       }
-      on AssetLoaderException catch(e) {
+      on AssetLoaderException {
         rethrow;
       }
       on Exception catch (e) {

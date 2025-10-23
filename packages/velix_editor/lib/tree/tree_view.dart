@@ -188,8 +188,10 @@ class WidgetTreeController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _loadSub.cancel();
     _selectionSub.cancel();
     _propertySub.cancel();
+
     super.dispose();
   }
 }

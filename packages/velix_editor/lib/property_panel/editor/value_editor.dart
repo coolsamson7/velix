@@ -91,11 +91,11 @@ class _ValueFieldState extends State<ValueField> {
     setState(() {});
   }
 
-  void _resetProperty(String property) {
+  /*void _resetProperty(String property) {
     currentCommand = null;
     commandStack.revert(value, property);
     setState(() {});
-  }
+  }*/
 
   Widget _buildEditor() {
     PropertyEditorBuilder builder;

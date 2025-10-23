@@ -23,7 +23,6 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
   bool _isDragging = false;
   bool _isLeftHovering = false;
   bool _isRightHovering = false;
-  double? _rulerX;
 
   @override
   void initState() {
@@ -34,7 +33,7 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
   void _startDrag(DragStartDetails details, bool fromLeft) {
     setState(() {
       _isDragging = true;
-      _rulerX = details.globalPosition.dx;
+      //_rulerX = details.globalPosition.dx;
     });
   }
 
@@ -47,14 +46,14 @@ class _LayoutCanvasState extends State<LayoutCanvas> {
         _width = (_width + 2 * details.delta.dx)
             .clamp(widget.minWidth, widget.maxWidth);
       }
-      _rulerX = details.globalPosition.dx;
+      //_rulerX = details.globalPosition.dx;
     });
   }
 
   void _endDrag(DragEndDetails details) {
     setState(() {
       _isDragging = false;
-      _rulerX = null;
+      //_rulerX = null;
     });
   }
 

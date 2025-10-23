@@ -450,9 +450,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     typeChecker = TypeChecker(resolver);
 
     ClassDesc findContext() {
+      // local function
+
       ClassDesc findWidgetContext(WidgetData widget) {
-        var parentContext =
-        widget.parent != null ? findWidgetContext(widget.parent!) : editContext.type!;
+        var parentContext = widget.parent != null ? findWidgetContext(widget.parent!) : editContext.type!;
         var result = parentContext;
 
         if (widget.type == "for") {
@@ -467,10 +468,11 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
             }
           }
         }
+
         return result;
       }
 
-      return findWidgetContext(widget.widget);
+      return findWidgetContext(widget.widget.parent!);
     }
 
     classContext = findContext();

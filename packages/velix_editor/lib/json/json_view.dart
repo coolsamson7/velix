@@ -33,9 +33,11 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
   // instance data
 
   WidgetData? root;
-  late String jsonString = "";
-  late final StreamSubscription? _subscription;
-  late final StreamSubscription? _changeSubscription;
+  String jsonString = "{}";
+  StreamSubscription? _subscription;
+  StreamSubscription? _changeSubscription;
+
+  // public
 
   WidgetData getRoot(WidgetData widget) {
     while (widget.parent != null) {
@@ -66,12 +68,12 @@ class _JsonEditorPanelState extends State<JsonEditorPanel> {
     final env = EnvironmentProvider.of(context);
     var bus = env.get<MessageBus>();
 
-    _subscription = bus.subscribe<LoadEvent>("load", (event) {
+    _subscription ??= bus.subscribe<LoadEvent>("load", (event) {
       setState(() {
         root = null;
       });
     });
-    _changeSubscription = bus.subscribe<PropertyChangeEvent>("property-changed",
+    _changeSubscription ??= bus.subscribe<PropertyChangeEvent>("property-changed",
             (event) {
           setWidget(getRoot(event.widget!));
         });

@@ -3,12 +3,14 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
 class FilePathSelector extends StatefulWidget {
+  final String title;
   final String? initialFilePath;
   final List<String>? recentFiles;
   final ValueChanged<String> onLoad;
 
   const FilePathSelector({
     super.key,
+    required this.title,
     this.initialFilePath,
     this.recentFiles,
     required this.onLoad,
@@ -49,6 +51,7 @@ class _FilePathSelectorState extends State<FilePathSelector> {
           }
         }
       });
+      widget.onLoad(path); // auto-load immediately
     }
   }
 
@@ -56,13 +59,7 @@ class _FilePathSelectorState extends State<FilePathSelector> {
     setState(() {
       _controller.text = path;
     });
-  }
-
-  void _load() {
-    final path = _controller.text;
-    if (path.isNotEmpty) {
-      widget.onLoad(path);
-    }
+    widget.onLoad(path); // auto-load immediately
   }
 
   String _getFileName(String path) {
@@ -98,7 +95,7 @@ class _FilePathSelectorState extends State<FilePathSelector> {
               ),
               const SizedBox(width: 8),
               Text(
-                'File Selection',
+                widget.title,
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.colorScheme.onSurface,
@@ -156,7 +153,9 @@ class _FilePathSelectorState extends State<FilePathSelector> {
                           Text(
                             _getFileName(_controller.text),
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: hasFile ? FontWeight.w500 : FontWeight.normal,
+                              fontWeight: hasFile
+                                  ? FontWeight.w500
+                                  : FontWeight.normal,
                               color: hasFile
                                   ? theme.colorScheme.onSurface
                                   : theme.colorScheme.onSurfaceVariant,
@@ -210,7 +209,10 @@ class _FilePathSelectorState extends State<FilePathSelector> {
                     onTap: () => _selectRecent(file),
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? theme.colorScheme.primaryContainer.withOpacity(0.5)
@@ -234,7 +236,9 @@ class _FilePathSelectorState extends State<FilePathSelector> {
                                 color: isSelected
                                     ? theme.colorScheme.primary
                                     : theme.colorScheme.onSurface,
-                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                                fontWeight: isSelected
+                                    ? FontWeight.w500
+                                    : FontWeight.normal,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -248,31 +252,6 @@ class _FilePathSelectorState extends State<FilePathSelector> {
               ),
             ),
           ],
-
-          const SizedBox(height: 12),
-
-          // Actions
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (hasFile)
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _controller.clear();
-                    });
-                  },
-                  icon: const Icon(Icons.clear, size: 16),
-                  label: const Text('Clear'),
-                ),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                onPressed: hasFile ? _load : null,
-                icon: const Icon(Icons.upload_file, size: 18),
-                label: const Text('Load File'),
-              ),
-            ],
-          ),
         ],
       ),
     );

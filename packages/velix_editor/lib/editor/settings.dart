@@ -50,7 +50,10 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
 
   // public
 
-  Future<void> flushSettings() async {
+  Future<void> flushSettings({bool write = false}) async {
+    if ( write )
+      writeSettings();
+
     await EnvironmentProvider.of(context).get<SettingsManager>().flush(_getRoot()!.state);
   }
 
@@ -163,22 +166,5 @@ class SettingsManager {
   Future<void> flush(Map<String, dynamic>? settings) async {
     await init();
     await file.writeAsString(jsonEncode(this.settings = settings ?? this.settings));
-  }
-
-  // public
-
-  T set<T>(String key, T value) {
-    settings[key] = value;
-
-    return value;
-  }
-
-  T get<T>(String key, {T? defaultValue}) {
-    var result = settings[key];
-    if ( result != null)
-      return result as T;
-    else  {
-      return set<T>(key, defaultValue!);
-    }
   }
 }

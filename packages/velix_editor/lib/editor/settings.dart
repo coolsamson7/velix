@@ -54,7 +54,7 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
     if ( write )
       writeSettings();
 
-    await EnvironmentProvider.of(context).get<SettingsManager>().flush(_getRoot()!.state);
+    await SettingsManager.instance.flush(_getRoot()!.state);
   }
 
   void applySettings() {
@@ -118,6 +118,10 @@ mixin StatefulMixin<T extends StatefulWidget> on State<T> {
 
 @Injectable()
 class SettingsManager {
+  // static data
+
+  static late SettingsManager instance;
+
   // instance data
 
   late Directory dir;
@@ -128,6 +132,8 @@ class SettingsManager {
   // constructor
 
   SettingsManager() {
+    instance = this;
+
     init();
   }
 

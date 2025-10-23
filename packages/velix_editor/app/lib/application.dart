@@ -27,17 +27,40 @@ class EditorApp extends StatefulWidget {
   State<EditorApp> createState() => EditorAppState();
 }
 
-class MyWindowListener extends WindowListener {
+class EditorWindowListener extends WindowListener {
+  // instance data
+
   EditorAppState state;
 
-  MyWindowListener({required this.state});
+  // constructor
+
+  EditorWindowListener({required this.state});
 
   // override
 
   @override
+  void onWindowResize() async {
+    await state.flushSettings(write: true);
+  }
+
+  @override
+  void onWindowMove() async {
+    await state.flushSettings(write: true);
+  }
+
+  @override
+  void onWindowMaximize() async {
+    await state.flushSettings(write: true);
+  }
+
+  @override
+  void onWindowUnmaximize() async {
+    await state.flushSettings(write: true);
+  }
+
+  @override
   void onWindowClose() async {
-    state.writeSettings();
-    await state.flushSettings();
+    await state.flushSettings(write: true);
 
     // done
 
@@ -46,60 +69,85 @@ class MyWindowListener extends WindowListener {
 }
 
 class EditorAppState extends State<EditorApp> with StatefulMixin {
+  // instance data
+
   @override
   String get stateName => "editorApp";
-
-  Rect? windowRect;
 
   // constructor
 
   EditorAppState() {
-    windowManager.addListener(MyWindowListener(state: this));
+    windowManager.addListener(EditorWindowListener(state: this));
   }
+
   // override
 
   @override
   Future<void> apply(Map<String, dynamic> data) async {
     // Restore locale
+
     final savedLocale = data["locale"];
     if (savedLocale != null && savedLocale is String) {
       widget.localeManager.locale = Locale(savedLocale);
     }
 
-    // Restore window position
-    final x = data["window_x"];
-    final y = data["window_y"];
-    final width = data["window_width"];
-    final height = data["window_height"];
-    if (x != null && y != null && width != null && height != null) {
-      windowRect = Rect.fromLTWH(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble());
+    // restore window position
 
-      // Optionally, use desktop window API to set window bounds
+    Map<String,dynamic>? window = data["window"];
+    if ( window != null) {
+      var bounds = Rect.fromLTWH(window["x"], window["y"], window["width"], window["height"],);
 
-      await windowManager.setBounds(windowRect!);
+      await windowManager.setBounds(bounds);
+
+      var state = data["state"];
+      switch (state) {
+        case "normal":
+          break;
+        case "maximized":
+          await windowManager.maximize();
+          break;
+        case "minimized":
+          await windowManager.minimize();
+          break;
+        case "fullscreen":
+          await windowManager.setFullScreen(true);
+          break;
+      }
     }
   }
 
   @override
   Future<void> write(Map<String, dynamic> data) async {
     // Save locale
+
     data["locale"] = widget.localeManager.locale.languageCode;
 
-    // Save window position
-    // For desktop: you can get real window bounds from window_manager
-    if (windowRect != null) {
-      data["window_x"] = windowRect!.left;
-      data["window_y"] = windowRect!.top;
-      data["window_width"] = windowRect!.width;
-      data["window_height"] = windowRect!.height;
-    } else {
-      // fallback: screen size
-      final size = WidgetsBinding.instance.window.physicalSize;
-      data["window_x"] = 0;
-      data["window_y"] = 0;
-      data["window_width"] = size.width;
-      data["window_height"] = size.height;
-    }
+    // window
+
+    var state = "normal";
+
+    final bool isMaximized = await windowManager.isMaximized();
+    if ( isMaximized )
+      state = "maximized";
+
+    final bool isMinimized = await windowManager.isMinimized();
+    if ( isMinimized )
+      state = "minimized";
+
+    final bool isFullScreen = await windowManager.isFullScreen();
+    if ( isFullScreen )
+      state = "fullscreen";
+
+    final pos = await windowManager.getPosition();
+    final size = await windowManager.getSize();
+
+    data["window"] = {
+      "x": pos.dx,
+      "y": pos.dy,
+      "width": size.width,
+      "height": size.height,
+      "state": state
+    };
   }
 
   @override

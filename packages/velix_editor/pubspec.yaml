@@ -43,8 +43,8 @@ flutter:
   assets:
     - assets/icons/
     - assets/icons/widget/
-    - assets/locales/en/editor.json
-    - assets/locales/de/editor.json
+    - assets/locales/en/
+    - assets/locales/de/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

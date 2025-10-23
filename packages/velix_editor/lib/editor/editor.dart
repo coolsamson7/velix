@@ -111,7 +111,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     // registry
 
     String registry = data["registry"] ?? "";
-    registryPaths =  data["registries"] ?? [];
+    registryPaths =  (data["registries"] as List?)?.cast<String>() ?? <String>[];
     if ( registry.isNotEmpty) {
       await loadRegistry(registry);
 
@@ -122,7 +122,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
 
     // file
 
-    paths =  data["files"] ?? [];
+    paths =  (data["files"] as List?)?.cast<String>() ?? [];
     String file = data["file"] ?? "";
     if ( file.isNotEmpty)
       await loadFile(file);

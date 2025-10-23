@@ -152,9 +152,12 @@ class _DropDownWidgetState extends AbstractEditorWidgetState<_DropDownWidget> {
     final widgetContext = WidgetContextScope.of(context);
     _mapper = widgetContext.formMapper;
 
+    Type type = dynamic;
     // ✅ databinding setup
     if (widget.data.databinding != null && widget.data.databinding!.isNotEmpty) {
       _property = _mapper.computeProperty(widgetContext.typeDescriptor, widget.data.databinding!);
+
+      type = _property!.getType();
       _selectedValue = _mapper.getValue(_property!);
       _mapper.map(property: _property!, widget: this, adapter: widget.environment.get<DropDownStateAdapter>());
     }
@@ -164,7 +167,7 @@ class _DropDownWidgetState extends AbstractEditorWidgetState<_DropDownWidget> {
         widget.data.onSelect!.isNotEmpty &&
         _onSelect == null) {
       var typeChecker = TypeChecker(RuntimeTypeTypeResolver(root: widgetContext.typeDescriptor, variables: {
-        "value": dynamic
+        "value": type
       }));
 
       var result = ActionParser.instance.parseStrict(widget.data.onSelect!, typeChecker: typeChecker);

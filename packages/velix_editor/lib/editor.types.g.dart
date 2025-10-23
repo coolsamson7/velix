@@ -58,7 +58,8 @@ import 'package:velix_editor/theme/widget_builder.dart' show WidgetBuilder;
 import 'package:velix_editor/theme/widgets/button_widget.dart' show ButtonWidgetBuilder, ButtonEditWidgetBuilder;
 import 'package:velix_editor/theme/widgets/column_widget.dart' show ColumnEditWidgetBuilder, ColumnWidgetBuilder;
 import 'package:velix_editor/theme/widgets/container_widget.dart' show ContainerEditWidgetBuilder, ContainerWidgetBuilder;
-import 'package:velix_editor/theme/widgets/dropdown_widget.dart' show DropDownWidgetBuilder, DropDownEditWidgetBuilder, DropDownStateAdapter;
+import 'package:velix_editor/theme/widgets/dropdown_widget.dart' show DropDownWidgetBuilder, DropDownStateAdapter, DropDownEditWidgetBuilder;
+import 'package:velix_ui/databinding/valued_widget.dart' show WidgetAdapter;
 import 'package:velix_editor/theme/widgets/for_widget.dart' show ForEditWidgetBuilder, ForWidgetBuilder;
 import 'package:velix_editor/theme/widgets/grid_widget.dart' show GridEditWidgetBuilder, GridWidgetBuilder;
 import 'package:velix_editor/theme/widgets/label_widget.dart' show LabelWidgetBuilder, EditLabelWidgetBuilder;
@@ -69,21 +70,9 @@ import 'package:velix_editor/theme/widgets/stack_widget.dart' show StackEditWidg
 import 'package:velix_editor/theme/widgets/switch_widget.dart' show SwitchWidgetBuilder, EditSwitchWidgetBuilder;
 import 'package:velix_editor/theme/widgets/text_widget.dart' show TextWidgetBuilder, TextEditWidgetBuilder;
 import 'package:velix_editor/util/message_bus.dart' show MessageBus;
-import 'package:velix_ui/databinding/valued_widget.dart';
 import 'package:velix_ui/module.dart';
 
 void registerEditorTypes() {
-  type<DropDownStateAdapter>(
-    location: 'package:velix_ui/databinding/widgets/material/dropdown.dart:8:1',
-    annotations: [
-      WidgetAdapter(platforms: [TargetPlatform.android]),
-      Injectable()
-    ],
-    constructor: () => DropDownStateAdapter(),
-    fromMapConstructor: (Map<String,dynamic> args) => DropDownStateAdapter(),
-    fromArrayConstructor: (List<dynamic> args) => DropDownStateAdapter(),
-  );
-
   type<CommandStack>(
     location: 'package:velix_editor/commands/command_stack.dart:11:1',
     annotations: [
@@ -496,6 +485,17 @@ void registerEditorTypes() {
     ],
   );
 
+  type<DropDownStateAdapter>(
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:62:1',
+    annotations: [
+      WidgetAdapter(platforms: [TargetPlatform.android]),
+      Injectable()
+    ],
+    constructor: () => DropDownStateAdapter(),
+    fromMapConstructor: (Map<String,dynamic> args) => DropDownStateAdapter(),
+    fromArrayConstructor: (List<dynamic> args) => DropDownStateAdapter(),
+  );
+
   type<MessageBus>(
     location: 'package:velix_editor/util/message_bus.dart:7:1',
     annotations: [
@@ -581,7 +581,7 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => Value(type: args[0] as ValueType? ?? ValueType.value, value: args[1] as String? ?? ""),
     fields: [
       field<Value,ValueType>('type',
-        type: ClassType<ValueType>(),
+        type: ObjectType<ValueType>(),
         annotations: [
           DeclareProperty()
         ],
@@ -688,8 +688,8 @@ void registerEditorTypes() {
         ],
         getter: (obj) => obj.id,
       ), 
-      field<WidgetData,AbstractWidgetState<StatefulWidget>>('widget',
-        type: ClassType<AbstractWidgetState<StatefulWidget>>(),
+      field<WidgetData,AbstractEditorWidgetState<StatefulWidget>>('widget',
+        type: ClassType<AbstractEditorWidgetState<StatefulWidget>>(),
         annotations: [
           Json(ignore: true)
         ],
@@ -712,7 +712,7 @@ void registerEditorTypes() {
     fromArrayConstructor: (List<dynamic> args) => GridItem(sizeMode: args[0] as GridSizeMode? ?? GridSizeMode.auto, size: args[1] as double? ?? 1, alignment: args[2] as GridAlignment? ?? GridAlignment.start),
     fields: [
       field<GridItem,GridSizeMode>('sizeMode',
-        type: ClassType<GridSizeMode>(),
+        type: ObjectType<GridSizeMode>(),
         annotations: [
           DeclareProperty()
         ],
@@ -727,7 +727,7 @@ void registerEditorTypes() {
         setter: (obj, value) => (obj as GridItem).size = value,
       ), 
       field<GridItem,GridAlignment>('alignment',
-        type: ClassType<GridAlignment>(),
+        type: ObjectType<GridAlignment>(),
         annotations: [
           DeclareProperty()
         ],
@@ -1081,7 +1081,7 @@ void registerEditorTypes() {
   );
 
   type<ButtonEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/button_widget.dart:80:1',
+    location: 'package:velix_editor/theme/widgets/button_widget.dart:82:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1208,7 +1208,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:26:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:27:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1234,7 +1234,7 @@ void registerEditorTypes() {
   );
 
   type<DropDownEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:197:1',
+    location: 'package:velix_editor/theme/widgets/dropdown_widget.dart:212:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1286,7 +1286,7 @@ void registerEditorTypes() {
   );
 
   type<ForWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/for_widget.dart:168:1',
+    location: 'package:velix_editor/theme/widgets/for_widget.dart:169:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1312,7 +1312,7 @@ void registerEditorTypes() {
   );
 
   type<GridEditWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:48:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:49:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1338,7 +1338,7 @@ void registerEditorTypes() {
   );
 
   type<GridWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/grid_widget.dart:168:1',
+    location: 'package:velix_editor/theme/widgets/grid_widget.dart:169:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1387,7 +1387,7 @@ void registerEditorTypes() {
   );
 
   type<EditLabelWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/label_widget.dart:37:1',
+    location: 'package:velix_editor/theme/widgets/label_widget.dart:38:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1436,7 +1436,7 @@ void registerEditorTypes() {
   );
 
   type<EditListWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/list_widget.dart:74:1',
+    location: 'package:velix_editor/theme/widgets/list_widget.dart:75:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1641,7 +1641,7 @@ void registerEditorTypes() {
   );
 
   type<EditSwitchWidgetBuilder>(
-    location: 'package:velix_editor/theme/widgets/switch_widget.dart:44:1',
+    location: 'package:velix_editor/theme/widgets/switch_widget.dart:45:1',
     superClass: widgetBuilderDescriptor,
     annotations: [
       Injectable()
@@ -1945,7 +1945,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/dropdown.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_switch"),
+      DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_dropdown"),
       JsonSerializable(discriminator: "dropdown", includeNull: false)
     ],
     params: [
@@ -1981,7 +1981,7 @@ void registerEditorTypes() {
       field<DropDownWidgetData,String>('databinding',
         type: StringType().optional().optional(),
         annotations: [
-          DeclareProperty(group: "general")
+          DeclareProperty(group: "data", editor: CodeEditorBuilder)
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as DropDownWidgetData).databinding = value,
@@ -2003,7 +2003,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/for.dart:10:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "for", group: "logic", icon: "widget_column"),
+      DeclareWidget(name: "for", group: "logic", icon: "widget_for"),
       JsonSerializable(discriminator: "for", includeNull: false)
     ],
     params: [
@@ -2018,7 +2018,7 @@ void registerEditorTypes() {
     fields: [
       field<ForWidgetData,String>('context',
         annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ContextPropertyValidator)
+          DeclareProperty(group: "data", editor: CodeEditorBuilder, validator: ContextPropertyValidator)
         ],
         getter: (obj) => obj.context,
         setter: (obj, value) => (obj as ForWidgetData).context = value,
@@ -2030,7 +2030,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/grid.dart:33:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "grid", group: "container", icon: "widget_grid"),
+      DeclareWidget(name: "grid", group: "container", icon: "widget_gridview"),
       JsonSerializable(discriminator: "grid", includeNull: false)
     ],
     params: [
@@ -2137,7 +2137,7 @@ void registerEditorTypes() {
     location: 'package:velix_editor/metadata/widgets/list.dart:8:1',
     superClass: widgetDataDescriptor,
     annotations: [
-      DeclareWidget(name: "list", group: "widgets", icon: "widget_switch"),
+      DeclareWidget(name: "list", group: "widgets", icon: "widget_listview"),
       JsonSerializable(discriminator: "list", includeNull: false)
     ],
     params: [
@@ -2294,7 +2294,7 @@ void registerEditorTypes() {
       field<SwitchWidgetData,String>('databinding',
         type: StringType().optional().optional(),
         annotations: [
-          DeclareProperty(group: "databinding", editor: CodeEditorBuilder)
+          DeclareProperty(group: "data", editor: CodeEditorBuilder)
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as SwitchWidgetData).databinding = value,
@@ -2332,7 +2332,7 @@ void registerEditorTypes() {
       field<TextWidgetData,String>('databinding',
         type: StringType().optional().optional(),
         annotations: [
-          DeclareProperty(group: "general", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
+          DeclareProperty(group: "data", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
         ],
         getter: (obj) => obj.databinding,
         setter: (obj, value) => (obj as TextWidgetData).databinding = value,

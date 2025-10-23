@@ -156,7 +156,7 @@
     "dropdown": {
       "title": "Dropdown",
 
-      "onSelect": {"label":  "onSelect"},
+      "onSelect": {"label":  "Select"},
       "padding": {"label":  "Padding"},
       "placeholder": {"label":  "Placeholder"},
       "databinding": {"label":  "Binding"}
@@ -174,7 +174,7 @@
         "label":  "Padding"
       },
       "databinding": {
-        "label":  "Label"
+        "label":  "Binding"
       }
     },
     "label": {
@@ -230,7 +230,7 @@
         "label":  "Size"
       },
       "databinding": {
-        "label":  "Databinding"
+        "label":  "Binding"
       },
       "style": {
         "label":  "Style"
@@ -258,7 +258,7 @@
         "label":  "Color"
       },
       "onClick": {
-        "label":  "On Click"
+        "label":  "Click"
       },
       "size": {
         "label":  "Size"

@@ -31,7 +31,7 @@ class GridItem {
 }
 
 @Dataclass()
-@DeclareWidget(name: "grid", group: "container", icon: "widget_grid")
+@DeclareWidget(name: "grid", group: "container", icon: "widget_gridview")
 @JsonSerializable(discriminator: "grid", includeNull: false)
 class GridWidgetData extends WidgetData {
   // instance data

@@ -11,6 +11,7 @@ import 'package:velix_editor/actions/action_parser.dart';
 
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
+import 'package:velix_editor/actions/eval.dart';
 import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/editor.dart';
@@ -272,31 +273,43 @@ void main() {
   // evaluator tests
 
   group('evaluator', () {
+    dynamic eval(String expression, dynamic instance) {
+      TypeDescriptor contextType = TypeDescriptor.forType(instance.runtimeType);
+      var result = ActionParser.instance.parseStrict(expression, typeChecker: TypeChecker(RuntimeTypeTypeResolver(root: contextType)));
 
-    var evaluator = ActionEvaluator(contextType: TypeDescriptor.forType(Page));
+      // compute call
+
+      var visitor = EvalVisitor(contextType);
+
+      var call = result.value!.accept(visitor, CallVisitorContext(instance: instance));
+
+      // eval
+
+      return call.eval(instance, EvalContext(instance: instance, variables: {}));
+    }
 
     // register types
 
     test('eval member ', () {
-      var value = evaluator.call( "user.name", page);
+      var value = eval( "user.name", page);
 
       expect(value, equals("andi"));
     });
 
     test('eval recursive member ', () {
-      var value = evaluator.call( "user.address.city", page);
+      var value = eval( "user.address.city", page);
 
       expect(value, equals("Köln"));
     });
 
     test('eval method call with literal arg', () {
-      var value = evaluator.call("user.hello(\"world\")", page);
+      var value = eval("user.hello(\"world\")", page);
 
       expect(value, equals("hello world"));
     });
 
     test('eval method call with complex arg', () {
-      var value = evaluator.call("user.hello(user.name)", page);
+      var value = eval("user.hello(user.name)", page);
 
       expect(value, equals("hello andi"));
     });

@@ -6,7 +6,7 @@ import '../annotations.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "list", group: "widgets", icon: "widget_switch")
+@DeclareWidget(name: "list", group: "widgets", icon: "widget_listview")
 @JsonSerializable(discriminator: "list", includeNull: false)
 class ListWidgetData extends WidgetData {
   // instance data

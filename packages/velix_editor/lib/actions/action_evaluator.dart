@@ -30,31 +30,3 @@ class ActionCompiler { // TODO: sender???
      return result.value!.accept(visitor, CallVisitorContext(instance: null));
    }
 }
-
-class ActionEvaluator {
-  // instance data
-
-  dynamic instance;
-  final parser = ActionParser.instance;
-  TypeDescriptor contextType;
-
-  // constructor
-
-  ActionEvaluator({required this.contextType});
-
-  // public
-
-  dynamic call(String input, dynamic instance) {
-    var result = parser.parseStrict(input, typeChecker: TypeChecker(RuntimeTypeTypeResolver(root: contextType)));
-
-    // compute call
-
-    var visitor = EvalVisitor(contextType);
-
-    var call = result.value!.accept(visitor, CallVisitorContext(instance: instance));
-
-    // eval
-
-    return call.eval(instance, EvalContext(instance: instance, variables: {})); // TODO
-  }
-}

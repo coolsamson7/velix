@@ -8,7 +8,7 @@ import '../annotations.dart';
 import '../widget_data.dart';
 
 @Dataclass()
-@DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_switch")
+@DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_dropdown")
 @JsonSerializable(discriminator: "dropdown", includeNull: false)
 class DropDownWidgetData extends WidgetData {
   // instance data
@@ -17,7 +17,7 @@ class DropDownWidgetData extends WidgetData {
   Insets? padding;
   @DeclareProperty(group: "general")
   Value placeholder;
-  @DeclareProperty(group: "data")
+  @DeclareProperty(group: "data", editor: CodeEditorBuilder)
   String? databinding;
   @DeclareProperty(group: "events", editor: CodeEditorBuilder, validator: ExpressionPropertyValidator)
   String? onSelect;

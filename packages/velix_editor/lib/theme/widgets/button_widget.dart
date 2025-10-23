@@ -49,10 +49,7 @@ class _ButtonWidgetState extends AbstractEditorWidgetState<ButtonWidget> {
 
     // Only compile once per lifecycle if onClick is set
     if (widget.data.onClick != null && widget.data.onClick!.isNotEmpty && _onClick == null) {
-      var widgetContext = WidgetContextScope.of(context);
-
-      final call = ActionCompiler.instance.compile(widget.data.onClick!, context: widgetContext.typeDescriptor);
-      _onClick = () => call.eval(widgetContext.instance, EvalContext(instance: widgetContext.instance, variables: {}));
+      _onClick = compile<VoidCallback>(widget.data.onClick!);
     }
   }
 

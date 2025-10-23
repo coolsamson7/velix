@@ -12,7 +12,7 @@ part "test_page.command.g.dart";
 class TestPage extends StatefulWidget {
   // instance data
 
-  TestData data;
+  final TestData data;
 
   // constructor
 
@@ -25,7 +25,7 @@ class TestPage extends StatefulWidget {
     );
 
   @override
-  State<TestPage> createState() => TestPageState();
+  State<TestPage> createState() => TestPageState(data: data);
 }
 
 class TestPageState extends State<TestPage>
@@ -33,12 +33,13 @@ class TestPageState extends State<TestPage>
   // instance data
 
   late FormMapper mapper;
+  TestData data;
 
   String json = "";
 
   // constructor
 
-  TestPageState();
+  TestPageState({required this.data});
 
   // internal
 
@@ -94,7 +95,7 @@ class TestPageState extends State<TestPage>
   @override
   void _save() {
     if (mapper.validate()) {
-      widget.data = mapper.commit();
+      data = mapper.commit();
     }
   }
 

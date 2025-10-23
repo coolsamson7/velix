@@ -11,6 +11,8 @@ import 'package:velix_ui/databinding/widgets/common/label.dart' show LabelAdapte
 import 'package:velix_ui/databinding/widgets/common/slider.dart' show SliderAdapter;
 import 'package:velix_ui/databinding/widgets/common/switch.dart' show SwitchAdapter;
 import 'package:velix_ui/databinding/widgets/cupertino/datepicker.dart' show CupertinoDatePickerAdapter;
+import 'package:velix_ui/databinding/widgets/cupertino/slider.dart' show CupertinoSliderAdapter;
+import 'package:velix_ui/databinding/widgets/cupertino/switch.dart' show CupertinoSwitchAdapter;
 import 'package:velix_ui/databinding/widgets/cupertino/text.dart' show CupertinoTextFieldAdapter;
 import 'package:velix_ui/databinding/widgets/material/datepicker.dart' show MaterialDatePickerAdapter;
 import 'package:velix_ui/databinding/widgets/material/dropdown.dart' show DropDownAdapter;
@@ -19,7 +21,7 @@ import 'package:velix_ui/module.dart' show UIModule;
 
 void registerUITypes() {
   type<CheckboxAdapter>(
-    location: 'package:velix_ui/databinding/widgets/common/checkbox.dart:9:1',
+    location: 'package:velix_ui/databinding/widgets/common/checkbox.dart:10:1',
     annotations: [
       WidgetAdapter(platforms: [TargetPlatform.android]),
       Injectable()
@@ -30,7 +32,7 @@ void registerUITypes() {
   );
 
   type<LabelAdapter>(
-    location: 'package:velix_ui/databinding/widgets/common/label.dart:8:1',
+    location: 'package:velix_ui/databinding/widgets/common/label.dart:9:1',
     annotations: [
       WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.android, TargetPlatform.macOS]),
       Injectable()
@@ -41,9 +43,9 @@ void registerUITypes() {
   );
 
   type<SliderAdapter>(
-    location: 'package:velix_ui/databinding/widgets/common/slider.dart:8:1',
+    location: 'package:velix_ui/databinding/widgets/common/slider.dart:9:1',
     annotations: [
-      WidgetAdapter(platforms: [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]),
+      WidgetAdapter(platforms: [TargetPlatform.android]),
       Injectable()
     ],
     constructor: () => SliderAdapter(),
@@ -52,7 +54,7 @@ void registerUITypes() {
   );
 
   type<SwitchAdapter>(
-    location: 'package:velix_ui/databinding/widgets/common/switch.dart:8:1',
+    location: 'package:velix_ui/databinding/widgets/common/switch.dart:9:1',
     annotations: [
       WidgetAdapter(platforms: [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]),
       Injectable()
@@ -71,6 +73,28 @@ void registerUITypes() {
     constructor: () => CupertinoDatePickerAdapter(),
     fromMapConstructor: (Map<String,dynamic> args) => CupertinoDatePickerAdapter(),
     fromArrayConstructor: (List<dynamic> args) => CupertinoDatePickerAdapter(),
+  );
+
+  type<CupertinoSliderAdapter>(
+    location: 'package:velix_ui/databinding/widgets/cupertino/slider.dart:10:1',
+    annotations: [
+      WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.macOS]),
+      Injectable()
+    ],
+    constructor: () => CupertinoSliderAdapter(),
+    fromMapConstructor: (Map<String,dynamic> args) => CupertinoSliderAdapter(),
+    fromArrayConstructor: (List<dynamic> args) => CupertinoSliderAdapter(),
+  );
+
+  type<CupertinoSwitchAdapter>(
+    location: 'package:velix_ui/databinding/widgets/cupertino/switch.dart:10:1',
+    annotations: [
+      WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.macOS]),
+      Injectable()
+    ],
+    constructor: () => CupertinoSwitchAdapter(),
+    fromMapConstructor: (Map<String,dynamic> args) => CupertinoSwitchAdapter(),
+    fromArrayConstructor: (List<dynamic> args) => CupertinoSwitchAdapter(),
   );
 
   type<CupertinoTextFieldAdapter>(
@@ -96,7 +120,7 @@ void registerUITypes() {
   );
 
   type<DropDownAdapter>(
-    location: 'package:velix_ui/databinding/widgets/material/dropdown.dart:8:1',
+    location: 'package:velix_ui/databinding/widgets/material/dropdown.dart:9:1',
     annotations: [
       WidgetAdapter(platforms: [TargetPlatform.android]),
       Injectable()

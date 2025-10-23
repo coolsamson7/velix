@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix/util/collections.dart';
 
@@ -168,7 +169,7 @@ class ValuedWidget {
 
   static final Map<AdapterKey, ValuedWidgetAdapter> _adapters = {};
 
-  static TargetPlatform platform = TargetPlatform.iOS;
+  static TargetPlatform platform = defaultTargetPlatform;
 
   // administration
 

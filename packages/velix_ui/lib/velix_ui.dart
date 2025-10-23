@@ -35,3 +35,7 @@ export './databinding/widgets/material/text.dart';
 // provider
 
 export './provider/environment_provider.dart';
+
+// module
+
+export './module.dart';

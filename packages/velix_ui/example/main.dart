@@ -114,7 +114,7 @@ void main() {
       ),
     );
 
-    final currencyFinder = find.byKey(const Key('price.currency'));
+    final currencyFinder = find.byKey(const Key('text:price.currency'));
     // one-way mapper
 
     mapper.addListener((event) {
@@ -186,7 +186,7 @@ void main() {
       ),
     );
 
-    final currencyFinder = find.byKey(const Key('product.price.currency'));
+    final currencyFinder = find.byKey(const Key('text:product.price.currency'));
 
     // one-way mapper
 
@@ -245,7 +245,7 @@ void main() {
       ),
     );
 
-    final currencyFinder = find.byKey(const Key('currency'));
+    final currencyFinder = find.byKey(const Key('text:currency'));
 
     // one-way mapper
 
@@ -295,7 +295,7 @@ void main() {
       ),
     );
 
-    final valueFinder = find.byKey(const Key('value'));
+    final valueFinder = find.byKey(const Key('text:value'));
 
     // one-way mapper
 
@@ -352,7 +352,7 @@ void main() {
       ),
     );
 
-    final valueFinder = find.byKey(const Key('value'));
+    final valueFinder = find.byKey(const Key('text:value'));
 
     // one-way mapper
 
@@ -414,7 +414,7 @@ void main() {
       ),
     );
 
-    final valueFinder = find.byKey(const Key('value'));
+    final valueFinder = find.byKey(const Key('text:value'));
 
     // one-way mapper
 
@@ -478,7 +478,7 @@ void main() {
       ),
     );
 
-    final valueFinder = find.byKey(const Key('price.value'));
+    final valueFinder = find.byKey(const Key('text:price.value'));
 
     // one-way mapper
 

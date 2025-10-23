@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:velix/velix.dart';
@@ -7,20 +8,20 @@ import '../../valued_widget.dart';
 import '../../form_mapper.dart';
 
 ///  A [ValuedWidgetAdapter] for a [Slider]
-@WidgetAdapter(platforms: [TargetPlatform.android])
+@WidgetAdapter(platforms: [TargetPlatform.iOS, TargetPlatform.macOS])
 @Injectable()
-class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
+class CupertinoSliderAdapter extends AbstractValuedWidgetAdapter<CupertinoSlider> {
   // constructor
 
-  SliderAdapter() : super('slider', [TargetPlatform.android]);
+  CupertinoSliderAdapter() : super('slider', [TargetPlatform.iOS, TargetPlatform.macOS]);
 
   // override
 
   @override
-  Slider build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
+  Widget build({required BuildContext context, required FormMapper mapper, required TypeProperty property, required Keywords args}) {
     var initialValue = mapper.getValue(property);
 
-    Slider widget = Slider.adaptive(
+    CupertinoSlider widget = CupertinoSlider(
       key: ValueKey("$name:${property.path}"),
       value:  double.parse(initialValue.toString()),
       min: double.parse(args["min"].toString()),
@@ -39,12 +40,12 @@ class SliderAdapter extends AbstractValuedWidgetAdapter<Slider> {
   }
 
   @override
-  dynamic getValue(Slider widget) {
+  dynamic getValue(CupertinoSlider widget) {
     return int.parse(widget.value.toString());
   }
 
   @override
-  void setValue(Slider widget, dynamic value, ValuedWidgetContext context) {
+  void setValue(CupertinoSlider widget, dynamic value, ValuedWidgetContext context) {
     // noop
   }
 }

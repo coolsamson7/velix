@@ -8,7 +8,7 @@ import 'package:file_selector_platform_interface/file_selector_platform_interfac
 
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Dialog;
 import 'package:oktoast/oktoast.dart' as ok show OKToast;
 import 'package:provider/provider.dart';
 import 'package:velix/reflectable/reflectable.dart';
@@ -19,6 +19,7 @@ import 'package:velix_editor/editor/test_model.dart';
 import 'package:velix_editor/metadata/widgets/container.dart';
 import 'package:velix_i18n/i18n/i18n.dart';
 import 'package:velix_mapper/mapper/json.dart';
+import 'package:velix_ui/dialog/dialog.dart' show Dialog;
 
 import 'package:velix_ui/provider/environment_provider.dart';
 import 'package:velix_di/di/di.dart';
@@ -271,24 +272,11 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
   }
 
   Future<bool> showUnsavedChangesDialog(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false, // force the user to choose
-      builder: (context) => AlertDialog(
-        title: const Text('Unsaved Changes'),
-        content: const Text('You have unsaved changes. Do you want to discard them?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false), // cancel / keep editing
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true), // discard changes
-            child: const Text('Discard'),
-          ),
-        ],
-      ),
-    );
+    final result = await Dialog.messageDialog(context)
+        .title('Unsaved Changes')
+        .message('You have unsaved changes. Do you want to discard them?')
+        .okCancel()
+        .show();
 
     return result ?? false;
   }

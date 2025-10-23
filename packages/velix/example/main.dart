@@ -28,7 +28,7 @@ void main() {
   // call getters
 
   var currency = type.get(price, "currency");
-  var value = type.get(price, "value");
+  //var value = type.get(price, "value");
 
   // call constructor
 

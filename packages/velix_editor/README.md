@@ -5,11 +5,11 @@
 [![Flutter CI](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg)](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml)
 [![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 
-<img width="320" height="320" alt="velix" src="https://github.com/user-attachments/assets/21141c08-9a34-4337-88af-173ad2f044a6" />
-
 # Velix UI Editor
 
 This package implements a wysiwyg UI editor and runtime engine with JSON as the persistence format.
+
+<img width="1487" height="877" alt="editor" src="https://github.com/user-attachments/assets/3b605ecd-6d1d-4b53-ad56-ced6f13e0243" />
 
 # Goals and Design Principles
 

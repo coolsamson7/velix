@@ -27,7 +27,7 @@ dependencies:
   velix_mapper: ^1.2.1
   velix_i18n: ^1.2.0
   velix_ui: ^1.3.0
-  velix_editor: ^0.1.3
+  velix_editor: ^0.9.0
   highlight: ^0.7.0
   flutter_highlight: ^0.7.0
   flutter_code_editor: ^0.3.3

@@ -378,20 +378,6 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
     Color color;
     String message;
 
-    // WTF TODO
-
-    if (lastResult.success) {
-      if (lastResult.complete)
-        _parseState = ParseState.complete;
-      else
-        _parseState = ParseState.prefixOnly;
-    }
-    else {
-      _parseState = ParseState.invalid;
-    }
-
-    //
-
     switch (_parseState) {
       case ParseState.complete:
         color = Colors.green.shade800;

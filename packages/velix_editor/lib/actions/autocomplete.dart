@@ -40,7 +40,7 @@ class Autocomplete {
 
   Autocomplete({required this.typeChecker});
 
-  // NEW
+  // public
 
   /// Get the token boundaries at the cursor position for inline completion
   CompletionContext? getCompletionContext(String input, int cursorOffset) {
@@ -138,9 +138,6 @@ class Autocomplete {
     return null;
   }
 
-  // NEW
-
-  // public
 
   /// Returns autocomplete suggestions at cursor position in `expr`.
   Iterable<Suggestion> suggest(String input, {int cursorOffset = -1, String fullInput = ""}) {
@@ -177,7 +174,7 @@ class Autocomplete {
         return type.properties.values
             .where((prop) => prop.name.startsWith(property))
             .map((prop) => Suggestion(
-                suggestion: prop.name,
+                suggestion: prop.isField() ? prop.name : methodSuggestion(prop as MethodDesc),
                 type: prop.isField() ? "field" : "method",
                 tooltip: ""));
     }
@@ -217,5 +214,25 @@ class Autocomplete {
     }
 
     return expr;
+  }
+
+  String methodSuggestion(MethodDesc prop) {
+    final buffer = StringBuffer();
+
+    buffer.write("${prop.name}(");
+
+    var first = true;
+    for (var param in prop.parameters) {
+      if (!first)
+        buffer.write(", ");
+
+      buffer.write(param.name);
+
+      first = false;
+    }
+
+    buffer.write(")");
+
+    return buffer.toString();
   }
 }

@@ -151,6 +151,28 @@ class UnknownPropertyDesc extends Desc {
     if (parent is ClassDesc)
       validPrefix = (parent as ClassDesc).properties.keys.where((String prop) => prop.startsWith(property)).isNotEmpty;
   }
+  
+  // internal
+
+  String methodSuggestion(MethodDesc prop) {
+    final buffer = StringBuffer();
+
+    buffer.write("${prop.name}(");
+
+    var first = true;
+    for (var param in prop.parameters) {
+      if (!first)
+        buffer.write(", ");
+
+      buffer.write(param.name);
+
+      first = false;
+    }
+
+    buffer.write(")");
+
+    return buffer.toString();
+  }
 
   // public
 
@@ -158,7 +180,7 @@ class UnknownPropertyDesc extends Desc {
     return parent is ClassDesc ? (parent as ClassDesc).properties.values
         .where((desc) => desc.name.startsWith(property))
         .map((prop) => Suggestion(
-              suggestion: prop.name,
+              suggestion:  prop.isField() ? prop.name : methodSuggestion(prop as MethodDesc),
               type: prop.isField() ? "field" : "method",
               tooltip: "")) : [];
   }

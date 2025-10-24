@@ -1,3 +1,13 @@
+
+![License](https://img.shields.io/github/license/coolsamson7/velix)
+![Dart](https://img.shields.io/badge/Dart-3.0-blue)
+[![Docs](https://img.shields.io/badge/docs-online-blue?logo=github)](https://coolsamson7.github.io/velix/)
+[![Flutter CI](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml/badge.svg)](https://github.com/coolsamson7/velix/actions/workflows/flutter.yaml)
+[![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
+
+
+<img width="320" height="320" alt="velix" src="https://github.com/user-attachments/assets/21141c08-9a34-4337-88af-173ad2f044a6" />
+
 # Velix UI Editor
 
 This package implements a wysiwyg UI editor and runtime engine with JSON as the persistence format.
@@ -19,7 +29,7 @@ On the other hand it still offers all of the typical features of a wysiwyg edito
 - i18n
 - shortcuts
 
-<img width="2278" height="1688" alt="image" src="https://github.com/user-attachments/assets/76a3cdfd-2816-4446-9047-8bbe4ada7da8" />
+<img width="2278" height="1688" alt="image" src="hNDttps://github.com/user-attachments/assets/76a3cdfd-2816-4446-9047-8bbe4ada7da8" />
 
 
 Currently the approach is to be able to design individual pages only.

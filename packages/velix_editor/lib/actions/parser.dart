@@ -165,9 +165,16 @@ class ExpressionParser {
   Parser<Expression> literal() =>
       numericLiteral().or(stringLiteral()).or(boolLiteral()).or(nullLiteral()).cast();
 
-  Parser<Expression> numericLiteral() =>
-      digit().plus().flatten().mapWithPosition((v, start, end) =>
-      Literal(int.parse(v), v)..start = start..end = end);
+  Parser<Expression> numericLiteral() {
+    // Matches: digits optionally followed by .digits
+    final number = (digit().plus() & (char('.') & digit().plus()).optional())
+        .flatten();
+
+    return number.mapWithPosition((v, start, end) {
+      final value = v.contains('.') ? double.parse(v) : int.parse(v);
+      return Literal(value, v)..start = start..end = end;
+    });
+  }
 
   // Fixed: Require closing quote for string literals
   Parser<Expression> stringLiteral() {
@@ -192,28 +199,41 @@ class ExpressionParser {
       string('null').mapWithPosition((_, start, end) =>
       Literal(null, 'null')..start = start..end = end);
 
+// unaryExpression
   Parser<Expression> unaryExpression() {
     final ops = ['-', '+', '!', '~'];
-    return ops.map(string).reduce((a, b) => a.or(b).cast<String>())
-        .trim()
-        .seq(token)
-        .mapWithPosition((list, start, end) => UnaryExpression(list[0], list[1])..start = start..end = end);
+    final List<Parser<String>> parsers = ops.map((s) => string(s)).toList();
+
+    final Parser<String> op = ChoiceParser<String>(parsers).trim();
+
+    return (op & token).mapWithPosition((values, start, end) {
+      final operator = values[0] as String;
+      final expr = values[1] as Expression;
+      return UnaryExpression(operator, expr)
+        ..start = start
+        ..end = end;
+    });
   }
 
-  Parser<Expression> binaryExpression() =>
-      token.plusSeparated(binaryOperation())
-          .map((sl) {
-        final elements = sl.elements;
-        Expression left = elements[0];
-        for (int i = 1; i < elements.length; i += 2) {
-          final op = elements[i] as String;
-          final right = elements[i + 1];
 
-          left = BinaryExpression(op, left, right)..start = left.start..end = right.end;
+  Parser<Expression> binaryExpression() =>
+      token.plusSeparated(binaryOperation()).map((sl) {
+        final elements = sl.elements;
+        final separators = sl.separators;
+
+        // Left-associative chaining
+        Expression left = elements.first;
+        for (int i = 0; i < separators.length; i++) {
+          final op = separators[i];
+          final right = elements[i + 1];
+          left = BinaryExpression(op, left, right)
+            ..start = left.start
+            ..end = right.end;
         }
 
         return left;
       });
+
 
   Parser<String> binaryOperation() =>
       ['+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=']

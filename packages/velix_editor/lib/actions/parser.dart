@@ -236,7 +236,7 @@ class ExpressionParser {
 
 
   Parser<String> binaryOperation() =>
-      ['+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=']
+      ['+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=', '&&', '||']
           .map(string)
           .reduce((a, b) => a.or(b).cast<String>())
           .trim();

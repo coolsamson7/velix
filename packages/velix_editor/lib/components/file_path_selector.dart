@@ -28,8 +28,24 @@ class _FilePathSelectorState extends State<FilePathSelector> {
   @override
   void initState() {
     super.initState();
+
     _controller = TextEditingController(text: widget.initialFilePath ?? '');
-    _recentFiles = widget.recentFiles ?? [];
+    _recentFiles = List.from(widget.recentFiles ?? []);
+
+    // Add initial file to recent files and load it
+    if (widget.initialFilePath != null && widget.initialFilePath!.isNotEmpty) {
+      if (!_recentFiles.contains(widget.initialFilePath!)) {
+        _recentFiles.insert(0, widget.initialFilePath!);
+        if (_recentFiles.length > 5) {
+          _recentFiles = _recentFiles.sublist(0, 5);
+        }
+      }
+
+      // Call onLoad after the widget is built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onLoad(widget.initialFilePath!);
+      });
+    }
   }
 
   @override
@@ -56,10 +72,13 @@ class _FilePathSelectorState extends State<FilePathSelector> {
   }
 
   void _selectRecent(String path) {
-    setState(() {
-      _controller.text = path;
-    });
-    widget.onLoad(path); // auto-load immediately
+    if (_controller.text != path) {
+      setState(() {
+        _controller.text = path;
+      });
+
+      widget.onLoad(path); // auto-load immediately
+    }
   }
 
   String _getFileName(String path) {
@@ -110,39 +129,44 @@ class _FilePathSelectorState extends State<FilePathSelector> {
           MouseRegion(
             onEnter: (_) => setState(() => _isHovering = true),
             onExit: (_) => setState(() => _isHovering = false),
-            child: InkWell(
-              onTap: _browseFile,
-              borderRadius: BorderRadius.circular(6),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _isHovering
+                    ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                    : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
                   color: _isHovering
-                      ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-                      : theme.colorScheme.surfaceVariant.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: _isHovering
-                        ? theme.colorScheme.primary.withOpacity(0.5)
-                        : theme.colorScheme.outline.withOpacity(0.2),
-                    width: 1.5,
-                  ),
+                      ? theme.colorScheme.primary.withOpacity(0.5)
+                      : theme.colorScheme.outline.withOpacity(0.2),
+                  width: 1.5,
                 ),
+              ),
+              child: InkWell(
+                onTap: hasFile ? null : _browseFile, // Only open chooser if no file selected
+                borderRadius: BorderRadius.circular(6),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: hasFile
-                            ? theme.colorScheme.primaryContainer
-                            : theme.colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Icon(
-                        hasFile ? Icons.description : Icons.folder_open,
-                        size: 20,
-                        color: hasFile
-                            ? theme.colorScheme.onPrimaryContainer
-                            : theme.colorScheme.onSurfaceVariant,
+                    // Icon that opens file chooser
+                    InkWell(
+                      onTap: _browseFile, // Always opens file chooser
+                      borderRadius: BorderRadius.circular(4),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: hasFile
+                              ? theme.colorScheme.primaryContainer
+                              : theme.colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Icon(
+                          hasFile ? Icons.description : Icons.folder_open,
+                          size: 20,
+                          color: hasFile
+                              ? theme.colorScheme.onPrimaryContainer
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -206,7 +230,7 @@ class _FilePathSelectorState extends State<FilePathSelector> {
                   final isSelected = _controller.text == file;
 
                   return InkWell(
-                    onTap: () => _selectRecent(file),
+                    onTap: () => _selectRecent(file), // Directly load the file
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
                       padding: const EdgeInsets.symmetric(

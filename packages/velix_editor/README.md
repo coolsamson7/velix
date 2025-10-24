@@ -28,8 +28,6 @@ On the other hand it of course offers all the typical features of a wysiwyg edit
 - i18n
 - shortcuts
 
-<img width="2278" height="1688" alt="image" src="hNDttps://github.com/user-attachments/assets/76a3cdfd-2816-4446-9047-8bbe4ada7da8" />
-
 Currently, the approach is to be able to design individual pages only.
 
 The most complex approach was to create an editor that would not only be used to design widget structures, only to generate 

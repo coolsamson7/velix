@@ -4,6 +4,8 @@ import 'package:velix_di/di/di.dart';
 
 import 'widget_builder.dart';
 
+
+/// This is the main registry that maintains all [WidgetBuilder]s
 @Injectable()
 class WidgetFactory {
   // instance data

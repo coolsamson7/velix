@@ -8,6 +8,7 @@ import '../annotations.dart';
 import '../properties/properties.dart';
 import '../widget_data.dart';
 
+/// data class for a button
 @Dataclass()
 @DeclareWidget(name: "button", group: "widgets", icon: "widget_button")
 @JsonSerializable(discriminator: "button", includeNull: false)

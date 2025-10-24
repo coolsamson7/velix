@@ -12,7 +12,7 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/container.dart';
 import '../widget_builder.dart';
 
-
+/// An edit builder responsible for [ContainerWidgetData]
 @Injectable()
 class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   final TypeRegistry typeRegistry;
@@ -94,6 +94,7 @@ class ContainerEditWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   }
 }
 
+/// A runtime builder responsible for [ContainerWidgetData]
 @Injectable()
 class ContainerWidgetBuilder extends WidgetBuilder<ContainerWidgetData> {
   final TypeRegistry typeRegistry;

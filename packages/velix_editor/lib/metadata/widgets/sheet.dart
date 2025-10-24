@@ -4,7 +4,7 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
-
+/// data class for the main sheet as the root of everything
 @Dataclass()
 @DeclareWidget(name: "sheet", group: "container", icon: "widget_column")
 @JsonSerializable(discriminator: "sheet", includeNull: false)

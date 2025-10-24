@@ -25,6 +25,7 @@ enum Direction {
   down,
 }
 
+/// Base class for widget data
 @Dataclass()
 @JsonSerializable(discriminatorField: "type", includeNull: false)
 /*abstract*/ class WidgetData {
@@ -70,7 +71,6 @@ enum Direction {
   void update() {
     widget?.setState((){});
   }
-
 
   bool acceptsChild(WidgetData widget) {
     return !isParentOf(widget, this);

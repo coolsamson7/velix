@@ -8,6 +8,7 @@ import '../actions/eval.dart';
 import '../metadata/properties/properties.dart';
 import '../widget_container.dart';
 
+/// abstract base class for widget states that display [WidgetData]
 abstract class AbstractEditorWidgetState<T extends StatefulWidget> extends AbstractWidgetState<T> {
   // protected
 

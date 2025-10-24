@@ -30,6 +30,7 @@ class GridItem {
   });
 }
 
+/// data class for grid like structures
 @Dataclass()
 @DeclareWidget(name: "grid", group: "container", icon: "widget_gridview")
 @JsonSerializable(discriminator: "grid", includeNull: false)

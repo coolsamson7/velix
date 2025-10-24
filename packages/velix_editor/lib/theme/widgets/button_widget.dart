@@ -7,6 +7,7 @@ import '../../widget_container.dart';
 import '../abstract_widget.dart' show AbstractEditorWidgetState;
 import '../widget_builder.dart';
 
+/// A runtime builder responsible for [ButtonWidgetData]
 @Injectable()
 class ButtonWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   // constructor
@@ -77,6 +78,7 @@ class _ButtonWidgetState extends AbstractEditorWidgetState<ButtonWidget> {
   }
 }
 
+/// An edit builder responsible for [ButtonWidgetData]
 @Injectable()
 class ButtonEditWidgetBuilder extends WidgetBuilder<ButtonWidgetData> {
   // constructor

@@ -5,7 +5,7 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
-
+/// data class for a column
 @Dataclass()
 @DeclareWidget(name: "column", group: "container", icon: "widget_column")
 @JsonSerializable(discriminator: "column", includeNull: false)

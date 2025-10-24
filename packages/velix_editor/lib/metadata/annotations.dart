@@ -5,6 +5,7 @@ import 'package:velix/reflectable/reflectable.dart';
 
 import 'type_registry.dart';
 
+/// Annotation used to annotate [WidgetData] classes.
 class DeclareWidget extends ClassAnnotation {
   // instance data
 
@@ -14,6 +15,10 @@ class DeclareWidget extends ClassAnnotation {
 
   // constructor
 
+  /// Create a new [DeclareWidget]
+  /// [name] name of the widget
+  /// [group] group name of the widget
+  /// [icon] icon name of the widget
   const DeclareWidget({required this.name, required this.group, required this.icon});
 
   // override
@@ -24,6 +29,7 @@ class DeclareWidget extends ClassAnnotation {
   }
 }
 
+/// Annotation used to annotate [WidgetData] properties
 class DeclareProperty extends FieldAnnotation {
   // instance data
 
@@ -35,6 +41,12 @@ class DeclareProperty extends FieldAnnotation {
 
   // constructor
 
+  /// Create a new [DeclareProperty]
+  /// [group] the group name of the property which will be used by the property panel
+  /// [hide] if [true] the property is not displayed in the property panel
+  /// [editor] optional [PropertyEditorBuilder] type that will be used to create the editor
+  /// [label] the label of the property. This is actually a i18n key
+  /// [validator] optional [PropertyValidator] class used to validate the property.
   const DeclareProperty({this.group = "", this.hide = false, this.editor, this.label, this.validator});
 
   // override

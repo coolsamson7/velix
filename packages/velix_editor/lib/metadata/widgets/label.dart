@@ -7,6 +7,7 @@ import '../annotations.dart';
 import '../properties/properties.dart';
 import '../widget_data.dart';
 
+/// data class for a label
 @Dataclass()
 @DeclareWidget(name: "label", group: "widgets", icon: "widget_label")
 @JsonSerializable(discriminator: "label", includeNull: false)

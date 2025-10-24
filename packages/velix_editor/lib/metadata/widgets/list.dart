@@ -5,6 +5,7 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
+/// data class for list like structures
 @Dataclass()
 @DeclareWidget(name: "list", group: "widgets", icon: "widget_listview")
 @JsonSerializable(discriminator: "list", includeNull: false)

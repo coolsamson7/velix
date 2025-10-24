@@ -46,6 +46,7 @@ extension ForWidgetDataExtensions on ForWidgetData {
   }
 }
 
+/// An edit builder responsible for [ForWidgetData]
 @Injectable()
 class ForEditWidgetBuilder extends WidgetBuilder<ForWidgetData> {
   final TypeRegistry typeRegistry;
@@ -163,9 +164,9 @@ class _ForEditWidgetState extends State<ForEditWidget> {
       },
     );
   }
-
 }
 
+/// A runtime builder responsible for [ForWidgetData]
 @Injectable()
 class ForWidgetBuilder extends  WidgetBuilder<ForWidgetData> {
   final TypeRegistry typeRegistry;

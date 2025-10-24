@@ -10,6 +10,7 @@ import './metadata/type_registry.dart';
 import './metadata/widget_data.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
+/// A [WidgetContext] contains the information that a subtree of widgets needs to be displayed
 class WidgetContext {
   // instance data
 
@@ -37,6 +38,7 @@ class WidgetContext {
    }
 }
 
+/// a widget whose only purpose is to establish a [WidgetContext] for its children
 class WidgetContextScope extends InheritedWidget {
   final WidgetContext contextValue;
 

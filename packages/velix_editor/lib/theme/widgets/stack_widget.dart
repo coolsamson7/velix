@@ -12,6 +12,7 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/stack.dart';
 import '../widget_builder.dart';
 
+/// An edit builder responsible for [StackWidgetData]
 @Injectable()
 class StackEditWidgetBuilder extends WidgetBuilder<StackWidgetData> {
   final TypeRegistry typeRegistry;
@@ -88,6 +89,7 @@ class StackEditWidgetBuilder extends WidgetBuilder<StackWidgetData> {
   }
 }
 
+/// A runtime builder responsible for [StackWidgetData]
 @Injectable()
 class StackWidgetBuilder extends WidgetBuilder<StackWidgetData> {
   final TypeRegistry typeRegistry;

@@ -3,13 +3,14 @@ import 'package:velix_di/di/di.dart';
 import 'package:velix_editor/commands/command_stack.dart';
 import 'package:velix_editor/event/events.dart';
 import 'package:velix_editor/theme/abstract_widget.dart';
-import 'package:velix_editor/theme/theme.dart';
+import 'package:velix_editor/theme/widget_factory.dart';
 import 'package:velix_editor/util/message_bus.dart';
 import 'package:velix_ui/provider/environment_provider.dart';
 
 import '../../metadata/widget_data.dart';
 import 'commands/reparent_command.dart';
 
+/// An [EditWidget] displays a [WidgetData] in edit mode.
 class EditWidget extends StatefulWidget {
   final WidgetData model;
 
@@ -20,6 +21,8 @@ class EditWidget extends StatefulWidget {
   State<EditWidget> createState() => EditWidgetState();
 }
 
+
+/// the state of a [EditWidget]
 class EditWidgetState extends AbstractEditorWidgetState<EditWidget> {
   late final Environment environment;
   late final WidgetFactory theme;

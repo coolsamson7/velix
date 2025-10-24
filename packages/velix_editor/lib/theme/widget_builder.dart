@@ -9,7 +9,7 @@ import 'package:velix_di/di/di.dart';
 import '../metadata/properties/properties.dart' hide Border;
 import '../metadata/widget_data.dart';
 import '../widget_container.dart';
-import 'theme.dart';
+import 'widget_factory.dart';
 
 extension InsetsHelper on Props.Insets {
   EdgeInsets edgeInsets() {
@@ -40,6 +40,7 @@ extension BorderHelper on Props.Border {
   }
 }
 
+/// A [WidgetBuilder] is a factory that creates a specific widget responsible to display a [WidgetData]
 @Injectable(factory: false, eager: false)
 abstract class WidgetBuilder<T extends WidgetData> {
   // instance data
@@ -49,6 +50,9 @@ abstract class WidgetBuilder<T extends WidgetData> {
 
   // constructor
 
+  /// create a new [WidgetBuilder]
+  /// [name] the name of the widget
+  /// [edit] if [true], the widget will be in edit mode
   WidgetBuilder({required this.name, this.edit = false});
 
   // lifecycle
@@ -57,8 +61,6 @@ abstract class WidgetBuilder<T extends WidgetData> {
   void setThema(WidgetFactory theme) {
     theme.register(this, name, edit);
   }
-
-  // protected
 
   // internal
 
@@ -82,6 +84,10 @@ abstract class WidgetBuilder<T extends WidgetData> {
 
   // abstract
 
+  /// create the widget given a [WidgetData] type
+  /// [data] the widget data
+  /// [environment] the current [Environment]
+  /// [context] the [BuildContext]
   Widget create(T data, Environment environment, BuildContext context);
 }
 

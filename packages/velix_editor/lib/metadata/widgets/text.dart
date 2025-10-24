@@ -7,6 +7,7 @@ import '../annotations.dart';
 import '../properties/properties.dart';
 import '../widget_data.dart';
 
+/// data class for a text widget that can be bound to a value
 @Dataclass()
 @DeclareWidget(name: "text", group: "widgets", icon: "widget_text")
 @JsonSerializable(discriminator: "text", includeNull: false)

@@ -12,6 +12,7 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/sheet.dart';
 import '../widget_builder.dart';
 
+/// An edit builder responsible for [SheetWidgetData]
 @Injectable()
 class SheetEditWidgetBuilder extends WidgetBuilder<SheetWidgetData> {
   final TypeRegistry typeRegistry;
@@ -86,6 +87,7 @@ class SheetEditWidgetBuilder extends WidgetBuilder<SheetWidgetData> {
   }
 }
 
+/// A runtime builder responsible for [SheetWidgetData]
 @Injectable()
 class SheetWidgetBuilder extends WidgetBuilder<SheetWidgetData> {
   final TypeRegistry typeRegistry;

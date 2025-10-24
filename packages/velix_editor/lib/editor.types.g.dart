@@ -53,7 +53,7 @@ import 'package:velix_editor/property_panel/editor_builder.dart' show PropertyEd
 import 'package:velix_editor/property_panel/editor_registry.dart' show PropertyEditorBuilderFactory;
 import 'package:velix_editor/property_panel/enum_editor.dart' show AbstractEnumBuilder;
 import 'package:velix_editor/property_panel/list_property_editor.dart' show ListPropertyEditor;
-import 'package:velix_editor/theme/theme.dart' show WidgetFactory;
+import 'package:velix_editor/theme/widget_factory.dart' show WidgetFactory;
 import 'package:velix_editor/theme/widget_builder.dart' show WidgetBuilder;
 import 'package:velix_editor/theme/widgets/button_widget.dart' show ButtonWidgetBuilder, ButtonEditWidgetBuilder;
 import 'package:velix_editor/theme/widgets/column_widget.dart' show ColumnEditWidgetBuilder, ColumnWidgetBuilder;

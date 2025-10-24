@@ -9,6 +9,7 @@ import '../../metadata/widgets/list.dart';
 import '../widget_builder.dart';
 import 'for_widget.dart';
 
+/// A runtime builder responsible for [ListWidgetData]
 @Injectable()
 class ListWidgetBuilder extends WidgetBuilder<ListWidgetData> {
   final TypeRegistry typeRegistry;
@@ -72,6 +73,7 @@ class _ListWidgetState extends State<_ListWidget> {
   }
 }
 
+/// An edit builder responsible for [ListWidgetData]
 @Injectable()
 class EditListWidgetBuilder extends WidgetBuilder<ListWidgetData> {
   TypeRegistry typeRegistry;

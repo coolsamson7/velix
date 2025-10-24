@@ -12,6 +12,7 @@ import '../../metadata/widget_data.dart';
 import '../../metadata/widgets/column.dart';
 import '../widget_builder.dart';
 
+/// An edit builder responsible for [ColumnWidgetData]
 @Injectable()
 class ColumnEditWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   final TypeRegistry typeRegistry;
@@ -89,6 +90,7 @@ class ColumnEditWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   }
 }
 
+/// A runtime builder responsible for [ColumnWidgetData]
 @Injectable()
 class ColumnWidgetBuilder extends WidgetBuilder<ColumnWidgetData> {
   final TypeRegistry typeRegistry;

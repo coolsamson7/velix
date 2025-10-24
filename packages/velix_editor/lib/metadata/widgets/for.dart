@@ -7,6 +7,7 @@ import '../annotations.dart';
 import '../widget_data.dart';
 
 
+/// data class for for a widget that binds to list and replicates its children by binding them to each element in the list
 @Dataclass()
 @DeclareWidget(name: "for", group: "logic", icon: "widget_for")
 @JsonSerializable(discriminator: "for", includeNull: false)

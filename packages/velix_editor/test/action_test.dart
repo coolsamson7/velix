@@ -106,10 +106,8 @@ void main() {
 
   // register types
 
-  Velix.bootstrap;
+  EditorModule.boot;
 
-  registerEditorTypes();
-  registerUITypes();
   registerTypes();
 
   // boot environment

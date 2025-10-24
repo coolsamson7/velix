@@ -11,6 +11,7 @@ import '../../metadata/widgets/text.dart';
 import '../../widget_container.dart';
 import '../widget_builder.dart';
 
+/// A runtime builder responsible for [TextWidgetData]
 @Injectable()
 class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   // constructor
@@ -120,6 +121,7 @@ class TextWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   }
 }
 
+/// An edit builder responsible for [TextWidgetData]
 @Injectable()
 class TextEditWidgetBuilder extends WidgetBuilder<TextWidgetData> {
   // constructor

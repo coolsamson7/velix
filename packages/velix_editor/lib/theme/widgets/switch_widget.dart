@@ -6,6 +6,7 @@ import '../../metadata/widgets/switch.dart';
 import '../../widget_container.dart';
 import '../widget_builder.dart';
 
+/// A runtime builder responsible for [SwitchWidgetData]
 @Injectable()
 class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
   // constructor
@@ -41,7 +42,7 @@ class SwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
   }
 }
 
-
+/// An edit builder responsible for [SwitchWidgetData]
 @Injectable()
 class EditSwitchWidgetBuilder extends WidgetBuilder<SwitchWidgetData> {
   // constructor

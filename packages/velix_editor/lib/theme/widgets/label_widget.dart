@@ -7,9 +7,9 @@ import '../../metadata/widgets/label.dart';
 import '../../widget_container.dart';
 import '../widget_builder.dart';
 
+/// A runtime builder responsible for [LabelWidgetData]
 @Injectable()
-class
-LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
+class LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   // constructor
 
   LabelWidgetBuilder() : super(name: "label");
@@ -35,6 +35,7 @@ LabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   }
 }
 
+/// An edit builder responsible for [LabelWidgetData]
 @Injectable()
 class EditLabelWidgetBuilder extends WidgetBuilder<LabelWidgetData> {
   // constructor

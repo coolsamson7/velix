@@ -23,6 +23,7 @@ import '../abstract_widget.dart';
 import '../widget_builder.dart';
 import 'for_widget.dart';
 
+/// A runtime builder responsible for [DropDownWidgetData]
 @Injectable()
 class DropDownWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
   final TypeRegistry typeRegistry;
@@ -82,7 +83,6 @@ class DropDownStateAdapter extends AbstractValuedWidgetAdapter<_DropDownWidgetSt
     // noop
   }
 }
-//
 
 class _DropDownWidgetState extends AbstractEditorWidgetState<_DropDownWidget> {
   dynamic _selectedValue;
@@ -208,6 +208,7 @@ class _DropDownWidgetState extends AbstractEditorWidgetState<_DropDownWidget> {
   }
 }
 
+/// An edit builder responsible for [DropDownWidgetData]
 @Injectable()
 class DropDownEditWidgetBuilder extends WidgetBuilder<DropDownWidgetData> {
   final TypeRegistry typeRegistry;

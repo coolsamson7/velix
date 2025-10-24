@@ -4,7 +4,7 @@ import 'package:velix_mapper/mapper/json.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
-
+/// data class for a stack
 @Dataclass()
 @DeclareWidget(name: "stack", group: "container", icon: "widget_stack")
 @JsonSerializable(discriminator: "stack", includeNull: false)

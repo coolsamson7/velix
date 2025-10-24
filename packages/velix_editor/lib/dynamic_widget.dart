@@ -5,9 +5,9 @@ import 'package:velix_ui/provider/environment_provider.dart';
 import 'metadata/metadata.dart';
 import 'metadata/widget_data.dart';
 
-import 'theme/theme.dart';
+import 'theme/widget_factory.dart';
 
-
+/// An [DynamicWidget] displays a [WidgetData] in runtime mode.
 class DynamicWidget extends StatefulWidget {
   // instance data
 

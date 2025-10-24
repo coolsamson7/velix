@@ -8,6 +8,7 @@ import '../properties/properties.dart';
 import '../widget_data.dart';
 
 
+/// data class for containers
 @Dataclass()
 @DeclareWidget(name: "container", group: "container", icon: "widget_container")
 @JsonSerializable(discriminator: "container", includeNull: false)

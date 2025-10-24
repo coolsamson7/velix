@@ -7,6 +7,7 @@ import '../../validate/validate.dart';
 import '../annotations.dart';
 import '../widget_data.dart';
 
+/// data class for a dropdown
 @Dataclass()
 @DeclareWidget(name: "dropdown", group: "widgets", icon: "widget_dropdown")
 @JsonSerializable(discriminator: "dropdown", includeNull: false)

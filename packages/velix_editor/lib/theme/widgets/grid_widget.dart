@@ -45,7 +45,7 @@ TableCellVerticalAlignment _mapGridAlignmentToVertical(GridAlignment alignment) 
   };
 }
 
-
+/// An edit builder responsible for [GridWidgetData]
 @Injectable()
 class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   final TypeRegistry typeRegistry;
@@ -166,6 +166,7 @@ class GridEditWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   }
 }
 
+/// A runtime builder responsible for [GridWidgetData]
 @Injectable()
 class GridWidgetBuilder extends WidgetBuilder<GridWidgetData> {
   final TypeRegistry typeRegistry;

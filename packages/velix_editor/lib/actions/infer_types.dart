@@ -126,14 +126,9 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
 
   @override
   bool isAssignableFrom(dynamic a, dynamic b) {
-    if (b == dynamic)
-      return true; // TODO ugly fuckin hack
-
     return a == b;
   }
 }
-
-// TODO
 
 class ClassDescTypeInfo extends TypeInfo<Desc,Desc> {
   // constructor
@@ -298,8 +293,6 @@ class ClassTypeCheckerContext extends TypeCheckerContext<ClassDescTypeInfo> {
 
   @override
   ClassDescTypeInfo resolved(ClassDescTypeInfo type) {
-
-
     if ( type.type is UnknownPropertyDesc)
       unknown.add(type.type as UnknownPropertyDesc);
 

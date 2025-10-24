@@ -20,7 +20,7 @@ class PropertyDescriptor {
   String label = "";
   final FieldDescriptor field;
   String group = "";
-  final Type? editor; // TODO
+  final Type? editor;
   final bool hide;
 
   dynamic defaultValue;

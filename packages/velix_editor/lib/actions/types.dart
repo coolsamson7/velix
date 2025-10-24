@@ -37,8 +37,7 @@ class ClassRegistry {
       else {
         result = Desc(name);
         types[name] = result;
-        //throw Exception("unknown type $name");
-      }// TODO List<...> ????
+      }
     }
 
     return result;
@@ -56,7 +55,7 @@ class ClassRegistry {
 
       var desc = ClassDesc(name);
 
-      desc.registry = this; // TODO
+      desc.registry = this;
 
       classes[name] = desc;
       types[name] = desc;
@@ -111,11 +110,12 @@ class Desc {
     "int": int_type,
     "double": double_type,
     "bool": bool_type,
+    "dynamic": dynamic_type,
   };
 
   // static
 
-  static Desc getType(String name) { // TODO sender?????
+  static Desc getType(String name) {
     var result = types[name];
     if ( result == null) {
       result = Desc(name);

@@ -39,8 +39,10 @@ class EditorCanvas extends StatefulWidget {
   // constructor
 
   EditorCanvas({super.key, required this.models, required this.typeRegistry, required this.messageBus, required this.isActive}) {
+    // link parents
+
     for ( var model in models)
-      linkParents(model); // TODO doppelt?
+      linkParents(model);
   }
 
   // override
@@ -186,7 +188,7 @@ class _EditorCanvasState extends State<EditorCanvas> {
               color: Colors.grey.shade200,
               child: ListView(
               children: widget.models.map((m) => Padding(
-                      padding: const EdgeInsets.all(8.0), // TODO?
+                      padding: const EdgeInsets.all(8.0),
                       child: EditWidget(model: m),
                     ),
               ).toList(),

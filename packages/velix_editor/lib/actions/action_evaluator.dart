@@ -4,7 +4,7 @@ import 'package:velix_editor/actions/infer_types.dart';
 import 'action_parser.dart';
 import 'eval.dart';
 
-class ActionCompiler { // TODO: sender???
+class ActionCompiler {
   ActionCompiler._internal();
 
   // static singleton instance (initialized on first call)

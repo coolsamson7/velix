@@ -288,7 +288,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     return result ?? false;
   }
 
-  void test() async { // TODO TEST CODE
+  void test() async {
     await loadRegistry("assets:main.types.g.json");
 
     selectClass(registry.getClass("TestPage"));
@@ -512,13 +512,9 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //loadSettings();
 
-      //TODO fuck zu oft!
-
       environment.get<MessageBus>().publish("load", LoadEvent(widget: models.first, source: this));
 
-      setState(() {
-
-      });
+      setState(() {});
     });
   }
 
@@ -699,7 +695,7 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
                                 ) :
 
                                 WidgetContainer(
-                                  instance:  environment.get<TestPage>(), // TODO
+                                  instance:  environment.get<TestPage>(), // TODO test code
                                   widget: models[0]
                                 ),
                               )

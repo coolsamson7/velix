@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/editor.types.g.dart';
 import 'package:velix_editor/metadata/properties/properties.dart';
 import 'package:velix_editor/metadata/widgets/button.dart';
@@ -97,10 +98,10 @@ void main() {
       var json = JSON.serialize(input);
       var result = JSON.deserialize<ButtonWidgetData>(json);
 
-      print(result);
+      result.id = input.id;
 
-      //final isEqual = TypeDescriptor.deepEquals(input, result);
-      //TODO -> uuid expect(isEqual, isTrue);
+      final isEqual = TypeDescriptor.deepEquals(input, result);
+      expect(isEqual, isTrue);
     });
   });
 }

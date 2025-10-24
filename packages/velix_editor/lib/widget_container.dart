@@ -25,16 +25,6 @@ class WidgetContext {
     //formMapper.addListener((event) => onEvent, emitOnChange: true);
   }
 
-  //( callback
-
-  void onEvent(FormEvent event) {
-    var widgets = bindings[event.path]; // TODO FOO
-    if (widgets != null) {
-      for ( var widget in widgets)
-        widget.update();
-    }
-  }
-
   // public
 
    void addBinding(TypeProperty binding, WidgetData widget) {
@@ -117,9 +107,7 @@ class _WidgetContainerState extends State<WidgetContainer> {
         }, emitOnChange: true);
     });
 
-    //return Provider<WidgetContext>.value(
     return WidgetContextScope(contextValue: widget.context,
-        //value: widget.context,
         child: Container(
           color: Colors.grey.shade200,
           child: ListView(

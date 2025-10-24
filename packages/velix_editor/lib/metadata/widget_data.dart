@@ -40,7 +40,7 @@ enum Direction {
   Cell? cell;
 
   @Json(ignore: true)
-  final id = Uuid().v4();
+  String id = Uuid().v4();
   @Json(ignore: true)
   AbstractEditorWidgetState? widget;
 

@@ -144,16 +144,7 @@ class EvalVisitor extends ExpressionVisitor<Eval,CallVisitorContext> {
 
   @override
   Eval visitLiteral(Literal expr, CallVisitorContext context) {
-    if (expr.value is int)
-      return EvalValue(value: expr.value);
-
-    if (expr.value is String)
-      return EvalValue(value: expr.value);
-
-    if (expr.value is bool)
-      return EvalValue(value: expr.value);
-
-    return EvalValue(value: null); // TODO?
+    return EvalValue(value: expr.value);
   }
 
   @override

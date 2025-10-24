@@ -477,12 +477,10 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
     classContext = findContext();
 
-    // TODO:just a test
+    // TODO: think of a better solution, thus sucks of course
 
     var property = widget.property;
     if ( property.name == "onSelect") {
-      //variables["\$value"] = ClassDesc("kkk");
-
       var dropDown = widget.object as DropDownWidgetData;
 
       if (dropDown.children.isNotEmpty && dropDown.children[0].type == "for") {

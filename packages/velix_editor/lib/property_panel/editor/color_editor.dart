@@ -24,7 +24,7 @@ class ColorEditorBuilder extends PropertyEditorBuilder<Color> {
     required ValueChanged<dynamic> onChanged,
   }) {
     return _ColorEditor(
-      value: value ?? Colors.white, // TODO
+      value: value ?? Colors.white,
       onChanged: onChanged,
     );
   }

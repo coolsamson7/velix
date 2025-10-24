@@ -20,9 +20,9 @@ class WidgetLoader {
 
   void _prepare(WidgetData data) {
     void traverse(WidgetData data, WidgetData? parent) {
-      data.parent = parent;
+      // link
 
-      // anything to check? TODO
+      data.parent = parent;
 
       // recursion
 

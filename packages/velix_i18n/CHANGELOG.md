@@ -1,3 +1,10 @@
+## 1.2.0
+
+ - **FIX**: deep merge.
+ - **FIX**: tests run.
+ - **FIX**: i18n merge was crap.
+ - **FEAT**: added static tr.
+
 ## 1.1.0
 
  - **FIX**: i18n must be listener.

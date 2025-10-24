@@ -1,3 +1,9 @@
+## 1.1.1
+
+ - **REFACTOR**: adapted to new syntax.
+ - **REFACTOR**: adapted to new syntax.
+ - **FIX**: build.yaml.
+
 ## 1.1.0
 
  - **FIX**: all type registries are updated.

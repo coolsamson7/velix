@@ -3,6 +3,90 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-10-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`velix` - `v0.91.3`](#velix---v0913)
+ - [`velix_di` - `v1.1.1`](#velix_di---v111)
+ - [`velix_editor` - `v0.1.3`](#velix_editor---v013)
+ - [`velix_editor_sample` - `v0.1.3`](#velix_editor_sample---v013)
+ - [`velix_i18n` - `v1.2.0`](#velix_i18n---v120)
+ - [`velix_mapper` - `v1.2.1`](#velix_mapper---v121)
+ - [`velix_ui` - `v1.3.0`](#velix_ui---v130)
+
+---
+
+#### `velix` - `v0.91.3`
+
+ - **FIX**: ClassType vs ObjectType is correct.
+ - **FIX**: annotation and parameter constant imports.
+ - **FIX**: import annotations.
+ - **FIX**: all imports with show.
+ - **FIX**: dart:ui was skipped.
+ - **FIX**: ? constructor arg.
+ - **FIX**: annotation parameters and field/method return types considered.
+ - **FIX**: missing ,.
+ - **FEAT**: narrow T.
+ - **FEAT**: hasTest.
+ - **FEAT**: added clone.
+ - **FEAT**: get returns T?
+ - **FEAT**: type generator collects superclass methods.
+ - **FEAT**: json generator for type information.
+ - **FEAT**: harmonized methods and fields.
+
+#### `velix_di` - `v1.1.1`
+
+ - **REFACTOR**: adapted to new syntax.
+ - **REFACTOR**: adapted to new syntax.
+ - **FIX**: build.yaml.
+
+#### `velix_editor` - `v0.1.3`
+
+ - **FIX**: context should only consider parents.
+ - **FIX**: test.
+ - **FEAT**: method arguments.
+
+#### `velix_editor_sample` - `v0.1.3`
+
+ - **FIX**: all type registries are updated.
+ - **FIX**: locale switch.
+ - **FIX**: load initial i18n.
+ - **FEAT**: added dependencies for code editor.
+ - **FEAT**: svg icons.
+
+#### `velix_i18n` - `v1.2.0`
+
+ - **FIX**: deep merge.
+ - **FIX**: tests run.
+ - **FIX**: i18n merge was crap.
+ - **FEAT**: added static tr.
+
+#### `velix_mapper` - `v1.2.1`
+
+ - **FIX**: list creation with correct type.
+ - **FIX**: nullable fix.
+
+#### `velix_ui` - `v1.3.0`
+
+ - **FIX**: cupertino vs material.
+ - **FIX**: multiple bindings work.
+ - **FEAT**: fluent dialogs.
+ - **FEAT**: added dropdown.
+ - **FEAT**: will bootstrap velix automatically.
+ - **FEAT**: added i18n update.
+ - **FEAT**: added label.
+ - **FEAT**: generate @Method.
+
+
 ## 2025-09-24
 
 ### Changes

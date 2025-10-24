@@ -1,3 +1,14 @@
+## 1.3.0
+
+ - **FIX**: cupertino vs material.
+ - **FIX**: multiple bindings work.
+ - **FEAT**: fluent dialogs.
+ - **FEAT**: added dropdown.
+ - **FEAT**: will bootstrap velix automatically.
+ - **FEAT**: added i18n update.
+ - **FEAT**: added label.
+ - **FEAT**: generate @Method.
+
 ## 1.2.0
 
  - **FIX**: all type registries are updated.

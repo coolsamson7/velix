@@ -1,3 +1,21 @@
+## 0.91.3
+
+ - **FIX**: ClassType vs ObjectType is correct.
+ - **FIX**: annotation and parameter constant imports.
+ - **FIX**: import annotations.
+ - **FIX**: all imports with show.
+ - **FIX**: dart:ui was skipped.
+ - **FIX**: ? constructor arg.
+ - **FIX**: annotation parameters and field/method return types considered.
+ - **FIX**: missing ,.
+ - **FEAT**: narrow T.
+ - **FEAT**: hasTest.
+ - **FEAT**: added clone.
+ - **FEAT**: get returns T?
+ - **FEAT**: type generator collects superclass methods.
+ - **FEAT**: json generator for type information.
+ - **FEAT**: harmonized methods and fields.
+
 ## 0.91.2
 
  - **FIX**: all type registries are updated.

@@ -1,3 +1,8 @@
+## 1.2.1
+
+ - **FIX**: list creation with correct type.
+ - **FIX**: nullable fix.
+
 ## 1.2.0
 
  - **FIX**: all tests green.

@@ -17,6 +17,7 @@ class WidgetAdapter {
   const WidgetAdapter({required this.platforms});
 }
 
+/// base class for [States] that display [WidgetData]
 abstract class AbstractWidgetState<T extends StatefulWidget> extends State<T> {
    String extractId(Object widget) {
        return (this.widget.key as ValueKey<String>).value; // hmm....

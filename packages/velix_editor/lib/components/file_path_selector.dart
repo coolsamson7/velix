@@ -40,11 +40,6 @@ class _FilePathSelectorState extends State<FilePathSelector> {
           _recentFiles = _recentFiles.sublist(0, 5);
         }
       }
-
-      // Call onLoad after the widget is built
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onLoad(widget.initialFilePath!);
-      });
     }
   }
 

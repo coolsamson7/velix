@@ -47,6 +47,10 @@ abstract class TypeResolver<T extends TypeInfo<dynamic,dynamic>> {
 
   T rootType();
 
+  bool isList(T type);
+
+  T elementType(T type);
+
   bool isAssignableFrom(dynamic a, dynamic b);
 
   TypeCheckerContext makeContext();
@@ -66,6 +70,7 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
     int: IntType(),
     double: DoubleType(),
     bool: BoolType(),
+    dynamic: ClassType<dynamic>(),
   };
 
   static AbstractType getTypeFor(Type type) {
@@ -104,6 +109,18 @@ class RuntimeTypeTypeResolver extends TypeResolver<RuntimeTypeInfo> {
   @override
   RuntimeTypeInfo rootType() {
     return RuntimeTypeInfo(root.objectType, null);
+  }
+
+  @override
+  bool isList(RuntimeTypeInfo type) {
+    return type.type is ListType;
+  }
+
+  @override
+  RuntimeTypeInfo elementType(RuntimeTypeInfo type) {
+    var elementType = (type.type as ListType).elementType;
+
+    return RuntimeTypeInfo(elementType, null);
   }
 
   @override
@@ -269,6 +286,17 @@ class ClassDescTypeResolver extends TypeResolver<ClassDescTypeInfo> {
   }
 
   @override
+  bool isList(ClassDescTypeInfo type) {
+    return type.type is ListDesc;
+  }
+
+
+  @override
+  ClassDescTypeInfo elementType(ClassDescTypeInfo type) {
+    return ClassDescTypeInfo((type.type as ListDesc).elementType, (type.type as ListDesc).elementType);
+  }
+
+  @override
   bool isAssignableFrom(dynamic a, dynamic b) {
     if ( b is UnknownPropertyDesc)
       return true;
@@ -360,24 +388,84 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI, TypeChec
   TI visitUnary(UnaryExpression expr, TypeCheckerContext<TI> context) {
     expr.argument.accept(this, context);
 
-    return resolver.resolveType(int); // TODO
+    final argType = expr.argument.type!;
+    switch(expr.op) {
+      case '-':
+        if (argType.type.type == int || argType.type.type == double)
+          return expr.type = argType as TI;
+        break;
+      case '!':
+        if (argType.type.type == bool)
+          return expr.type = resolver.resolveType(bool);
+        break;
+      case '~':
+        if (argType.type.type == int)
+          return expr.type = resolver.resolveType(int);
+        break;
+    }
+
+    throw TypeException('Invalid operand type for ${expr.op}');
   }
+
+  // +, -, *, /, %
+  // &&
+  // <, <=, ==, >, >=
 
   @override
   TI visitBinary(BinaryExpression expr, TypeCheckerContext<TI> context) {
-    expr.left.accept(this, context);
-    expr.right.accept(this, context);
+    final left = expr.left.accept(this, context);
+    final right = expr.right.accept(this, context);
 
-    return resolver.resolveType(int); // TODO
+    switch(expr.op) {
+      // numeric
+
+      case '+':
+      case '-':
+      case '*':
+      case '/':
+      case '%':
+        if ((left.type.type == int || left.type.type == double) &&
+            (right.type.type == int || right.type.type == double)) {
+          return expr.type = left; // preserve numeric type
+        }
+        break;
+
+      // bool
+
+      case '&&':
+      case '||':
+        if (left.type.type == bool && right.type.type == bool)
+          return expr.type = left;
+        break;
+
+      case '==':
+      case '!=':
+      case '<':
+      case '<=':
+      case '>':
+      case '>=':
+        return expr.type = resolver.resolveType(bool);
+    }
+
+    throw TypeException('Invalid operand types for ${expr.op}');
   }
 
   @override
   TI visitConditional(ConditionalExpression expr, TypeCheckerContext<TI> context) {
-    expr.test.accept(this, context);
-    expr.consequent.accept(this, context);
-    expr.alternate.accept(this, context);
+    final testType = expr.test.accept(this, context);
+    if (testType.type.type != bool)
+      throw TypeException('Condition must be bool');
 
-    return resolver.resolveType(bool); // TODO
+    final consType = expr.consequent.accept(this, context);
+    final altType = expr.alternate.accept(this, context);
+
+    // Simple approach: if types match, return that
+    if (consType.type == altType.type)
+      return expr.type = consType;
+
+    // Otherwise, use dynamic (or compute common supertype if available)
+
+    return expr.type = resolver.resolveType(dynamic);
   }
 
   @override
@@ -389,10 +477,27 @@ class TypeChecker<TI extends TypeInfo> implements ExpressionVisitor<TI, TypeChec
 
   @override
   TI visitIndex(IndexExpression expr, TypeCheckerContext<TI> context) {
-    expr.object.accept(this, context);
-    expr.index.accept(this, context);
+    // First, infer the type of the object being indexed
+    final objType = expr.object.accept(this, context);
 
-    return resolver.resolveType(int); // TODO
+    // Infer the type of the index itself
+    final indexType = expr.index.accept(this, context);
+
+    // Index should be int
+    if (indexType.type.type != int) {
+      throw TypeException('Index must be of type int, got ${indexType.type}');
+    }
+
+    // Determine element type if the object is a list
+
+    if (resolver.isList(objType)) {
+      final elementType = resolver.elementType(objType);
+
+      return expr.type = elementType;//resolver.resolve(elementDesc.name, forExpression: expr);
+    }
+
+    // Fallback for dynamic/unknown types
+    return expr.type = resolver.resolveType(dynamic);
   }
 
   @override

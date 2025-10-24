@@ -1,5 +1,5 @@
 name: velix_editor
-description: "Velix Wysiwyg UI editor and runtime engine."
+description: "Velix Wysiwyg UI editor and runtime engine based on a JSON persistence format including reflection based evaluation of dart expressions."
 
 homepage: https://github.com/coolsamson7/velix
 repository: https://github.com/coolsamson7/velix

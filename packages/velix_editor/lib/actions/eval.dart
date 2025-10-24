@@ -75,6 +75,84 @@ class EvalContextVar extends Eval {
   }
 }
 
+class EvalUnary extends Eval {
+  final String op;
+  final Eval argument;
+
+  EvalUnary({required this.op, required this.argument});
+
+  @override
+  dynamic eval(dynamic value, EvalContext context) {
+    final arg = argument.eval(value, context);
+    switch (op) {
+      case '-': return -arg;
+      case '!': return !arg;
+      case '~': return ~arg;
+      default: return arg;
+    }
+  }
+}
+
+class EvalBinary extends Eval {
+  final String op;
+  final Eval left;
+  final Eval right;
+
+  EvalBinary({required this.op, required this.left, required this.right});
+
+  @override
+  dynamic eval(dynamic value, EvalContext context) {
+    final l = left.eval(value, context);
+    final r = right.eval(value, context);
+
+    switch (op) {
+      case '+':  return l + r;
+      case '-':  return l - r;
+      case '*':  return l * r;
+      case '/':  return l / r;
+      case '%':  return l % r;
+      case '&&': return l && r;
+      case '||': return l || r;
+      case '==': return l == r;
+      case '!=': return l != r;
+      case '<':  return l < r;
+      case '<=': return l <= r;
+      case '>':  return l > r;
+      case '>=': return l >= r;
+      default: return l;
+    }
+  }
+}
+
+class EvalConditional extends Eval {
+  final Eval test;
+  final Eval consequent;
+  final Eval alternate;
+
+  EvalConditional({required this.test, required this.consequent, required this.alternate});
+
+  @override
+  dynamic eval(dynamic value, EvalContext context) {
+    return test.eval(value, context)
+        ? consequent.eval(value, context)
+        : alternate.eval(value, context);
+  }
+}
+
+class EvalIndex extends Eval {
+  final Eval object;
+  final Eval index;
+
+  EvalIndex({required this.object, required this.index});
+
+  @override
+  dynamic eval(dynamic value, EvalContext context) {
+    final obj = object.eval(value, context);
+    final idx = index.eval(value, context);
+    return obj[idx];
+  }
+}
+
 class EvalField extends Eval {
   // instance data
 
@@ -161,7 +239,34 @@ class EvalVisitor extends ExpressionVisitor<Eval,CallVisitorContext> {
 
   @override
   Eval visitUnary(UnaryExpression expr, CallVisitorContext context) {
-    return expr.argument.accept(this, context);
+    return EvalUnary(op: expr.op, argument: expr.argument.accept(this, context));
+  }
+
+
+  @override
+  Eval visitBinary(BinaryExpression expr, CallVisitorContext context) {
+    return EvalBinary(
+      op: expr.op,
+      left: expr.left.accept(this, context),
+      right: expr.right.accept(this, context),
+    );
+  }
+
+  @override
+  Eval visitConditional(ConditionalExpression expr, CallVisitorContext context) {
+    return EvalConditional(
+      test: expr.test.accept(this, context),
+      consequent: expr.consequent.accept(this, context),
+      alternate: expr.alternate.accept(this, context),
+    );
+  }
+
+  @override
+  Eval visitIndex(IndexExpression expr, CallVisitorContext context) {
+    return EvalIndex(
+      object: expr.object.accept(this, context),
+      index: expr.index.accept(this, context),
+    );
   }
 
   @override

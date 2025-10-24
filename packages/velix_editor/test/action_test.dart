@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:velix/validation/validation.dart';
 
 import 'package:velix_di/velix_di.dart';
 import 'package:velix_editor/actions/action_parser.dart';
@@ -11,6 +12,7 @@ import 'package:velix_editor/actions/action_parser.dart';
 import 'package:velix/reflectable/reflectable.dart';
 import 'package:velix_editor/actions/autocomplete.dart';
 import 'package:velix_editor/actions/eval.dart';
+import 'package:velix_editor/actions/expressions.dart';
 import 'package:velix_editor/actions/infer_types.dart';
 import 'package:velix_editor/actions/types.dart';
 import 'package:velix_editor/editor.dart';
@@ -186,28 +188,101 @@ void main() {
     var parser = ActionParser.instance;
 
     final checker = TypeChecker(RuntimeTypeTypeResolver(root: TypeDescriptor.forType(Page)));
+    final context =  TypeCheckerContext<RuntimeTypeInfo>();
 
-    test('methods ', () {
-      var code = "getUsers()";
-
+    Expression parse(String code) {
       var expression = parser.parse(code);
 
-      expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
+      expression.accept(checker, context);
 
-      print(expression);
+      return expression;
+    }
 
-      //expect(() {
-      //  expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
-      //}, throwsA(isA<Exception>()));
+    test('literals ', () {
+      // int
+
+      var expression = parse("1");
+
+      expect(expression.getType<AbstractType>().type, equals(int));
+
+      // bool
+
+      expression = parse("true");
+
+      expect(expression.getType<AbstractType>().type, equals(bool));
+
+      // double
+
+      expression = parse("1.1");
+
+      expect(expression.getType<AbstractType>().type, equals(double));
+
+      // string
+
+      expression = parse("\"\"");
+
+      expect(expression.getType<AbstractType>().type, equals(String));
+    });
+
+    test('unary ', () {
+      // -
+      var expression = parse("-1");
+
+      expect(expression.getType<AbstractType>().type, equals(int));
+
+      // !
+      expression = parse("!true");
+
+      expect(expression.getType<AbstractType>().type, equals(bool));
+    });
+
+    test('binary ', () {
+      // +, -, *, /, %
+      // &&
+      // <, <=, ==, >, >=
+
+      // arithmetic
+
+      var expression = parse("1 + 2");
+
+      expect(expression.getType<AbstractType>().type, equals(int));
+
+      // logic
+
+      expression = parse("true && false");
+
+      expect(expression.getType<AbstractType>().type, equals(bool));
+
+      // comparison
+
+      expression = parse("1 < 2");
+
+      expect(expression.getType<AbstractType>().type, equals(bool));
+    });
+
+    test('index ', () {
+      var code = "users[0]";
+
+      var expression = parse(code);
+
+      expect(expression.getType<AbstractType>().type, equals(User));
+    });
+
+    /* TODO test('conditional ', () {
+      var expression = parse("1 > 0 ? true : false");
+
+      expect(expression.getType<AbstractType>().type, equals(bool));
+    })*/;
+
+    test('methods ', () {
+      var expression = parse("getUsers()");
+
+      expect(expression.getType<AbstractType>().type, equals(List<User>));
     });
 
     test('wrong parameter number ', () {
-      var code = "user.hello()";
-
-      var expression = parser.parse(code);
-
       expect(() {
-        expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
+        parse("user.hello()");
       }, throwsA(isA<Exception>()));
     });
 
@@ -216,7 +291,7 @@ void main() {
 
       var expression = parser.parse(code);
       expect(() {
-        expression.accept(checker, TypeCheckerContext<RuntimeTypeInfo>());
+        expression.accept(checker, context);
       }, throwsA(isA<Exception>()));
     });
   });
@@ -289,8 +364,88 @@ void main() {
 
     // register types
 
+    test('eval literal ', () {
+      // number
+
+      var value = eval("1", page);
+
+      expect(value, equals(1));
+
+      // bool
+
+      value = eval("true", page);
+
+      expect(value, equals(true));
+
+      // string
+
+      value = eval("\"true\"", page);
+
+      expect(value, equals("true"));
+    });
+
+    test('eval variable ', () {
+      // number
+
+      var value = eval("user", page);
+
+      expect(value, equals(page.user));
+    });
+
+    test('eval unary ', () {
+      // number
+
+      var value = eval("-1", page);
+
+      expect(value, equals(-1));
+
+      // bool
+
+      value = eval("!true", page);
+
+      expect(value, equals(false));
+    });
+
+    test('eval binary ', () {
+      // number
+
+      var value = eval("1 + 1", page);
+
+      expect(value, equals(2));
+
+      // bool
+
+      value = eval("true && false", page);
+
+      expect(value, equals(false));
+
+      // string
+
+      value = eval("1 < 2", page);
+
+      expect(value, equals(true));
+    });
+
+    test('eval condition ', () {
+      // number
+
+      //TODO var value = eval("2 > 1 ? true : false", page);
+
+      //expect(value, equals(true));
+    });
+
+    test('eval index ', () {
+      // number
+
+      var value = eval("users[0]", page);
+
+      expect(value is User, equals(true));
+    });
+
+    //
+
     test('eval member ', () {
-      var value = eval( "user.name", page);
+      var value = eval("user.name", page);
 
       expect(value, equals("andi"));
     });

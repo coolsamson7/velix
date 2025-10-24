@@ -65,8 +65,13 @@ class CodeEditor extends StatefulWidget {
 class CompletionItem {
   final String label;
   final IconData? icon;
+  final List<ParameterDesc>? parameters; // For method signatures
 
-  CompletionItem({required this.label, required this.icon});
+  CompletionItem({
+    required this.label,
+    required this.icon,
+    this.parameters,
+  });
 }
 
 /// Parsing state: invalid, prefix-only (in progress), or complete
@@ -114,18 +119,33 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
       return _parseState = lastResult.success ? ParseState.prefixOnly : ParseState.invalid;
     }
-
-
   }
 
   Iterable<CompletionItem> suggestions(String pattern, int offset) {
     try {
       return autocomplete
           .suggest(pattern, cursorOffset: offset)
-          .map((s) => CompletionItem(
-        label: s.suggestion,
-        icon: s.type == "field" ? Icons.data_object : Icons.functions,
-      ));
+          .map((s) {
+        // Check if this is a method and extract parameters
+        List<ParameterDesc>? params;
+        IconData icon = Icons.code;
+
+        if (s.type == "method") {
+          icon = Icons.functions;
+          // TODO  Try to get method descriptor to extract parameters
+          //if (s.descriptor != null && s.descriptor is MethodDesc) {
+          //  params = (s.descriptor as MethodDesc).parameters;
+          //}
+        } else if (s.type == "field") {
+          icon = Icons.data_object;
+        }
+
+        return CompletionItem(
+          label: s.suggestion,
+          icon: icon,
+          parameters: params,
+        );
+      });
     } catch (_) {
       return [];
     }
@@ -314,6 +334,16 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
                 itemBuilder: (context, index) {
                   final item = items[index];
                   final isSelected = index == _selectedIndex;
+
+                  // Build method signature if parameters exist
+                  String displayText = item.label;
+                  if (item.parameters != null && item.parameters!.isNotEmpty) {
+                    final params = item.parameters!
+                        .map((p) => '${p.type.name} ${p.name}')
+                        .join(', ');
+                    displayText = '${item.label}($params)';
+                  }
+
                   return InkWell(
                     onTap: () {
                       setState(() {
@@ -334,7 +364,7 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              item.label,
+                              displayText,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontFamily: 'monospace',
@@ -344,6 +374,8 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
                                     ? Colors.blue.shade800
                                     : Colors.black87,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (isSelected)
@@ -549,12 +581,20 @@ class _CodeEditorState extends State<CodeEditor> with SingleTickerProviderStateM
 
           switch (event.logicalKey) {
             case LogicalKeyboardKey.arrowDown:
-              _selectedIndex = (_selectedIndex + 1) % _matches.length;
+              setState(() {
+                _selectedIndex = (_selectedIndex + 1) % _matches.length;
+              });
               _updateInlineCompletionNormalized(_lastUserText, _lastUserCursorPos);
+              _removeOverlay();
+              _showOverlay(_matches);
               return KeyEventResult.handled;
             case LogicalKeyboardKey.arrowUp:
-              _selectedIndex = (_selectedIndex - 1 + _matches.length) % _matches.length;
+              setState(() {
+                _selectedIndex = (_selectedIndex - 1 + _matches.length) % _matches.length;
+              });
               _updateInlineCompletionNormalized(_lastUserText, _lastUserCursorPos);
+              _removeOverlay();
+              _showOverlay(_matches);
               return KeyEventResult.handled;
             case LogicalKeyboardKey.tab:
             case LogicalKeyboardKey.enter:

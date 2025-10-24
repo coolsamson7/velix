@@ -126,6 +126,8 @@ class EditorScreenState extends State<EditorScreen> with CommandController<Edito
     String file = data["file"] ?? "";
     if ( file.isNotEmpty)
       await loadFile(file);
+
+    setState(() {});
   }
 
   @override
